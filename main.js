@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { AnnDataSource, ObsSetsAnndataLoader } from '@vitessce/zarr';
 
 // data
-const uuids = ['ad693f99fb9006e68a53e97598da1509',
+var uuids = ['ad693f99fb9006e68a53e97598da1509',
 '173de2e80adf6a73ac8cff5ccce20dfc',
 'b95f34761c252ebbd1e482cd9afae73f',
 '5a5ca03fa623602d9a859224aa40ace4',
@@ -32,6 +32,9 @@ const uuids = ['ad693f99fb9006e68a53e97598da1509',
 '8d631eee88855ac59155edca2a3bc1ca',
 '1ea6c0ac5ba60fe35bf63af8699b6fbe']
 
+// for dev purposes
+uuids.splice(5)
+
 // get hubmap url to zarr
 function getURL(uuid) {
     return `https://assets.hubmapconsortium.org/${uuid}/hubmap_ui/anndata-zarr/secondary_analysis.zarr`;
@@ -40,7 +43,7 @@ const urls = uuids.map(getURL);
 
 // Get list of obssets
 const obsSetsList = [];
-for (let i = 0; i < 5; i++) { // 5 => urls.length
+for (let i = 0; i < urls.length; i++) { 
     const url = urls[i]
     const source = new AnnDataSource({ url });
     const config = {
@@ -69,6 +72,22 @@ function getCountsPerType(o) {
     return dict;
 }
 const obsSetsListChildrenCounts = obsSetsListChildren.map(getCountsPerType);
+console.log(obsSetsListChildrenCounts)
+
+// const listOfThings = []
+// for (let i = 0; i < urls.length; i++) {
+//     let uuid = uuids[i]
+//     for (const [key, value] of Object.entries(obsSetsListChildrenCounts[i])) {
+//         listOfThings.push([uuid, key, value])
+//     }
+// }
+// console.log(listOfThings)
+
+// const myNewThing = listOfThings.map(it => {
+//     return Object.values(it).toString()
+//   }).join('\n')
+
+// console.log(myNewThing)
 
 // get a list of all types
 const allTypes = [...new Set(obsSetsListChildrenCounts.map(i => Object.keys(i)).flat())].sort();
@@ -86,5 +105,182 @@ const matrix = obsSetsListChildrenCounts.map(getMatrixColumn);
 
 console.log(matrix)
 
+const matrix2 = [];
+for (let i = 0; i < urls.length; i++) {
+    for (let j = 0; j < matrix[i].length; j++) {
+        matrix2.push({row: i, col: j, value: matrix[i][j]})
+    }
+}
+console.log('matrix2', matrix2);
 
-// visualization
+
+
+
+// console.log(obsSetsListChildrenCounts)
+
+const obsSetsListChildrenCountsMatrix = [];
+for (let i = 0; i < urls.length; i++) {
+    const sampleName = uuids[i];
+    for (const [key, value] of Object.entries(obsSetsListChildrenCounts[i])) {
+        const cellID = key;
+        obsSetsListChildrenCountsMatrix.push({row: sampleName, col: cellID, value: value});
+    }
+}
+console.log('matrix', obsSetsListChildrenCountsMatrix);
+
+// console.log(matrix.map((o,i) => { uuids[i], o}))
+
+// // visualization
+// const widthFull = 450;
+// const heightFull = 450;
+// var margin = {top: 30, right: 30, bottom: 100, left: 100};
+
+// var width = 450 - margin.left - margin.right;
+// var height = 450 - margin.top - margin.bottom;
+
+// // append the svg object to the body of the page
+// var svg = d3.select("#app")
+// .append("svg")
+//   .attr("width", width + margin.left + margin.right)
+//   .attr("height", height + margin.top + margin.bottom)
+// .append("g")
+//   .attr("transform",
+//         "translate(" + margin.left + "," + margin.top + ")");
+
+
+// // Labels of row and columns
+// var myGroups = uuids;
+// var myVars = allTypes;
+
+// // Build X scales and axis:
+// var x = d3.scaleBand()
+//   .range([ 0, width ])
+//   .domain(myGroups)
+//   .padding(0.01);
+// svg.append("g")
+//   .attr("transform", "translate(0," + height + ")")
+//   .call(d3.axisBottom(x))
+
+// // Build X scales and axis:
+// var y = d3.scaleBand()
+//   .range([ height, 0 ])
+//   .domain(myVars)
+//   .padding(0.01);
+// svg.append("g")
+//   .call(d3.axisLeft(y));
+
+// // Build color scale
+// var myColor = d3.scaleLinear()
+//   .range(["white", "#69b3a2"])
+//   .domain([1,100])
+
+// svg.selectAll()
+//   .data(matrix)
+//   .enter()
+
+// console.log(svg)
+
+// svg.selectAll()
+//     .data(matrix, function(d) {return d.group+':'+d.variable;})
+//     .enter()
+//     .append("rect")
+//     .attr("x", function(d) { return x(d.group) })
+//     .attr("y", function(d) { return y(d.variable) })
+//     .attr("width", x.bandwidth() )
+//     .attr("height", y.bandwidth() )
+//     .style("fill", function(d) { return myColor(d.value)} )
+
+
+
+// set the dimensions and margins of the graph
+var margin = {top: 30, right: 30, bottom: 30, left: 30},
+  width = 450 - margin.left - margin.right,
+  height = 450 - margin.top - margin.bottom;
+const data = {"data":[[8,2],[5,4],[9,6]]};
+// append the svg object to the body of the page
+var svg = d3.select("#app")
+.append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+.append("g")
+  .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+// Labels of row and columns
+var rows = [];
+var cols = [];
+var chartData = [];
+data.data.forEach((item, i) => {
+  if( i === 0) {
+    item.forEach((itm , j) => {
+      cols.push("col" + j);
+      chartData.push({ row: "row" + i, col: "col" + j,value: itm});
+    });
+  } else {
+     item.forEach((itm , j) => {
+      chartData.push({ row: "row" + i, col: "col" + j, value: itm});
+    });
+  }
+  rows.unshift("row" + i);
+})
+console.log(data)
+
+chartData = obsSetsListChildrenCountsMatrix;
+
+
+// Labels of row and columns
+var myGroups = allTypes;
+var myVars = uuids; 
+
+// Build X scales and axis:
+var x = d3.scaleBand()
+  .range([ 0, width ])
+  .domain(myGroups)
+  .padding(0.01);
+svg.append("g")
+  .attr("transform", "translate(0," + height + ")")
+  .call(d3.axisBottom(x))
+
+// Build X scales and axis:
+var y = d3.scaleBand()
+  .range([ height, 0 ])
+  .domain(myVars)
+  .padding(0.01);
+svg.append("g")
+  .call(d3.axisLeft(y));
+
+
+// // Build X scales and axis:
+// var x = d3.scaleBand()
+//   .range([ 0, width ])
+//   .domain(cols)
+//   .padding(0.01);
+// svg.append("g")
+//   .attr("transform", "translate(0," + height + ")")
+//   .call(d3.axisBottom(x))
+
+// // Build X scales and axis:
+// var y = d3.scaleBand()
+//   .range([ height, 0 ])
+//   .domain(rows)
+//   .padding(0.01);
+// svg.append("g")
+//   .call(d3.axisLeft(y));
+
+// Build color scale
+var myColor = d3.scaleLinear()
+  .range(["white", "#69b3a2"])
+  .domain([0,2000])
+console.log(chartData);
+//Read the data
+  svg.selectAll()
+      .data(chartData, function(d) {return d.row+':'+d.col;})
+      .enter()
+      .append("rect")
+      .attr("x", function(d) { return x(d.col) })
+      .attr("y", function(d) { return y(d.row) })
+      .attr("width", x.bandwidth() )
+      .attr("height", y.bandwidth() )
+      .style("fill", function(d) { return myColor(d.value)} )
+
+console.log(svg)
