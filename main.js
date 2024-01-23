@@ -38,7 +38,10 @@ function getURL(uuid) {
 
 const urls = uuids.map(getURL);
 
-function getLoader(url) {
+// Get list of obssets
+const obsSetsList = [];
+for (let i = 0; i < 5; i++) { // 5 => urls.length
+    const url = urls[i]
     const source = new AnnDataSource({ url });
     const config = {
         url,
@@ -50,73 +53,36 @@ function getLoader(url) {
             }
         ],
     };
-
     const loader = new ObsSetsAnndataLoader(source, config);
-    // const { data: { obsSets } } = await loader.load();
-    return loader;
+    const { data: { obsSets } } = await loader.load();
+    obsSetsList.push(obsSets);
 }
-
-const loaders = urls.map(getLoader);
-
-const { data: { obsSets } } = await loaders[0].load();
-console.log(obsSets)
-
-const { data: { obsSets2 } } = await loaders[1].load();
-console.log(obsSets2)
-
-// function getSomething(url) {
-//     console.log('yay')
-//     const source = new AnnDataSource({ url });
-//     console.log('nah')
-//     const config = {
-//         url,
-//         fileType: 'obsSets.anndata.zarr',
-//         options: [
-//             {
-//                 name: 'Cell Ontology Annotation',
-//                 path: 'obs/predicted_CLID' //'obs/predicted_label'
-//             }
-//         ],
-//     };
-// //     console.log('yep')
-// //     return [source, config]
-// // }
+// get the actual data
+const obsSetsListChildren = obsSetsList.map((o) => o.tree[0].children);
 
 
-// function getSomething(url) {
-//     const source = new AnnDataSource({ url });
-//     const config = {
-//         url,
-//         fileType: 'obsSets.anndata.zarr',
-//         options: [
-//             {
-//                 name: 'Cell Ontology Annotation',
-//                 path: 'obs/predicted_CLID' //'obs/predicted_label'
-//             }
-//         ],
-//     };
-//     loader = new ObsSetsAnndataLoader(source, config);
-//     return loader;
-// }
+// get the counts per cell type
+function getCountsPerType(o) {
+    var dict = new Object();
+    for(var t of o) {
+        dict[t.name] = t.set.length;
+    }
+    return dict;
+}
+const obsSetsListChildrenCounts = obsSetsListChildren.map(getCountsPerType);
 
-// // first one
-// var loader = new getSomething(getURL(uuids[0]));
-// var { data: { obsSets } } = await loader.load();
+// get a list of all types
+const allTypes = [...new Set(obsSetsListChildrenCounts.map(i => Object.keys(i)).flat())]sort();
 
-// console.log(obsSets)
+// get the matrix column for each entry
+function getMatrixColumn(o) {
+    const matrixColumn = new Array(allTypes.length).fill(0);
+    for (const [key, value] of Object.entries(o)) {
+        let index = allTypes.indexOf(key)
+        matrixColumn[index] = value;
+    }
+    return matrixColumn;
+}
+const matrix = obsSetsListChildrenCounts.map(getMatrixColumn);
 
-// console.log('done with first')
-// // second one
-// var loader1 = new getSomething(getURL(uuids[1]));
-// var { data: { obsSets1 } } = await loader1.load();
-// console.log(obsSets1)
-
-
-// url = getURL(uuids[1])
-
-// sourceAndConfig = getSomething(url);
-// console.log('here')
-// loader = new ObsSetsAnndataLoader(sourceAndConfig[0], sourceAndConfig[1]);
-// var { data: { obsSets } } = await loader.load();
-// console.log('second', obsSets)
-
+console.log(matrix)
