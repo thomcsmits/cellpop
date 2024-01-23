@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { AnnDataSource, ObsSetsAnndataLoader } from '@vitessce/zarr';
 
+// data
 const uuids = ['ad693f99fb9006e68a53e97598da1509',
 '173de2e80adf6a73ac8cff5ccce20dfc',
 'b95f34761c252ebbd1e482cd9afae73f',
@@ -31,11 +32,10 @@ const uuids = ['ad693f99fb9006e68a53e97598da1509',
 '8d631eee88855ac59155edca2a3bc1ca',
 '1ea6c0ac5ba60fe35bf63af8699b6fbe']
 
-
+// get hubmap url to zarr
 function getURL(uuid) {
     return `https://assets.hubmapconsortium.org/${uuid}/hubmap_ui/anndata-zarr/secondary_analysis.zarr`;
 }
-
 const urls = uuids.map(getURL);
 
 // Get list of obssets
@@ -60,7 +60,6 @@ for (let i = 0; i < 5; i++) { // 5 => urls.length
 // get the actual data
 const obsSetsListChildren = obsSetsList.map((o) => o.tree[0].children);
 
-
 // get the counts per cell type
 function getCountsPerType(o) {
     var dict = new Object();
@@ -72,7 +71,7 @@ function getCountsPerType(o) {
 const obsSetsListChildrenCounts = obsSetsListChildren.map(getCountsPerType);
 
 // get a list of all types
-const allTypes = [...new Set(obsSetsListChildrenCounts.map(i => Object.keys(i)).flat())]sort();
+const allTypes = [...new Set(obsSetsListChildrenCounts.map(i => Object.keys(i)).flat())].sort();
 
 // get the matrix column for each entry
 function getMatrixColumn(o) {
@@ -86,3 +85,6 @@ function getMatrixColumn(o) {
 const matrix = obsSetsListChildrenCounts.map(getMatrixColumn);
 
 console.log(matrix)
+
+
+// visualization
