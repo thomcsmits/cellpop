@@ -193,10 +193,13 @@ console.log('matrix', obsSetsListChildrenCountsMatrix);
 
 
 // set the dimensions and margins of the graph
-var margin = {top: 30, right: 30, bottom: 30, left: 30},
-  width = 450 - margin.left - margin.right,
-  height = 450 - margin.top - margin.bottom;
-const data = {"data":[[8,2],[5,4],[9,6]]};
+
+var width = obsSetsListChildrenCountsMatrix.length * 10;
+var height = obsSetsListChildrenCounts.length * 30;
+var margin = {top: 30, right: 30, bottom: 30, left: 30};
+// width = 600 - margin.left - margin.right;
+// height = 600 - margin.top - margin.bottom;
+
 // append the svg object to the body of the page
 var svg = d3.select("#app")
 .append("svg")
@@ -205,27 +208,6 @@ var svg = d3.select("#app")
 .append("g")
   .attr("transform",
         "translate(" + margin.left + "," + margin.top + ")");
-
-// Labels of row and columns
-var rows = [];
-var cols = [];
-var chartData = [];
-data.data.forEach((item, i) => {
-  if( i === 0) {
-    item.forEach((itm , j) => {
-      cols.push("col" + j);
-      chartData.push({ row: "row" + i, col: "col" + j,value: itm});
-    });
-  } else {
-     item.forEach((itm , j) => {
-      chartData.push({ row: "row" + i, col: "col" + j, value: itm});
-    });
-  }
-  rows.unshift("row" + i);
-})
-console.log(data)
-
-chartData = obsSetsListChildrenCountsMatrix;
 
 
 // Labels of row and columns
@@ -250,31 +232,14 @@ svg.append("g")
   .call(d3.axisLeft(y));
 
 
-// // Build X scales and axis:
-// var x = d3.scaleBand()
-//   .range([ 0, width ])
-//   .domain(cols)
-//   .padding(0.01);
-// svg.append("g")
-//   .attr("transform", "translate(0," + height + ")")
-//   .call(d3.axisBottom(x))
-
-// // Build X scales and axis:
-// var y = d3.scaleBand()
-//   .range([ height, 0 ])
-//   .domain(rows)
-//   .padding(0.01);
-// svg.append("g")
-//   .call(d3.axisLeft(y));
-
 // Build color scale
 var myColor = d3.scaleLinear()
   .range(["white", "#69b3a2"])
   .domain([0,2000])
-console.log(chartData);
+
 //Read the data
   svg.selectAll()
-      .data(chartData, function(d) {return d.row+':'+d.col;})
+      .data(obsSetsListChildrenCountsMatrix, function(d) {return d.row+':'+d.col;})
       .enter()
       .append("rect")
       .attr("x", function(d) { return x(d.col) })
@@ -282,5 +247,20 @@ console.log(chartData);
       .attr("width", x.bandwidth() )
       .attr("height", y.bandwidth() )
       .style("fill", function(d) { return myColor(d.value)} )
+
+// var maxw = 0;
+// y.selectAll("text").each(function() {
+//     if(this.getBBox().width > maxw) maxw = this.getBBox().width;
+// });
+
+// svg.attr("transform", "translate(" + maxw + ",0)");
+
+// var maxh = 0;
+// x.selectAll("text").each(function() {
+//     if(this.getBBox().height > maxh) maxh = this.getBBox().height;
+// });
+
+// svg.attr("transform", "translate(0," + height + ")")
+
 
 console.log(svg)
