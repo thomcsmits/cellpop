@@ -196,7 +196,7 @@ console.log('matrix', obsSetsListChildrenCountsMatrix);
 
 var width = obsSetsListChildrenCountsMatrix.length * 10;
 var height = obsSetsListChildrenCounts.length * 30;
-var margin = {top: 30, right: 30, bottom: 30, left: 30};
+var margin = {top: 100, right: 100, bottom: 100, left: 100};
 // width = 600 - margin.left - margin.right;
 // height = 600 - margin.top - margin.bottom;
 
@@ -222,6 +222,9 @@ var x = d3.scaleBand()
 svg.append("g")
   .attr("transform", "translate(0," + height + ")")
   .call(d3.axisBottom(x))
+  .selectAll("text")
+    .attr("transform", "translate(-10,0)rotate(-45)")
+    .style("text-anchor", "end");
 
 // Build X scales and axis:
 var y = d3.scaleBand()
@@ -238,7 +241,7 @@ var myColor = d3.scaleLinear()
   .domain([0,2000])
 
 //Read the data
-  svg.selectAll()
+var rects = svg.selectAll()
       .data(obsSetsListChildrenCountsMatrix, function(d) {return d.row+':'+d.col;})
       .enter()
       .append("rect")
@@ -260,7 +263,87 @@ var myColor = d3.scaleLinear()
 //     if(this.getBBox().height > maxh) maxh = this.getBBox().height;
 // });
 
-// svg.attr("transform", "translate(0," + height + ")")
 
+// svg.attr("transform", "translate(0," + height + ")")
+console.log(obsSetsListChildrenCountsMatrix)
 
 console.log(svg)
+
+rects.on('click', function(d) {
+  console.log(d)
+  console.log(d.target.__data__.row)
+  createBarChart(d.target.__data__.row)
+  d3.select(this)
+})
+
+function createBarChart(selectedRow) {
+  const data = obsSetsListChildrenCountsMatrix.filter((o) => o.row === selectedRow)
+  
+  width = 400
+  height = 150
+
+  var svgBar = d3.select("#app")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+  
+svgBar.append("text")
+  .attr("class", "title")
+  .attr("text-anchor", "start")
+  .attr("x", 20)
+  .text(selectedRow);
+      
+
+// X axis
+const x = d3.scaleBand()
+  .range([ 0, width ])
+  .domain(data.map(d => d.col))
+  .padding(0.2);
+  svgBar.append("g")
+  .attr("transform", `translate(0, ${height})`)
+  .call(d3.axisBottom(x))
+  .selectAll("text")
+    .attr("transform", "translate(-10,0)rotate(-45)")
+    .style("text-anchor", "end");
+
+svgBar.append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "end")
+    .attr("x", width - 10)
+    .attr("y", height + 75)
+    .text("Cell type");
+
+// Add Y axis
+const y = d3.scaleLinear()
+  .domain([0, 13000])
+  .range([ height, 0]);
+  svgBar.append("g")
+  .call(d3.axisLeft(y));
+
+svgBar.append("text")
+  .attr("class", "y label")
+  .attr("text-anchor", "end")
+  .attr('x', -30)
+  .attr("y", -60)
+  .attr("dy", ".75em")
+  .attr("transform", "rotate(-90)")
+  .text("Number of cells");
+
+// Bars
+svgBar.selectAll("mybar")
+  .data(data)
+  .join("rect")
+    .attr("x", d => x(d.col))
+    .attr("y", d => y(d.value))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d.value))
+    .attr("fill", "#69b3a2")
+
+return svg
+
+}
+
+
