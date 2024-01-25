@@ -255,7 +255,7 @@ var rects = svg.selectAll()
 
 
 // tooltip
-  const tooltip = d3.select("#app")
+  const tooltip = svg
     .append("div")
     .style("opacity", 0)
     .attr("class", "tooltip")
@@ -270,7 +270,11 @@ var rects = svg.selectAll()
       console.log('mouseover')
       console.log(event)
       console.log(d)
-      tooltip.style("opacity", 1)
+      if (event.ctrlKey) {
+        addHighlight(0, 100)
+      } else {
+        tooltip.style("opacity", 1)
+      }
     }
     const mousemove = function(event,d) {
       tooltip
@@ -286,6 +290,26 @@ var rects = svg.selectAll()
 rects.on('mouseover', mouseover)
 rects.on('mousemove', mousemove)
 rects.on('mouseleave', mouseleave)
+
+
+
+function addHighlight(y, height) {
+  svg.append('rect')
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('width', width)
+    .attr('height', height)
+    .attr('stroke', 'black')
+    .attr('fill', '#69a3b2');
+}
+// const highlight = svg
+//   .append('rect')
+//     .attr('x', 10)
+//     .attr('y', 120)
+//     .attr('width', 600)
+//     .attr('height', 40)
+//     .attr('stroke', 'black')
+//     .attr('fill', '#69a3b2');
 
   // svg.selectAll()
 
@@ -363,39 +387,39 @@ rects.on('mouseleave', mouseleave)
 
 
 
-const drawLine = function(x, rectWidth) {
-  svg.append('line')
-      .style("stroke", "black")
-      .style("stroke-width", 2)
-      .attr("x1", x)
-      .attr("y1", 0)
-      .attr("x2", x)
-      .attr("y2", height);
+// const drawLine = function(x, rectWidth) {
+//   svg.append('line')
+//       .style("stroke", "black")
+//       .style("stroke-width", 2)
+//       .attr("x1", x)
+//       .attr("y1", 0)
+//       .attr("x2", x)
+//       .attr("y2", height);
 
-  svg.append('line')
-      .style("stroke", "black")
-      .style("stroke-width", 2)
-      .attr("x1", x+rectWidth)
-      .attr("y1", 0)
-      .attr("x2", x+rectWidth)
-      .attr("y2", height);
+//   svg.append('line')
+//       .style("stroke", "black")
+//       .style("stroke-width", 2)
+//       .attr("x1", x+rectWidth)
+//       .attr("y1", 0)
+//       .attr("x2", x+rectWidth)
+//       .attr("y2", height);
 
-  svg.append('line')
-      .style("stroke", "black")
-      .style("stroke-width", 2)
-      .attr("x1", x)
-      .attr("y1", 0)
-      .attr("x2", x+rectWidth)
-      .attr("y2", 0);
+//   svg.append('line')
+//       .style("stroke", "black")
+//       .style("stroke-width", 2)
+//       .attr("x1", x)
+//       .attr("y1", 0)
+//       .attr("x2", x+rectWidth)
+//       .attr("y2", 0);
 
-  svg.append('line')
-      .style("stroke", "black")
-      .style("stroke-width", 2)
-      .attr("x1", x)
-      .attr("y1", height)
-      .attr("x2", x+rectWidth)
-      .attr("y2", height);
-} 
+//   svg.append('line')
+//       .style("stroke", "black")
+//       .style("stroke-width", 2)
+//       .attr("x1", x)
+//       .attr("y1", height)
+//       .attr("x2", x+rectWidth)
+//       .attr("y2", height);
+// } 
 
 
 // var maxw = 0;
