@@ -252,12 +252,23 @@ var rects = svg.selectAll()
         .style("fill", function(d) { return myColor(d.value)} )
 
 
+svg.append('rect')
+  .attr("class", "highlight")
+  .attr('x', 0)
+  .attr('y', 0)
+  .attr('width', width)
+  .attr('height', height)
+  .attr('stroke', 'black')
+  .attr('fill', 'none')
+  .attr('pointer-events', 'none')
+  .attr('visibility', 'hidden')
+
 
 
 // tooltip
-  const tooltip = svg
+  var tooltip = svg
     .append("div")
-    .style("opacity", 0)
+    .style("opacity", 1)
     .attr("class", "tooltip")
     .style("background-color", "white")
     .style("border", "solid")
@@ -267,11 +278,8 @@ var rects = svg.selectAll()
 
     // Three function that change the tooltip when user hover / move / leave a cell
     const mouseover = function(event,d) {
-      console.log('mouseover')
-      console.log(event)
-      console.log(d)
       if (event.ctrlKey) {
-        addHighlight(0, 100)
+        addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
       } else {
         tooltip.style("opacity", 1)
       }
@@ -283,6 +291,7 @@ var rects = svg.selectAll()
         .style("top", (event.y)/2 + "px")
     }
     const mouseleave = function(d) {
+      removeHighlight();
       tooltip.style("opacity", 0)
     }
 
@@ -291,17 +300,35 @@ rects.on('mouseover', mouseover)
 rects.on('mousemove', mousemove)
 rects.on('mouseleave', mouseleave)
 
+// x.on('click', function(e){
+//   console.log('yay')
+// })
+
 
 
 function addHighlight(y, height) {
-  svg.append('rect')
-    .attr('x', 0)
-    .attr('y', 0)
-    .attr('width', width)
-    .attr('height', height)
-    .attr('stroke', 'black')
-    .attr('fill', '#69a3b2');
+  svg.selectAll('.highlight')
+      .attr('visibility', 'shown')
+      .attr('y', y)
+      .attr('height', height)
 }
+
+function removeHighlight() {
+  svg.selectAll('.highlight')
+      .attr('visibility', 'hidden')
+}
+
+
+// function addHighlight(y, height) {
+//   svg.append('rect')
+//     .attr('x', 0)
+//     .attr('y', 0)
+//     .attr('width', width)
+//     .attr('height', height)
+//     .attr('stroke', 'black')
+//     .attr('fill', 'none')
+//     // .attr('visibility', 'shown')
+// }
 // const highlight = svg
 //   .append('rect')
 //     .attr('x', 10)
@@ -436,15 +463,19 @@ function addHighlight(y, height) {
 
 
 // svg.attr("transform", "translate(0," + height + ")")
-console.log(obsSetsListChildrenCountsMatrix)
+// console.log(obsSetsListChildrenCountsMatrix)
 
-console.log(svg)
+// console.log(svg)
 
 rects.on('click', function(d) {
   console.log(d)
   console.log(d.target.__data__.row)
+  console.log(d3.selectAll(".bar").size())
+  if (d3.selectAll(".bar").size() >= 2) {
+    d3.select(".bar").remove();
+  }
   createBarChart(d.target.__data__.row)
-  d3.select(this)
+  // d3.select(this)
 })
 
 function createBarChart(selectedRow) {
@@ -457,6 +488,7 @@ function createBarChart(selectedRow) {
   .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
+    .attr("class", "bar")
   .append("g")
     .attr("transform",
           "translate(" + margin.left + "," + margin.top + ")");
