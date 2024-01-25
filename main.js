@@ -194,9 +194,9 @@ console.log('matrix', obsSetsListChildrenCountsMatrix);
 
 // set the dimensions and margins of the graph
 
-var width = obsSetsListChildrenCountsMatrix.length * 10;
-var height = obsSetsListChildrenCounts.length * 30;
-var margin = {top: 100, right: 100, bottom: 100, left: 100};
+var width = obsSetsListChildrenCountsMatrix.length * 5;
+var height = obsSetsListChildrenCounts.length * 20;
+var margin = {top: 100, right: 100, bottom: 100, left: 150};
 // width = 600 - margin.left - margin.right;
 // height = 600 - margin.top - margin.bottom;
 
@@ -253,18 +253,43 @@ var rects = svg.selectAll()
 
 
 // create a tooltip
+// const tooltip = svg
+//   .append("text")
+//   // .style("opacity", 0)
+//   .attr("class", "tooltip")
+//   .style("background-color", "white")
+//   .style("border", "solid")
+//   .text('yay<br>yay2')
+//   // .html('<p>yay</p>')
+//   .attr('x', 0)
+//   .attr('y', 0)
+//   // .attr('width', 100)
+//   // .attr('height', 100)
+//   // .style("z-index", "10")
+//   .style("border-width", "2px")
+//   .style("border-radius", "5px")
+//   .style("padding", "5px")
+//   .attr('pointer-events', 'none')
+//   // .attr('visibility', 'hidden')
+//   // .style('left', '200px')
+
+// create a tooltip
 const tooltip = d3.select("#app")
   .append("div")
   .style("opacity", 0)
   .attr("class", "tooltip")
   .style("background-color", "white")
   .style("border", "solid")
+  // .style("z-index", "10")
   .style("border-width", "2px")
   .style("border-radius", "5px")
   .style("padding", "5px")
   .attr('pointer-events', 'none')
   .attr('visibility', 'hidden')
+  .style('left', '200px')
 
+
+// highlight
 svg.append('rect')
   .attr("class", "highlight")
   .attr('x', 0)
@@ -279,13 +304,12 @@ svg.append('rect')
 
     // Three function that change the tooltip when user hover / move / leave a cell
     const mouseover = function(event,d) {
-      console.log(event.x)
       if (event.ctrlKey) {
         tooltip
           .html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
           .style("opacity", 1)
-          .style("left", (event.x)/2 + "px")
-          .style("top", (event.y)/2 + "px")
+          // .style("left", (event.x)/2 + "px")
+          // .style("top", (event.y)/2 + "px")
       } else {
         addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
       }
@@ -349,7 +373,7 @@ rects.on('click', function(d) {
 function createBarChart(selectedRow) {
   const data = obsSetsListChildrenCountsMatrix.filter((o) => o.row === selectedRow)
   
-  width = 400
+  width = 250
   height = 150
 
   var svgBar = d3.select("#app")
