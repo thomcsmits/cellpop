@@ -60,75 +60,52 @@ for (let i = 0; i < urls.length; i++) {
     const { data: { obsSets } } = await loader.load();
     obsSetsList.push(obsSets);
 }
-// get the actual data
-const obsSetsListChildren = obsSetsList.map((o) => o.tree[0].children);
+console.log('obssets', obsSetsList)
 
-// get the counts per cell type
-function getCountsPerType(o) {
+
+// get the matrix column for each entry
+function getMatrixColumn(o, allTypes) {
+  const matrixColumn = new Array(allTypes.length).fill(0);
+  for (const [key, value] of Object.entries(o)) {
+      let index = allTypes.indexOf(key)
+      matrixColumn[index] = value;
+  }
+  return matrixColumn;
+}
+
+
+function wrangleData(obsSetsList, urls) {
+  // get the actual data
+  const obsSetsListChildren = obsSetsList.map((o) => o.tree[0].children);
+  const obsSetsListChildrenCounts = obsSetsListChildren.map(getCountsPerType);
+
+  // get a list of all types
+  const allTypes = [...new Set(obsSetsListChildrenCounts.map(i => Object.keys(i)).flat())].sort();
+
+  const matrix = obsSetsListChildrenCounts.map((o) => getMatrixColumn(o, allTypes));
+
+  const obsSetsListChildrenCountsMatrix = [];
+  for (let i = 0; i < urls.length; i++) {
+      const sampleName = uuids[i];
+      for (const [key, value] of Object.entries(obsSetsListChildrenCounts[i])) {
+          const cellID = key;
+          obsSetsListChildrenCountsMatrix.push({row: sampleName, col: cellID, value: value});
+      }
+  }
+  return {obsSetsList: obsSetsList, allTypes: allTypes, matrix: matrix, obsSetsListChildrenCounts: obsSetsListChildrenCounts, obsSetsListChildrenCountsMatrix: obsSetsListChildrenCountsMatrix};
+}
+
+  // get the counts per cell type
+  function getCountsPerType(o) {
     var dict = new Object();
     for(var t of o) {
         dict[t.name] = t.set.length;
     }
     return dict;
 }
-const obsSetsListChildrenCounts = obsSetsListChildren.map(getCountsPerType);
-console.log(obsSetsListChildrenCounts)
 
-// const listOfThings = []
-// for (let i = 0; i < urls.length; i++) {
-//     let uuid = uuids[i]
-//     for (const [key, value] of Object.entries(obsSetsListChildrenCounts[i])) {
-//         listOfThings.push([uuid, key, value])
-//     }
-// }
-// console.log(listOfThings)
+var data = wrangleData(obsSetsList, urls);
 
-// const myNewThing = listOfThings.map(it => {
-//     return Object.values(it).toString()
-//   }).join('\n')
-
-// console.log(myNewThing)
-
-// get a list of all types
-const allTypes = [...new Set(obsSetsListChildrenCounts.map(i => Object.keys(i)).flat())].sort();
-
-// get the matrix column for each entry
-function getMatrixColumn(o) {
-    const matrixColumn = new Array(allTypes.length).fill(0);
-    for (const [key, value] of Object.entries(o)) {
-        let index = allTypes.indexOf(key)
-        matrixColumn[index] = value;
-    }
-    return matrixColumn;
-}
-const matrix = obsSetsListChildrenCounts.map(getMatrixColumn);
-
-console.log(matrix)
-
-const matrix2 = [];
-for (let i = 0; i < urls.length; i++) {
-    for (let j = 0; j < matrix[i].length; j++) {
-        matrix2.push({row: i, col: j, value: matrix[i][j]})
-    }
-}
-console.log('matrix2', matrix2);
-
-
-
-
-// console.log(obsSetsListChildrenCounts)
-
-const obsSetsListChildrenCountsMatrix = [];
-for (let i = 0; i < urls.length; i++) {
-    const sampleName = uuids[i];
-    for (const [key, value] of Object.entries(obsSetsListChildrenCounts[i])) {
-        const cellID = key;
-        obsSetsListChildrenCountsMatrix.push({row: sampleName, col: cellID, value: value});
-    }
-}
-console.log('matrix', obsSetsListChildrenCountsMatrix);
-
-// console.log(matrix.map((o,i) => { uuids[i], o}))
 
 // // visualization
 // const widthFull = 450;
@@ -194,24 +171,35 @@ console.log('matrix', obsSetsListChildrenCountsMatrix);
 
 // set the dimensions and margins of the graph
 
-var width = obsSetsListChildrenCountsMatrix.length * 5;
-var height = obsSetsListChildrenCounts.length * 20;
+var width = data.obsSetsListChildrenCountsMatrix.length * 5;
+var height = data.obsSetsListChildrenCounts.length * 20;
 var margin = {top: 100, right: 100, bottom: 100, left: 150};
 // width = 600 - margin.left - margin.right;
 // height = 600 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
-var svg = d3.select("#app")
+var svgMain = d3.select("#app")
 .append("svg")
   .attr("width", width + margin.left + margin.right)
   .attr("height", height + margin.top + margin.bottom)
 .append("g")
   .attr("transform",
-        "translate(" + margin.left + "," + margin.top + ")");
+        "translate(" + margin.left + "," + margin.top + ")")
+  .attr("class", "mainGroup");
 
+
+var yes = svgMain.append("g")
+.attr("transform",
+      "translate(" + margin.left + "," + margin.top + ")")
+.attr("class", "thing1");
+
+var yes2 = svgMain.append("g")
+.attr("transform",
+"translate(" + margin.left + "," + margin.top + ")")
+.attr("class", "thing2");
 
 // Labels of row and columns
-var myGroups = allTypes;
+var myGroups = data.allTypes;
 var myVars = uuids; 
 
 // Build X scales and axis:
@@ -219,7 +207,7 @@ var x = d3.scaleBand()
   .range([ 0, width ])
   .domain(myGroups)
   .padding(0.01);
-svg.append("g")
+  yes2.append("g")
   .attr("transform", "translate(0," + height + ")")
   .call(d3.axisBottom(x))
   .selectAll("text")
@@ -231,7 +219,7 @@ var y = d3.scaleBand()
   .range([ height, 0 ])
   .domain(myVars)
   .padding(0.01);
-svg.append("g")
+  yes2.append("g")
   .call(d3.axisLeft(y));
 
 
@@ -241,8 +229,8 @@ var myColor = d3.scaleLinear()
   .domain([0,2000])
 
 //Read the data
-var rects = svg.selectAll()
-      .data(obsSetsListChildrenCountsMatrix, function(d) {return d.row+':'+d.col;})
+var rects = yes2.selectAll()
+      .data(data.obsSetsListChildrenCountsMatrix, function(d) {return d.row+':'+d.col;})
       .enter()
       .append("rect")
         .attr("x", function(d) { return x(d.col) })
@@ -371,7 +359,7 @@ rects.on('click', function(d) {
 })
 
 function createBarChart(selectedRow) {
-  const data = obsSetsListChildrenCountsMatrix.filter((o) => o.row === selectedRow)
+  const data = data.obsSetsListChildrenCountsMatrix.filter((o) => o.row === selectedRow)
   
   width = 250
   height = 150
@@ -440,3 +428,4 @@ svgBar.selectAll("mybar")
 return svg
 
 }
+console.log('svg', svg)
