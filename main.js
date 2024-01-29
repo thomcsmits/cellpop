@@ -63,18 +63,7 @@ for (let i = 0; i < urls.length; i++) {
 console.log('obssets', obsSetsList)
 
 
-// get the matrix column for each entry
-function getMatrixColumn(o, allTypes) {
-  const matrixColumn = new Array(allTypes.length).fill(0);
-  for (const [key, value] of Object.entries(o)) {
-      let index = allTypes.indexOf(key)
-      matrixColumn[index] = value;
-  }
-  return matrixColumn;
-}
-
-
-function wrangleData(obsSetsList, urls) {
+function wrangleData(obsSetsList, urls, rowNames) {
   // get the actual data
   const obsSetsListChildren = obsSetsList.map((o) => o.tree[0].children);
   const obsSetsListChildrenCounts = obsSetsListChildren.map(getCountsPerType);
@@ -82,7 +71,7 @@ function wrangleData(obsSetsList, urls) {
   // get a list of all types
   const allTypes = [...new Set(obsSetsListChildrenCounts.map(i => Object.keys(i)).flat())].sort();
 
-  const matrix = obsSetsListChildrenCounts.map((o) => getMatrixColumn(o, allTypes));
+  // const matrix = obsSetsListChildrenCounts.map((o) => getMatrixColumn(o, allTypes));
 
   const obsSetsListChildrenCountsMatrix = [];
   for (let i = 0; i < urls.length; i++) {
@@ -92,228 +81,172 @@ function wrangleData(obsSetsList, urls) {
           obsSetsListChildrenCountsMatrix.push({row: sampleName, col: cellID, value: value});
       }
   }
-  return {obsSetsList: obsSetsList, allTypes: allTypes, matrix: matrix, obsSetsListChildrenCounts: obsSetsListChildrenCounts, obsSetsListChildrenCountsMatrix: obsSetsListChildrenCountsMatrix};
+  return {counts: obsSetsListChildrenCounts, countsMatrix: obsSetsListChildrenCountsMatrix, colNames: allTypes, rowNames: uuids, obsSetsList: obsSetsList};
 }
 
-  // get the counts per cell type
-  function getCountsPerType(o) {
-    var dict = new Object();
-    for(var t of o) {
-        dict[t.name] = t.set.length;
-    }
-    return dict;
+
+// // get the matrix column for each entry
+// function getMatrixColumn(o, allTypes) {
+//   const matrixColumn = new Array(allTypes.length).fill(0);
+//   for (const [key, value] of Object.entries(o)) {
+//       let index = allTypes.indexOf(key)
+//       matrixColumn[index] = value;
+//   }
+//   return matrixColumn;
+// }
+
+// get the counts per cell type
+function getCountsPerType(o) {
+  var dict = new Object();
+  for(var t of o) {
+      dict[t.name] = t.set.length;
+  }
+  return dict;
 }
 
-var data = wrangleData(obsSetsList, urls);
+var data = wrangleData(obsSetsList, urls, uuids);
+console.log('data', data)
+
+var svg = getMainVis(data);
 
 
 // // visualization
-// const widthFull = 450;
-// const heightFull = 450;
-// var margin = {top: 30, right: 30, bottom: 100, left: 100};
+function getMainVis(data) {
+  // set the dimensions and margins of the graph
+  var width = data.countsMatrix.length * 5;
+  var height = data.counts.length * 20;
+  var margin = {top: 100, right: 100, bottom: 100, left: 150};
+  var dimensions = {width: width, height: height, margin: margin};
 
-// var width = 450 - margin.left - margin.right;
-// var height = 450 - margin.top - margin.bottom;
+  // append the svg object to the body of the page
+  var svg = d3.select("#app")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")")
+    .attr("class", "mainGroup");
 
-// // append the svg object to the body of the page
-// var svg = d3.select("#app")
-// .append("svg")
-//   .attr("width", width + margin.left + margin.right)
-//   .attr("height", height + margin.top + margin.bottom)
-// .append("g")
-//   .attr("transform",
-//         "translate(" + margin.left + "," + margin.top + ")");
+  // return svg  
+  svg = getMainThing(svg, data, dimensions)
+  console.log('svg', svg)
+  return svg
+}
 
-
-// // Labels of row and columns
-// var myGroups = uuids;
-// var myVars = allTypes;
-
-// // Build X scales and axis:
-// var x = d3.scaleBand()
-//   .range([ 0, width ])
-//   .domain(myGroups)
-//   .padding(0.01);
-// svg.append("g")
-//   .attr("transform", "translate(0," + height + ")")
-//   .call(d3.axisBottom(x))
-
-// // Build X scales and axis:
-// var y = d3.scaleBand()
-//   .range([ height, 0 ])
-//   .domain(myVars)
-//   .padding(0.01);
-// svg.append("g")
-//   .call(d3.axisLeft(y));
-
-// // Build color scale
-// var myColor = d3.scaleLinear()
-//   .range(["white", "#69b3a2"])
-//   .domain([1,100])
-
-// svg.selectAll()
-//   .data(matrix)
-//   .enter()
-
-// console.log(svg)
-
-// svg.selectAll()
-//     .data(matrix, function(d) {return d.group+':'+d.variable;})
-//     .enter()
-//     .append("rect")
-//     .attr("x", function(d) { return x(d.group) })
-//     .attr("y", function(d) { return y(d.variable) })
-//     .attr("width", x.bandwidth() )
-//     .attr("height", y.bandwidth() )
-//     .style("fill", function(d) { return myColor(d.value)} )
-
-
-
-// set the dimensions and margins of the graph
-
-var width = data.obsSetsListChildrenCountsMatrix.length * 5;
-var height = data.obsSetsListChildrenCounts.length * 20;
-var margin = {top: 100, right: 100, bottom: 100, left: 150};
-// width = 600 - margin.left - margin.right;
-// height = 600 - margin.top - margin.bottom;
-
-// append the svg object to the body of the page
-var svgMain = d3.select("#app")
-.append("svg")
-  .attr("width", width + margin.left + margin.right)
-  .attr("height", height + margin.top + margin.bottom)
-.append("g")
+function getMainThing(svg, data, dimensions) {
+  svg.append("g")
   .attr("transform",
-        "translate(" + margin.left + "," + margin.top + ")")
-  .attr("class", "mainGroup");
+        "translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
+  .attr("class", "thing1");
 
+  // Build X scales and axis:
+  var x = d3.scaleBand()
+    .range([ 0, dimensions.width ])
+    .domain(data.colNames)
+    .padding(0.01);
+    svg.append("g")
+    .attr("transform", "translate(0," + dimensions.height + ")")
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+      .attr("transform", "translate(-10,0)rotate(-45)")
+      .style("text-anchor", "end");
 
-var yes = svgMain.append("g")
-.attr("transform",
-      "translate(" + margin.left + "," + margin.top + ")")
-.attr("class", "thing1");
-
-var yes2 = svgMain.append("g")
-.attr("transform",
-"translate(" + margin.left + "," + margin.top + ")")
-.attr("class", "thing2");
-
-// Labels of row and columns
-var myGroups = data.allTypes;
-var myVars = uuids; 
-
-// Build X scales and axis:
-var x = d3.scaleBand()
-  .range([ 0, width ])
-  .domain(myGroups)
+  // Build X scales and axis:
+  var y = d3.scaleBand()
+  .range([ dimensions.height, 0 ])
+  .domain(data.rowNames)
   .padding(0.01);
-  yes2.append("g")
-  .attr("transform", "translate(0," + height + ")")
-  .call(d3.axisBottom(x))
-  .selectAll("text")
-    .attr("transform", "translate(-10,0)rotate(-45)")
-    .style("text-anchor", "end");
-
-// Build X scales and axis:
-var y = d3.scaleBand()
-  .range([ height, 0 ])
-  .domain(myVars)
-  .padding(0.01);
-  yes2.append("g")
+  svg.append("g")
   .call(d3.axisLeft(y));
 
-
-// Build color scale
-var myColor = d3.scaleLinear()
+  // Build color scale
+  var colorRange = d3.scaleLinear()
   .range(["white", "#69b3a2"])
   .domain([0,2000])
 
-//Read the data
-var rects = yes2.selectAll()
-      .data(data.obsSetsListChildrenCountsMatrix, function(d) {return d.row+':'+d.col;})
+  //Read the data
+  var rects = svg.selectAll()
+      .data(data.countsMatrix, function(d) {return d.row+':'+d.col;})
       .enter()
       .append("rect")
         .attr("x", function(d) { return x(d.col) })
         .attr("y", function(d) { return y(d.row) })
         .attr("width", x.bandwidth() )
         .attr("height", y.bandwidth() )
-        .style("fill", function(d) { return myColor(d.value)} )
+        .style("fill", function(d) { return colorRange(d.value)} )
+
+    // highlight
+    svg.append('rect')
+    .attr("class", "highlight")
+    .attr('x', 0)
+    .attr('y', 0)
+    .attr('width', dimensions.width)
+    .attr('height', dimensions.height)
+    .attr('stroke', 'black')
+    .attr('fill', 'none')
+    .attr('pointer-events', 'none')
+    .attr('visibility', 'hidden')
 
 
-// create a tooltip
-// const tooltip = svg
-//   .append("text")
-//   // .style("opacity", 0)
-//   .attr("class", "tooltip")
-//   .style("background-color", "white")
-//   .style("border", "solid")
-//   .text('yay<br>yay2')
-//   // .html('<p>yay</p>')
-//   .attr('x', 0)
-//   .attr('y', 0)
-//   // .attr('width', 100)
-//   // .attr('height', 100)
-//   // .style("z-index", "10")
-//   .style("border-width", "2px")
-//   .style("border-radius", "5px")
-//   .style("padding", "5px")
-//   .attr('pointer-events', 'none')
-//   // .attr('visibility', 'hidden')
-//   // .style('left', '200px')
+    // create a tooltip
+    // const tooltip = svg
+    //   .append("text")
+    //   // .style("opacity", 0)
+    //   .attr("class", "tooltip")
+    //   .style("background-color", "white")
+    //   .style("border", "solid")
+    //   .text('yay<br>yay2')
+    //   // .html('<p>yay</p>')
+    //   .attr('x', 0)
+    //   .attr('y', 0)
+    //   // .attr('width', 100)
+    //   // .attr('height', 100)
+    //   // .style("z-index", "10")
+    //   .style("border-width", "2px")
+    //   .style("border-radius", "5px")
+    //   .style("padding", "5px")
+    //   .attr('pointer-events', 'none')
+    //   // .attr('visibility', 'hidden')
+    //   // .style('left', '200px')
 
-// create a tooltip
-const tooltip = d3.select("#app")
-  .append("div")
-  .style("opacity", 0)
-  .attr("class", "tooltip")
-  .style("background-color", "white")
-  .style("border", "solid")
-  // .style("z-index", "10")
-  .style("border-width", "2px")
-  .style("border-radius", "5px")
-  .style("padding", "5px")
-  .attr('pointer-events', 'none')
-  .attr('visibility', 'hidden')
-  .style('left', '200px')
-
-
-// highlight
-svg.append('rect')
-  .attr("class", "highlight")
-  .attr('x', 0)
-  .attr('y', 0)
-  .attr('width', width)
-  .attr('height', height)
-  .attr('stroke', 'black')
-  .attr('fill', 'none')
-  .attr('pointer-events', 'none')
-  .attr('visibility', 'hidden')
+    // create a tooltip
+    const tooltip = d3.select("#app")
+    .append("div")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    // .style("z-index", "10")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px")
+    .attr('pointer-events', 'none')
+    .attr('visibility', 'hidden')
+    .style('left', '200px')
 
 
-    // Three function that change the tooltip when user hover / move / leave a cell
-    const mouseover = function(event,d) {
-      if (event.ctrlKey) {
-        tooltip
-          .html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
-          .style("opacity", 1)
-          // .style("left", (event.x)/2 + "px")
-          // .style("top", (event.y)/2 + "px")
-      } else {
-        addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
-      }
+  const mouseover = function(event,d) {
+    if (event.ctrlKey) {
+      tooltip
+        .html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
+        .style("opacity", 1)
+        // .style("left", (event.x)/2 + "px")
+        // .style("top", (event.y)/2 + "px")
+    } else {
+      addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
     }
-    const mouseleave = function(d) {
-      tooltip.style("opacity", 0)
-      removeHighlight();
-    }
+  }
+  const mouseleave = function(d) {
+    tooltip.style("opacity", 0)
+    removeHighlight();
+  }
 
 
 rects.on('mouseover', mouseover)
 rects.on('mouseleave', mouseleave)
 
-// x.on('click', function(e){
-//   console.log('yay')
-// })
+
 
 
 
@@ -343,10 +276,6 @@ function removeTooltip() {
   .attr('visibility', 'hidden')
 }
 
-
-
-// add bar chart
-
 rects.on('click', function(d) {
   console.log(d)
   console.log(d.target.__data__.row)
@@ -357,6 +286,14 @@ rects.on('click', function(d) {
   createBarChart(d.target.__data__.row)
   // d3.select(this)
 })
+
+return svg;
+}
+
+
+
+
+// add bar chart
 
 function createBarChart(selectedRow) {
   const data = data.obsSetsListChildrenCountsMatrix.filter((o) => o.row === selectedRow)
