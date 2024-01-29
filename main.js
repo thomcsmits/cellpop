@@ -97,93 +97,145 @@ function wrangleData(obsSetsList, urls, rowNames) {
 
 // get the counts per cell type
 function getCountsPerType(o) {
-	var dict = new Object();
-	for(var t of o) {
+	let dict = new Object();
+	for(const t of o) {
 		dict[t.name] = t.set.length;
 	}
 	return dict;
 }
 
-var data = wrangleData(obsSetsList, urls, uuids);
+let data = wrangleData(obsSetsList, urls, uuids);
 console.log('data', data)
 
-var svg = getMainVis(data);
+let svg = getMainVis(data);
 
 
 // // visualization
 function getMainVis(data) {
-	// set the dimensions and margins of the graph
-	var width = data.countsMatrix.length * 5;
-	var height = data.counts.length * 20;
-	var margin = {top: 100, right: 100, bottom: 100, left: 150};
-	var dimensions = {width: width, height: height, margin: margin};
+	// set the of the graph
+
+	let widthRatio = 0.9;
+	let heightRatio = 0.6; 
+
+	let widthRight = data.countsMatrix.length * 10;
+	let heightBottom =  data.counts.length * 50;
+
+	let width = widthRight / widthRatio;
+	let height = heightBottom / heightRatio;
+
+	let widthLeft = width - widthRight;
+	let heightTop = height - heightBottom;
+
+	// let widthFull = 800;
+	// let heightFull = 800;
+	// let widthLeft = 200;
+	// let widthRight = 600;
+	// let heightTop = 200;
+	// let heightBottom = 600;
+
+	// let height = heightFull;
+	// let width = widthFull;
+
+	// var width = data.countsMatrix.length * 5;
+	// var height = data.counts.length * 20;
+	// var margin = {top: 100, right: 100, bottom: 100, left: 150};
+	let dimensions = {
+		global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
+		heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 50, bottom: 50, left: 50}},
+		barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 50}},
+	};
+	
+	// var dimensionsHeatmap = {width: widthRight, height: heightBottom, margin: {top: 50, right: 50, bottom: 50, left: 50}}
+	// var marginHeatmap = {top: 100, right: 100, bottom: 100, left: 150};
 
 	// append the svg object to the body of the page
-	var svg = d3.select("#app")
+	let svg = d3.select("#app")
 	.append("svg")
-		.attr("width", width + margin.left + margin.right)
-		.attr("height", height + margin.top + margin.bottom)
+		.attr("width", width)
+		.attr("height", height)
 	.append("g")
-		.attr("transform",
-			"translate(" + margin.left + "," + margin.top + ")")
-		.attr("class", "mainGroup");
+		// .attr("transform",
+		// 	"translate(" + margin.left + "," + margin.top + ")")
+		.attr("class", "main")
 
 
-	var svgHeatmap = svg.append("g")
-		.attr("transform",
-			"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
-		.attr("class", "heatmap");
+	let svgHeatmap = svg.append("g")
+    .attr("transform",
+        "translate(" + eval(dimensions.heatmap.offsetWidth + dimensions.heatmap.margin.left) + "," + eval(dimensions.heatmap.offsetHeight + dimensions.heatmap.margin.top) + ")")
+    .attr("class", "heatmap")
 
-	var svgBarTop = svg.append("g")
-		.attr("transform",
-			"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
-		.attr("class", "heatmap");
+	let [x, y, colorRange] = renderHeatmap(svgHeatmap, data, dimensions)
 
-	var svgBarLeft = svg.append("g")
-		.attr("transform",
-			"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
-		.attr("class", "heatmap");
-
-	var svgBarcharts = svg.append("g")
-		.attr("transform",
-			"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
-		.attr("class", "barcharts");
 	
-	// return svg  
-	getMainThing(svgHeatmap, data, dimensions)
+	// let svgHeatmap = svg.append("g")
+	// 	.attr("width", width + margin.left + margin.right)
+	// 	.attr("height", height + margin.top + margin.bottom)
+	// 	.attr("transform",
+	// 		"translate(" + dimensions.margin.left + "," + dimensions.margin.top + widthTop + ")")
+	// 	.attr("class", "heatmap")
+	// 	.style("outline", "thick solid black")
+
+	let svgBarTop = svg.append("g")
+		.attr("transform",
+			"translate(" + eval(dimensions.barTop.offsetWidth + dimensions.barTop.margin.left) + "," + eval(dimensions.barTop.offsetHeight + dimensions.barTop.margin.top) + ")")
+		.attr("class", "bartop")
+
+	// let svgBarLeft = svg.append("g")
+	// 	.attr("transform",
+	// 		"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
+	// 	.attr("class", "barleft");
+
+	// let svgBarcharts = svg.append("g")
+	// 	.attr("transform",
+	// 		"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
+	// 	.attr("class", "barextends");
+	
+
+	try{	
+		renderTopBar(svgBarTop, data, dimensions, x)
+	}	
+	catch(e) {
+		console.log(e)
+	}
+ 	
 	console.log('svg here', svg)
 	return svg
 }
 
-function getMainThing(svg, data, dimensions) {
+function renderHeatmap(svg, data, dimensions) {
+	let width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
+	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
 
-	// Build X scales and axis:
-	var x = d3.scaleBand()
-		.range([ 0, dimensions.width ])
+	// Add x-axis
+	let x = d3.scaleBand()
+		.range([ 0, width ])
 		.domain(data.colNames)
 		.padding(0.01);
-		svg.append("g")
-		.attr("transform", "translate(0," + dimensions.height + ")")
+
+	svg.append("g")
+		.attr("transform", "translate(0," + height + ")")
 		.call(d3.axisBottom(x))
 		.selectAll("text")
 		.attr("transform", "translate(-10,0)rotate(-45)")
 		.style("text-anchor", "end");
 
-	// Build X scales and axis:
-	var y = d3.scaleBand()
-	.range([ dimensions.height, 0 ])
-	.domain(data.rowNames)
-	.padding(0.01);
+	// Add y-axis
+	let y = d3.scaleBand()
+		.range([ height, 0 ])
+		.domain(data.rowNames)
+		.padding(0.01);
+
 	svg.append("g")
 	.call(d3.axisLeft(y));
 
-	// Build color scale
-	var colorRange = d3.scaleLinear()
-	.range(["white", "#69b3a2"])
-	.domain([0,2000])
+	// Add color
+	let colorRange = d3.scaleLinear()
+		.range(["white", "#69b3a2"])
+		.domain([0,2000])
+
 
 	//Read the data
-	var rects = svg.selectAll()
+	let rects = svg.selectAll()
 		.data(data.countsMatrix, function(d) {return d.row+':'+d.col;})
 		.enter()
 		.append("rect")
@@ -195,15 +247,15 @@ function getMainThing(svg, data, dimensions) {
 
     // highlight
     svg.append('rect')
-    .attr("class", "highlight")
-    .attr('x', 0)
-    .attr('y', 0)
-    .attr('width', dimensions.width)
-    .attr('height', dimensions.height)
-    .attr('stroke', 'black')
-    .attr('fill', 'none')
-    .attr('pointer-events', 'none')
-    .attr('visibility', 'hidden')
+		.attr("class", "highlight")
+		.attr('x', 0)
+		.attr('y', 0)
+		.attr('width', width)
+		.attr('height', height)
+		.attr('stroke', 'black')
+		.attr('fill', 'none')
+		.attr('pointer-events', 'none')
+		.attr('visibility', 'hidden')
 
 
     // create a tooltip
@@ -229,18 +281,18 @@ function getMainThing(svg, data, dimensions) {
 
     // create a tooltip
     const tooltip = d3.select("#app")
-    .append("div")
-    .style("opacity", 0)
-    .attr("class", "tooltip")
-    .style("background-color", "white")
-    .style("border", "solid")
-    // .style("z-index", "10")
-    .style("border-width", "2px")
-    .style("border-radius", "5px")
-    .style("padding", "5px")
-    .attr('pointer-events', 'none')
-    .attr('visibility', 'hidden')
-    .style('left', '200px')
+		.append("div")
+		.style("opacity", 0)
+		.attr("class", "tooltip")
+		.style("background-color", "white")
+		.style("border", "solid")
+		// .style("z-index", "10")
+		.style("border-width", "2px")
+		.style("border-radius", "5px")
+		.style("padding", "5px")
+		.attr('pointer-events', 'none')
+		.attr('visibility', 'hidden')
+		.style('left', '200px')
 
 
     const mouseover = function(event,d) {
@@ -263,11 +315,11 @@ function getMainThing(svg, data, dimensions) {
     rects.on('mouseleave', mouseleave)
 
 
-    function addHighlight(y, height) {
+    function addHighlight(y, currHeight) {
         svg.selectAll('.highlight')
             .attr('visibility', 'shown')
             .attr('y', y)
-            .attr('height', height)
+            .attr('height', currHeight)
     }
 
     function removeHighlight() {
@@ -300,45 +352,48 @@ function getMainThing(svg, data, dimensions) {
     // d3.select(this)
     })
 
-    return svg;
+    return [x,y,colorRange];
 }
 
 
 // add bar chart
 
-function createBarChart(dataFull, selectedRow, dimensions) {
+function createBarChart(dataFull, selectedRow, dimensions, x, y, colorRange) {
     const data = dataFull.countsMatrix.filter((o) => o.row === selectedRow)
     
     const width = 250
     const height = 150
 
-    var svgBar = d3.select("#app")
+    let svgBar = d3.select("#app")
     .append("svg")
-        .attr("width", width + dimensions.margin.left + dimensions.margin.right)
-        .attr("height", height + dimensions.margin.top + dimensions.margin.bottom)
+        // .attr("width", width + dimensions.margin.left + dimensions.margin.right)
+        // .attr("height", height + dimensions.margin.top + dimensions.margin.bottom)
+		.attr("width", 100)
+		.attr("height", 100)
         .attr("class", "bar")
     .append("g")
         .attr("transform",
-            "translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")");
+            // "translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")");
+			"translate(" + 10 + "," +10 + ")");
     
     svgBar.append("text")
-    .attr("class", "title")
-    .attr("text-anchor", "start")
-    .attr("x", 20)
-    .text(selectedRow);
+		.attr("class", "title")
+		.attr("text-anchor", "start")
+		.attr("x", 20)
+		.text(selectedRow);
         
 
     // X axis
-    const x = d3.scaleBand()
-    .range([ 0, width ])
-    .domain(data.map(d => d.col))
-    .padding(0.2);
-    svgBar.append("g")
-    .attr("transform", `translate(0, ${height})`)
-    .call(d3.axisBottom(x))
-    .selectAll("text")
-        .attr("transform", "translate(-10,0)rotate(-45)")
-        .style("text-anchor", "end");
+    // const x = d3.scaleBand()
+	// 	.range([ 0, width ])
+	// 	.domain(data.map(d => d.col))
+	// 	.padding(0.2);
+	// 	svgBar.append("g")
+	// 	.attr("transform", `translate(0, ${height})`)
+	// 	.call(d3.axisBottom(x))
+	// 	.selectAll("text")
+	// 		.attr("transform", "translate(-10,0)rotate(-45)")
+	// 		.style("text-anchor", "end");
 
     svgBar.append("text")
         .attr("class", "x label")
@@ -348,11 +403,11 @@ function createBarChart(dataFull, selectedRow, dimensions) {
         .text("Cell type");
 
     // Add Y axis
-    const y = d3.scaleLinear()
-    .domain([0, 13000])
-    .range([ height, 0]);
-    svgBar.append("g")
-    .call(d3.axisLeft(y));
+    // const y = d3.scaleLinear()
+    // .domain([0, 13000])
+    // .range([ height, 0]);
+    // svgBar.append("g")
+    // .call(d3.axisLeft(y));
 
     svgBar.append("text")
     .attr("class", "y label")
@@ -376,3 +431,75 @@ function createBarChart(dataFull, selectedRow, dimensions) {
     return svg
 }
 console.log('svg', svg)
+
+
+/**
+ * Find the upper bound for the axis for an array with values.
+ * arr: array with values
+ * Returns the first 5- or 1- value that is higher
+ * E.g. if the max value is 97, it returns 100. If the max value is 147, it returns 500.
+ */
+function getUpperBound(arr) {
+	const maxValue = Math.max(...arr);
+	const lengthValue = maxValue.toString().length;
+	const bound10 = Math.pow(10, lengthValue);
+	const bound5 = bound10 / 2;
+	if (maxValue < bound5) {
+		return bound5;
+	} else {
+		return bound10;
+	}
+}
+
+
+
+
+function renderTopBar(svg, dataFull, dimensions, x) {
+	let width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;
+	let height = dimensions.barTop.height - dimensions.barTop.margin.top - dimensions.barTop.margin.bottom;
+
+	const data = []
+	for (const col of dataFull.colNames) {
+		data.push({col: col, countTotal: dataFull.countsMatrix.filter(r => r.col === col).map(r => r.value).reduce((a, b) => a + b, 0)})
+	}
+	console.log(data)
+	console.log('here', data)
+
+	let upperbound = getUpperBound(data.map(c => c.countTotal));
+
+	// import x-axis
+	// const x = eval(axes.x);
+	
+	// Add y-axis
+	const y = d3.scaleLinear()
+		.range([ height, 0 ])
+		.domain([ 0, upperbound])
+
+	svg.append("g")
+		.call(d3.axisLeft(y));
+
+    svg.append("text")
+		.attr("class", "y label")
+		.attr("text-anchor", "end")
+		.attr('x', -30)
+		.attr("y", -60)
+		.attr("dy", ".75em")
+		.attr("transform", "rotate(-90)")
+		.text("Total number of cells");
+
+    // Bars
+    svg.selectAll("mybar")
+		.data(data)
+		.join("rect")
+			.attr("x", d => x(d.col))
+			.attr("y", d => y(d.countTotal))
+			.attr("width", x.bandwidth())
+			.attr("height", d => height - y(d.countTotal))
+			.attr("fill", "#69b3a2")
+
+	console.log('made it')	
+		
+    // return svg
+
+
+}
