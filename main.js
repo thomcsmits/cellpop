@@ -117,8 +117,9 @@ function getMainVis(data) {
 	let widthRatio = 0.9;
 	let heightRatio = 0.6; 
 
-	let widthRight = data.countsMatrix.length * 10;
-	let heightBottom =  data.counts.length * 50;
+	console.log(data.colNames)
+	let widthRight = data.colNames.length * 40;
+	let heightBottom =  data.rowNames.length * 40;
 
 	let width = widthRight / widthRatio;
 	let height = heightBottom / heightRatio;
@@ -141,7 +142,7 @@ function getMainVis(data) {
 	// var margin = {top: 100, right: 100, bottom: 100, left: 150};
 	let dimensions = {
 		global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
-		heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 50, bottom: 50, left: 50}},
+		heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 50, bottom: 100, left: 50}},
 		barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 50}},
 	};
 	
@@ -219,6 +220,14 @@ function renderHeatmap(svg, data, dimensions) {
 		.attr("transform", "translate(-10,0)rotate(-45)")
 		.style("text-anchor", "end");
 
+	svg.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "end")
+        .attr("x", width / 2)
+        .attr("y", height + dimensions.heatmap.margin.bottom - 10)
+        .text("Cell type");
+
+
 	// Add y-axis
 	let y = d3.scaleBand()
 		.range([ height, 0 ])
@@ -227,6 +236,15 @@ function renderHeatmap(svg, data, dimensions) {
 
 	svg.append("g")
 	.call(d3.axisLeft(y));
+
+    svg.append("text")
+		.attr("class", "y label")
+		.attr("text-anchor", "end")
+		.attr('x', -30)
+		.attr("y", -200)
+		.attr("dy", ".75em")
+		.attr("transform", "rotate(-90)")
+		.text("Samples");
 
 	// Add color
 	let colorRange = d3.scaleLinear()
@@ -478,14 +496,14 @@ function renderTopBar(svg, dataFull, dimensions, x) {
 	svg.append("g")
 		.call(d3.axisLeft(y));
 
-    svg.append("text")
-		.attr("class", "y label")
-		.attr("text-anchor", "end")
-		.attr('x', -30)
-		.attr("y", -60)
-		.attr("dy", ".75em")
-		.attr("transform", "rotate(-90)")
-		.text("Total number of cells");
+    // svg.append("text")
+	// 	.attr("class", "y label")
+	// 	.attr("text-anchor", "end")
+	// 	.attr('x', 0)
+	// 	.attr("y", -60)
+	// 	.attr("dy", ".75em")
+	// 	.attr("transform", "rotate(-90)")
+	// 	.text("Total number of cells");
 
     // Bars
     svg.selectAll("mybar")
