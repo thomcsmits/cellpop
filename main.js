@@ -3,7 +3,7 @@ import { AnnDataSource, ObsSetsAnndataLoader } from '@vitessce/zarr';
 
 // data
 var uuids = ['ad693f99fb9006e68a53e97598da1509',
-	'173de2e80adf6a73ac8cff5ccce20dfc',
+    '173de2e80adf6a73ac8cff5ccce20dfc',
 	'b95f34761c252ebbd1e482cd9afae73f',
 	'5a5ca03fa623602d9a859224aa40ace4',
 	'3c1b10bc912c60c9afc36b7423695236',
@@ -139,7 +139,6 @@ function getMainVis(data) {
 			"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
 		.attr("class", "heatmap");
 
-
 	var svgBarLeft = svg.append("g")
 		.attr("transform",
 			"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
@@ -244,89 +243,83 @@ function getMainThing(svg, data, dimensions) {
     .style('left', '200px')
 
 
-  const mouseover = function(event,d) {
-    if (event.ctrlKey) {
-      tooltip
-        .html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
-        .style("opacity", 1)
-        // .style("left", (event.x)/2 + "px")
-        // .style("top", (event.y)/2 + "px")
-    } else {
-      addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
+    const mouseover = function(event,d) {
+        if (event.ctrlKey) {
+        tooltip
+            .html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
+            .style("opacity", 1)
+            // .style("left", (event.x)/2 + "px")
+            // .style("top", (event.y)/2 + "px")
+        } else {
+        addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
+        }
     }
-  }
-  const mouseleave = function(d) {
-    tooltip.style("opacity", 0)
-    removeHighlight();
-  }
+    const mouseleave = function(d) {
+        tooltip.style("opacity", 0)
+        removeHighlight();
+    }
+
+    rects.on('mouseover', mouseover)
+    rects.on('mouseleave', mouseleave)
 
 
-rects.on('mouseover', mouseover)
-rects.on('mouseleave', mouseleave)
+    function addHighlight(y, height) {
+        svg.selectAll('.highlight')
+            .attr('visibility', 'shown')
+            .attr('y', y)
+            .attr('height', height)
+    }
+
+    function removeHighlight() {
+        svg.selectAll('.highlight')
+            .attr('visibility', 'hidden')
+    }
 
 
+    function addTooltip(x, y, text) {
+        svg.selectAll('.tooltip')
+        .attr('x', 0)
+        .attr('y',0)
+        .text('hello')
+        .attr('visibility', 'shown')
+    }
 
+    function removeTooltip() {
+    svg.selectAll('.tooltip')
+    .attr('visibility', 'hidden')
+    }
 
+    rects.on('click', function(d) {
+    console.log(d)
+    console.log(d.target.__data__.row)
+    console.log(d3.selectAll(".bar").size())
+    if (d3.selectAll(".bar").size() >= 2) {
+        d3.select(".bar").remove();
+    }
+    createBarChart(data, d.target.__data__.row, dimensions)
+    // d3.select(this)
+    })
 
-function addHighlight(y, height) {
-  svg.selectAll('.highlight')
-      .attr('visibility', 'shown')
-      .attr('y', y)
-      .attr('height', height)
+    return svg;
 }
-
-function removeHighlight() {
-  svg.selectAll('.highlight')
-      .attr('visibility', 'hidden')
-}
-
-
-function addTooltip(x, y, text) {
-  svg.selectAll('.tooltip')
-  .attr('x', 0)
-  .attr('y',0)
-  .text('hello')
-  .attr('visibility', 'shown')
-}
-
-function removeTooltip() {
-  svg.selectAll('.tooltip')
-  .attr('visibility', 'hidden')
-}
-
-rects.on('click', function(d) {
-  console.log(d)
-  console.log(d.target.__data__.row)
-  console.log(d3.selectAll(".bar").size())
-  if (d3.selectAll(".bar").size() >= 2) {
-    d3.select(".bar").remove();
-  }
-  createBarChart(d.target.__data__.row)
-  // d3.select(this)
-})
-
-return svg;
-}
-
-
 
 
 // add bar chart
 
-function createBarChart(selectedRow) {
-  const data = data.obsSetsListChildrenCountsMatrix.filter((o) => o.row === selectedRow)
+function createBarChart(dataFull, selectedRow, dimensions) {
+  const data = dataFull.countsMatrix.filter((o) => o.row === selectedRow)
   
-  width = 250
-  height = 150
+  const width = 250
+  const height = 150
 
   var svgBar = d3.select("#app")
   .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
+    .attr("width", width + dimensions.margin.left + dimensions.margin.right)
+    .attr("height", height + dimensions.margin.top + dimensions.margin.bottom)
     .attr("class", "bar")
   .append("g")
     .attr("transform",
-          "translate(" + margin.left + "," + margin.top + ")");
+          "translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")");
   
 svgBar.append("text")
   .attr("class", "title")
