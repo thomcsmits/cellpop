@@ -465,11 +465,14 @@ function getUpperBound(arr) {
 	const lengthValue = maxValue.toString().length;
 	const bound10 = Math.pow(10, lengthValue);
 	const bound5 = bound10 / 2;
+	const bound25 = bound5 /2;
+	if (maxValue < bound25) {
+		return bound25
+	}
 	if (maxValue < bound5) {
 		return bound5;
-	} else {
-		return bound10;
 	}
+	return bound10;
 }
 
 
