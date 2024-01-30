@@ -142,8 +142,10 @@ function getMainVis(data) {
 	// var margin = {top: 100, right: 100, bottom: 100, left: 150};
 	let dimensions = {
 		global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
-		heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 50, bottom: 100, left: 50}},
-		barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 50}},
+		heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 50, bottom: 100, left: 0}},
+		barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
+		barLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
+		// barLeft: {offsetWidth: 100, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 50, right: 0, bottom: 0, left: 100}},
 	};
 	
 	// var dimensionsHeatmap = {width: widthRight, height: heightBottom, margin: {top: 50, right: 50, bottom: 50, left: 50}}
@@ -160,6 +162,7 @@ function getMainVis(data) {
 		.attr("class", "main")
 
 
+	// create main heatmap
 	let svgHeatmap = svg.append("g")
     .attr("transform",
         "translate(" + eval(dimensions.heatmap.offsetWidth + dimensions.heatmap.margin.left) + "," + eval(dimensions.heatmap.offsetHeight + dimensions.heatmap.margin.top) + ")")
@@ -167,38 +170,36 @@ function getMainVis(data) {
 
 	let [x, y, colorRange] = renderHeatmap(svgHeatmap, data, dimensions)
 
-	
-	// let svgHeatmap = svg.append("g")
-	// 	.attr("width", width + margin.left + margin.right)
-	// 	.attr("height", height + margin.top + margin.bottom)
-	// 	.attr("transform",
-	// 		"translate(" + dimensions.margin.left + "," + dimensions.margin.top + widthTop + ")")
-	// 	.attr("class", "heatmap")
-	// 	.style("outline", "thick solid black")
-
+	// create top barchart
 	let svgBarTop = svg.append("g")
 		.attr("transform",
 			"translate(" + eval(dimensions.barTop.offsetWidth + dimensions.barTop.margin.left) + "," + eval(dimensions.barTop.offsetHeight + dimensions.barTop.margin.top) + ")")
 		.attr("class", "bartop")
 
-	// let svgBarLeft = svg.append("g")
-	// 	.attr("transform",
-	// 		"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
-	// 	.attr("class", "barleft");
+	renderTopBar(svgBarTop, data, dimensions, x)
+
+	// create left barchart
+	let svgBarLeft = svg.append("g")
+		.attr("transform",
+			"translate(" + eval(dimensions.barLeft.offsetWidth + dimensions.barLeft.margin.left) + "," + eval(dimensions.barLeft.offsetHeight + dimensions.barLeft.margin.top) + ")") //rotate(90)")
+		// .attr("transform", 
+		// 	"rotate(90)")
+		.attr("class", "barleft")
+
+	renderLeftBar(svgBarLeft, data, dimensions, y)
+	// svgBarLeft.append('rect')
+	// 	.attr('x', 0)
+	// 	.attr('y', 0)
+	// 	.attr('width', dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right)
+	// 	.attr('height', dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom)
+	// 	.attr('stroke', 'blue')
+	// 	.attr('fill', 'blue')
 
 	// let svgBarcharts = svg.append("g")
 	// 	.attr("transform",
 	// 		"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
 	// 	.attr("class", "barextends");
 	
-
-	try{	
-		renderTopBar(svgBarTop, data, dimensions, x)
-	}	
-	catch(e) {
-		console.log(e)
-	}
- 	
 	console.log('svg here', svg)
 	return svg
 }
@@ -235,7 +236,9 @@ function renderHeatmap(svg, data, dimensions) {
 		.padding(0.01);
 
 	svg.append("g")
-	.call(d3.axisLeft(y));
+		.call(d3.axisRight(y))
+		.attr("transform", "translate(" + width + ",0)")
+		//.style("text-anchor", "end");
 
     svg.append("text")
 		.attr("class", "y label")
@@ -480,8 +483,8 @@ function renderTopBar(svg, dataFull, dimensions, x) {
 	for (const col of dataFull.colNames) {
 		data.push({col: col, countTotal: dataFull.countsMatrix.filter(r => r.col === col).map(r => r.value).reduce((a, b) => a + b, 0)})
 	}
-	console.log(data)
-	console.log('here', data)
+	// console.log(data)
+	// console.log('here', data)
 
 	let upperbound = getUpperBound(data.map(c => c.countTotal));
 
@@ -513,11 +516,50 @@ function renderTopBar(svg, dataFull, dimensions, x) {
 			.attr("y", d => y(d.countTotal))
 			.attr("width", x.bandwidth())
 			.attr("height", d => height - y(d.countTotal))
-			.attr("fill", "#69b3a2")
+			.attr("fill", "black")
 
-	console.log('made it')	
+	// console.log('made it')	
 		
     // return svg
 
 
+}
+
+
+function renderLeftBar(svg, dataFull, dimensions, y) {
+	let width = dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right;
+	let height = dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom;
+
+	const data = []
+	for (let i = 0; i < dataFull.rowNames.length; i++) {
+		data.push({row: dataFull.rowNames[i], countTotal: Object.values(dataFull.counts[i]).reduce((a, b) => a + b, 0)})
+	}
+
+	let upperbound = getUpperBound(data.map(c => c.countTotal));
+
+	// Add y-axis
+	const x = d3.scaleLinear()
+		.range([ width, 0 ])
+		.domain([ 0, upperbound])
+
+	const y_changed = y.padding(0.05)
+	// console.log(y_changed)
+
+	svg.append("g")
+		.call(d3.axisBottom(x))
+		.attr("transform", "translate(0," + height + ")")
+		.selectAll("text")
+		.attr("transform", "translate(-10,0)rotate(-45)")
+		.style("text-anchor", "end");
+
+    // // Bars
+    svg.selectAll("mybar")
+		.data(data)
+		.join("rect")
+			.attr("x", d => x(d.countTotal))
+			.attr("y", d => y(d.row))
+			.attr("width", d => width - x(d.countTotal))
+			.attr("height", y.bandwidth())
+			.attr("fill", "black")
+		
 }
