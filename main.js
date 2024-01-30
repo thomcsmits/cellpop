@@ -118,7 +118,7 @@ function getMainVis(data) {
 	let heightRatio = 0.6; 
 
 	console.log(data.colNames)
-	let widthRight = data.colNames.length * 40;
+	let widthRight = data.colNames.length * 25;
 	let heightBottom =  data.rowNames.length * 40;
 
 	let width = widthRight / widthRatio;
@@ -145,6 +145,7 @@ function getMainVis(data) {
 		heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 50, bottom: 100, left: 0}},
 		barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
 		barLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
+		detailBar: {offsetWidth: 0, offsetHeight: 0, width: width / 2, height: height, margin: {top: 50, right: 50, bottom: 50, left: 100}},
 		// barLeft: {offsetWidth: 100, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 50, right: 0, bottom: 0, left: 100}},
 	};
 	
@@ -379,7 +380,7 @@ function renderHeatmap(svg, data, dimensions) {
 
 // add bar chart
 
-function createBarChart(dataFull, selectedRow, dimensions, x, y, colorRange) {
+function createBarChart(dataFull, selectedRow, dimensions) {
     const data = dataFull.countsMatrix.filter((o) => o.row === selectedRow)
     
     const width = 250
@@ -389,13 +390,13 @@ function createBarChart(dataFull, selectedRow, dimensions, x, y, colorRange) {
     .append("svg")
         // .attr("width", width + dimensions.margin.left + dimensions.margin.right)
         // .attr("height", height + dimensions.margin.top + dimensions.margin.bottom)
-		.attr("width", 100)
-		.attr("height", 100)
+		.attr("width", dimensions.detailBar.width + dimensions.detailBar.margin.left + dimensions.detailBar.margin.right)
+		.attr("height", dimensions.detailBar.height + dimensions.detailBar.margin.top + dimensions.detailBar.margin.bottom)
         .attr("class", "bar")
     .append("g")
         .attr("transform",
-            // "translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")");
-			"translate(" + 10 + "," +10 + ")");
+            "translate(" + dimensions.detailBar.margin.left + "," + dimensions.detailBar.margin.top + ")");
+			// "translate(" + 10 + "," +10 + ")");
     
     svgBar.append("text")
 		.attr("class", "title")
@@ -405,16 +406,16 @@ function createBarChart(dataFull, selectedRow, dimensions, x, y, colorRange) {
         
 
     // X axis
-    // const x = d3.scaleBand()
-	// 	.range([ 0, width ])
-	// 	.domain(data.map(d => d.col))
-	// 	.padding(0.2);
-	// 	svgBar.append("g")
-	// 	.attr("transform", `translate(0, ${height})`)
-	// 	.call(d3.axisBottom(x))
-	// 	.selectAll("text")
-	// 		.attr("transform", "translate(-10,0)rotate(-45)")
-	// 		.style("text-anchor", "end");
+    const x = d3.scaleBand()
+		.range([ 0, width ])
+		.domain(data.map(d => d.col))
+		.padding(0.2);
+		svgBar.append("g")
+		.attr("transform", `translate(0, ${height})`)
+		.call(d3.axisBottom(x))
+		.selectAll("text")
+			.attr("transform", "translate(-10,0)rotate(-45)")
+			.style("text-anchor", "end");
 
     svgBar.append("text")
         .attr("class", "x label")
@@ -424,11 +425,11 @@ function createBarChart(dataFull, selectedRow, dimensions, x, y, colorRange) {
         .text("Cell type");
 
     // Add Y axis
-    // const y = d3.scaleLinear()
-    // .domain([0, 13000])
-    // .range([ height, 0]);
-    // svgBar.append("g")
-    // .call(d3.axisLeft(y));
+    const y = d3.scaleLinear()
+    .domain([0, 13000])
+    .range([ height, 0]);
+    svgBar.append("g")
+    .call(d3.axisLeft(y));
 
     svgBar.append("text")
     .attr("class", "y label")
@@ -545,8 +546,8 @@ function renderLeftBar(svg, dataFull, dimensions, y) {
 		.range([ width, 0 ])
 		.domain([ 0, upperbound])
 
-	const y_changed = y.padding(0.05)
-	// console.log(y_changed)
+	const y_changed = y//.padding(0.25)
+	console.log(y_changed)
 
 	svg.append("g")
 		.call(d3.axisBottom(x))
@@ -560,9 +561,9 @@ function renderLeftBar(svg, dataFull, dimensions, y) {
 		.data(data)
 		.join("rect")
 			.attr("x", d => x(d.countTotal))
-			.attr("y", d => y(d.row))
+			.attr("y", d => y_changed(d.row))
 			.attr("width", d => width - x(d.countTotal))
-			.attr("height", y.bandwidth())
+			.attr("height", y_changed.bandwidth())
 			.attr("fill", "black")
 		
 }
