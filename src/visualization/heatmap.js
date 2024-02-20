@@ -106,34 +106,32 @@ export function renderHeatmap(svg, data, dimensions) {
 		.append("div")
 		.attr("class", "tooltip")
 		.style("background-color", "#FFFFFF")
-		.attr("opacity", 0.8)
+		.attr("opacity", 0)
 		.style("border", "solid")
 		.style("border-width", "1px")
 		.style("border-radius", "5px")
 		.style("padding", "5px")
 		.attr("pointer-events", "none")
-		.attr("visibility", "hidden")
+		// .attr("visibility", "hidden")
 		.style("position", "absolute")
 
 
     const mouseover = function(event,d) {
         if (event.ctrlKey) {
-        tooltip
-            .html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
-            .style("opacity", 0.8)
-            .style("left", (event.x) + "px")
-            .style("top", (event.y) + "px")
+			addTooltip(tooltip, event, d);
         } else {
         	addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
         }
     }
     const mouseleave = function(d) {
-        tooltip.style("opacity", 0)
+		removeTooltip(tooltip);
         removeHighlight();
     }
 
-    rects.on("mouseover", mouseover)
-    rects.on("mouseleave", mouseleave)
+    rects.on("mouseover", mouseover);
+	rowsBehind.on("mouseover", mouseover);
+    rects.on("mouseleave", mouseleave);
+	rowsBehind.on("mouseleave", mouseleave);
 
 
     function addHighlight(y, currHeight) {
@@ -149,17 +147,19 @@ export function renderHeatmap(svg, data, dimensions) {
     }
 
 
-    function addTooltip(x, y, text) {
-        svg.selectAll(".tooltip")
-        .attr("x", 0)
-        .attr("y",0)
-        .text("hello")
-        .attr("visibility", "shown")
+    function addTooltip(tooltip, event, d) {
+		tooltip
+			.html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
+			.style("opacity", 0.8)
+			.attr("visibility", "shown")
+			.style("left", (event.x) + "px")
+			.style("top", (event.y) + "px")
     }
 
-    function removeTooltip() {
-    svg.selectAll(".tooltip")
-    .attr("visibility", "hidden")
+    function removeTooltip(tooltip) {
+		tooltip
+			.html(``)
+			.style("opacity", 0)
     }
 
     rects.on("click", function(d) {
