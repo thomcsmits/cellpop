@@ -74,7 +74,7 @@ export function renderHeatmap(svg, data, dimensions) {
 			.attr("y", function(d) { return y(d) })
 			.attr("width", width )
 			.attr("height", y.bandwidth() )
-			.style("fill", colorRange(0))
+			.style("fill", colorRange(1000))
 
 
 	// Read the data
@@ -162,16 +162,19 @@ export function renderHeatmap(svg, data, dimensions) {
 			.style("opacity", 0)
     }
 
-    rects.on("click", function(d) {
-    console.log(d)
-    console.log(d.target.__data__.row)
-    console.log(d3.selectAll(".bar").size())
-    if (d3.selectAll(".bar").size() >= 2) {
-        d3.select(".bar").remove();
-    }
-    createBarChart(data, d.target.__data__.row, dimensions)
-    // d3.select(this)
-    })
+	function createBarExtension(d) {
+		let target = d.target.__data__;
+		if (d.target.__data__.row) {
+			target = d.target.__data__.row
+		}
+		if (d3.selectAll(".bar").size() >= 2) {
+			d3.select(".bar").remove();
+		}
+		createBarChart(data, target, dimensions);
+	}
+    
+	rects.on("click", createBarExtension);
+	rowsBehind.on("click", createBarExtension);
 
     return [x,y,colorRange];
 }

@@ -72,5 +72,5 @@ export function createBarChart(dataFull, selectedRow, dimensions) {
         .attr("height", d => height - y(d.value))
         .attr("fill", "#69b3a2")
 
-    return svg
+    return svgBar;
 }
