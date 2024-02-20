@@ -55,18 +55,29 @@ export function renderHeatmap(svg, data, dimensions) {
 
 		console.log(data)
 
-	//Add rows in the back
-	let rows = svg.selectAll()
+	// Add rows and columns behind
+	let colsBehind = svg.selectAll()
+		.data(data.colNames, function(d) {return d;})
+		.enter()
+		.append("rect")
+			.attr("x", function(d) { return x(d) })
+			.attr("y", 0)
+			.attr("width", x.bandwidth() )
+			.attr("height", height )
+			.style("fill", colorRange(0))
+
+	let rowsBehind = svg.selectAll()
 		.data(data.rowNames, function(d) {return d;})
 		.enter()
 		.append("rect")
-			.attr("x", function(d) { return 0 })
+			.attr("x", 0)
 			.attr("y", function(d) { return y(d) })
 			.attr("width", width )
 			.attr("height", y.bandwidth() )
-			.style("fill", function(d) { return colorRange(0)} )
+			.style("fill", colorRange(0))
 
-	//Read the data
+
+	// Read the data
 	let rects = svg.selectAll()
 		.data(data.countsMatrix, function(d) {return d.row+':'+d.col;})
 		.enter()
