@@ -256,6 +256,19 @@ function renderHeatmap(svg, data, dimensions) {
 		.domain([0,2000])
 
 
+		console.log(data)
+
+	//Add rows in the back
+	let rows = svg.selectAll()
+		.data(data.rowNames, function(d) {return d;})
+		.enter()
+		.append("rect")
+			.attr("x", function(d) { return 0 })
+			.attr("y", function(d) { return y(d) })
+			.attr("width", width )
+			.attr("height", y.bandwidth() )
+			.style("fill", function(d) { return colorRange(0)} )
+
 	//Read the data
 	let rects = svg.selectAll()
 		.data(data.countsMatrix, function(d) {return d.row+':'+d.col;})
@@ -281,49 +294,28 @@ function renderHeatmap(svg, data, dimensions) {
 
 
     // create a tooltip
-    // const tooltip = svg
-    //   .append("text")
-    //   // .style("opacity", 0)
-    //   .attr("class", "tooltip")
-    //   .style("background-color", "white")
-    //   .style("border", "solid")
-    //   .text('yay<br>yay2')
-    //   // .html('<p>yay</p>')
-    //   .attr('x', 0)
-    //   .attr('y', 0)
-    //   // .attr('width', 100)
-    //   // .attr('height', 100)
-    //   // .style("z-index", "10")
-    //   .style("border-width", "2px")
-    //   .style("border-radius", "5px")
-    //   .style("padding", "5px")
-    //   .attr('pointer-events', 'none')
-    //   // .attr('visibility', 'hidden')
-    //   // .style('left', '200px')
-
-    // create a tooltip
     const tooltip = d3.select("#app")
 		.append("div")
-		.style("opacity", 0)
 		.attr("class", "tooltip")
-		.style("background-color", "white")
+		.style("background-color", "#FFFFFF")
+		.attr("opacity", 0)
 		.style("border", "solid")
 		// .style("z-index", "10")
-		.style("border-width", "2px")
+		.style("border-width", "1px")
 		.style("border-radius", "5px")
 		.style("padding", "5px")
 		.attr('pointer-events', 'none')
 		.attr('visibility', 'hidden')
-		.style('left', '200px')
+		.style("position", "absolute")
 
 
     const mouseover = function(event,d) {
         if (event.ctrlKey) {
         tooltip
             .html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
-            .style("opacity", 1)
-            // .style("left", (event.x)/2 + "px")
-            // .style("top", (event.y)/2 + "px")
+            .style("opacity", 0.8)
+            .style("left", (event.x) + "px")
+            .style("top", (event.y) + "px")
         } else {
         addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
         }
