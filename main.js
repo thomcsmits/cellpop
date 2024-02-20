@@ -1,5 +1,8 @@
 import * as d3 from "d3";
-import { AnnDataSource, ObsSetsAnndataLoader } from '@vitessce/zarr';
+import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
+import { getMainVis } from "./src/visualization";
+
+console.log('here')
 
 // data
 var uuids = ['ad693f99fb9006e68a53e97598da1509',
@@ -105,9 +108,6 @@ function getCountsPerType(o) {
 }
 
 let data = wrangleData(obsSetsList, urls, uuids);
-console.log('data', data)
-
-let svg = getMainVis(data);
 
 
 // // visualization
@@ -548,14 +548,4 @@ function renderLeftBar(svg, dataFull, dimensions, y) {
 		.attr("transform", "translate(-10,0)rotate(-45)")
 		.style("text-anchor", "end");
 
-    // // Bars
-    svg.selectAll("mybar")
-		.data(data)
-		.join("rect")
-			.attr("x", d => x(d.countTotal))
-			.attr("y", d => y_changed(d.row))
-			.attr("width", d => width - x(d.countTotal))
-			.attr("height", y_changed.bandwidth())
-			.attr("fill", "black")
-		
-}
+getMainVis(data);
