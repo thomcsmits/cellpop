@@ -41,7 +41,7 @@ export function renderHeatmap(svg, data, dimensions) {
     svg.append("text")
 		.attr("class", "y label")
 		.attr("text-anchor", "end")
-		.attr('x', -30)
+		.attr("x", -30)
 		.attr("y", -200)
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
@@ -79,7 +79,7 @@ export function renderHeatmap(svg, data, dimensions) {
 
 	// Read the data
 	let rects = svg.selectAll()
-		.data(data.countsMatrix, function(d) {return d.row+':'+d.col;})
+		.data(data.countsMatrix, function(d) {return d.row+":"+d.col;})
 		.enter()
 		.append("rect")
 			.attr("x", function(d) { return x(d.col) })
@@ -89,16 +89,16 @@ export function renderHeatmap(svg, data, dimensions) {
 			.style("fill", function(d) { return colorRange(d.value)} )
 
     // highlight
-    svg.append('rect')
+    svg.append("rect")
 		.attr("class", "highlight")
-		.attr('x', 0)
-		.attr('y', 0)
-		.attr('width', width)
-		.attr('height', height)
-		.attr('stroke', 'black')
-		.attr('fill', 'none')
-		.attr('pointer-events', 'none')
-		.attr('visibility', 'hidden')
+		.attr("x", 0)
+		.attr("y", 0)
+		.attr("width", width)
+		.attr("height", height)
+		.attr("stroke", "black")
+		.attr("fill", "none")
+		.attr("pointer-events", "none")
+		.attr("visibility", "hidden")
 
 
     // create a tooltip
@@ -106,14 +106,13 @@ export function renderHeatmap(svg, data, dimensions) {
 		.append("div")
 		.attr("class", "tooltip")
 		.style("background-color", "#FFFFFF")
-		.attr("opacity", 0)
+		.attr("opacity", 0.8)
 		.style("border", "solid")
-		// .style("z-index", "10")
 		.style("border-width", "1px")
 		.style("border-radius", "5px")
 		.style("padding", "5px")
-		.attr('pointer-events', 'none')
-		.attr('visibility', 'hidden')
+		.attr("pointer-events", "none")
+		.attr("visibility", "hidden")
 		.style("position", "absolute")
 
 
@@ -125,7 +124,7 @@ export function renderHeatmap(svg, data, dimensions) {
             .style("left", (event.x) + "px")
             .style("top", (event.y) + "px")
         } else {
-        addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
+        	addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
         }
     }
     const mouseleave = function(d) {
@@ -133,37 +132,37 @@ export function renderHeatmap(svg, data, dimensions) {
         removeHighlight();
     }
 
-    rects.on('mouseover', mouseover)
-    rects.on('mouseleave', mouseleave)
+    rects.on("mouseover", mouseover)
+    rects.on("mouseleave", mouseleave)
 
 
     function addHighlight(y, currHeight) {
-        svg.selectAll('.highlight')
-            .attr('visibility', 'shown')
-            .attr('y', y)
-            .attr('height', currHeight)
+        svg.selectAll(".highlight")
+            .attr("visibility", "shown")
+            .attr("y", y)
+            .attr("height", currHeight)
     }
 
     function removeHighlight() {
-        svg.selectAll('.highlight')
-            .attr('visibility', 'hidden')
+        svg.selectAll(".highlight")
+            .attr("visibility", "hidden")
     }
 
 
     function addTooltip(x, y, text) {
-        svg.selectAll('.tooltip')
-        .attr('x', 0)
-        .attr('y',0)
-        .text('hello')
-        .attr('visibility', 'shown')
+        svg.selectAll(".tooltip")
+        .attr("x", 0)
+        .attr("y",0)
+        .text("hello")
+        .attr("visibility", "shown")
     }
 
     function removeTooltip() {
-    svg.selectAll('.tooltip')
-    .attr('visibility', 'hidden')
+    svg.selectAll(".tooltip")
+    .attr("visibility", "hidden")
     }
 
-    rects.on('click', function(d) {
+    rects.on("click", function(d) {
     console.log(d)
     console.log(d.target.__data__.row)
     console.log(d3.selectAll(".bar").size())

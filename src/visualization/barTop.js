@@ -11,7 +11,7 @@ export function renderTopBar(svg, dataFull, dimensions, x) {
 		data.push({col: col, countTotal: dataFull.countsMatrix.filter(r => r.col === col).map(r => r.value).reduce((a, b) => a + b, 0)})
 	}
 	// console.log(data)
-	// console.log('here', data)
+	// console.log("here", data)
 
 	let upperbound = getUpperBound(data.map(c => c.countTotal));
 
@@ -29,7 +29,7 @@ export function renderTopBar(svg, dataFull, dimensions, x) {
     // svg.append("text")
 	// 	.attr("class", "y label")
 	// 	.attr("text-anchor", "end")
-	// 	.attr('x', 0)
+	// 	.attr("x", 0)
 	// 	.attr("y", -60)
 	// 	.attr("dy", ".75em")
 	// 	.attr("transform", "rotate(-90)")
@@ -45,7 +45,7 @@ export function renderTopBar(svg, dataFull, dimensions, x) {
 			.attr("height", d => height - y(d.countTotal))
 			.attr("fill", "black")
 
-	// console.log('made it')	
+	// console.log("made it")	
 		
     // return svg
 

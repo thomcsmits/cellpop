@@ -56,7 +56,7 @@ export function createBarChart(dataFull, selectedRow, dimensions) {
     svgBar.append("text")
     .attr("class", "y label")
     .attr("text-anchor", "end")
-    .attr('x', -30)
+    .attr("x", -30)
     .attr("y", -60)
     .attr("dy", ".75em")
     .attr("transform", "rotate(-90)")

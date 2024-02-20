@@ -6,7 +6,7 @@ import { renderLeftBar } from "./barSide";
 
 // visualization
 export function getMainVis(data) {
-    console.log('here')
+    console.log("here")
 	// set the of the graph
 
 	let widthRatio = 0.9;
@@ -83,19 +83,19 @@ export function getMainVis(data) {
 		.attr("class", "barleft")
 
 	renderLeftBar(svgBarLeft, data, dimensions, y)
-	// svgBarLeft.append('rect')
-	// 	.attr('x', 0)
-	// 	.attr('y', 0)
-	// 	.attr('width', dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right)
-	// 	.attr('height', dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom)
-	// 	.attr('stroke', 'blue')
-	// 	.attr('fill', 'blue')
+	// svgBarLeft.append("rect")
+	// 	.attr("x", 0)
+	// 	.attr("y", 0)
+	// 	.attr("width", dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right)
+	// 	.attr("height", dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom)
+	// 	.attr("stroke", "blue")
+	// 	.attr("fill", "blue")
 
 	// let svgBarcharts = svg.append("g")
 	// 	.attr("transform",
 	// 		"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
 	// 	.attr("class", "barextends");
 	
-	console.log('svg here', svg)
+	console.log("svg here", svg)
 	return svg
 }
