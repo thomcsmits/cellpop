@@ -53,8 +53,6 @@ export function getMainVis(data) {
 		.attr("width", width)
 		.attr("height", height)
 	.append("g")
-		// .attr("transform",
-		// 	"translate(" + margin.left + "," + margin.top + ")")
 		.attr("class", "main")
     
         
@@ -75,26 +73,8 @@ export function getMainVis(data) {
 	renderTopBar(svgBarTop, data, dimensions, x)
 
 	// create left barchart
-	let svgBarLeft = svg.append("g")
-		.attr("transform",
-			"translate(" + eval(dimensions.barLeft.offsetWidth + dimensions.barLeft.margin.left) + "," + eval(dimensions.barLeft.offsetHeight + dimensions.barLeft.margin.top) + ")") //rotate(90)")
-		// .attr("transform", 
-		// 	"rotate(90)")
-		.attr("class", "barleft")
+	renderLeftBar(data, dimensions, y)
 
-	renderLeftBar(svgBarLeft, data, dimensions, y)
-	// svgBarLeft.append("rect")
-	// 	.attr("x", 0)
-	// 	.attr("y", 0)
-	// 	.attr("width", dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right)
-	// 	.attr("height", dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom)
-	// 	.attr("stroke", "blue")
-	// 	.attr("fill", "blue")
-
-	// let svgBarcharts = svg.append("g")
-	// 	.attr("transform",
-	// 		"translate(" + dimensions.margin.left + "," + dimensions.margin.top + ")")
-	// 	.attr("class", "barextends");
 	
 	console.log("svg here", svg)
 	return svg

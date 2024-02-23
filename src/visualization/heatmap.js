@@ -1,11 +1,11 @@
 import * as d3 from "d3";
 
 import { createBarChart } from "./barExtensions";
+import { renderLeftBar } from "./barSide";
 import { reorderArray } from "./util";
 
 export function renderHeatmap(svg, data, dimensions) {
-	console.log('data', data)
-
+	// Get dimensions
 	let width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
 	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
 
@@ -37,13 +37,11 @@ export function renderHeatmap(svg, data, dimensions) {
 		.domain(data.rowNames)
 		.padding(0.01);
 
-
 	svg.append("g")
 		.call(d3.axisRight(y))
 		.attr("class", "axisright")
 		.attr("transform", "translate(" + width + ",0)")
 		//.style("text-anchor", "end");
-
 
     svg.append("text")
 		.attr("class", "y-label")
@@ -54,11 +52,11 @@ export function renderHeatmap(svg, data, dimensions) {
 		.attr("transform", "rotate(-90)")
 		.text("Samples");
 
+
 	// Add color
 	let colorRange = d3.scaleLinear()
 		.range(["white", "#69b3a2"])
 		.domain([0,2000])
-
 
 
 	// Add rows and columns behind
@@ -98,7 +96,8 @@ export function renderHeatmap(svg, data, dimensions) {
 			.attr("height", y.bandwidth() )
 			.style("fill", function(d) { return colorRange(d.value)} )
 
-    // highlight
+
+    // Add highlight
     svg.append("rect")
 		.attr("class", "highlight")
 		.attr("x", 0)
@@ -111,7 +110,7 @@ export function renderHeatmap(svg, data, dimensions) {
 		.attr("visibility", "hidden")
 
 
-    // create a tooltip
+    // Add tooltip
     const tooltip = d3.select("#app")
 		.append("div")
 		.attr("class", "tooltip")
@@ -126,6 +125,7 @@ export function renderHeatmap(svg, data, dimensions) {
 		.style("position", "absolute")
 
 
+	// Define mouse functions
     const mouseover = function(event,d) {
         if (event.target.classList[0].includes('heatmap-rects') && event.ctrlKey) {
 			addTooltip(tooltip, event, d);
@@ -151,6 +151,7 @@ export function renderHeatmap(svg, data, dimensions) {
             .attr("visibility", "shown")
             .attr("y", y)
             .attr("height", currHeight)
+			.raise()
     }
 
     function removeHighlight() {
@@ -199,22 +200,23 @@ export function renderHeatmap(svg, data, dimensions) {
 		// Update data
 		data = dragged(event, d, this, data, y);
 		// Update the y-domain
-		y.domain(data.rowNames);
+		y = y.domain(data.rowNames);
 		svg.select("g.axisright").remove()
 		svg.append("g")
 			.attr("class", "axisright")
 			.call(d3.axisRight(y))
 			.attr("transform", "translate(" + width + ",0)")
+
+		// Update left bar
+		renderLeftBar(data, dimensions, y);
 	})
     .on("end", function(event, d) { 
 		dragended(event, d, this, data, y); 
 	})
 
 
-
 	// Apply drag behavior to rows
 	rowsBehind.call(dragRows);
-
 
 
     return [x,y,colorRange];
@@ -283,6 +285,7 @@ export function renderHeatmap(svg, data, dimensions) {
 		// Update the ordering of rowNames
 		data.rowNames = reorderArray(data.rowNames, currentIndex, newIndex);
 		data.rowNamesWrapped = reorderArray(data.rowNamesWrapped, currentIndex, newIndex);
+		data.counts = reorderArray(data.counts, currentIndex, newIndex);
 
 		return data;
 	}

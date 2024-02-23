@@ -2,14 +2,31 @@ import * as d3 from "d3";
 
 import { getUpperBound } from "./util";
 
-export function renderLeftBar(svg, dataFull, dimensions, y) {
+export function renderLeftBar(dataFull, dimensions, y) {
+	// console.log('y', y)
+	// console.log('bar left y', y('ad693f99fb9006e68a53e97598da1509'))
+	// Remove any prior barcharts
+	d3.select("g.barleft").remove();
+
+	// Create svg element
+	let svg = d3.select("g.main")
+		.append("g")
+			.attr("transform",
+				"translate(" + eval(dimensions.barLeft.offsetWidth + dimensions.barLeft.margin.left) + "," + eval(dimensions.barLeft.offsetHeight + dimensions.barLeft.margin.top) + ")")
+			.attr("class", "barleft")
+
+	// console.log(svg)
 	let width = dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right;
 	let height = dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom;
 
+	console.log('h', dataFull.counts)
 	const data = []
 	for (let i = 0; i < dataFull.rowNames.length; i++) {
 		data.push({row: dataFull.rowNames[i], countTotal: Object.values(dataFull.counts[i]).reduce((a, b) => a + b, 0)})
 	}
+
+	// console.log('data', data)
+	// console.log('here', dataFull.rowNames)
 
 	let upperbound = getUpperBound(data.map(c => c.countTotal));
 
@@ -18,8 +35,8 @@ export function renderLeftBar(svg, dataFull, dimensions, y) {
 		.range([ width, 0 ])
 		.domain([ 0, upperbound])
 
-	const y_changed = y//.padding(0.25)
-	console.log(y_changed)
+	const y_changed = y.padding(0.25)
+	// console.log(y_changed)
 
 	svg.append("g")
 		.call(d3.axisBottom(x))
@@ -29,7 +46,7 @@ export function renderLeftBar(svg, dataFull, dimensions, y) {
 		.style("text-anchor", "end");
 
     // // Bars
-    svg.selectAll("mybar")
+    svg.selectAll()
 		.data(data)
 		.join("rect")
 			.attr("x", d => x(d.countTotal))
@@ -37,5 +54,9 @@ export function renderLeftBar(svg, dataFull, dimensions, y) {
 			.attr("width", d => width - x(d.countTotal))
 			.attr("height", y_changed.bandwidth())
 			.attr("fill", "black")
+
+		// console.log(svg)
+
+	console.log(y_changed(dataFull.rowNames[0]))
 		
 }
