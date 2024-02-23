@@ -16,6 +16,7 @@ export function renderHeatmap(svg, data, dimensions) {
 		.padding(0.01);
 
 	svg.append("g")
+		.attr("class", "axisbottom")
 		.attr("transform", "translate(0," + height + ")")
 		.call(d3.axisBottom(x))
 		.selectAll("text")
@@ -23,7 +24,7 @@ export function renderHeatmap(svg, data, dimensions) {
 		.style("text-anchor", "end");
 
 	svg.append("text")
-        .attr("class", "x label")
+        .attr("class", "x-label")
         .attr("text-anchor", "end")
         .attr("x", width / 2)
         .attr("y", height + dimensions.heatmap.margin.bottom - 10)
@@ -36,17 +37,16 @@ export function renderHeatmap(svg, data, dimensions) {
 		.domain(data.rowNames)
 		.padding(0.01);
 
-	// console.log(data.rowNames)
-	// data.rowNames = reorderArray(data.rowNames, 0, 3);
-	// y.domain(data.rowNames)
 
 	svg.append("g")
 		.call(d3.axisRight(y))
+		.attr("class", "axisright")
 		.attr("transform", "translate(" + width + ",0)")
 		//.style("text-anchor", "end");
 
+
     svg.append("text")
-		.attr("class", "y label")
+		.attr("class", "y-label")
 		.attr("text-anchor", "end")
 		.attr("x", -30)
 		.attr("y", -200)
@@ -72,7 +72,6 @@ export function renderHeatmap(svg, data, dimensions) {
 			.attr("width", x.bandwidth() )
 			.attr("height", height )
 			.style("fill", colorRange(0))
-
 
 
 	let rowsBehind = svg.selectAll()
@@ -201,6 +200,11 @@ export function renderHeatmap(svg, data, dimensions) {
 		data = dragged(event, d, this, data, y);
 		// Update the y-domain
 		y.domain(data.rowNames);
+		svg.select("g.axisright").remove()
+		svg.append("g")
+			.attr("class", "axisright")
+			.call(d3.axisRight(y))
+			.attr("transform", "translate(" + width + ",0)")
 	})
     .on("end", function(event, d) { 
 		dragended(event, d, this, data, y); 
