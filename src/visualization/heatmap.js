@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import { createBarChart } from "./barExtensions";
 import { renderLeftBar } from "./barSide";
 import { dragstarted, dragged, dragended } from "./drag";
+import { addTooltip, removeTooltip } from "./tooltips";
 
 
 export function renderHeatmap(svg, data, dimensions) {
@@ -112,7 +113,7 @@ export function renderHeatmap(svg, data, dimensions) {
 
 
     // Add tooltip
-    const tooltip = d3.select("#app")
+    d3.select("#app")
 		.append("div")
 		.attr("class", "tooltip")
 		.style("background-color", "#FFFFFF")
@@ -128,15 +129,16 @@ export function renderHeatmap(svg, data, dimensions) {
 
 	// Define mouse functions
     const mouseover = function(event,d) {
-        if (event.target.classList[0].includes('heatmap-rects') && event.ctrlKey) {
-			addTooltip(tooltip, event, d);
+        if (event.ctrlKey) {
+			if (event.target.classList[0].includes('heatmap-rects')) {}
+			addTooltip(event, d);
         } else {
         	addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
         }
     }
     const mouseleave = function(d) {
-		removeTooltip(tooltip);
-        removeHighlight();
+		removeTooltip();
+        removeHighlight(svg);
     }
 
     rects.on("mouseover", mouseover);
@@ -144,37 +146,10 @@ export function renderHeatmap(svg, data, dimensions) {
     rects.on("mouseleave", mouseleave);
 	rowsBehind.on("mouseleave", mouseleave);
 
-	rects.on('mousedown', rects.attr("pointer-events", "none"))
-	// rects.on('mouseup', rects.attr("pointer-events", "auto"))
+	// rects.on('mousedown', rects.attr("pointer-events", "none"))
+	// rects.on('mouseup', rects.attr("pointer-events", "visible"))
 
-    function addHighlight(y, currHeight) {
-        svg.selectAll(".highlight")
-            .attr("visibility", "shown")
-            .attr("y", y)
-            .attr("height", currHeight)
-			.raise()
-    }
-
-    function removeHighlight() {
-        svg.selectAll(".highlight")
-            .attr("visibility", "hidden")
-    }
-
-
-    function addTooltip(tooltip, event, d) {
-		tooltip
-			.html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
-			.style("opacity", 0.8)
-			.attr("visibility", "shown")
-			.style("left", (event.x) + "px")
-			.style("top", (event.y) + "px")
-    }
-
-    function removeTooltip(tooltip) {
-		tooltip
-			.html(``)
-			.style("opacity", 0)
-    }
+    
 
 	function createBarExtension(d) {
 		let target = d.target.__data__;
@@ -224,3 +199,16 @@ export function renderHeatmap(svg, data, dimensions) {
 }
 
 
+// heatmap highlight
+function addHighlight(y, currHeight) {
+	d3.select(".highlight")
+		.attr("visibility", "shown")
+		.attr("y", y)
+		.attr("height", currHeight)
+		.raise()
+}
+
+function removeHighlight() {
+	d3.select(".highlight")
+		.attr("visibility", "hidden")
+}
