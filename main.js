@@ -109,6 +109,9 @@ function getCountsPerType(o) {
 
 let data = wrangleData(obsSetsList, urls, uuids);
 
+// add row/col to row/colnames
+data.rowNamesWrapped = data.rowNames.map(d => {return {row: d}})
+data.colNamesWrapped = data.colNames.map(d => {return {col: d}})
 
 // visualization
 getMainVis(data);
