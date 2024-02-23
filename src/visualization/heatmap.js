@@ -1,8 +1,11 @@
 import * as d3 from "d3";
 
 import { createBarChart } from "./barExtensions";
+import { reorderArray } from "./util";
 
 export function renderHeatmap(svg, data, dimensions) {
+	console.log('data', data)
+
 	let width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
 	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
 
@@ -33,6 +36,10 @@ export function renderHeatmap(svg, data, dimensions) {
 		.domain(data.rowNames)
 		.padding(0.01);
 
+	// console.log(data.rowNames)
+	// data.rowNames = reorderArray(data.rowNames, 0, 3);
+	// y.domain(data.rowNames)
+
 	svg.append("g")
 		.call(d3.axisRight(y))
 		.attr("transform", "translate(" + width + ",0)")
@@ -53,7 +60,6 @@ export function renderHeatmap(svg, data, dimensions) {
 		.domain([0,2000])
 
 
-		console.log(data)
 
 	// Add rows and columns behind
 	let colsBehind = svg.selectAll()
@@ -69,7 +75,6 @@ export function renderHeatmap(svg, data, dimensions) {
 
 
 
-	console.log(data)
 	let rowsBehind = svg.selectAll()
 		.data(data.rowNamesWrapped, function(d) {return d.row;})
 		.enter()
@@ -187,29 +192,50 @@ export function renderHeatmap(svg, data, dimensions) {
 
 	// Define drag behavior
 	let dragRows = d3.drag()
-	.on("start", dragstarted)
-	.on("drag", dragged)
-	.on("end", dragended);
+	.on("start", function(event, d) { 
+		removeHighlight();
+		dragstarted(event, d, this); 
+	})
+    .on("drag", function(event, d) {
+		// Update data
+		data = dragged(event, d, this, data, y);
+		// Update the y-domain
+		y.domain(data.rowNames);
+	})
+    .on("end", function(event, d) { 
+		dragended(event, d, this, data, y); 
+	})
+
 
 
 	// Apply drag behavior to rows
 	rowsBehind.call(dragRows);
 
 
-	// Drag start function
-	function dragstarted(event, d) {
-		console.log(event.sourceEvent.target)
 
-		d3.select(this).raise().classed("active", true);
+    return [x,y,colorRange];
+}
+
+
+
+
+	// Drag start function
+	function dragstarted(event, d, element) {
+		const rects = d3.selectAll(".heatmap-rects");
+
+		// Set dragged elements to active
+		d3.select(element).raise().classed("active", true);
 		rects.filter(r => r.row === d.row).raise().classed("active", true);
 	}
 
 
 	// Dragging function
-	function dragged(event, d) {
-		console.log(d)
+	function dragged(event, d, element, data, y) {
+		const rects = d3.selectAll(".heatmap-rects");
+		const rowsBehind = d3.selectAll(".heatmap-rows");
+
 		// Let the selected row and rects on that row move with the cursor
-		d3.select(this).attr("y", d.y = event.y);
+		d3.select(element).attr("y", d.y = event.y);
 		rects.filter(r => r.row === d.row).attr("y", d.y = event.y)
 
 		// Calculate the current index of the dragged row
@@ -228,7 +254,7 @@ export function renderHeatmap(svg, data, dimensions) {
 
 		// If row stays at the same place, return
 		if (newIndex === currentIndex) {
-			return
+			return data;
 		}
 
 		// Calculate the displacement of the dragged row
@@ -251,24 +277,22 @@ export function renderHeatmap(svg, data, dimensions) {
 		})
 
 		// Update the ordering of rowNames
-		let selectedElement = data.rowNames[currentIndex];
-		let rowNamesCopy = [...data.rowNames.slice(0, currentIndex), ...data.rowNames.slice(currentIndex + 1)];
-		rowNamesCopy = [...rowNamesCopy.slice(0, newIndex), selectedElement, ...rowNamesCopy.slice(newIndex)];
-		data.rowNames = rowNamesCopy;
-	
-		// Update the y-domain
-		y.domain(data.rowNames)
+		data.rowNames = reorderArray(data.rowNames, currentIndex, newIndex);
+		data.rowNamesWrapped = reorderArray(data.rowNamesWrapped, currentIndex, newIndex);
+
+		return data;
 	}
 
 	// Drag end function
-	function dragended(event, d) {
+	function dragended(event, d, element, data, y) {
+		const rects = d3.selectAll(".heatmap-rects");
+
 		// Get the current index and set the y-coordinate of this row when drag ends
 		let currentIndex = data.rowNames.indexOf(d.row);
-		d3.select(this).attr("y", y(data.rowNames[currentIndex]));
+		d3.select(element).attr("y", y(data.rowNames[currentIndex]));
 		rects.filter(r => r.row === d.row).attr("y", y(data.rowNames[currentIndex]));
-		d3.select(this).classed("active", false);
+
+		// Set dragged elements to inactive
+		d3.select(element).classed("active", false);
 		rects.filter(r => r.row === d.row).raise().classed("active", false);
 	}
-
-    return [x,y,colorRange];
-}

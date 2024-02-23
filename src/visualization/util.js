@@ -18,3 +18,11 @@ export function getUpperBound(arr) {
 	}
 	return bound10;
 }
+
+
+export function reorderArray(arr, currentIndex, newIndex) {
+	let selectedElement = arr[currentIndex];
+	let arrCopy = [...arr.slice(0, currentIndex), ...arr.slice(currentIndex + 1)];
+	arrCopy = [...arrCopy.slice(0, newIndex), selectedElement, ...arrCopy.slice(newIndex)];
+	return arrCopy;
+}
