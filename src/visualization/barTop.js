@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 
 import { getUpperBound } from "./util";
+import { defineTooltipBarTop, addTooltipBarTop, removeTooltipBarTop } from "./tooltips";
 
 export function renderTopBar(svg, dataFull, dimensions, x) {
 	let width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;
@@ -36,7 +37,7 @@ export function renderTopBar(svg, dataFull, dimensions, x) {
 	// 	.text("Total number of cells");
 
     // Bars
-    svg.selectAll("mybar")
+    let bars = svg.selectAll()
 		.data(data)
 		.join("rect")
 			.attr("x", d => x(d.col))
@@ -45,9 +46,19 @@ export function renderTopBar(svg, dataFull, dimensions, x) {
 			.attr("height", d => height - y(d.countTotal))
 			.attr("fill", "black")
 
-	// console.log("made it")	
-		
-    // return svg
+	defineTooltipBarTop();
 
+	// Define mouse functions
+    const mouseover = function(event,d) {
+        if (event.ctrlKey) {
+			addTooltipBarTop(event, d);
+        }
+    }
+    const mouseleave = function() {
+		removeTooltipBarTop();
+    }
+
+	bars.on("mouseover", mouseover);
+	bars.on("mouseleave", mouseleave);
 
 }

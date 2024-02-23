@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { createBarChart } from "./barExtensions";
 import { renderLeftBar } from "./barSide";
 import { dragstarted, dragged, dragended } from "./drag";
-import { addTooltip, removeTooltip } from "./tooltips";
+import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
 
 
 export function renderHeatmap(svg, data, dimensions) {
@@ -111,20 +111,7 @@ export function renderHeatmap(svg, data, dimensions) {
 		.attr("pointer-events", "none")
 		.attr("visibility", "hidden")
 
-
-    // Add tooltip
-    d3.select("#app")
-		.append("div")
-		.attr("class", "tooltip")
-		.style("background-color", "#FFFFFF")
-		.attr("opacity", 0)
-		.style("border", "solid")
-		.style("border-width", "1px")
-		.style("border-radius", "5px")
-		.style("padding", "5px")
-		.attr("pointer-events", "none")
-		// .attr("visibility", "hidden")
-		.style("position", "absolute")
+	defineTooltip()
 
 
 	// Define mouse functions

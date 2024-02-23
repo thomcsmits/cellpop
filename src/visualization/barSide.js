@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 
 import { getUpperBound } from "./util";
+import { defineTooltipBarSide, addTooltipBarSide, removeTooltipBarSide, defineTooltip } from "./tooltips";
 
 export function renderLeftBar(dataFull, dimensions, y) {
 	// console.log('y', y)
@@ -46,7 +47,7 @@ export function renderLeftBar(dataFull, dimensions, y) {
 		.style("text-anchor", "end");
 
     // // Bars
-    svg.selectAll()
+    let bars = svg.selectAll()
 		.data(data)
 		.join("rect")
 			.attr("x", d => x(d.countTotal))
@@ -57,6 +58,19 @@ export function renderLeftBar(dataFull, dimensions, y) {
 
 		// console.log(svg)
 
-	console.log(y_changed(dataFull.rowNames[0]))
+	defineTooltipBarSide();
+
+	// Define mouse functions
+    const mouseover = function(event,d) {
+        if (event.ctrlKey) {
+			addTooltipBarSide(event, d);
+        }
+    }
+    const mouseleave = function() {
+		removeTooltipBarSide();
+    }
+
+	bars.on("mouseover", mouseover);
+	bars.on("mouseleave", mouseleave);
 		
 }
