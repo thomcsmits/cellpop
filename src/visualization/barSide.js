@@ -1,11 +1,9 @@
 import * as d3 from "d3";
 
 import { getUpperBound } from "./util";
-import { defineTooltipBarSide, addTooltipBarSide, removeTooltipBarSide, defineTooltip } from "./tooltips";
+import { defineTooltipBarSide, addTooltipBarSide, removeTooltipBarSide } from "./tooltips";
 
 export function renderLeftBar(dataFull, dimensions, y) {
-	// console.log('y', y)
-	// console.log('bar left y', y('ad693f99fb9006e68a53e97598da1509'))
 	// Remove any prior barcharts
 	d3.select("g.barleft").remove();
 
@@ -16,19 +14,17 @@ export function renderLeftBar(dataFull, dimensions, y) {
 				"translate(" + eval(dimensions.barLeft.offsetWidth + dimensions.barLeft.margin.left) + "," + eval(dimensions.barLeft.offsetHeight + dimensions.barLeft.margin.top) + ")")
 			.attr("class", "barleft")
 
-	// console.log(svg)
+	// Get dimensions
 	let width = dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right;
 	let height = dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom;
 
-	console.log('h', dataFull.counts)
+	// Get accumulated data
 	const data = []
 	for (let i = 0; i < dataFull.rowNames.length; i++) {
 		data.push({row: dataFull.rowNames[i], countTotal: Object.values(dataFull.counts[i]).reduce((a, b) => a + b, 0)})
 	}
 
-	// console.log('data', data)
-	// console.log('here', dataFull.rowNames)
-
+	// Determine upper bound
 	let upperbound = getUpperBound(data.map(c => c.countTotal));
 
 	// Add y-axis

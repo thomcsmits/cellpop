@@ -65,12 +65,7 @@ export function getMainVis(data) {
 	let [x, y, colorRange] = renderHeatmap(svgHeatmap, data, dimensions)
 
 	// create top barchart
-	let svgBarTop = svg.append("g")
-		.attr("transform",
-			"translate(" + eval(dimensions.barTop.offsetWidth + dimensions.barTop.margin.left) + "," + eval(dimensions.barTop.offsetHeight + dimensions.barTop.margin.top) + ")")
-		.attr("class", "bartop")
-
-	renderTopBar(svgBarTop, data, dimensions, x)
+	renderTopBar(data, dimensions, x)
 
 	// create left barchart
 	renderLeftBar(data, dimensions, y)

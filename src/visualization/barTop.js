@@ -3,7 +3,18 @@ import * as d3 from "d3";
 import { getUpperBound } from "./util";
 import { defineTooltipBarTop, addTooltipBarTop, removeTooltipBarTop } from "./tooltips";
 
-export function renderTopBar(svg, dataFull, dimensions, x) {
+export function renderTopBar(dataFull, dimensions, x) {
+	// Remove any prior barcharts
+	d3.select("g.bartop").remove();
+
+	// Create svg element
+	let svg = d3.select("g.main")
+		.append("g")
+			.attr("transform",
+				"translate(" + eval(dimensions.barTop.offsetWidth + dimensions.barTop.margin.left) + "," + eval(dimensions.barTop.offsetHeight + dimensions.barTop.margin.top) + ")")
+			.attr("class", "bartop")
+
+	// Get dimensions
 	let width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;
 	let height = dimensions.barTop.height - dimensions.barTop.margin.top - dimensions.barTop.margin.bottom;
 
