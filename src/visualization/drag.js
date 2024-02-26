@@ -11,6 +11,7 @@ export function dragstarted(event, d) {
     // Set dragged elements to active
     rowsBehind.filter(r => r.row === d.row).raise().classed("active", true);
     rects.filter(r => r.row === d.row).raise().classed("active", true);
+    d3.select(".highlight").raise().classed("active", true);
 }
 
 
@@ -19,9 +20,10 @@ export function dragged(event, d, data, y) {
     const rects = d3.selectAll(".heatmap-rects");
     const rowsBehind = d3.selectAll(".heatmap-rows");
 
-    // Let the selected row and rects on that row move with the cursor
+    // Let the selected row and rects on that row and highlight move with the cursor
     rowsBehind.filter(r => r.row === d.row).attr("y", d.y = event.y);
     rects.filter(r => r.row === d.row).attr("y", d.y = event.y)
+    d3.select(".highlight").attr("y", event.y)
 
     // Calculate the current index of the dragged row
     let currentIndex = data.rowNames.indexOf(d.row);
@@ -80,8 +82,10 @@ export function dragended(event, d, data, y) {
     let currentIndex = data.rowNames.indexOf(d.row);
     rowsBehind.filter(r => r.row === d.row).attr("y", y(data.rowNames[currentIndex]));
     rects.filter(r => r.row === d.row).attr("y", y(data.rowNames[currentIndex]));
+    d3.select(".highlight").attr("y", y(data.rowNames[currentIndex]));
 
     // Set dragged elements to inactive
     rowsBehind.filter(r => r.row === d.row).classed("active", false);
     rects.filter(r => r.row === d.row).classed("active", false);
+    d3.select(".highlight").classed("active", false);
 }

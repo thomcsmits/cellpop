@@ -134,9 +134,9 @@ export function renderHeatmap(data, dimensions) {
         	addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
         }
     }
-    const mouseleave = function(d) {
+    const mouseleave = function(event,d) {
 		removeTooltip();
-        removeHighlight(svg);
+        removeHighlight(event,d);
     }
 
     rects.on("mouseover", mouseover);
@@ -144,10 +144,6 @@ export function renderHeatmap(data, dimensions) {
     rects.on("mouseleave", mouseleave);
 	rowsBehind.on("mouseleave", mouseleave);
 
-	// rects.on('mousedown', rects.attr("pointer-events", "none"))
-	// rects.on('mouseup', rects.attr("pointer-events", "visible"))
-
-    
 
 	function createBarExtension(d) {
 		let target = d.target.__data__;
@@ -159,18 +155,10 @@ export function renderHeatmap(data, dimensions) {
 		}
 		createBarChart(data, target, dimensions, x);
 	}
-    
-
-	// function clickBehaviour() {
-
-
-	// }
-
 
 	// Define drag behavior
 	let drag = d3.drag()
 	.on("start", function(event, d) { 
-		removeHighlight();
 		dragstarted(event, d); 
 	})
     .on("drag", function(event, d) {
@@ -196,10 +184,11 @@ export function renderHeatmap(data, dimensions) {
 
 	// Apply drag behavior to rows
 	// rowsBehind.call(drag).on("click", createBarExtension);
-	// rects.call(drag).on("click", createBarExtension);
-	rects.on("click", createBarExtension);
+	rects.call(drag).on("click", createBarExtension);
+	rects.call(drag).on("click", createBarExtension);
 
 
+	console.log('y', y(data.rowNames[data.rowNames.length - 1]))
 
     return [x,y,colorRange];
 }
@@ -214,7 +203,12 @@ function addHighlight(y, currHeight) {
 		.raise()
 }
 
-function removeHighlight() {
+function removeHighlight(event, d) {
+	// makes sure the highlight stays when dragging
+	if (event.defaultPrevented) {
+		return;
+	}
+
 	d3.select(".highlight")
 		.attr("visibility", "hidden")
 }
