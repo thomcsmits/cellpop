@@ -2,8 +2,6 @@ import * as d3 from "d3";
 import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
 import { getMainVis } from "./src/visualization";
 
-console.log('here')
-
 // data
 var uuids = ['ad693f99fb9006e68a53e97598da1509',
     '173de2e80adf6a73ac8cff5ccce20dfc',
@@ -35,8 +33,6 @@ var uuids = ['ad693f99fb9006e68a53e97598da1509',
 	'8d631eee88855ac59155edca2a3bc1ca',
 	'1ea6c0ac5ba60fe35bf63af8699b6fbe']
 
-// for dev purposes
-uuids.splice(5)
 
 // get hubmap url to zarr
 function getURL(uuid) {
@@ -44,28 +40,48 @@ function getURL(uuid) {
 }
 const urls = uuids.map(getURL);
 
-// Get list of obssets
-const obsSetsList = [];
-for (let i = 0; i < urls.length; i++) { 
-    const url = urls[i]
-    const source = new AnnDataSource({ url });
-    const config = {
-        url,
-        fileType: 'obsSets.anndata.zarr',
-        options: [
-            {
-                name: 'Cell Ontology Annotation',
-                path: 'obs/predicted_CLID' //'obs/predicted_label'
-            }
-        ],
-    };
-    const loader = new ObsSetsAnndataLoader(source, config);
-    const { data: { obsSets } } = await loader.load();
-    obsSetsList.push(obsSets);
+// Get one Promise with all ObsSets
+function retrieveObsSets(urls) {
+	const obsSetsListPromises = [];
+	for (let i = 0; i < urls.length; i++) { 
+		const url = urls[i]
+		const source = new AnnDataSource({ url });
+		const config = {
+			url,
+			fileType: 'obsSets.anndata.zarr',
+			options: [
+				{
+					name: 'Cell Ontology Annotation',
+					path: 'obs/predicted_CLID' //'obs/predicted_label'
+				}
+			],
+		};
+		const loader = new ObsSetsAnndataLoader(source, config);
+		obsSetsListPromises.push(loader.load());
+	}
+	return Promise.all(obsSetsListPromises)
 }
-console.log('obssets', obsSetsList)
+
+// Retrieve the ObsSets, then wrangle data and call the vis
+retrieveObsSets(urls)
+    .then(obsSetsListWrapped => {
+		// wrangle data
+		let obsSetsList = obsSetsListWrapped.map((o) => o.data.obsSets);
+		let data = wrangleData(obsSetsList, urls, uuids);
+
+		// add row/col to row/colnames
+		data.rowNamesWrapped = data.rowNames.map(d => {return {row: d}})
+		data.colNamesWrapped = data.colNames.map(d => {return {col: d}})
+
+		// visualization
+		getMainVis(data);
+    })
+    .catch(error => {
+        console.error(error);
+    });
 
 
+// wrangle data
 function wrangleData(obsSetsList, urls, rowNames) {
 	// get the actual data
 	const obsSetsListChildren = obsSetsList.map((o) => o.tree[0].children);
@@ -88,16 +104,6 @@ function wrangleData(obsSetsList, urls, rowNames) {
 }
 
 
-// // get the matrix column for each entry
-// function getMatrixColumn(o, allTypes) {
-//   const matrixColumn = new Array(allTypes.length).fill(0);
-//   for (const [key, value] of Object.entries(o)) {
-//       let index = allTypes.indexOf(key)
-//       matrixColumn[index] = value;
-//   }
-//   return matrixColumn;
-// }
-
 // get the counts per cell type
 function getCountsPerType(o) {
 	let dict = new Object();
@@ -107,11 +113,3 @@ function getCountsPerType(o) {
 	return dict;
 }
 
-let data = wrangleData(obsSetsList, urls, uuids);
-
-// add row/col to row/colnames
-data.rowNamesWrapped = data.rowNames.map(d => {return {row: d}})
-data.colNamesWrapped = data.colNames.map(d => {return {col: d}})
-
-// visualization
-getMainVis(data);
