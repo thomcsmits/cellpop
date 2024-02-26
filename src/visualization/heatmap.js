@@ -94,7 +94,7 @@ export function renderHeatmap(data, dimensions) {
 			.attr("y", function(d) { return y(d.row) })
 			.attr("width", width )
 			.attr("height", y.bandwidth() )
-			.style("fill", colorRange(1000))
+			.style("fill", colorRange(0))
 
 
 	// Read the data
@@ -183,8 +183,8 @@ export function renderHeatmap(data, dimensions) {
 
 
 	// Apply drag behavior to rows
-	// rowsBehind.call(drag).on("click", createBarExtension);
-	rects.call(drag).on("click", createBarExtension);
+	rowsBehind.call(drag).on("click", createBarExtension);
+	// rects.on("click", createBarExtension).call(drag);
 	rects.call(drag).on("click", createBarExtension);
 
 

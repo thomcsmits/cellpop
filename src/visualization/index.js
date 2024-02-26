@@ -11,7 +11,6 @@ export function getMainVis(data) {
 	let widthRatio = 0.9;
 	let heightRatio = 0.6; 
 
-	console.log(data.colNames)
 	let widthRight = data.colNames.length * 25;
 	let heightBottom =  data.rowNames.length * 40;
 
