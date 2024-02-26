@@ -1,24 +1,22 @@
 import * as d3 from "d3";
 
-// add bar chart
+import { getUpperBound } from "./util";
 
-export function createBarChart(dataFull, selectedRow, dimensions) {
+// add bar chart
+export function createBarChart(dataFull, selectedRow, dimensions, x) {
     const data = dataFull.countsMatrix.filter((o) => o.row === selectedRow)
     
-    const width = 250
-    const height = 150
+    let width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
+	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
 
     let svgBar = d3.select("#app")
     .append("svg")
-        // .attr("width", width + dimensions.margin.left + dimensions.margin.right)
-        // .attr("height", height + dimensions.margin.top + dimensions.margin.bottom)
-		.attr("width", dimensions.detailBar.width + dimensions.detailBar.margin.left + dimensions.detailBar.margin.right)
+		.attr("width", dimensions.global.width)
 		.attr("height", dimensions.detailBar.height + dimensions.detailBar.margin.top + dimensions.detailBar.margin.bottom)
         .attr("class", "bar")
     .append("g")
         .attr("transform",
-            "translate(" + dimensions.detailBar.margin.left + "," + dimensions.detailBar.margin.top + ")");
-			// "translate(" + 10 + "," +10 + ")");
+            "translate(" + eval(dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left) + "," + eval(dimensions.detailBar.offsetHeight + dimensions.detailBar.margin.top) + ")");
     
     svgBar.append("text")
 		.attr("class", "title")
@@ -28,11 +26,7 @@ export function createBarChart(dataFull, selectedRow, dimensions) {
         
 
     // X axis
-    const x = d3.scaleBand()
-		.range([ 0, width ])
-		.domain(data.map(d => d.col))
-		.padding(0.2);
-		svgBar.append("g")
+    svgBar.append("g")
 		.attr("transform", `translate(0, ${height})`)
 		.call(d3.axisBottom(x))
 		.selectAll("text")
@@ -42,13 +36,16 @@ export function createBarChart(dataFull, selectedRow, dimensions) {
     svgBar.append("text")
         .attr("class", "x label")
         .attr("text-anchor", "end")
-        .attr("x", width - 10)
-        .attr("y", height + 75)
+        .attr("x", width / 2)
+        .attr("y", height + dimensions.heatmap.margin.bottom - 10)
         .text("Cell type");
 
+
     // Add Y axis
+    let upperbound = getUpperBound(data.map(c => c.value));
+
     const y = d3.scaleLinear()
-    .domain([0, 13000])
+    .domain([0, upperbound])
     .range([ height, 0]);
     svgBar.append("g")
     .call(d3.axisLeft(y));
