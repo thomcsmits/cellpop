@@ -38,6 +38,9 @@ export function renderTopBar(dataFull, dimensions, x) {
 	svg.append("g")
 		.call(d3.axisLeft(y));
 
+
+	const x_changed = x.padding(0.25)
+
     // svg.append("text")
 	// 	.attr("class", "y label")
 	// 	.attr("text-anchor", "end")
@@ -51,7 +54,7 @@ export function renderTopBar(dataFull, dimensions, x) {
     let bars = svg.selectAll()
 		.data(data)
 		.join("rect")
-			.attr("x", d => x(d.col))
+			.attr("x", d => x_changed(d.col))
 			.attr("y", d => y(d.countTotal))
 			.attr("width", x.bandwidth())
 			.attr("height", d => height - y(d.countTotal))
