@@ -161,7 +161,6 @@ let promiseMetadata = getMetadata(uuids);
 Promise.all([promiseData, promiseMetadata]).then((values) => {
 	let data = values[0];
 	let metadata = values[1];
-	console.log(metadata)
 	data.metadata = {rows: metadata};
 	getMainVis(data);
 })

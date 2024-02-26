@@ -34,8 +34,6 @@ export function renderLeftBar(dataFull, dimensions, y) {
 
 	const y_changed = y.paddingInner(0.25)
 	
-	// console.log(y_changed)
-
 	svg.append("g")
 		.call(d3.axisBottom(x))
 		.attr("transform", "translate(0," + height + ")")
@@ -53,14 +51,11 @@ export function renderLeftBar(dataFull, dimensions, y) {
 			.attr("height", y_changed.bandwidth())
 			.attr("fill", "black")
 
-		// console.log(svg)
-
 	defineTooltipBarSide();
 
 	// Define mouse functions
     const mouseover = function(event,d) {
 		let metadataRow = dataFull.metadata.rows.filter(r => r.row === d.row)[0].metadata;
-		console.log(metadataRow)
         if (event.ctrlKey) {
 			addTooltipBarSide(event, d, metadataRow);
         }

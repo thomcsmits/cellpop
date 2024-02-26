@@ -187,9 +187,6 @@ export function renderHeatmap(data, dimensions) {
 	// rects.on("click", createBarExtension).call(drag);
 	rects.call(drag).on("click", createBarExtension);
 
-
-	console.log('y', y(data.rowNames[data.rowNames.length - 1]))
-
     return [x,y,colorRange];
 }
 

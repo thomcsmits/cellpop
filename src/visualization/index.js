@@ -69,7 +69,5 @@ export function getMainVis(data) {
 	// // create graph
 	// renderGraph(data, dimensions)
 
-	
-	console.log("svg here", svg)
 	return svg
 }
