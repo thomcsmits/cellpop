@@ -6,7 +6,18 @@ import { dragstarted, dragged, dragended } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
 
 
-export function renderHeatmap(svg, data, dimensions) {
+export function renderHeatmap(data, dimensions) {
+	// Remove any prior heatmaps
+	d3.select("g.heatmap").remove();
+
+	// Create svg element
+	let svg = d3.select("g.main")
+		.append("g")
+			.attr("transform",
+				"translate(" + eval(dimensions.heatmap.offsetWidth + dimensions.heatmap.margin.left) + "," + eval(dimensions.heatmap.offsetHeight + dimensions.heatmap.margin.top) + ")")
+			.attr("class", "heatmap")
+
+
 	// Get dimensions
 	let width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
 	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
@@ -146,11 +157,14 @@ export function renderHeatmap(svg, data, dimensions) {
 		if (d3.selectAll(".bar").size() >= 2) {
 			d3.select(".bar").remove();
 		}
-		createBarChart(data, target, dimensions);
+		createBarChart(data, target, dimensions, x);
 	}
     
-	rects.on("click", createBarExtension);
-	rowsBehind.on("click", createBarExtension);
+
+	// function clickBehaviour() {
+
+
+	// }
 
 
 	// Define drag behavior
@@ -176,11 +190,15 @@ export function renderHeatmap(svg, data, dimensions) {
     .on("end", function(event, d) { 
 		dragended(event, d, data, y); 
 	})
+	// .clickDistance(10)
+	// .clickBehaviour(createBarExtension)
 
 
 	// Apply drag behavior to rows
-	rowsBehind.call(drag);
-	rects.call(drag);
+	// rowsBehind.call(drag).on("click", createBarExtension);
+	// rects.call(drag).on("click", createBarExtension);
+	rects.on("click", createBarExtension);
+
 
 
     return [x,y,colorRange];

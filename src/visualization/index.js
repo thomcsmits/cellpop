@@ -3,12 +3,11 @@ import * as d3 from "d3";
 import { renderHeatmap } from "./heatmap";
 import { renderTopBar } from "./barTop";
 import { renderLeftBar } from "./barSide";
+import { renderGraph } from "./graph";
 
 // visualization
 export function getMainVis(data) {
-    console.log("here")
-	// set the of the graph
-
+	// set the dimensions of the graph
 	let widthRatio = 0.9;
 	let heightRatio = 0.6; 
 
@@ -21,6 +20,8 @@ export function getMainVis(data) {
 
 	let widthLeft = width - widthRight;
 	let heightTop = height - heightBottom;
+
+	// height = height + 400;
 
 	// let widthFull = 800;
 	// let heightFull = 800;
@@ -40,7 +41,8 @@ export function getMainVis(data) {
 		heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 50, bottom: 100, left: 0}},
 		barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
 		barLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
-		detailBar: {offsetWidth: 0, offsetHeight: 0, width: width / 2, height: height, margin: {top: 50, right: 50, bottom: 50, left: 100}},
+		graph: {offsetWidth: widthLeft, offsetHeight: height, width: widthRight, height: heightTop, margin: {top: 0, right: 0, bottom: 0, left: 0}},
+		detailBar: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: height, margin: {top: 50, right: 50, bottom: 50, left: 0}},
 		// barLeft: {offsetWidth: 100, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 50, right: 0, bottom: 0, left: 100}},
 	};
 	
@@ -57,18 +59,16 @@ export function getMainVis(data) {
     
         
 	// create main heatmap
-	let svgHeatmap = svg.append("g")
-    .attr("transform",
-        "translate(" + eval(dimensions.heatmap.offsetWidth + dimensions.heatmap.margin.left) + "," + eval(dimensions.heatmap.offsetHeight + dimensions.heatmap.margin.top) + ")")
-    .attr("class", "heatmap")
-
-	let [x, y, colorRange] = renderHeatmap(svgHeatmap, data, dimensions)
+	let [x, y, colorRange] = renderHeatmap(data, dimensions)
 
 	// create top barchart
 	renderTopBar(data, dimensions, x)
 
 	// create left barchart
 	renderLeftBar(data, dimensions, y)
+
+	// // create graph
+	// renderGraph(data, dimensions)
 
 	
 	console.log("svg here", svg)
