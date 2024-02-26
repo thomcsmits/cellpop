@@ -39,7 +39,7 @@ export function renderTopBar(dataFull, dimensions, x) {
 		.call(d3.axisLeft(y));
 
 
-	const x_changed = x.padding(0.25)
+	const x_changed = x.paddingInner(0.25)
 
     // svg.append("text")
 	// 	.attr("class", "y label")

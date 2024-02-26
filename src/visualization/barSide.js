@@ -32,7 +32,8 @@ export function renderLeftBar(dataFull, dimensions, y) {
 		.range([ width, 0 ])
 		.domain([ 0, upperbound])
 
-	const y_changed = y.padding(0.25)
+	const y_changed = y.paddingInner(0.25)
+	
 	// console.log(y_changed)
 
 	svg.append("g")
@@ -58,8 +59,10 @@ export function renderLeftBar(dataFull, dimensions, y) {
 
 	// Define mouse functions
     const mouseover = function(event,d) {
+		let metadataRow = dataFull.metadata.rows.filter(r => r.row === d.row)[0].metadata;
+		console.log(metadataRow)
         if (event.ctrlKey) {
-			addTooltipBarSide(event, d);
+			addTooltipBarSide(event, d, metadataRow);
         }
     }
     const mouseleave = function() {
