@@ -4,22 +4,25 @@ import { reorderArray } from "./util";
 
 
 // Drag start function
-export function dragstarted(event, d, element) {
+export function dragstarted(event, d) {
+    console.log('col' in event.subject ? 'rectangle' : 'row')
+
     const rects = d3.selectAll(".heatmap-rects");
+    const rowsBehind = d3.selectAll(".heatmap-rows");
 
     // Set dragged elements to active
-    d3.select(element).raise().classed("active", true);
+    rowsBehind.filter(r => r.row === d.row).raise().classed("active", true);
     rects.filter(r => r.row === d.row).raise().classed("active", true);
 }
 
 
 // Dragging function
-export function dragged(event, d, element, data, y) {
+export function dragged(event, d, data, y) {
     const rects = d3.selectAll(".heatmap-rects");
     const rowsBehind = d3.selectAll(".heatmap-rows");
 
     // Let the selected row and rects on that row move with the cursor
-    d3.select(element).attr("y", d.y = event.y);
+    rowsBehind.filter(r => r.row === d.row).attr("y", d.y = event.y);
     rects.filter(r => r.row === d.row).attr("y", d.y = event.y)
 
     // Calculate the current index of the dragged row
@@ -51,10 +54,10 @@ export function dragged(event, d, element, data, y) {
         if (rowIndex !== currentIndex && rowIndex >= Math.min(currentIndex, newIndex) && rowIndex <= Math.max(currentIndex, newIndex)) {
             // Shift the row up or down depending on the direction of the moved row
             if (displacement > 0) {
-                d3.select(this).attr("y", y(data.rowNames[rowIndex - 1]));
+                rowsBehind.filter(r => r.row === rowName.row).attr("y", y(data.rowNames[rowIndex - 1]));
                 rects.filter(r => r.row === rowName.row).attr("y", y(data.rowNames[rowIndex - 1]));
             } else {
-                d3.select(this).attr("y", y(data.rowNames[rowIndex + 1]));
+                rowsBehind.filter(r => r.row === rowName.row).attr("y", y(data.rowNames[rowIndex + 1]));
                 rects.filter(r => r.row === rowName.row).attr("y", y(data.rowNames[rowIndex + 1]));
             }
         }
@@ -70,15 +73,16 @@ export function dragged(event, d, element, data, y) {
 
 
 // Drag end function
-export function dragended(event, d, element, data, y) {
+export function dragended(event, d, data, y) {
     const rects = d3.selectAll(".heatmap-rects");
+    const rowsBehind = d3.selectAll(".heatmap-rows");
 
     // Get the current index and set the y-coordinate of this row when drag ends
     let currentIndex = data.rowNames.indexOf(d.row);
-    d3.select(element).attr("y", y(data.rowNames[currentIndex]));
+    rowsBehind.filter(r => r.row === d.row).attr("y", y(data.rowNames[currentIndex]));
     rects.filter(r => r.row === d.row).attr("y", y(data.rowNames[currentIndex]));
 
     // Set dragged elements to inactive
-    d3.select(element).classed("active", false);
-    rects.filter(r => r.row === d.row).raise().classed("active", false);
+    rowsBehind.filter(r => r.row === d.row).classed("active", false);
+    rects.filter(r => r.row === d.row).classed("active", false);
 }

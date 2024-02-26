@@ -154,14 +154,14 @@ export function renderHeatmap(svg, data, dimensions) {
 
 
 	// Define drag behavior
-	let dragRows = d3.drag()
+	let drag = d3.drag()
 	.on("start", function(event, d) { 
 		removeHighlight();
-		dragstarted(event, d, this); 
+		dragstarted(event, d); 
 	})
     .on("drag", function(event, d) {
 		// Update data
-		data = dragged(event, d, this, data, y);
+		data = dragged(event, d, data, y);
 		// Update the y-domain
 		y = y.domain(data.rowNames);
 		svg.select("g.axisright").remove()
@@ -174,12 +174,13 @@ export function renderHeatmap(svg, data, dimensions) {
 		renderLeftBar(data, dimensions, y);
 	})
     .on("end", function(event, d) { 
-		dragended(event, d, this, data, y); 
+		dragended(event, d, data, y); 
 	})
 
 
 	// Apply drag behavior to rows
-	rowsBehind.call(dragRows);
+	rowsBehind.call(drag);
+	rects.call(drag);
 
 
     return [x,y,colorRange];
