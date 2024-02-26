@@ -62,25 +62,6 @@ function retrieveObsSets(urls) {
 	return Promise.all(obsSetsListPromises)
 }
 
-// Retrieve the ObsSets, then wrangle data and call the vis
-retrieveObsSets(urls)
-    .then(obsSetsListWrapped => {
-		// wrangle data
-		let obsSetsList = obsSetsListWrapped.map((o) => o.data.obsSets);
-		let data = wrangleData(obsSetsList, urls, uuids);
-
-		// add row/col to row/colnames
-		data.rowNamesWrapped = data.rowNames.map(d => {return {row: d}})
-		data.colNamesWrapped = data.colNames.map(d => {return {col: d}})
-
-		// visualization
-		getMainVis(data);
-    })
-    .catch(error => {
-        console.error(error);
-    });
-
-
 // wrangle data
 function wrangleData(obsSetsList, urls, rowNames) {
 	// get the actual data
@@ -113,3 +94,74 @@ function getCountsPerType(o) {
 	return dict;
 }
 
+
+// // Retrieve the ObsSets, then wrangle data and call the vis
+let promiseData = retrieveObsSets(urls)
+    .then(obsSetsListWrapped => {
+		// wrangle data
+		let obsSetsList = obsSetsListWrapped.map((o) => o.data.obsSets);
+		let data = wrangleData(obsSetsList, urls, uuids);
+
+		// add row/col to row/colnames
+		data.rowNamesWrapped = data.rowNames.map(d => {return {row: d}})
+		data.colNamesWrapped = data.colNames.map(d => {return {col: d}})
+
+		return data;
+
+		// visualization
+		// getMainVis(data);
+    })
+    .catch(error => {
+        console.error(error);
+    });
+
+
+// get metadata
+function getMetadata(uuids) {
+	let searchApi = 'https://search.api.hubmapconsortium.org/v3/portal/search';
+	let queryBody = {
+		"size": 10000,
+		"query": {"ids": {"values": uuids}},
+	}
+
+	const requestOptions = {
+		method: 'POST',
+		headers: {
+		'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(queryBody),
+	};
+
+	let promiseMetadata = fetch(searchApi, requestOptions)
+		.then(response => {
+			if (!response.ok) {
+			throw new Error('Network response was not ok');
+			}
+			return response.json();
+		})
+		.then(queryBody => {
+			let listAll = queryBody.hits.hits;
+
+			let metadata = listAll.map(l => {
+				let ls = l._source;
+				let dmm = l._source.donor.mapped_metadata;
+				return {row: ls.uuid, metadata: {title: ls.title, dataset_type: ls.dataset_type, anatomy_2: ls.anatomy_2[0], sex: dmm.sex[0], age: dmm.age_value[0]}};
+			})
+			return metadata;
+		})
+		.catch(error => {
+			console.error('Error:', error);
+		});
+	return promiseMetadata;
+} 
+
+let promiseMetadata = getMetadata(uuids);
+
+
+Promise.all([promiseData, promiseMetadata]).then((values) => {
+	let data = values[0];
+	let metadata = values[1];
+	console.log(metadata)
+	data.metadata = {rows: metadata};
+	getMainVis(data);
+})
