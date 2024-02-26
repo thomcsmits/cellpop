@@ -5,8 +5,6 @@ import { reorderArray } from "./util";
 
 // Drag start function
 export function dragstarted(event, d) {
-    console.log('col' in event.subject ? 'rectangle' : 'row')
-
     const rects = d3.selectAll(".heatmap-rects");
     const rowsBehind = d3.selectAll(".heatmap-rows");
 
@@ -29,8 +27,9 @@ export function dragged(event, d, data, y) {
     let currentIndex = data.rowNames.indexOf(d.row);
     
     // Calculate the new index based on the y-coordinate of the drag event
-    let newIndex = data.rowNames.length - 1 - Math.floor(event.y / y.bandwidth());
-
+    let rowSize = y(data.rowNames[0]) - y(data.rowNames[1]);
+    let newIndex = data.rowNames.length - Math.ceil((event.y - y.paddingOuter()*y.bandwidth()) / rowSize);
+    
     // If row goes beyond boundaries, set it to the first/last item
     if (newIndex < 0) {
         newIndex = 0;
