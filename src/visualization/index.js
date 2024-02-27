@@ -48,6 +48,18 @@ export function getMainVis(data) {
 	// var dimensionsHeatmap = {width: widthRight, height: heightBottom, margin: {top: 50, right: 50, bottom: 50, left: 50}}
 	// var marginHeatmap = {top: 100, right: 100, bottom: 100, left: 150};
 
+	// add a (temporary) button for switch between % and n
+	let buttonFraction = document.createElement('button');
+	buttonFraction.textContent = 'Change fraction/absolute';
+	document.body.appendChild(buttonFraction);
+	buttonFraction.addEventListener('click', () => alert('hi'))
+
+	// add a button for resetting the bottom thing
+	let buttonReset = document.createElement('button');
+	buttonReset.textContent = 'Reset stacked bar charts';
+	document.body.appendChild(buttonReset);
+	buttonReset.addEventListener('click', () => d3.selectAll('.bardetail').remove())
+
 	// append the svg object to the body of the page
 	let svg = d3.select("#app")
 	.append("svg")
@@ -68,6 +80,10 @@ export function getMainVis(data) {
 
 	// // create graph
 	// renderGraph(data, dimensions)
+
+	svg.attr("resize", "both")
+
+	console.log(svg)
 
 	return svg
 }

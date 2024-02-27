@@ -13,7 +13,7 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
     .append("svg")
 		.attr("width", dimensions.global.width)
 		.attr("height", dimensions.detailBar.height + dimensions.detailBar.margin.top + dimensions.detailBar.margin.bottom)
-        .attr("class", "bar")
+        .attr("class", "bardetail")
     .append("g")
         .attr("transform",
             "translate(" + eval(dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left) + "," + eval(dimensions.detailBar.offsetHeight + dimensions.detailBar.margin.top) + ")");
@@ -60,7 +60,7 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
     .text("Number of cells");
 
     // Bars
-    svgBar.selectAll("mybar")
+    svgBar.selectAll()
     .data(data)
     .join("rect")
         .attr("x", d => x(d.col))
@@ -69,5 +69,6 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
         .attr("height", d => height - y(d.value))
         .attr("fill", "#69b3a2")
 
+        console.log(svgBar)
     return svgBar;
 }

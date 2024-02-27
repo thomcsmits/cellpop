@@ -6,7 +6,7 @@ import { dragstarted, dragged, dragended } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
 
 
-export function renderHeatmap(data, dimensions) {
+export function renderHeatmap(data, dimensions, fraction = false) {
 	// Remove any prior heatmaps
 	d3.select("g.heatmap").remove();
 
@@ -150,8 +150,9 @@ export function renderHeatmap(data, dimensions) {
 		if (d.target.__data__.row) {
 			target = d.target.__data__.row
 		}
-		if (d3.selectAll(".bar").size() >= 2) {
-			d3.select(".bar").remove();
+		console.log(d3.selectAll(".bardetail"))
+		if (d3.selectAll(".bardetail").size() >= 2) {
+			d3.select(".bardetail").remove();
 		}
 		createBarChart(data, target, dimensions, x);
 	}
@@ -183,9 +184,9 @@ export function renderHeatmap(data, dimensions) {
 
 
 	// Apply drag behavior to rows
-	rowsBehind.call(drag).on("click", createBarExtension);
-	// rects.on("click", createBarExtension).call(drag);
-	rects.call(drag).on("click", createBarExtension);
+	// rowsBehind.call(drag).on("click", createBarExtension);
+	rects.on("click", createBarExtension)//call(drag);
+	// rects.call(drag).on("click", createBarExtension);
 
     return [x,y,colorRange];
 }
