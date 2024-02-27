@@ -153,11 +153,11 @@ export function renderHeatmap(data, dimensions, fraction = false) {
 		let target = d.target.__data__;
 		if (d.target.__data__.row) {
 			target = d.target.__data__.row
-		}
-		console.log(d3.selectAll(".bardetail"))
-		if (d3.selectAll(".bardetail").size() >= 2) {
-			d3.select(".bardetail").remove();
-		}
+		// }
+		// console.log(d3.selectAll(".bardetail"))
+		// if (d3.selectAll(".bardetail").size() >= 2) {
+		// 	d3.select(".bardetail").remove();
+		// }
 		createBarChart(data, target, dimensions, x);
 	}
 
