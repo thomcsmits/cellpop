@@ -52,10 +52,16 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
 
         // make all existing ones smaller
         for (let i = 0; i < nBars-1; i++) {
-            let j = d3.selectAll(`.sample-${i+1}`)
-            console.log('j', j)
-            j.attr("transform",
-                `translate(${eval(dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left)},${i * heightInd})` + 
+            let sample_i = d3.select(`.sample-${i+1}`);
+            sample_i.attr("transform",
+                `translate(${eval(dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left)},${i * heightInd})`)
+            let sample_i_rects = sample_i.select(".rects");
+            sample_i_rects.attr("transform",
+                `scale(${1},${1 / nBars})`);
+
+            // todo: figure out how to get new domain to draw new axis
+            let sample_i_y_axis = sample_i.select(".axisleft")
+            sample_i_y_axis.attr("transform",
                 `scale(${1},${1 / nBars})`);
         }
         
@@ -65,8 +71,7 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
     let svgBarSample = svgBar.append("g")
         .attr("class", `bardetailsample sample-${nBars}`)
         .attr("transform",
-            `translate(${eval(dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left)},${height - heightInd})` + 
-            `scale(${1},${1 / nBars})`);
+            `translate(${eval(dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left)},${(nBars-1)*heightInd})`);
 
     const data = dataFull.countsMatrix.filter((o) => o.row === selectedRow)
     
@@ -94,16 +99,26 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
         .selectAll("text")
 			.style("font-size", dimensions.textSize.tick);
 
-    // Bars
-    svgBarSample.selectAll()
-    .data(data)
-    .join("rect")
-        .attr("x", d => x(d.col))
-        .attr("y", d => y(d.value))
-        .attr("width", x.bandwidth())
-        .attr("height", d => height - y(d.value))
-        .attr("fill", "#69b3a2")
+    // Add bars
+    svgBarSample.append("g")
+        .attr("class", "rects")
+        .selectAll()
+        .data(data)
+        .join("rect")
+            .attr("x", d => x(d.col))
+            .attr("y", d => y(d.value))
+            .attr("width", x.bandwidth())
+            .attr("height", d => height - y(d.value))
+            .attr("fill", "#69b3a2")
 
-    console.log('svgbar', svgBar)
+    // Resize bars
+    let sample = d3.selectAll(`.sample-${nBars}`)
+    sample.select(".rects")
+        .attr("transform",
+            `scale(${1},${1 / nBars})`);
+    sample.select(".axisleft")
+        .attr("transform",
+            `scale(${1},${1 / nBars})`);
+
     return svgBar;
 }
