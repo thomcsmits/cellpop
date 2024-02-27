@@ -33,15 +33,17 @@ export function renderHeatmap(data, dimensions, fraction = false) {
 		.attr("transform", "translate(0," + height + ")")
 		.call(d3.axisBottom(x))
 		.selectAll("text")
-		.attr("transform", "translate(-10,0)rotate(-45)")
-		.style("text-anchor", "end");
+			.attr("transform", "translate(-10,0)rotate(-45)")
+			.style("text-anchor", "end")
+			.style("font-size", dimensions.textSize.tick);
 
 	svg.append("text")
         .attr("class", "x-label")
         .attr("text-anchor", "end")
         .attr("x", width / 2)
         .attr("y", height + dimensions.heatmap.margin.bottom - 10)
-        .text("Cell type");
+        .text("Cell type")
+		.style("font-size", dimensions.textSize.label);
 
 
 	// Add y-axis
@@ -51,10 +53,11 @@ export function renderHeatmap(data, dimensions, fraction = false) {
 		.padding(0.01);
 
 	svg.append("g")
-		.call(d3.axisRight(y))
 		.attr("class", "axisright")
 		.attr("transform", "translate(" + width + ",0)")
-		//.style("text-anchor", "end");
+		.call(d3.axisRight(y))
+		.selectAll("text")
+			.style("font-size", dimensions.textSize.tick);
 
     svg.append("text")
 		.attr("class", "y-label")
@@ -63,7 +66,8 @@ export function renderHeatmap(data, dimensions, fraction = false) {
 		.attr("y", -200)
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
-		.text("Samples");
+		.text("Samples")
+		.style("font-size", dimensions.textSize.label);
 
 
 	// Add color

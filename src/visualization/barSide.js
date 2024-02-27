@@ -38,8 +38,9 @@ export function renderLeftBar(dataFull, dimensions, y) {
 		.call(d3.axisBottom(x))
 		.attr("transform", "translate(0," + height + ")")
 		.selectAll("text")
-		.attr("transform", "translate(-10,0)rotate(-45)")
-		.style("text-anchor", "end");
+			.attr("transform", "translate(-10,0)rotate(-45)")
+			.style("text-anchor", "end")
+			.style("font-size", dimensions.textSize.tick);
 
     // // Bars
     let bars = svg.selectAll()

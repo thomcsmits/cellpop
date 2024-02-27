@@ -36,7 +36,10 @@ export function renderTopBar(dataFull, dimensions, x) {
 		.domain([ 0, upperbound])
 
 	svg.append("g")
-		.call(d3.axisLeft(y));
+		.attr("class", "axisleft")
+		.call(d3.axisLeft(y))
+		.selectAll("text")
+			.style("font-size", dimensions.textSize.tick);
 
 
 	const x_changed = x.paddingInner(0.25)
@@ -48,7 +51,8 @@ export function renderTopBar(dataFull, dimensions, x) {
 	// 	.attr("y", -60)
 	// 	.attr("dy", ".75em")
 	// 	.attr("transform", "rotate(-90)")
-	// 	.text("Total number of cells");
+	// 	.text("Total number of cells")
+	//.style("font-size", dimensions.textSize.label);
 
     // Bars
     let bars = svg.selectAll()
