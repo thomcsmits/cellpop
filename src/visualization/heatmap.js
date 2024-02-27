@@ -6,7 +6,18 @@ import { dragstarted, dragged, dragended } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
 
 
-export function renderHeatmap(svg, data, dimensions) {
+export function renderHeatmap(data, dimensions, fraction = false) {
+	// Remove any prior heatmaps
+	d3.select("g.heatmap").remove();
+
+	// Create svg element
+	let svg = d3.select("g.main")
+		.append("g")
+			.attr("transform",
+				"translate(" + eval(dimensions.heatmap.offsetWidth + dimensions.heatmap.margin.left) + "," + eval(dimensions.heatmap.offsetHeight + dimensions.heatmap.margin.top) + ")")
+			.attr("class", "heatmap")
+
+
 	// Get dimensions
 	let width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
 	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
@@ -22,15 +33,17 @@ export function renderHeatmap(svg, data, dimensions) {
 		.attr("transform", "translate(0," + height + ")")
 		.call(d3.axisBottom(x))
 		.selectAll("text")
-		.attr("transform", "translate(-10,0)rotate(-45)")
-		.style("text-anchor", "end");
+			.attr("transform", "translate(-10,0)rotate(-45)")
+			.style("text-anchor", "end")
+			.style("font-size", dimensions.textSize.tick);
 
 	svg.append("text")
         .attr("class", "x-label")
         .attr("text-anchor", "end")
         .attr("x", width / 2)
         .attr("y", height + dimensions.heatmap.margin.bottom - 10)
-        .text("Cell type");
+        .text("Cell type")
+		.style("font-size", dimensions.textSize.label);
 
 
 	// Add y-axis
@@ -40,10 +53,11 @@ export function renderHeatmap(svg, data, dimensions) {
 		.padding(0.01);
 
 	svg.append("g")
-		.call(d3.axisRight(y))
 		.attr("class", "axisright")
 		.attr("transform", "translate(" + width + ",0)")
-		//.style("text-anchor", "end");
+		.call(d3.axisRight(y))
+		.selectAll("text")
+			.style("font-size", dimensions.textSize.tick);
 
     svg.append("text")
 		.attr("class", "y-label")
@@ -52,7 +66,8 @@ export function renderHeatmap(svg, data, dimensions) {
 		.attr("y", -200)
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
-		.text("Samples");
+		.text("Samples")
+		.style("font-size", dimensions.textSize.label);
 
 
 	// Add color
@@ -83,7 +98,7 @@ export function renderHeatmap(svg, data, dimensions) {
 			.attr("y", function(d) { return y(d.row) })
 			.attr("width", width )
 			.attr("height", y.bandwidth() )
-			.style("fill", colorRange(1000))
+			.style("fill", colorRange(0))
 
 
 	// Read the data
@@ -123,9 +138,9 @@ export function renderHeatmap(svg, data, dimensions) {
         	addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
         }
     }
-    const mouseleave = function(d) {
+    const mouseleave = function(event,d) {
 		removeTooltip();
-        removeHighlight(svg);
+        removeHighlight(event,d);
     }
 
     rects.on("mouseover", mouseover);
@@ -133,30 +148,22 @@ export function renderHeatmap(svg, data, dimensions) {
     rects.on("mouseleave", mouseleave);
 	rowsBehind.on("mouseleave", mouseleave);
 
-	// rects.on('mousedown', rects.attr("pointer-events", "none"))
-	// rects.on('mouseup', rects.attr("pointer-events", "visible"))
-
-    
 
 	function createBarExtension(d) {
 		let target = d.target.__data__;
 		if (d.target.__data__.row) {
 			target = d.target.__data__.row
 		}
-		if (d3.selectAll(".bar").size() >= 2) {
-			d3.select(".bar").remove();
+		console.log(d3.selectAll(".bardetail"))
+		if (d3.selectAll(".bardetail").size() >= 2) {
+			d3.select(".bardetail").remove();
 		}
-		createBarChart(data, target, dimensions);
+		createBarChart(data, target, dimensions, x);
 	}
-    
-	rects.on("click", createBarExtension);
-	rowsBehind.on("click", createBarExtension);
-
 
 	// Define drag behavior
 	let drag = d3.drag()
 	.on("start", function(event, d) { 
-		removeHighlight();
 		dragstarted(event, d); 
 	})
     .on("drag", function(event, d) {
@@ -176,12 +183,14 @@ export function renderHeatmap(svg, data, dimensions) {
     .on("end", function(event, d) { 
 		dragended(event, d, data, y); 
 	})
+	// .clickDistance(10)
+	// .clickBehaviour(createBarExtension)
 
 
 	// Apply drag behavior to rows
-	rowsBehind.call(drag);
-	rects.call(drag);
-
+	// rowsBehind.call(drag).on("click", createBarExtension);
+	rects.on("click", createBarExtension)//call(drag);
+	// rects.call(drag).on("click", createBarExtension);
 
     return [x,y,colorRange];
 }
@@ -196,7 +205,12 @@ function addHighlight(y, currHeight) {
 		.raise()
 }
 
-function removeHighlight() {
+function removeHighlight(event, d) {
+	// makes sure the highlight stays when dragging
+	if (event.defaultPrevented) {
+		return;
+	}
+
 	d3.select(".highlight")
 		.attr("visibility", "hidden")
 }

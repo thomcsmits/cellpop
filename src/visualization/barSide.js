@@ -32,15 +32,15 @@ export function renderLeftBar(dataFull, dimensions, y) {
 		.range([ width, 0 ])
 		.domain([ 0, upperbound])
 
-	const y_changed = y.padding(0.25)
-	// console.log(y_changed)
-
+	const y_changed = y.paddingInner(0.25)
+	
 	svg.append("g")
 		.call(d3.axisBottom(x))
 		.attr("transform", "translate(0," + height + ")")
 		.selectAll("text")
-		.attr("transform", "translate(-10,0)rotate(-45)")
-		.style("text-anchor", "end");
+			.attr("transform", "translate(-10,0)rotate(-45)")
+			.style("text-anchor", "end")
+			.style("font-size", dimensions.textSize.tick);
 
     // // Bars
     let bars = svg.selectAll()
@@ -52,14 +52,13 @@ export function renderLeftBar(dataFull, dimensions, y) {
 			.attr("height", y_changed.bandwidth())
 			.attr("fill", "black")
 
-		// console.log(svg)
-
 	defineTooltipBarSide();
 
 	// Define mouse functions
     const mouseover = function(event,d) {
+		let metadataRow = dataFull.metadata.rows.filter(r => r.row === d.row)[0].metadata;
         if (event.ctrlKey) {
-			addTooltipBarSide(event, d);
+			addTooltipBarSide(event, d, metadataRow);
         }
     }
     const mouseleave = function() {

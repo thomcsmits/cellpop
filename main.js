@@ -2,8 +2,6 @@ import * as d3 from "d3";
 import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
 import { getMainVis } from "./src/visualization";
 
-console.log('here')
-
 // data
 var uuids = ['ad693f99fb9006e68a53e97598da1509',
     '173de2e80adf6a73ac8cff5ccce20dfc',
@@ -35,8 +33,6 @@ var uuids = ['ad693f99fb9006e68a53e97598da1509',
 	'8d631eee88855ac59155edca2a3bc1ca',
 	'1ea6c0ac5ba60fe35bf63af8699b6fbe']
 
-// for dev purposes
-uuids.splice(5)
 
 // get hubmap url to zarr
 function getURL(uuid) {
@@ -44,28 +40,29 @@ function getURL(uuid) {
 }
 const urls = uuids.map(getURL);
 
-// Get list of obssets
-const obsSetsList = [];
-for (let i = 0; i < urls.length; i++) { 
-    const url = urls[i]
-    const source = new AnnDataSource({ url });
-    const config = {
-        url,
-        fileType: 'obsSets.anndata.zarr',
-        options: [
-            {
-                name: 'Cell Ontology Annotation',
-                path: 'obs/predicted_CLID' //'obs/predicted_label'
-            }
-        ],
-    };
-    const loader = new ObsSetsAnndataLoader(source, config);
-    const { data: { obsSets } } = await loader.load();
-    obsSetsList.push(obsSets);
+// Get one Promise with all ObsSets
+function retrieveObsSets(urls) {
+	const obsSetsListPromises = [];
+	for (let i = 0; i < urls.length; i++) { 
+		const url = urls[i]
+		const source = new AnnDataSource({ url });
+		const config = {
+			url,
+			fileType: 'obsSets.anndata.zarr',
+			options: [
+				{
+					name: 'Cell Ontology Annotation',
+					path: 'obs/predicted_CLID' //'obs/predicted_label'
+				}
+			],
+		};
+		const loader = new ObsSetsAnndataLoader(source, config);
+		obsSetsListPromises.push(loader.load());
+	}
+	return Promise.all(obsSetsListPromises)
 }
-console.log('obssets', obsSetsList)
 
-
+// wrangle data
 function wrangleData(obsSetsList, urls, rowNames) {
 	// get the actual data
 	const obsSetsListChildren = obsSetsList.map((o) => o.tree[0].children);
@@ -88,16 +85,6 @@ function wrangleData(obsSetsList, urls, rowNames) {
 }
 
 
-// // get the matrix column for each entry
-// function getMatrixColumn(o, allTypes) {
-//   const matrixColumn = new Array(allTypes.length).fill(0);
-//   for (const [key, value] of Object.entries(o)) {
-//       let index = allTypes.indexOf(key)
-//       matrixColumn[index] = value;
-//   }
-//   return matrixColumn;
-// }
-
 // get the counts per cell type
 function getCountsPerType(o) {
 	let dict = new Object();
@@ -107,11 +94,73 @@ function getCountsPerType(o) {
 	return dict;
 }
 
-let data = wrangleData(obsSetsList, urls, uuids);
 
-// add row/col to row/colnames
-data.rowNamesWrapped = data.rowNames.map(d => {return {row: d}})
-data.colNamesWrapped = data.colNames.map(d => {return {col: d}})
+// // Retrieve the ObsSets, then wrangle data and call the vis
+let promiseData = retrieveObsSets(urls)
+    .then(obsSetsListWrapped => {
+		// wrangle data
+		let obsSetsList = obsSetsListWrapped.map((o) => o.data.obsSets);
+		let data = wrangleData(obsSetsList, urls, uuids);
 
-// visualization
-getMainVis(data);
+		// add row/col to row/colnames
+		data.rowNamesWrapped = data.rowNames.map(d => {return {row: d}})
+		data.colNamesWrapped = data.colNames.map(d => {return {col: d}})
+
+		return data;
+
+		// visualization
+		// getMainVis(data);
+    })
+    .catch(error => {
+        console.error(error);
+    });
+
+
+// get metadata
+function getMetadata(uuids) {
+	let searchApi = 'https://search.api.hubmapconsortium.org/v3/portal/search';
+	let queryBody = {
+		"size": 10000,
+		"query": {"ids": {"values": uuids}},
+	}
+
+	const requestOptions = {
+		method: 'POST',
+		headers: {
+		'Content-Type': 'application/json',
+		},
+		body: JSON.stringify(queryBody),
+	};
+
+	let promiseMetadata = fetch(searchApi, requestOptions)
+		.then(response => {
+			if (!response.ok) {
+			throw new Error('Network response was not ok');
+			}
+			return response.json();
+		})
+		.then(queryBody => {
+			let listAll = queryBody.hits.hits;
+
+			let metadata = listAll.map(l => {
+				let ls = l._source;
+				let dmm = l._source.donor.mapped_metadata;
+				return {row: ls.uuid, metadata: {title: ls.title, dataset_type: ls.dataset_type, anatomy_2: ls.anatomy_2[0], sex: dmm.sex[0], age: dmm.age_value[0]}};
+			})
+			return metadata;
+		})
+		.catch(error => {
+			console.error('Error:', error);
+		});
+	return promiseMetadata;
+} 
+
+let promiseMetadata = getMetadata(uuids);
+
+
+Promise.all([promiseData, promiseMetadata]).then((values) => {
+	let data = values[0];
+	let metadata = values[1];
+	data.metadata = {rows: metadata};
+	getMainVis(data);
+})
