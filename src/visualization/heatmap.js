@@ -6,7 +6,7 @@ import { dragstarted, dragged, dragended } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
 
 
-export function renderHeatmap(data, dimensions, fraction = false) {
+export function renderHeatmap(data, dimensions) {
 	// Remove any prior heatmaps
 	d3.select("g.heatmap").remove();
 
@@ -62,12 +62,35 @@ export function renderHeatmap(data, dimensions, fraction = false) {
     svg.append("text")
 		.attr("class", "y-label")
 		.attr("text-anchor", "end")
-		.attr("x", -30)
-		.attr("y", -200)
+		.attr("x", -height/2)
+		.attr("y", width + 100)
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
 		.text("Samples")
 		.style("font-size", dimensions.textSize.label);
+
+	// add metadata scale
+	// let y_meta = d3.scaleOrdinal()
+	// 	.domain(['right', 'left'])
+	// 	.range([0, 300, height])
+
+	// svg.append("g")
+	// 	.attr("class", "axisright")
+	// 	.attr("transform", "translate(" + eval(width+100) + ",0)")
+	// 	.call(d3.axisRight(y_meta))
+	// 	.selectAll("text")
+	// 		.attr("transform", "translate(0,150)")
+	// 		.style("font-size", dimensions.textSize.tick);
+
+	// svg.append("text")
+	// 	.attr("class", "y-label")
+	// 	.attr("text-anchor", "end")
+	// 	.attr("x", -height/2)
+	// 	.attr("y", width + 150)
+	// 	.attr("dy", ".75em")
+	// 	.attr("transform", "rotate(-90)")
+	// 	.text("Metadata")
+	// 	.style("font-size", dimensions.textSize.label);
 
 
 	// Add color
@@ -153,7 +176,7 @@ export function renderHeatmap(data, dimensions, fraction = false) {
 		let target = d.target.__data__;
 		if (d.target.__data__.row) {
 			target = d.target.__data__.row
-		// }
+		}
 		// console.log(d3.selectAll(".bardetail"))
 		// if (d3.selectAll(".bardetail").size() >= 2) {
 		// 	d3.select(".bardetail").remove();
