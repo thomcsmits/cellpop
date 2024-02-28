@@ -13,9 +13,9 @@ export function showAnimation(data) {
 
 }
 
-function createStackedBar(data) {
+function createStackedBar(data2) {
 
-    let data2 = {
+    let data = {
         countsMatrix: [{row: 'sampleA', col: 'cellZ', value: 10},
                  {row: 'sampleB', col: 'cellZ', value: 5},
                 //  {row: 'sampleC', col: 'cellZ', value: 10},
@@ -34,20 +34,18 @@ function createStackedBar(data) {
     console.log('data', data)
     console.log('data', data2)
 
-    var stackedData = d3.stack()
-    .keys(data.colNames)
-    .value(([, group], key) => {
-        if (group.get(key)) {
-            return group.get(key).value;
-        } else {
-            return 0;
-        }})
-    (d3.index(data.countsMatrix, d => d.row, d => d.col));
+    const rowValsCounter = [];
+    for (const row of data.rowNames) {
+        rowValsCounter.push({row: row, counter: 0});
+    }
 
-
-    // rows = samples
-    // cols = types of cells
-    // we want 1 entry per sample (row)
+    for (const entry of data.countsMatrix) {
+        let currVal = rowValsCounter.filter(r => r.row === entry.row)[0].counter;
+        let newVal = currVal + entry.value;
+        entry.start = currVal;
+        entry.end = newVal;
+        rowValsCounter.filter(r => r.row === entry.row)[0].counter = newVal;
+    }
 
     let width = 1000;
     let height = 1000;
@@ -87,28 +85,28 @@ function createStackedBar(data) {
 
     svg.append("g").selectAll()
         .attr("class", "bars")
-        .data(stackedData)
-        .enter().append("g")
-            .attr("fill", function(d) {return color(d.key)})
-            .selectAll("rect")
-            .data(function(d) {return d;})
-            .enter().append("rect")
-                .attr("x", function(d) {return x(d.data[0]);})
-                .attr("y", function(d) {return y(d[1])})
-                .attr("height", function(d) {return y(d[0]) - y(d[1])})
-                .attr("width", x.bandwidth())
+        .data(data.countsMatrix, function(d) {return d.row+":"+d.col;})
+        .enter()
+        .append("rect")
+            .attr("class", "bar-rects")
+            .attr("x", function(d) {return x(d.row)})
+            .attr("y", function(d) {return y(d.end)})
+            .attr("width", x.bandwidth())
+            .attr("height", function(d) {return y(d.start) - y(d.end)})
+            .attr("fill", function(d) {return color(d.col)})
 
-    d3.select(".animate")
-        .transition()
-        .duration(2000)
-        // .attr("transform", "translate(500,0)")
-        .attr("transform", "rotate(90, 650, 750)")
 
-    d3.selectAll(".animate")
-        .select("g.axisleft")
-            .transition()
-            .duration(2000)
-            .remove()
+    // d3.select(".animate")
+    //     .transition()
+    //     .duration(2000)
+    //     // .attr("transform", "translate(500,0)")
+    //     .attr("transform", "rotate(90, 650, 750)")
+
+    // d3.selectAll(".animate")
+    //     .select("g.axisleft")
+    //         .transition()
+    //         .duration(2000)
+    //         .remove()
 
     // d3.selectAll(".animate")
     //     .select("g.axisbottom")
