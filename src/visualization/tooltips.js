@@ -24,8 +24,8 @@ export function addTooltip(event, d) {
 		.html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
 		.style("opacity", 0.8)
 		.attr("visibility", "shown")
-		.style("left", (event.x) + "px")
-		.style("top", (event.y) + "px")
+		.style("left", `${event.x + window.scrollX}px`)
+		.style("top", `${event.y + window.scrollY}px`)
 }
 
 export function removeTooltip() {
@@ -61,8 +61,8 @@ export function addTooltipBarSide(event, d, metadata) {
 		.html(`Row: ${d.row}<br>Total count: ${d.countTotal}<br>Metadata:<br>${metadataText}`)
 		.style("opacity", 0.8)
 		.attr("visibility", "shown")
-		.style("left", (event.x) + "px")
-		.style("top", (event.y) + "px")
+		.style("left", `${event.x + window.scrollX}px`)
+		.style("top", `${event.y + window.scrollY}px`)
 }
 
 export function removeTooltipBarSide() {
@@ -93,8 +93,8 @@ export function addTooltipBarTop(event, d) {
 		.html(`Column: ${d.col}<br>Total count: ${d.countTotal}`)
 		.style("opacity", 0.8)
 		.attr("visibility", "shown")
-		.style("left", (event.x) + "px")
-		.style("top", (event.y) + "px")
+		.style("left", `${event.x + window.scrollX}px`)
+		.style("top", `${event.y + window.scrollY}px`)
 }
 
 export function removeTooltipBarTop() {
