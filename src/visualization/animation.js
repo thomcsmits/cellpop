@@ -57,6 +57,7 @@ function createStackedBar(data) {
             .attr("width", width + 100)
             .attr("height", height + 100)
         .append("g")
+            .attr("class", "animate")
             .attr("transform", 
                  "translate(50,50)")
 
@@ -66,6 +67,7 @@ function createStackedBar(data) {
         .padding([0.01])
 
     svg.append("g")
+        .attr("class", "axisbottom")
         .attr("transform", "translate(0," + height + ")")
         .call(d3.axisBottom(x));
 
@@ -74,6 +76,7 @@ function createStackedBar(data) {
         .range([ height, 0 ]);
     
     svg.append("g")
+        .attr("class", "axisleft")
         .call(d3.axisLeft(y));
     
     var color = d3.scaleOrdinal()
@@ -82,19 +85,8 @@ function createStackedBar(data) {
                 "#C665BF", "#8AFF79", "#4E5C35", "#A4FCE5", "#FF8095", "#7A85FE"])
 
 
-    // let yes = d3.stack().keys(data.colNames).value(([, group], key) => group.get(key).value)(d3.index(data.countsMatrix, d => d.row, d => d.col))
-    // console.log(yes)
-
-    // console.log(d3.index(data.countsMatrix, d => d.row, d => d.col))
-
- 
-    console.log('stacked', stackedData)
-
-    // console.log(stackedData)
-
-
-
     svg.append("g").selectAll()
+        .attr("class", "bars")
         .data(stackedData)
         .enter().append("g")
             .attr("fill", function(d) {return color(d.key)})
@@ -105,4 +97,25 @@ function createStackedBar(data) {
                 .attr("y", function(d) {return y(d[1])})
                 .attr("height", function(d) {return y(d[0]) - y(d[1])})
                 .attr("width", x.bandwidth())
+
+    d3.select(".animate")
+        .transition()
+        .duration(2000)
+        // .attr("transform", "translate(500,0)")
+        .attr("transform", "rotate(90, 650, 750)")
+
+    d3.selectAll(".animate")
+        .select("g.axisleft")
+            .transition()
+            .duration(2000)
+            .remove()
+
+    // d3.selectAll(".animate")
+    //     .select("g.axisbottom")
+    //         .transition()
+    //         .duration(2000)
+    //         .attr("transform", "rotate(-90, 500, 400)")
+        
+
+    console.log('svg', svg)
 }
