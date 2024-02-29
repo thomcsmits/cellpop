@@ -1,6 +1,5 @@
 import * as d3 from "d3";
 
-import { createBarChart } from "./barExtensions";
 import { renderLeftBar } from "./barSide";
 import { dragstarted, dragged, dragended } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
@@ -172,26 +171,22 @@ export function renderHeatmap(data, dimensions) {
 	rowsBehind.on("mouseleave", mouseleave);
 
 
-	function createBarExtension(d) {
-		let target = d.target.__data__;
-		if (d.target.__data__.row) {
-			target = d.target.__data__.row
-		}
-		// console.log(d3.selectAll(".bardetail"))
-		// if (d3.selectAll(".bardetail").size() >= 2) {
-		// 	d3.select(".bardetail").remove();
-		// }
-		createBarChart(data, target, dimensions, x);
-	}
+	// allowClick is a variable set to true at each dragstart
+	// if no row is moved, it remains true, otherwise it's set to false
+	// at dragend, if allowClick is true, a layered bar chart is created
+	let allowClick;
 
 	// Define drag behavior
 	let drag = d3.drag()
 	.on("start", function(event, d) { 
 		dragstarted(event, d); 
+		allowClick = true;
 	})
     .on("drag", function(event, d) {
 		// Update data
-		data = dragged(event, d, data, y);
+		let dataAndClick = dragged(event, d, data, y, allowClick);
+		data = dataAndClick[0];
+		allowClick = dataAndClick[1];
 		// Update the y-domain
 		y = y.domain(data.rowNames);
 		svg.select("g.axisright").remove()
@@ -204,16 +199,12 @@ export function renderHeatmap(data, dimensions) {
 		renderLeftBar(data, dimensions, y);
 	})
     .on("end", function(event, d) { 
-		dragended(event, d, data, y); 
+		dragended(event, d, data, dimensions, x, y, allowClick); 
 	})
-	// .clickDistance(10)
-	// .clickBehaviour(createBarExtension)
-
 
 	// Apply drag behavior to rows
-	// rowsBehind.call(drag).on("click", createBarExtension);
-	rects.on("click", createBarExtension)//call(drag);
-	// rects.call(drag).on("click", createBarExtension);
+	rowsBehind.call(drag)
+	rects.call(drag)
 
     return [x,y,colorRange];
 }

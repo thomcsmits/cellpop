@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 
 import { reorderArray } from "./util";
+import { createBarChart } from "./barExtensions";
 
 
 // Drag start function
@@ -16,7 +17,7 @@ export function dragstarted(event, d) {
 
 
 // Dragging function
-export function dragged(event, d, data, y) {
+export function dragged(event, d, data, y, allowClick) {
     const rects = d3.selectAll(".heatmap-rects");
     const rowsBehind = d3.selectAll(".heatmap-rows");
 
@@ -42,7 +43,7 @@ export function dragged(event, d, data, y) {
 
     // If row stays at the same place, return
     if (newIndex === currentIndex) {
-        return data;
+        return [data, allowClick];
     }
 
     // Calculate the displacement of the dragged row
@@ -69,12 +70,12 @@ export function dragged(event, d, data, y) {
     data.rowNamesWrapped = reorderArray(data.rowNamesWrapped, currentIndex, newIndex);
     data.counts = reorderArray(data.counts, currentIndex, newIndex);
 
-    return data;
+    return [data, false];
 }
 
 
 // Drag end function
-export function dragended(event, d, data, y) {
+export function dragended(event, d, data, dimensions, x, y, allowClick) {
     const rects = d3.selectAll(".heatmap-rects");
     const rowsBehind = d3.selectAll(".heatmap-rows");
 
@@ -88,4 +89,9 @@ export function dragended(event, d, data, y) {
     rowsBehind.filter(r => r.row === d.row).classed("active", false);
     rects.filter(r => r.row === d.row).classed("active", false);
     d3.select(".highlight").classed("active", false);
+
+    // if the row hasn't moved, create extending bar chart
+    if (allowClick){
+        createBarChart(data, d.row, dimensions, x);
+    }
 }
