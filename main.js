@@ -1,6 +1,7 @@
 import * as d3 from "d3";
 import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
 import { getMainVis } from "./src/visualization";
+import { showAnimation } from "./src/visualization/animation";
 
 // data
 var uuids = ['ad693f99fb9006e68a53e97598da1509',
@@ -33,6 +34,8 @@ var uuids = ['ad693f99fb9006e68a53e97598da1509',
 	'8d631eee88855ac59155edca2a3bc1ca',
 	'1ea6c0ac5ba60fe35bf63af8699b6fbe']
 
+// uuids = uuids.slice(0, 3);
+console.log(uuids.length)
 
 // get hubmap url to zarr
 function getURL(uuid) {
@@ -162,5 +165,7 @@ Promise.all([promiseData, promiseMetadata]).then((values) => {
 	let data = values[0];
 	let metadata = values[1];
 	data.metadata = {rows: metadata};
+	// console.log('data', data)
+	// showAnimation(data);
 	getMainVis(data);
 })
