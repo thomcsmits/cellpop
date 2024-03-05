@@ -89,7 +89,7 @@ export function getMainVis(data) {
 	}
 	app.appendChild(buttonMetadata);
 
-	sortByMetadata(data, ['sex', ['Female', 'Male']])
+	// sortByMetadata(data, ['sex', ['Female', 'Male']])
 
 	// add div for visualization
 	let mainVis = document.createElement('div');
@@ -106,10 +106,10 @@ export function getMainVis(data) {
     
         
 	// create main heatmap
-	let [x, y, colorRange] = renderHeatmap(data, dimensions)
+	let [x, y, colorRange] = renderHeatmap(data, dimensions, false)
 
 	// create top barchart
-	renderTopViolin(data, dimensions, x)
+	renderTopBar(data, dimensions, x)
 
 	// create left barchart
 	renderLeftBar(data, dimensions, y)
