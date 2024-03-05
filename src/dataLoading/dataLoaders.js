@@ -1,11 +1,4 @@
-// data
-//      countsMatrix [{row: x, col: x, value: x}, {row: x, col: x, value: x}]
-//      OR counts {row: [{col: x, value: x}, {col: x, value: x}], row: [{col: x, value: x}, {col: x, value: x}]} 
-//      rowNamesOrder
-//      colNamesOrder
-//      metadata
-// dimensions
-// options?
+
 
 export function loadData() {
 
@@ -16,20 +9,6 @@ export function loadData() {
 
 }
 
-
-export function loadDataWithCounts(counts, metadata={}, ordering={}) {
-    const countsMatrix = getCountsMatrixFromCounts(counts);
-    let data = {countsMatrix: countsMatrix};
-    loadDataWrapper(data, ordering);
-    data.metadata = metadata;
-    
-}
-
-export function loadDataWithCountsMatrix(countsMatrix, metadata={}, ordering={}) {
-    let data = {countsMatrix: countsMatrix};
-    loadDataWrapper(data, ordering);
-    data.metadata = metadata;
-}
 
 export function loadDataWithVitessce(obsSetsList, rowNames, metadata={}) {
     const counts = getCountsFromObsSetsList(obsSetsList, rowNames);
@@ -44,98 +23,12 @@ export function loadHuBMAPData() {
 }
 
 
-
 function getCountsFromObsSetsList(obsSetsList, rowNames) {
     const counts = new Object();
 	for (let i = 0; i < rowNames.length; i++) {
 		counts[rowNames[i]] = getCountsPerType(obsSetsList[i].tree[0].children);
 	}
     return counts;
-}
-
-function getCountsMatrixFromCounts(counts) {
-    const countsMatrix = [];
-	for (const row of Object.keys(counts)) {
-		for (const [key, value] of Object.entries(counts[row])) {
-			countsMatrix.push({row: row, col: key, value: value});
-		}
-	}
-    return countsMatrix;
-}
-
-/**
- * Given a data object with a countsMatrix, 
- * add, wrap and sort rowNames and colNames, 
- * and extend matrix
- * @param {*} data 
- */
-function loadDataWrapper(data, ordering={}) {
-    getRowNames(data);
-    getColNames(data);
-    extendCountsMatrix(data);
-    if (ordering.rowNamesOrder) {
-        sortRowNames(data, ordering.rowNamesOrder);
-    }
-    if (ordering.colNamesOrder) {
-        sortColNames(data, ordering.colNamesOrder);
-    }
-    wrapRowNames(data);
-    wrapColNames(data);
-    return data;
-}
-
-
-function getRowNames(data) {
-    data.rowNames = [...new Set(data.countsMatrix.map((r) => r.row))];
-}
-
-function getColNames(data) {
-    data.colNames = [...new Set(data.countsMatrix.map((r) => r.col))];
-}
-
-function sortNames(arr, sortingArr) {
-    arr.sort(function(a, b){
-        if (sortingArr.indexOf(a) === -1) {
-            return 1;
-        }
-        if (sortingArr.indexOf(b) === -1) {
-            return -1;
-        }
-        return sortingArr.indexOf(a) - sortingArr.indexOf(b);
-      });
-    return arr;
-}
-
-function sortRowNames(data, rowNamesOrder) {
-    data.rowNames = sortNames(data.rowNames, rowNamesOrder);
-}
-
-function sortColNames(data, colNamesOrder) {
-    data.colNames = sortNames(data.colNames, colNamesOrder);
-}
-
-function wrapRowNames(data) {
-	data.rowNamesWrapped = data.rowNames.map(d => {return {row: d}});
-}
-
-function wrapColNames(data) {
-    data.colNamesWrapped = data.colNames.map(d => {return {col: d}});
-}
-
-function extendCountsMatrix(data) {
-    const nTotal = data.rowNames.length * data.colNames.length;
-    if (data.countsMatrix.length === nTotal) {
-        return
-    }
-    for (const row of data.rowNames) {
-        const countsMatrixRow = data.countsMatrix.filter(r => r.row === row);
-        for (const col of data.colNames) {
-            const countsMatrixRowCol = countsMatrixRow.filter(r => r.col === col);
-            if (countsMatrixRowCol.length === 0) {
-                data.countsMatrix.push({row: row, col: col, value: 0});
-            }
-        }
-    }
 }
 
 
