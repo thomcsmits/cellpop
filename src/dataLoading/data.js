@@ -9,7 +9,10 @@
 
 export function loadData() {
 
-
+    // let data = {countsMatrix: countsMatrix};
+    // getRowNames(data);
+    // getColNames(data);
+    // extendCountsMatrix(data);
 
 }
 
@@ -19,21 +22,21 @@ export function loadDataWithCounts(counts) {
     // const allTypes = [...new Set(counts.map(i => Object.keys(i)).flat())].sort();
     // console.log(allTypes)
     // console.log(counts.map(i => Object.keys(i)))
-
 }
 
 export function loadDataWithCountsMatrix(countsMatrix, rowNamesOrder, colNamesOrder) {
     // console.log(countsMatrix)
     // const allTypes = [...new Set(obsSetsListChildrenCounts.map(i => Object.keys(i)).flat())].sort();
-    
-
 }
 
 export function loadDataWithVitessce(obsSetsList, rowNames) {
     console.log(obsSetsList)
     const counts = getCountsFromObsSetsList(obsSetsList, rowNames);
     const countsMatrix = getCountsMatrixFromCounts(counts);
-    console.log(countsMatrix)
+    let data = {countsMatrix: countsMatrix};
+    getRowNames(data);
+    getColNames(data);
+    extendCountsMatrix(data)
 
 }
 
@@ -61,28 +64,46 @@ function getCountsMatrixFromCounts(counts) {
     return countsMatrix;
 }
 
-function getRowNames() {
+
+function getRowNames(data) {
+    data.rowNames = [...new Set(data.countsMatrix.map((r) => r.row))];
+}
+
+function getColNames(data) {
+    data.colNames = [...new Set(data.countsMatrix.map((r) => r.col))];
+}
+
+function sortRowNames(data, rowNamesOrder) {
 
 }
 
-function getColNames() {
+function sortColNames(data, colNamesOrder) {
 
 }
 
-function sortRowNames() {
+function wrapRowNames(data) {
+	data.rowNamesWrapped = data.rowNames.map(d => {return {row: d}});
 
 }
 
-function sortColNames() {
-
+function wrapColNames(data) {
+    data.colNamesWrapped = data.colNames.map(d => {return {col: d}});
 }
 
-function wrapRowNames() {
-
-}
-
-function wrapColNames() {
-
+function extendCountsMatrix(data) {
+    const nTotal = data.rowNames.length * data.colNames.length;
+    if (data.countsMatrix.length === nTotal) {
+        return
+    }
+    for (const row of data.rowNames) {
+        const countsMatrixRow = data.countsMatrix.filter(r => r.row === row);
+        for (const col of data.colNames) {
+            const countsMatrixRowCol = countsMatrixRow.filter(r => r.col === col);
+            if (countsMatrixRowCol.length === 0) {
+                data.countsMatrix.push({row: row, col: col, value: 0});
+            }
+        }
+    }
 }
 
 
