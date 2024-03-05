@@ -17,27 +17,26 @@ export function loadData() {
 }
 
 
-export function loadDataWithCounts(counts) {
-    // console.log(counts)
-    // const allTypes = [...new Set(counts.map(i => Object.keys(i)).flat())].sort();
-    // console.log(allTypes)
-    // console.log(counts.map(i => Object.keys(i)))
+export function loadDataWithCounts(counts, metadata={}, ordering={}) {
+    const countsMatrix = getCountsMatrixFromCounts(counts);
+    let data = {countsMatrix: countsMatrix};
+    loadDataWrapper(data, ordering);
+    data.metadata = metadata;
+    
 }
 
-export function loadDataWithCountsMatrix(countsMatrix, rowNamesOrder, colNamesOrder) {
-    // console.log(countsMatrix)
-    // const allTypes = [...new Set(obsSetsListChildrenCounts.map(i => Object.keys(i)).flat())].sort();
+export function loadDataWithCountsMatrix(countsMatrix, metadata={}, ordering={}) {
+    let data = {countsMatrix: countsMatrix};
+    loadDataWrapper(data, ordering);
+    data.metadata = metadata;
 }
 
-export function loadDataWithVitessce(obsSetsList, rowNames) {
-    console.log(obsSetsList)
+export function loadDataWithVitessce(obsSetsList, rowNames, metadata={}) {
     const counts = getCountsFromObsSetsList(obsSetsList, rowNames);
     const countsMatrix = getCountsMatrixFromCounts(counts);
     let data = {countsMatrix: countsMatrix};
-    getRowNames(data);
-    getColNames(data);
-    extendCountsMatrix(data)
-
+    loadDataWrapper(data);
+    data.metadata = metadata;
 }
 
 export function loadHuBMAPData() {
@@ -64,6 +63,27 @@ function getCountsMatrixFromCounts(counts) {
     return countsMatrix;
 }
 
+/**
+ * Given a data object with a countsMatrix, 
+ * add, wrap and sort rowNames and colNames, 
+ * and extend matrix
+ * @param {*} data 
+ */
+function loadDataWrapper(data, ordering={}) {
+    getRowNames(data);
+    getColNames(data);
+    extendCountsMatrix(data);
+    if (ordering.rowNamesOrder) {
+        sortRowNames(data, ordering.rowNamesOrder);
+    }
+    if (ordering.colNamesOrder) {
+        sortColNames(data, ordering.colNamesOrder);
+    }
+    wrapRowNames(data);
+    wrapColNames(data);
+    return data;
+}
+
 
 function getRowNames(data) {
     data.rowNames = [...new Set(data.countsMatrix.map((r) => r.row))];
@@ -73,17 +93,29 @@ function getColNames(data) {
     data.colNames = [...new Set(data.countsMatrix.map((r) => r.col))];
 }
 
-function sortRowNames(data, rowNamesOrder) {
+function sortNames(arr, sortingArr) {
+    arr.sort(function(a, b){
+        if (sortingArr.indexOf(a) === -1) {
+            return 1;
+        }
+        if (sortingArr.indexOf(b) === -1) {
+            return -1;
+        }
+        return sortingArr.indexOf(a) - sortingArr.indexOf(b);
+      });
+    return arr;
+}
 
+function sortRowNames(data, rowNamesOrder) {
+    data.rowNames = sortNames(data.rowNames, rowNamesOrder);
 }
 
 function sortColNames(data, colNamesOrder) {
-
+    data.colNames = sortNames(data.colNames, colNamesOrder);
 }
 
 function wrapRowNames(data) {
 	data.rowNamesWrapped = data.rowNames.map(d => {return {row: d}});
-
 }
 
 function wrapColNames(data) {
