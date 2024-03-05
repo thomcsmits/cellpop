@@ -68,7 +68,7 @@ export function dragged(event, d, data, y, allowClick) {
 
     // Update the ordering of rowNames
     data.rowNames = reorderArray(data.rowNames, currentIndex, newIndex);
-    data.rowNamesWrapped = wrapRowNames(data);
+    wrapRowNames(data);
     
     return [data, false];
 }
