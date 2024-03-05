@@ -1,9 +1,7 @@
 import * as d3 from "d3";
-import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
 import { getMainVis } from "./src/visualization";
 import { showAnimation } from "./src/visualization/animation";
-import { loadDataWithCountsMatrix, loadDataWithCounts } from "./src/dataLoading/dataWrangling";
-// import { getHubMAPIDs } from "./src/dataLoading/dataHuBMAP"; 
+import { loadHuBMAPData } from "./src/dataLoading/dataHuBMAP"; 
 
 // data
 var uuids = ['ad693f99fb9006e68a53e97598da1509',
@@ -36,111 +34,12 @@ var uuids = ['ad693f99fb9006e68a53e97598da1509',
 	'8d631eee88855ac59155edca2a3bc1ca',
 	'1ea6c0ac5ba60fe35bf63af8699b6fbe']
 
-uuids = uuids.slice(0, 3);
-console.log(uuids.length)
+// uuids = uuids.slice(0, 3);
+// console.log(uuids.length)
 
-// get hubmap url to zarr
-function getURL(uuid) {
-	return `https://assets.hubmapconsortium.org/${uuid}/hubmap_ui/anndata-zarr/secondary_analysis.zarr`;
-}
-const urls = uuids.map(getURL);
-
-// Get one Promise with all ObsSets
-function retrieveObsSets(urls) {
-	const obsSetsListPromises = [];
-	for (let i = 0; i < urls.length; i++) { 
-		const url = urls[i]
-		const source = new AnnDataSource({ url });
-		const config = {
-			url,
-			fileType: 'obsSets.anndata.zarr',
-			options: [
-				{
-					name: 'Cell Ontology Annotation',
-					path: 'obs/predicted_CLID' //'obs/predicted_label'
-				}
-			],
-		};
-		const loader = new ObsSetsAnndataLoader(source, config);
-		obsSetsListPromises.push(loader.load());
-	}
-	return Promise.all(obsSetsListPromises);
-}
-
-
-
-
-
-// // Retrieve the ObsSets, then wrangle data and call the vis
-function getPromiseData(urls) {
-	let promiseData = retrieveObsSets(urls)
-    .then(obsSetsListWrapped => {
-		// wrangle data
-		let obsSetsList = obsSetsListWrapped.map((o) => o.data.obsSets);
-		return obsSetsList;
-    })
-    .catch(error => {
-        console.error(error);
-    });
-	return promiseData;
-}
-
-
-// get metadata
-function getPromiseMetadata(uuids) {
-	let searchApi = 'https://search.api.hubmapconsortium.org/v3/portal/search';
-	let queryBody = {
-		"size": 10000,
-		"query": {"ids": {"values": uuids}},
-	}
-
-	const requestOptions = {
-		method: 'POST',
-		headers: {
-		'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(queryBody),
-	};
-
-	let promiseMetadata = fetch(searchApi, requestOptions)
-		.then(response => {
-			if (!response.ok) {
-			throw new Error('Network response was not ok');
-			}
-			return response.json();
-		})
-		.then(queryBody => {
-			let listAll = queryBody.hits.hits;
-			console.log(listAll)
-
-			let metadata = listAll.map(l => {
-				let ls = l._source;
-				let dmm = l._source.donor.mapped_metadata;
-				return {row: ls.uuid, metadata: {title: ls.title, dataset_type: ls.dataset_type, anatomy_2: ls.anatomy_2[0], sex: dmm.sex[0], age: dmm.age_value[0]}};
-			})
-
-			let hubmapIDs = listAll.map(l => l._source.hubmap_id) // return {[l._source.uuid]: l._source.hubmap_id};
-			return [hubmapIDs, metadata];
-		})
-		.catch(error => {
-			console.error('Error:', error);
-		});
-	return promiseMetadata;
-} 
-
-
-
-Promise.all([getPromiseData(urls), getPromiseMetadata(uuids), smth]).then((values) => {
-	const obsSetsList = values[0];
-	const uuidToHubmap = values[1][0];
-	const metadata = values[1][1];
-
-	const counts = getCountsFromObsSetsList(obsSetsList, rowNames);
-	const data = loadDataWithCounts(counts, metadata=metadata);
-
+loadHuBMAPData(uuids).then((data) => {
+	console.log('data', data);
 	getMainVis(data);
-
-	// loadDataWithCountsMatrix(data.countsMatrix);
-	// loadDataWithCounts(data.counts)
-	// loadDataWithVitessce(data.obsSetsList, data.rowNames);
-})
+}).catch(error => {
+	console.error(error);
+});

@@ -1,4 +1,4 @@
-
+import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
 
 export function loadData() {
 
@@ -18,12 +18,19 @@ export function loadDataWithVitessce(obsSetsList, rowNames, metadata={}) {
     data.metadata = metadata;
 }
 
-export function loadHuBMAPData() {
+export function loadHuBMAPData(uuids, ordering, metadata) {
+    function getURL(uuid) {
+        return `https://assets.hubmapconsortium.org/${uuid}/hubmap_ui/anndata-zarr/secondary_analysis.zarr`;
+    }
+    const urls = uuids.map(getURL);
+
+
+
 
 }
 
 
-function getCountsFromObsSetsList(obsSetsList, rowNames) {
+export function getCountsFromObsSetsList(obsSetsList, rowNames) {
     const counts = new Object();
 	for (let i = 0; i < rowNames.length; i++) {
 		counts[rowNames[i]] = getCountsPerType(obsSetsList[i].tree[0].children);

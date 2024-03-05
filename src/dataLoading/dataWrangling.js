@@ -14,7 +14,7 @@ export function loadDataWithCounts(counts, metadata={}, ordering={}) {
     let data = {countsMatrix: countsMatrix};
     loadDataWrapper(data, ordering);
     data.metadata = metadata;
-    
+    return data;
 }
 
 
@@ -22,6 +22,7 @@ export function loadDataWithCountsMatrix(countsMatrix, metadata={}, ordering={})
     let data = {countsMatrix: countsMatrix};
     loadDataWrapper(data, ordering);
     data.metadata = metadata;
+    return data;
 }
 
 

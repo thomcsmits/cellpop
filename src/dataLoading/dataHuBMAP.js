@@ -1,11 +1,23 @@
-function loadHuBMAPData(uuids, ordering, metadata) {
+import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
+import { getCountsFromObsSetsList } from "./dataLoaders";
+import { loadDataWithCounts } from "./dataWrangling";
+
+export function loadHuBMAPData(uuids, ordering, metadataFields) {
     const urls = uuids.map(getHuBMAPURL);
-
-
-
     // for each url, check if predicted_CLID or predicted_label
-
+    const hubmapData = Promise.all([getPromiseData(urls), getPromiseMetadata(uuids)]).then((values) => {
+        const obsSetsList = values[0];
+        const hubmapIDs = values[1][0];
+        const metadata = values[1][1];
+        const counts = getCountsFromObsSetsList(obsSetsList, hubmapIDs);
+        let data = loadDataWithCounts(counts, ordering=ordering);
+        data.metadata = metadata;
+        return data;
+    }).catch(error => {
+        console.error(error);
+    });
     
+    return hubmapData;
 }
 
 // get hubmap url to zarr
@@ -15,7 +27,7 @@ function getHuBMAPURL(uuid) {
 
 
 // Get one Promise with all ObsSets
-function retrieveObsSets(urls) {
+function getPromiseData(urls) {
 	const obsSetsListPromises = [];
 	for (let i = 0; i < urls.length; i++) { 
 		const url = urls[i]
@@ -33,21 +45,25 @@ function retrieveObsSets(urls) {
 		const loader = new ObsSetsAnndataLoader(source, config);
 		obsSetsListPromises.push(loader.load());
 	}
-	return Promise.all(obsSetsListPromises)
+
+    let promiseData = Promise.all(obsSetsListPromises).then(obsSetsListWrapped => {
+		// wrangle data
+		let obsSetsList = obsSetsListWrapped.map((o) => o.data.obsSets);
+		return obsSetsList;
+    })
+    .catch(error => {
+        console.error(error);
+    });
+	return promiseData
 }
 
 
-
 // get metadata
-function getHuBMAPMetadata(uuids) {
+function getPromiseMetadata(uuids) {
 	let searchApi = 'https://search.api.hubmapconsortium.org/v3/portal/search';
 	let queryBody = {
 		"size": 10000,
-		"query": {
-            "ids": {
-                "values": uuids
-            }
-        },
+		"query": {"ids": {"values": uuids}},
 	}
 
 	const requestOptions = {
@@ -67,31 +83,16 @@ function getHuBMAPMetadata(uuids) {
 		})
 		.then(queryBody => {
 			let listAll = queryBody.hits.hits;
-            console.log(listAll)
-
 			let metadata = listAll.map(l => {
 				let ls = l._source;
 				let dmm = l._source.donor.mapped_metadata;
 				return {row: ls.uuid, metadata: {title: ls.title, dataset_type: ls.dataset_type, anatomy_2: ls.anatomy_2[0], sex: dmm.sex[0], age: dmm.age_value[0]}};
 			})
-			return metadata;
+			let hubmapIDs = listAll.map(l => l._source.hubmap_id); // return {[l._source.uuid]: l._source.hubmap_id};
+			return [hubmapIDs, metadata];
 		})
 		.catch(error => {
 			console.error('Error:', error);
 		});
 	return promiseMetadata;
 } 
-
-// let promiseMetadata = getMetadata(uuids);
-
-
-// Promise.all([promiseData, promiseMetadata]).then((values) => {
-// 	let data = values[0];
-// 	let metadata = values[1];
-// 	data.metadata = {rows: metadata};
-// 	// console.log('data', data)
-// 	// showAnimation(data);
-// 	getMainVis(data);
-
-// 	loadDataWithCountsMatrix(data.countsMatrix);
-// })
