@@ -137,6 +137,5 @@ export function calculateFractions(data) {
         const countsMatrixColFraction = data.countsMatrix.map(r => ({row: r.row, col: r.col, value: eval(r.value/countsMatrixColSum)}))
         countsMatrixColFractions.push(...countsMatrixColFraction);
     }
-    data.countsMatrixRowFractions = countsMatrixRowFractions;
-    data.countsMatrixColFraction = countsMatrixColFractions
+    data.countsMatrixFractions = {row: countsMatrixRowFractions, col: countsMatrixColFractions};
 }
