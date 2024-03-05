@@ -2,6 +2,7 @@ import * as d3 from "d3";
 
 import { reorderArray } from "./util";
 import { createBarChart } from "./barExtensions";
+import { wrapRowNames } from "../dataLoading/dataWrangling";
 
 
 // Drag start function
@@ -67,9 +68,8 @@ export function dragged(event, d, data, y, allowClick) {
 
     // Update the ordering of rowNames
     data.rowNames = reorderArray(data.rowNames, currentIndex, newIndex);
-    data.rowNamesWrapped = reorderArray(data.rowNamesWrapped, currentIndex, newIndex);
-    data.counts = reorderArray(data.counts, currentIndex, newIndex);
-
+    data.rowNamesWrapped = wrapRowNames(data);
+    
     return [data, false];
 }
 
