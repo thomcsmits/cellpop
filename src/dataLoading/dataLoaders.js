@@ -1,32 +1,18 @@
 import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
 
 export function loadData() {
-
-    // let data = {countsMatrix: countsMatrix};
-    // getRowNames(data);
-    // getColNames(data);
-    // extendCountsMatrix(data);
-
+    // create a wrapper for all data loaders?
 }
 
 
 export function loadDataWithVitessce(obsSetsList, rowNames, metadata={}) {
-    const counts = getCountsFromObsSetsList(obsSetsList, rowNames);
-    const countsMatrix = getCountsMatrixFromCounts(counts);
-    let data = {countsMatrix: countsMatrix};
-    loadDataWrapper(data);
-    data.metadata = metadata;
-}
+    // options: anndata/zarr, csv, json
 
-export function loadHuBMAPData(uuids, ordering, metadata) {
-    function getURL(uuid) {
-        return `https://assets.hubmapconsortium.org/${uuid}/hubmap_ui/anndata-zarr/secondary_analysis.zarr`;
-    }
-    const urls = uuids.map(getURL);
-
-
-
-
+    // const counts = getCountsFromObsSetsList(obsSetsList, rowNames);
+    // const countsMatrix = getCountsMatrixFromCounts(counts);
+    // let data = {countsMatrix: countsMatrix};
+    // loadDataWrapper(data);
+    // data.metadata = metadata;
 }
 
 
@@ -39,7 +25,6 @@ export function getCountsFromObsSetsList(obsSetsList, rowNames) {
 }
 
 
-
 // get the counts per cell type
 function getCountsPerType(o) {
 	let dict = new Object();
@@ -49,12 +34,6 @@ function getCountsPerType(o) {
 	return dict;
 }
 
-
-
-
-// function extendData(data) {
-    
-// }
 
 
 

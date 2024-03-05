@@ -54,7 +54,7 @@ function getPromiseData(urls) {
     .catch(error => {
         console.error(error);
     });
-	return promiseData
+	return promiseData;
 }
 
 
