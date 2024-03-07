@@ -20,8 +20,8 @@ export function renderLeftBar(dataFull, dimensions, y) {
 
 	// Get accumulated data
 	const data = []
-	for (let i = 0; i < dataFull.rowNames.length; i++) {
-		data.push({row: dataFull.rowNames[i], countTotal: Object.values(dataFull.counts[i]).reduce((a, b) => a + b, 0)})
+	for (const row of dataFull.rowNames) {
+		data.push({row: row, countTotal: dataFull.countsMatrix.filter(r => r.row === row).map(r => r.value).reduce((a, b) => a + b, 0)})
 	}
 
 	// Determine upper bound

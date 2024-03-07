@@ -1,19 +1,19 @@
 import * as d3 from "d3";
 
 import { renderHeatmap } from "./heatmap";
-import { renderTopBar } from "./barTop";
+import { renderTopBar, renderTopViolin } from "./barTop";
 import { renderLeftBar } from "./barSide";
 import { renderGraph } from "./graph";
 import { getPossibleMetadataSelections, sortByMetadata } from "./metadata";
 
 // visualization
 export function getMainVis(data) {
-	console.log(data);
+	console.log('data', data);
 	const app = document.getElementById('app');
 
 	// set the dimensions of the graph
 	let widthRatio = 0.9;
-	let heightRatio = 0.6; 
+	let heightRatio = 0.8; 
 
 	let widthRight = data.colNames.length * 25;
 	let heightBottom =  data.rowNames.length * 40;
@@ -89,7 +89,7 @@ export function getMainVis(data) {
 	}
 	app.appendChild(buttonMetadata);
 
-	sortByMetadata(data, ['sex', ['Female', 'Male']])
+	// sortByMetadata(data, ['sex', ['Female', 'Male']])
 
 	// add div for visualization
 	let mainVis = document.createElement('div');
@@ -106,7 +106,7 @@ export function getMainVis(data) {
     
         
 	// create main heatmap
-	let [x, y, colorRange] = renderHeatmap(data, dimensions)
+	let [x, y, colorRange] = renderHeatmap(data, dimensions, false)
 
 	// create top barchart
 	renderTopBar(data, dimensions, x)
@@ -117,7 +117,7 @@ export function getMainVis(data) {
 	// // create graph
 	// renderGraph(data, dimensions)
 
-	svg.attr("resize", "both")
+	// svg.attr("resize", "both")
 
 	console.log(svg)
 

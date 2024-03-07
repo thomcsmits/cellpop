@@ -3,9 +3,14 @@ import * as d3 from "d3";
 import { renderLeftBar } from "./barSide";
 import { dragstarted, dragged, dragended } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
+import { getUpperBound } from "./util";
 
 
-export function renderHeatmap(data, dimensions) {
+export function renderHeatmap(data, dimensions, fraction=false) {
+	let countsMatrix = data.countsMatrix;
+	if (fraction) {
+		countsMatrix = data.countsMatrixFractions.row;
+	}
 	// Remove any prior heatmaps
 	d3.select("g.heatmap").remove();
 
@@ -95,7 +100,7 @@ export function renderHeatmap(data, dimensions) {
 	// Add color
 	let colorRange = d3.scaleLinear()
 		.range(["white", "#69b3a2"])
-		.domain([0,2000])
+		.domain([0,getUpperBound(countsMatrix.map(r => r.value))])
 
 
 	// Add rows and columns behind
@@ -125,7 +130,7 @@ export function renderHeatmap(data, dimensions) {
 
 	// Read the data
 	let rects = svg.selectAll()
-		.data(data.countsMatrix, function(d) {return d.row+":"+d.col;})
+		.data(countsMatrix, function(d) {return d.row+":"+d.col;})
 		.enter()
 		.append("rect")
 			.attr("class", "heatmap-rects")
