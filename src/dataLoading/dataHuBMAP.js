@@ -6,7 +6,6 @@ export function loadHuBMAPData(uuids, ordering, metadataFields) {
 	// let t0 = performance.now()
     const urls = uuids.map(getHuBMAPURL);
     // for each url, check if predicted_CLID or predicted_label
-	let t0 = performance.now()
 
 	const obsSetsListPromises = getPromiseData(urls);
 	let promiseData = Promise.all(obsSetsListPromises).then(obsSetsListWrapped => {
@@ -18,15 +17,12 @@ export function loadHuBMAPData(uuids, ordering, metadataFields) {
         console.error(error);
     });
     const hubmapData = Promise.all([promiseData, getPromiseMetadata(uuids)]).then((values) => {
-		let t1 = performance.now()
         const obsSetsList = values[0];
         const hubmapIDs = values[1][0];
         const metadata = values[1][1];
         const counts = getCountsFromObsSetsList(obsSetsList, hubmapIDs);
         let data = loadDataWithCounts(counts, ordering=ordering);
         data.metadata = metadata;
-		// let t1 = performance.now()
-		console.log(`Difference: ${t1 - t0}`)
         return data;
     }).catch(error => {
         console.error(error);
