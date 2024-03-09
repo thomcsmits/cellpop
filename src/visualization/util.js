@@ -5,8 +5,25 @@
  * E.g. if the max value is 97, it returns 100. If the max value is 147, it returns 500.
  */
 export function getUpperBound(arr) {
-	const maxValue = Math.max(...arr);
-	const lengthValue = maxValue.toString().length;
+	let maxValue = Math.max(...arr);
+	if (maxValue > 1) {
+		return getUpperBoundInner(maxValue);
+	} else {
+		const multiplyFactor = Math.round(1/maxValue);
+		const multiplyFactorRound = Math.pow(10, multiplyFactor.toString().length);
+		const newVal = multiplyFactorRound * getUpperBoundInner(maxValue * multiplyFactorRound);
+		return newVal;
+	}
+}
+
+/**
+ * Helper function for getUpperBound
+ * @param {} maxValue number to find the nearest 2.5/5/10 above
+ * @returns number that is the nearest 2.5/5/10 above maxValue
+ */
+function getUpperBoundInner(maxValue) {
+	const maxValueRound = Math.round(maxValue);
+	const lengthValue = maxValueRound.toString().length;
 	const bound10 = Math.pow(10, lengthValue);
 	const bound5 = bound10 / 2;
 	const bound25 = bound5 /2;
@@ -18,7 +35,6 @@ export function getUpperBound(arr) {
 	}
 	return bound10;
 }
-
 
 export function reorderArray(arr, currentIndex, newIndex) {
 	let selectedElement = arr[currentIndex];
