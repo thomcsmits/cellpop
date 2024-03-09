@@ -133,7 +133,7 @@ export function calculateFractions(data) {
     }
 
     for (const col of data.colNames) {
-        const countsMatrixCol = data.countsMatrix.filter(r => r.row === row);
+        const countsMatrixCol = data.countsMatrix.filter(r => r.col === col);
         const countsMatrixColValues = countsMatrixCol.map(r => r.value);
         const countsMatrixColValuesSum = countsMatrixColValues.reduce((a, b) => a + b, 0);
         const countsMatrixColFraction = countsMatrixCol.map(r => ({row: r.row, col: r.col, value: eval(r.value/countsMatrixColValuesSum)}))
