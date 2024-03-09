@@ -125,16 +125,18 @@ export function calculateFractions(data) {
     const countsMatrixRowFractions = [];
     const countsMatrixColFractions = [];
     for (const row of data.rowNames) {
-        const countsMatrixRow = data.countsMatrix.filter(r => r.row === row).map(r => r.value);
-        const countsMatrixRowSum = countsMatrixRow.reduce((a, b) => a + b, 0);
-        const countsMatrixRowFraction = data.countsMatrix.map(r => ({row: r.row, col: r.col, value: eval(r.value/countsMatrixRowSum)}))
+        const countsMatrixRow = data.countsMatrix.filter(r => r.row === row);
+        const countsMatrixRowValues = countsMatrixRow.map(r => r.value);
+        const countsMatrixRowValuesSum = countsMatrixRowValues.reduce((a, b) => a + b, 0);
+        const countsMatrixRowFraction = countsMatrixRow.map(r => ({row: r.row, col: r.col, value: eval(r.value/countsMatrixRowValuesSum)}))
         countsMatrixRowFractions.push(...countsMatrixRowFraction);
     }
 
     for (const col of data.colNames) {
-        const countsMatrixCol = data.countsMatrix.filter(r => r.col === col).map(r => r.value);
-        const countsMatrixColSum = countsMatrixCol.reduce((a, b) => a + b, 0);
-        const countsMatrixColFraction = data.countsMatrix.map(r => ({row: r.row, col: r.col, value: eval(r.value/countsMatrixColSum)}))
+        const countsMatrixCol = data.countsMatrix.filter(r => r.row === row);
+        const countsMatrixColValues = countsMatrixCol.map(r => r.value);
+        const countsMatrixColValuesSum = countsMatrixColValues.reduce((a, b) => a + b, 0);
+        const countsMatrixColFraction = countsMatrixCol.map(r => ({row: r.row, col: r.col, value: eval(r.value/countsMatrixColValuesSum)}))
         countsMatrixColFractions.push(...countsMatrixColFraction);
     }
     data.countsMatrixFractions = {row: countsMatrixRowFractions, col: countsMatrixColFractions};
