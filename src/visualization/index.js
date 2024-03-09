@@ -54,10 +54,15 @@ export function getMainVis(data) {
 	// var marginHeatmap = {top: 100, right: 100, bottom: 100, left: 150};
 
 	// add a (temporary) button for switch between % and n
-	let buttonFraction = document.createElement('button');
-	buttonFraction.textContent = 'Change fraction/absolute';
-	app.appendChild(buttonFraction);
-	buttonFraction.addEventListener('click', () => alert('hi'))
+	let buttonFractionOn = document.createElement('button');
+	buttonFractionOn.textContent = 'Change to fraction';
+	app.appendChild(buttonFractionOn);
+	buttonFractionOn.addEventListener('click', () => renderHeatmap(data, dimensions, true));
+
+	let buttonFractionOff = document.createElement('button');
+	buttonFractionOff.textContent = 'Change to absolute';
+	app.appendChild(buttonFractionOff);
+	buttonFractionOff.addEventListener('click', () => renderHeatmap(data, dimensions, false));
 
 	// add a button for resetting the bottom thing
 	let buttonReset = document.createElement('button');
