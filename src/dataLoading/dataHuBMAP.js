@@ -22,7 +22,7 @@ export function loadHuBMAPData(uuids, ordering, metadataFields) {
         const metadata = values[1][1];
         const counts = getCountsFromObsSetsList(obsSetsList, hubmapIDs);
         let data = loadDataWithCounts(counts, ordering=ordering);
-        data.metadata = metadata;
+        data.metadata = {rows: metadata};
         return data;
     }).catch(error => {
         console.error(error);
@@ -88,7 +88,7 @@ function getPromiseMetadata(uuids) {
 			let metadata = listAll.map(l => {
 				let ls = l._source;
 				let dmm = l._source.donor.mapped_metadata;
-				return {row: ls.uuid, metadata: {title: ls.title, dataset_type: ls.dataset_type, anatomy_2: ls.anatomy_2[0], sex: dmm.sex[0], age: dmm.age_value[0]}};
+				return {row: ls.hubmap_id, metadata: {title: ls.title, dataset_type: ls.dataset_type, anatomy_2: ls.anatomy_2[0], sex: dmm.sex[0], age: dmm.age_value[0]}};
 			})
 			let hubmapIDs = listAll.map(l => l._source.hubmap_id); // return {[l._source.uuid]: l._source.hubmap_id};
 			return [hubmapIDs, metadata];
