@@ -11,7 +11,7 @@ export function getUpperBound(arr) {
 	} else {
 		const multiplyFactor = Math.round(1/maxValue);
 		const multiplyFactorRound = Math.pow(10, multiplyFactor.toString().length);
-		const newVal = multiplyFactorRound * getUpperBoundInner(maxValue * multiplyFactorRound);
+		const newVal = getUpperBoundInner(maxValue * multiplyFactorRound) / multiplyFactorRound;
 		return newVal;
 	}
 }
