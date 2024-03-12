@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import { getMainVis } from "./visualization";
 // import { showAnimation } from "./src/visualization/animation";
 import { loadHuBMAPData } from "./dataLoading/dataHuBMAP"; 
+import { useState } from "react";
 
 // data
 var uuids = ['ad693f99fb9006e68a53e97598da1509',
@@ -38,19 +39,46 @@ var uuids = ['ad693f99fb9006e68a53e97598da1509',
 // console.log(uuids.length)
 
 
-const CellPop = () => {
+export const CellPop = (props) => {
+
+	const [theme, setTheme] = useState(props.theme);
+	const [dimensions, setDimensions] = useState(props.dimensions);
+	const [fraction, setFraction] = useState(false);
+
+
+	// get metadata options
+
+
+	// useref for creating the svg
+
+
+	// resizing hooks
+
+
+	// call function that wraps the renderXXX
+		// getMainVis(props.data);
+	
+
+	// create MUI buttons with callback functions to e.g. change theme
+	
+	return (
+		<div>
+
+		</div>
+	)
+		
 	// return <div id="app"></div>
 }
 
-loadHuBMAPData(uuids).then((data) => {
-	console.log('data', data);
-	getMainVis(data);
-}).catch(error => {
-	console.error(error);
-});
+// loadHuBMAPData(uuids).then((data) => {
+// 	console.log('data', data);
+// 	getMainVis(data);
+// }).catch(error => {
+// 	console.error(error);
+// });
 
 
-export function CellPop(data) {
-	getMainVis(data);
-}
+// export function CellPop(data) {
+// 	getMainVis(data);
+// }
 
