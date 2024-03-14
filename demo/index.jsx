@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { CellPop } from './src/CellPopComponent.jsx';
+import Demo from './demo.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-    <CellPop />
+    <Demo />
   );
   

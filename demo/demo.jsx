@@ -1,11 +1,18 @@
-import * as d3 from "d3";
-import { getMainVis } from "./src/visualization";
-import { showAnimation } from "./src/visualization/animation";
-import { loadHuBMAPData } from "./src/dataLoading/dataHuBMAP"; 
+import React, { useEffect, useState } from "react";
+// import * as d3 from "d3";
+// import { getMainVis } from "./src/visualization";
+// import { showAnimation } from "./src/visualization/animation";
+import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
+import { CellPop } from "../src/CellPopComponent";
 
-// data
-var uuids = ['ad693f99fb9006e68a53e97598da1509',
-    '173de2e80adf6a73ac8cff5ccce20dfc',
+
+function Demo() {
+
+	const [data, setData] = useState();
+
+	// data
+	var uuids = ['ad693f99fb9006e68a53e97598da1509',
+	'173de2e80adf6a73ac8cff5ccce20dfc',
 	'b95f34761c252ebbd1e482cd9afae73f',
 	'5a5ca03fa623602d9a859224aa40ace4',
 	'3c1b10bc912c60c9afc36b7423695236',
@@ -34,12 +41,30 @@ var uuids = ['ad693f99fb9006e68a53e97598da1509',
 	'8d631eee88855ac59155edca2a3bc1ca',
 	'1ea6c0ac5ba60fe35bf63af8699b6fbe']
 
-// uuids = uuids.slice(0, 3);
-// console.log(uuids.length)
+	uuids = uuids.slice(0, 3);
+	// console.log(uuids.length)
 
-loadHuBMAPData(uuids).then((data) => {
-	console.log('data', data);
-	getMainVis(data);
-}).catch(error => {
-	console.error(error);
-});
+	// useEffect to make sure the data only loads once
+	useEffect(() => {
+		loadHuBMAPData(uuids).then((data) => {
+			setData(data);
+			// console.log('data', data);
+			// getMainVis(data);
+			}).catch(error => {
+				console.error(error);
+		});
+	}, [])
+
+	// const props = {
+	// 	data: null,
+	// 	theme: 'light',
+	// }
+
+	return (
+		<>
+			<CellPop data={data} theme={'light'}/>
+		</>
+	)
+}
+
+export default Demo;
