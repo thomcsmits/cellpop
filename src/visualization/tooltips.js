@@ -4,7 +4,7 @@ import * as d3 from "d3";
 
 // Add tooltip
 export function defineTooltip() {
-	d3.select("#mainVis")
+	d3.select("#cellpopvis")
 		.append("div")
 		.attr("class", "tooltip")
 		.style("background-color", "#FFFFFF")
@@ -38,7 +38,7 @@ export function removeTooltip() {
 
 // Add tooltip
 export function defineTooltipBarSide() {
-	d3.select("#mainVis")
+	d3.select("#cellpopvis")
 		.append("div")
 		.attr("class", "tooltip-axis-y")
 		.style("background-color", "#FFFFFF")
@@ -73,7 +73,7 @@ export function removeTooltipBarSide() {
 
 // Add tooltip
 export function defineTooltipBarTop() {
-	d3.select("#mainVis")
+	d3.select("#cellpopvis")
 		.append("div")
 		.attr("class", "tooltip-axis-x")
 		.style("background-color", "#FFFFFF")

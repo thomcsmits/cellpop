@@ -101,11 +101,11 @@ export function getMainVis(data, dimensions=null) {
 
 	// add div for visualization
 	let mainVis = document.createElement('div');
-	mainVis.id = 'mainVis';
+	mainVis.id = 'cellpopvis';
 	app.appendChild(mainVis);
 
 	// append the svg object to the body of the page
-	let svg = d3.select("#mainVis")
+	let svg = d3.select("#cellpopvis")
 	.append("svg")
 		.attr("width", width)
 		.attr("height", height)
