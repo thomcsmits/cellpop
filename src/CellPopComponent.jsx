@@ -26,7 +26,8 @@ export const CellPop = (props) => {
 	}
 
 	const cellPopRef = useRef();
-
+	
+	// const [data, setData] = useState(props.data);
 	const [theme, setTheme] = useState(props.theme);
 	const [dimensions, setDimensions] = useState(props.dimensions);
 	const [fraction, setFraction] = useState(false);
@@ -47,18 +48,19 @@ export const CellPop = (props) => {
 			.attr("height", 1000)
 		.append("g")
 			.attr("class", "main")
+	}, [])
 
+	// call functions on updates
+	useEffect(() => {
 		// create main heatmap
-		console.log('smth', props.data)
-		let [x, y, colorRange] = renderHeatmap(svg, props.data, dimensions, false, theme)
+		let [x, y, colorRange] = renderHeatmap(props.data, props.dimensions, fraction, theme, metadataField)
 
 		// create top barchart
-		renderTopBar(svg, props.data, dimensions, x)
+		renderTopBar(props.data, props.dimensions, x)
 
-		// // create left barchart
-		renderLeftBar(svg, props.data, dimensions, y)
-		
-	}, [])
+		// create left barchart
+		renderLeftBar(props.data, props.dimensions, y)
+	}, [theme, fraction, metadataField])
 
 
 
