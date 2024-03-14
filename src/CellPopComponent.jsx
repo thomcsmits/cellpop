@@ -7,6 +7,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import Button from '@mui/material/Button';
 
 import * as d3 from "d3";
 import { getMainVis } from "./visualization";
@@ -87,9 +88,15 @@ export const CellPop = (props) => {
 	function changeMetadataField(event) {
 		setMetadataField(event.target.value);
 	}
+
+	function resetStackedBar() {
+		d3.selectAll('.bardetail').remove();
+	}
 	
 	return (
 		<div>
+			<Button variant="outlined" onClick={resetStackedBar}>Reset stacked bar chart</Button>
+
 			<ToggleButtonGroup
 				color="primary"
 				value={fraction}
