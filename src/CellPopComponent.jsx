@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import InputLabel from '@mui/material/InputLabel';
@@ -13,6 +13,10 @@ import { getMainVis } from "./visualization";
 // import { showAnimation } from "./src/visualization/animation";
 import { loadHuBMAPData } from "./dataLoading/dataHuBMAP"; 
 import { getPossibleMetadataSelections } from "./visualization/metadata";
+import { renderHeatmap } from "./visualization/heatmap";
+import { renderTopBar, renderTopViolin } from "./visualization/barTop";
+import { renderLeftBar } from "./visualization/barSide";
+import { renderGraph } from "./visualization/graph";
 
 
 export const CellPop = (props) => {
@@ -21,19 +25,41 @@ export const CellPop = (props) => {
 		return <></>;
 	}
 
+	const cellPopRef = useRef();
+
 	const [theme, setTheme] = useState(props.theme);
 	const [dimensions, setDimensions] = useState(props.dimensions);
 	const [fraction, setFraction] = useState(false);
 	const [metadataField, setMetadataField] = useState("None");
-
-	
-
 
 	// get metadata options
 	const metadataFields = getPossibleMetadataSelections(props.data);
 
 
 	// useref for creating the svg
+	useEffect(() => {
+		const app = d3.select(cellPopRef.current);
+
+		// add svg element
+		let svg = app
+		.append("svg")
+			.attr("width", 1000)
+			.attr("height", 1000)
+		.append("g")
+			.attr("class", "main")
+
+		// create main heatmap
+		console.log('smth', props.data)
+		let [x, y, colorRange] = renderHeatmap(svg, props.data, dimensions, false, theme)
+
+		// create top barchart
+		renderTopBar(svg, props.data, dimensions, x)
+
+		// // create left barchart
+		renderLeftBar(svg, props.data, dimensions, y)
+		
+	}, [])
+
 
 
 	// resizing hooks
@@ -99,6 +125,9 @@ export const CellPop = (props) => {
 				<ToggleButton value="light">Light</ToggleButton>
 				<ToggleButton value="dark">Dark</ToggleButton>
 			</ToggleButtonGroup>
+
+			<div id='cellpopvis' ref={cellPopRef}></div>
+
 		</div>
 	)
 }
