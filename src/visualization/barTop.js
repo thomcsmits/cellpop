@@ -44,15 +44,15 @@ export function renderTopBar(dataFull, dimensions, x) {
 
 	const x_changed = x.paddingInner(0.25)
 
-    // svg.append("text")
-	// 	.attr("class", "y label")
-	// 	.attr("text-anchor", "end")
-	// 	.attr("x", 0)
-	// 	.attr("y", -60)
-	// 	.attr("dy", ".75em")
-	// 	.attr("transform", "rotate(-90)")
-	// 	.text("Total number of cells")
-	//.style("font-size", dimensions.textSize.label);
+    svg.append("text")
+		.attr("class", "y label")
+		.attr("text-anchor", "end")
+		.attr("x", 30)
+		.attr("y", -70)
+		.attr("dy", ".75em")
+		.attr("transform", "rotate(-90)")
+		.text("Total number of cells")
+	.style("font-size", dimensions.textSize.labelSmall);
 
     // Bars
     let bars = svg.selectAll()
