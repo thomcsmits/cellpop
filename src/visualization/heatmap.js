@@ -104,7 +104,7 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 
 	let gradient = svg.append("g")
 		.attr("class", "axiscolor")
-		.attr("transform", "translate(" + eval(width+100) + ",0)")
+		.attr("transform", "translate(" + eval(width+150) + ",10)")
 
 	let colorAxisSize = 100;
 	let colorAxisSteps = 100;
@@ -121,22 +121,24 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 			.attr("height", colorAxisSize / colorAxisSteps)
 			.attr("fill", color)
 	}
-	gradient.append("text").text("Value")
+
+	const colorAxisLabel = fraction ? 'Fraction' : 'Count'; 
+	gradient.append("text")
+		.attr("y", -10)
+		.text("Value")
+		.style("font-size", dimensions.textSize.label);
 
 	gradient.append("text")
 		.attr("x", colorAxisWidth)
 		.attr("y", colorAxisSize)
 		.text(0)
+		.style("font-size", dimensions.textSize.tick);
 
 	gradient.append("text")
 		.attr("x", colorAxisWidth)
 		.attr("y", 0)
 		.text(getUpperBound(countsMatrix.map(r => r.value)))
-	
-		// .call(d3.axisRight(colorRange))
-		// .selectAll("text")
-		// 	.style("font-size", dimensions.textSize.tick);
-
+		.style("font-size", dimensions.textSize.tick);
 
 	// Add rows and columns behind
 	let colsBehind = svg.selectAll()
