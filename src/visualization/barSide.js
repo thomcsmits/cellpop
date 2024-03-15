@@ -42,6 +42,16 @@ export function renderLeftBar(dataFull, dimensions, y) {
 			.style("text-anchor", "end")
 			.style("font-size", dimensions.textSize.tick);
 
+	svg.append("text")
+		.attr("class", "x label")
+		.attr("text-anchor", "end")
+		.attr("x", width - 50)
+		.attr("y", 40)
+		.attr("dy", ".75em")
+		.attr("transform", "translate(0," + height + ")")
+		.text("Total number of cells")
+		.style("font-size", dimensions.textSize.labelSmall);
+
     // // Bars
     let bars = svg.selectAll()
 		.data(data)

@@ -67,7 +67,7 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 		.attr("class", "y-label")
 		.attr("text-anchor", "end")
 		.attr("x", -height/2)
-		.attr("y", width + 100)
+		.attr("y", width + 120)
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
 		.text("Sample")
@@ -125,7 +125,7 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 	const colorAxisLabel = fraction ? 'Fraction' : 'Count'; 
 	gradient.append("text")
 		.attr("y", -10)
-		.text("Value")
+		.text(colorAxisLabel)
 		.style("font-size", dimensions.textSize.label);
 
 	gradient.append("text")
