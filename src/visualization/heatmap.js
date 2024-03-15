@@ -6,7 +6,7 @@ import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
 import { getUpperBound } from "./util";
 
 
-export function renderHeatmap(data, dimensions, fraction=false) {
+export function renderHeatmap(data, dimensions, fraction=false, theme) {
 	let countsMatrix = data.countsMatrix;
 	if (fraction) {
 		countsMatrix = data.countsMatrixFractions.row;
@@ -70,7 +70,7 @@ export function renderHeatmap(data, dimensions, fraction=false) {
 		.attr("y", width + 100)
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
-		.text("Samples")
+		.text("Sample")
 		.style("font-size", dimensions.textSize.label);
 
 	// add metadata scale
@@ -101,6 +101,41 @@ export function renderHeatmap(data, dimensions, fraction=false) {
 	let colorRange = d3.scaleLinear()
 		.range(["white", "#69b3a2"])
 		.domain([0,getUpperBound(countsMatrix.map(r => r.value))])
+
+	let gradient = svg.append("g")
+		.attr("class", "axiscolor")
+		.attr("transform", "translate(" + eval(width+100) + ",0)")
+
+	let colorAxisSize = 100;
+	let colorAxisSteps = 100;
+	let colorAxisWidth = 100;
+
+	console.log(gradient)
+	for (let i = 0; i < colorAxisSteps; i++) {
+		const color = colorRange(i * getUpperBound(countsMatrix.map(r => r.value)) / colorAxisSteps);
+		gradient.append("rect")
+			.attr("class", "colorlabelrect")
+			.attr("x", 0)
+			.attr("y", colorAxisSize - i * colorAxisSize / colorAxisSteps)
+			.attr("width", colorAxisWidth * 0.9)
+			.attr("height", colorAxisSize / colorAxisSteps)
+			.attr("fill", color)
+	}
+	gradient.append("text").text("Value")
+
+	gradient.append("text")
+		.attr("x", colorAxisWidth)
+		.attr("y", colorAxisSize)
+		.text(0)
+
+	gradient.append("text")
+		.attr("x", colorAxisWidth)
+		.attr("y", 0)
+		.text(getUpperBound(countsMatrix.map(r => r.value)))
+	
+		// .call(d3.axisRight(colorRange))
+		// .selectAll("text")
+		// 	.style("font-size", dimensions.textSize.tick);
 
 
 	// Add rows and columns behind
