@@ -8,6 +8,8 @@ import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 
 import * as d3 from "d3";
 import { getMainVis } from "./visualization";
@@ -45,8 +47,8 @@ export const CellPop = (props) => {
 		// add svg element
 		let svg = app
 		.append("svg")
-			.attr("width", 1000)
-			.attr("height", 1000)
+			.attr("width", props.dimensions.global.width)
+			.attr("height", props.dimensions.global.height)
 		.append("g")
 			.attr("class", "main")
 	}, [])
@@ -95,45 +97,49 @@ export const CellPop = (props) => {
 	
 	return (
 		<div>
-			<Button variant="outlined" onClick={resetStackedBar}>Reset stacked bar chart</Button>
+			<Stack spacing={6} direction="row">
 
-			<ToggleButtonGroup
-				color="primary"
-				value={fraction}
-				exclusive
-				onChange={changeFraction}
-				aria-label="Fraction"
-			>
-				<ToggleButton value={false}>Count</ToggleButton>
-				<ToggleButton value={true}>Fraction</ToggleButton>
-			</ToggleButtonGroup>
+				<Button variant="outlined" onClick={resetStackedBar}>Reset stacked bar chart</Button>
 			
-			<FormControl sx={{ m: 1, width: 300 }}>
-				<InputLabel id="sort-by-metadata">Sort by metadata</InputLabel>
-				<Select
-					labelId="demo-simple-select-label"
-					id="demo-simple-select"
-					value={metadataField}
-					label="select-metadata"
-					onChange={changeMetadataField}
+				<ToggleButtonGroup
+					color="primary"
+					value={fraction}
+					exclusive
+					onChange={changeFraction}
+					aria-label="Fraction"
 				>
-					<MenuItem value="None" key="None">None</MenuItem>
-					{metadataFields.map(d => {
-						return <MenuItem value={d[0]} key={d[0]}>{d[0]}</MenuItem>
-					})}
-				</Select>
-			</FormControl>
+					<ToggleButton value={false}>Count</ToggleButton>
+					<ToggleButton value={true}>Fraction</ToggleButton>
+				</ToggleButtonGroup>
 
-			<ToggleButtonGroup
-				color="primary"
-				value={theme}
-				exclusive
-				onChange={changeTheme}
-				aria-label="Theme"
-			>
-				<ToggleButton value="light">Light</ToggleButton>
-				<ToggleButton value="dark">Dark</ToggleButton>
-			</ToggleButtonGroup>
+				<FormControl sx={{ m: 1, width: 300 }}>
+					<InputLabel id="sort-by-metadata">Sort by metadata</InputLabel>
+					<Select
+						labelId="demo-simple-select-label"
+						id="demo-simple-select"
+						value={metadataField}
+						label="select-metadata"
+						onChange={changeMetadataField}
+					>
+						<MenuItem value="None" key="None">None</MenuItem>
+						{metadataFields.map(d => {
+							return <MenuItem value={d[0]} key={d[0]}>{d[0]}</MenuItem>
+						})}
+					</Select>
+				</FormControl>
+
+				<ToggleButtonGroup
+					color="primary"
+					value={theme}
+					exclusive
+					onChange={changeTheme}
+					aria-label="Theme"
+				>
+					<ToggleButton value="light">Light</ToggleButton>
+					<ToggleButton value="dark">Dark</ToggleButton>
+				</ToggleButtonGroup>
+				
+			</Stack>
 
 			<div id='cellpopvis' ref={cellPopRef}></div>
 
