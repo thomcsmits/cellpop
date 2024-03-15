@@ -34,9 +34,8 @@ var uuids = ['ad693f99fb9006e68a53e97598da1509',
 	'8d631eee88855ac59155edca2a3bc1ca',
 	'1ea6c0ac5ba60fe35bf63af8699b6fbe']
 
-// uuids = uuids.slice(0, 3);
-// console.log(uuids.length)
 
+// Load data directly as demo
 loadHuBMAPData(uuids).then((data) => {
 	console.log('data', data);
 	getMainVis(data);
