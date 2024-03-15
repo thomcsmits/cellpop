@@ -1,8 +1,6 @@
 import * as d3 from "d3";
-import { getMainVis } from "../src/visualization";
 import { showAnimation } from "../src/visualization/animation";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP"; 
-
 // data
 var uuids = ['ad693f99fb9006e68a53e97598da1509',
     '173de2e80adf6a73ac8cff5ccce20dfc',
@@ -37,8 +35,7 @@ var uuids = ['ad693f99fb9006e68a53e97598da1509',
 
 // Load data directly as demo
 loadHuBMAPData(uuids).then((data) => {
-	console.log('data', data);
-	getMainVis(data);
+	showAnimation(data);
 }).catch(error => {
 	console.error(error);
 });
