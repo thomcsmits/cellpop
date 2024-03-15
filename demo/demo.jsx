@@ -4,6 +4,9 @@ import React, { useEffect, useState } from "react";
 // import { showAnimation } from "./src/visualization/animation";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
 import { CellPop } from "../src/CellPopComponent";
+import { counts } from "../dataLocal/counts";
+import { metadata } from "../dataLocal/metadata";
+import { loadDataWithCounts } from "../src/dataLoading/dataWrangling";
 
 
 function Demo() {
@@ -41,18 +44,24 @@ function Demo() {
 	'8d631eee88855ac59155edca2a3bc1ca',
 	'1ea6c0ac5ba60fe35bf63af8699b6fbe']
 
-	uuids = uuids.slice(0, 3);
+	// uuids = uuids.slice(0, 3);
 	// console.log(uuids.length)
 
 	// useEffect to make sure the data only loads once
+	// useEffect(() => {
+	// 	loadHuBMAPData(uuids).then((data) => {
+	// 		setData(data);
+	// 		console.log('data', data);
+	// 		// getMainVis(data);
+	// 		}).catch(error => {
+	// 			console.error(error);
+	// 	});
+	// }, [])
+
 	useEffect(() => {
-		loadHuBMAPData(uuids).then((data) => {
-			setData(data);
-			// console.log('data', data);
-			// getMainVis(data);
-			}).catch(error => {
-				console.error(error);
-		});
+		let dataLoaded = loadDataWithCounts(counts);
+        dataLoaded.metadata = {rows: metadata};
+		setData(dataLoaded)
 	}, [])
 
 	// const props = {
@@ -60,11 +69,11 @@ function Demo() {
 	// 	theme: 'light',
 	// }
 
-	let widthRatio = 0.9;
+	let widthRatio = 0.8;
 	let heightRatio = 0.8; 
 
-	let widthRight = 40 * 25;
-	let heightBottom =  5 * 40;
+	let widthRight = 45 * 25;
+	let heightBottom =  20 * 40;
 
 	let width = widthRight / widthRatio;
 	let height = heightBottom / heightRatio;
@@ -74,7 +83,7 @@ function Demo() {
 
 	let dimensions = {
 		global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
-		heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 200, bottom: 100, left: 0}},
+		heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 400, bottom: 100, left: 0}},
 		barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
 		barLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
 		graph: {offsetWidth: widthLeft, offsetHeight: height, width: widthRight, height: heightTop, margin: {top: 0, right: 200, bottom: 0, left: 0}},
