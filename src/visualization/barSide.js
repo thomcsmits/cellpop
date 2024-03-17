@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { getUpperBound } from "./util";
 import { defineTooltipBarSide, addTooltipBarSide, removeTooltipBarSide } from "./tooltips";
 
-export function renderLeftBar(dataFull, dimensions, y) {
+export function renderLeftBar(dataFull, dimensions, y, themeColors) {
 	// Remove any prior barcharts
 	d3.select("g.barleft").remove();
 
@@ -40,7 +40,8 @@ export function renderLeftBar(dataFull, dimensions, y) {
 		.selectAll("text")
 			.attr("transform", "translate(-10,0)rotate(-45)")
 			.style("text-anchor", "end")
-			.style("font-size", dimensions.textSize.tick);
+			.style("font-size", dimensions.textSize.tick)
+			.style("fill", themeColors.text);
 
 	svg.append("text")
 		.attr("class", "x label")
@@ -50,7 +51,8 @@ export function renderLeftBar(dataFull, dimensions, y) {
 		.attr("dy", ".75em")
 		.attr("transform", "translate(0," + height + ")")
 		.text("Total number of cells")
-		.style("font-size", dimensions.textSize.labelSmall);
+		.style("font-size", dimensions.textSize.labelSmall)
+		.style("fill", themeColors.text);
 
     // // Bars
     let bars = svg.selectAll()
@@ -60,7 +62,7 @@ export function renderLeftBar(dataFull, dimensions, y) {
 			.attr("y", d => y_changed(d.row))
 			.attr("width", d => width - x(d.countTotal))
 			.attr("height", y_changed.bandwidth())
-			.attr("fill", "black")
+			.attr("fill", themeColors.bars);
 
 	defineTooltipBarSide();
 

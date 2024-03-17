@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { getUpperBound } from "./util";
 import { defineTooltipBarTop, addTooltipBarTop, removeTooltipBarTop } from "./tooltips";
 
-export function renderTopBar(dataFull, dimensions, x) {
+export function renderTopBar(dataFull, dimensions, x, themeColors) {
 	// Remove any prior barcharts
 	d3.select("g.bartop").remove();
 
@@ -39,7 +39,8 @@ export function renderTopBar(dataFull, dimensions, x) {
 		.attr("class", "axisleft")
 		.call(d3.axisLeft(y))
 		.selectAll("text")
-			.style("font-size", dimensions.textSize.tick);
+			.style("font-size", dimensions.textSize.tick)
+			.style("fill", themeColors.text);
 
 
 	const x_changed = x.paddingInner(0.25)
@@ -52,7 +53,8 @@ export function renderTopBar(dataFull, dimensions, x) {
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
 		.text("Total number of cells")
-	.style("font-size", dimensions.textSize.labelSmall);
+		.style("font-size", dimensions.textSize.labelSmall)
+		.style("fill", themeColors.text);
 
     // Bars
     let bars = svg.selectAll()
@@ -62,7 +64,7 @@ export function renderTopBar(dataFull, dimensions, x) {
 			.attr("y", d => y(d.countTotal))
 			.attr("width", x.bandwidth())
 			.attr("height", d => height - y(d.countTotal))
-			.attr("fill", "black")
+			.attr("fill", themeColors.bars);
 
 	defineTooltipBarTop();
 

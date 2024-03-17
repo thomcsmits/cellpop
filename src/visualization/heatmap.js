@@ -245,9 +245,12 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
 			.attr("class", "axisright")
 			.call(d3.axisRight(y))
 			.attr("transform", "translate(" + width + ",0)")
+			.selectAll("text")
+				.style("font-size", dimensions.textSize.tick)
+				.style("fill", themeColors.text);
 
 		// Update left bar
-		renderLeftBar(data, dimensions, y);
+		renderLeftBar(data, dimensions, y, themeColors);
 	})
     .on("end", function(event, d) { 
 		dragended(event, d, data, dimensions, x, y, allowClick); 
