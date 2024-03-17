@@ -12,7 +12,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 
 import * as d3 from "d3";
-import { getMainVis } from "./visualization";
+// import { getMainVis } from "./visualization";
 // import { showAnimation } from "./src/visualization/animation";
 import { loadHuBMAPData } from "./dataLoading/dataHuBMAP"; 
 import { getPossibleMetadataSelections } from "./visualization/metadata";
@@ -20,6 +20,7 @@ import { renderHeatmap } from "./visualization/heatmap";
 import { renderTopBar, renderTopViolin } from "./visualization/barTop";
 import { renderLeftBar } from "./visualization/barSide";
 import { renderGraph } from "./visualization/graph";
+import { getTheme } from "./visualization/theme";
 
 
 export const CellPop = (props) => {
@@ -51,18 +52,29 @@ export const CellPop = (props) => {
 			.attr("height", props.dimensions.global.height)
 		.append("g")
 			.attr("class", "main")
+
+		// add background
+		svg.append("rect")
+			.attr("class", "background")
+			.attr("width", props.dimensions.global.width)
+			.attr("height", props.dimensions.global.height)
 	}, [])
 
 	// call functions on updates
 	useEffect(() => {
+		let themeColors = getTheme(theme);
+
+		// change background theme
+		d3.select(".background").attr("fill", themeColors.background);
+
 		// create main heatmap
-		let [x, y, colorRange] = renderHeatmap(props.data, props.dimensions, fraction, theme, metadataField)
+		let [x, y, colorRange] = renderHeatmap(props.data, props.dimensions, fraction, themeColors, metadataField);
 
 		// create top barchart
-		renderTopBar(props.data, props.dimensions, x)
+		renderTopBar(props.data, props.dimensions, x, themeColors);
 
 		// create left barchart
-		renderLeftBar(props.data, props.dimensions, y)
+		renderLeftBar(props.data, props.dimensions, y, themeColors);
 	}, [theme, fraction, metadataField])
 
 

@@ -5,9 +5,10 @@ import { renderTopBar, renderTopViolin } from "./barTop";
 import { renderLeftBar } from "./barSide";
 import { renderGraph } from "./graph";
 import { getPossibleMetadataSelections, sortByMetadata } from "./metadata";
+import { getTheme } from './theme';
 
 // visualization
-export function getMainVis(data, dimensions=null) {
+export function getMainVis(data, dimensions=null, theme='light') {
 	if (!dimensions) {
 		// set the dimensions of the graph
 		let widthRatio = 0.9;
@@ -98,6 +99,7 @@ export function getMainVis(data, dimensions=null) {
 	app.appendChild(buttonMetadata);
 
 	// sortByMetadata(data, ['sex', ['Female', 'Male']])
+	let themeColors = getTheme(theme);
 
 	// add div for visualization
 	let mainVis = document.createElement('div');
@@ -111,16 +113,22 @@ export function getMainVis(data, dimensions=null) {
 		.attr("height", height)
 	.append("g")
 		.attr("class", "main")
-    
-        
+	
+	// add background
+	svg.append("rect")
+		.attr("class", "background")
+		.attr("width", width)
+		.attr("height", height)
+		.style("fill", themeColors.background);
+     
 	// create main heatmap
-	let [x, y, colorRange] = renderHeatmap(data, dimensions, false)
+	let [x, y, colorRange] = renderHeatmap(data, dimensions, false, themeColors)
 
 	// create top barchart
-	renderTopBar(data, dimensions, x)
+	renderTopBar(data, dimensions, x, themeColors)
 
 	// create left barchart
-	renderLeftBar(data, dimensions, y)
+	renderLeftBar(data, dimensions, y, themeColors)
 
 	// // create graph
 	// renderGraph(data, dimensions)
