@@ -253,7 +253,7 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
 		renderLeftBar(data, dimensions, y, themeColors);
 	})
     .on("end", function(event, d) { 
-		dragended(event, d, data, dimensions, x, y, allowClick); 
+		dragended(event, d, data, dimensions, themeColors, x, y, allowClick); 
 	})
 
 	// Apply drag behavior to rows

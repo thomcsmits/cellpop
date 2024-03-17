@@ -65,7 +65,7 @@ export const CellPop = (props) => {
 		let themeColors = getTheme(theme);
 
 		// change background theme
-		d3.select(".background").attr("fill", themeColors.background);
+		d3.selectAll(".background").attr("fill", themeColors.background);
 
 		// create main heatmap
 		let [x, y, colorRange] = renderHeatmap(props.data, props.dimensions, fraction, themeColors, metadataField);
@@ -77,7 +77,10 @@ export const CellPop = (props) => {
 		renderLeftBar(props.data, props.dimensions, y, themeColors);
 	}, [theme, fraction, metadataField])
 
-
+	// temp: remove stacked bar when theme change
+	useEffect(() => {
+		resetStackedBar();
+	}, [theme])
 
 	// resizing hooks
 

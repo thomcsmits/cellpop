@@ -3,19 +3,26 @@ import * as d3 from "d3";
 import { getUpperBound } from "./util";
 
 // add bar chart
-export function createBarChart(dataFull, selectedRow, dimensions, x) {
+export function createBarChart(dataFull, selectedRow, dimensions, x, themeColors) {
     let width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
 	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
 
     let nBars = 0;
     let heightInd = height;
-    let svgBar = d3.selectAll('.bardetail')
+    let svgBar = d3.selectAll('.bardetail');
     if (svgBar.size() === 0) {
         svgBar = d3.select('#app')
         .append("svg")
             .attr("width", dimensions.global.width)
             .attr("height", dimensions.detailBar.height + dimensions.detailBar.margin.top + dimensions.detailBar.margin.bottom)
             .attr("class", "bardetail");
+
+        // add background
+        svgBar.append("rect")
+            .attr("class", "background")
+            .attr("width", dimensions.global.width)
+            .attr("height", dimensions.detailBar.height + dimensions.detailBar.margin.top + dimensions.detailBar.margin.bottom)
+            .style("fill", themeColors.background);
 
         // X axis
         svgBar.append("g")
@@ -24,7 +31,8 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
             .selectAll("text")
                 .attr("transform", "translate(-10,0)rotate(-45)")
                 .style("text-anchor", "end")
-                .style("font-size", dimensions.textSize.tick);
+                .style("font-size", dimensions.textSize.tick)
+                .style("fill", themeColors.text);
 
         svgBar.append("text")
             .attr("class", "x label")
@@ -32,7 +40,8 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
             .attr("x", dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left + width / 2)
             .attr("y", height + dimensions.heatmap.margin.bottom - 10)
             .text("Cell type")
-            .style("font-size", dimensions.textSize.label);
+            .style("font-size", dimensions.textSize.label)
+            .style("fill", themeColors.text);
 
         // Y axis label
         svgBar.append("text")
@@ -43,7 +52,8 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
             .attr("dy", ".75em")
             .attr("transform", "rotate(-90)")
             .text("Number of cells")
-            .style("font-size", dimensions.textSize.label);
+            .style("font-size", dimensions.textSize.label)
+            .style("fill", themeColors.text);
         
         nBars = 1;
     } else {
@@ -83,7 +93,8 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
 		.attr("x", 30)
         .attr("y", 50)
 		.text(selectedRow)
-        .style("font-size", dimensions.textSize.title);
+        .style("font-size", dimensions.textSize.title)
+        .style("fill", themeColors.text);
         
 
     // Add Y axis
@@ -97,7 +108,8 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
         .attr("class", "axisleft")
         .call(d3.axisLeft(y))
         .selectAll("text")
-			.style("font-size", dimensions.textSize.tick);
+			.style("font-size", dimensions.textSize.tick)
+            .style("fill", themeColors.text);
 
     // Add bars
     svgBarSample.append("g")
@@ -109,7 +121,7 @@ export function createBarChart(dataFull, selectedRow, dimensions, x) {
             .attr("y", d => y(d.value))
             .attr("width", x.bandwidth())
             .attr("height", d => height - y(d.value))
-            .attr("fill", "#69b3a2")
+            .attr("fill", themeColors.heatmapMax);
 
     // Resize bars
     let sample = d3.selectAll(`.sample-${nBars}`)
