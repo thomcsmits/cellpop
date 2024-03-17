@@ -194,7 +194,7 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
 		.attr("y", 0)
 		.attr("width", width)
 		.attr("height", height)
-		.attr("stroke", "black")
+		.attr("stroke", themeColors.heatmapHighlight)
 		.attr("fill", "none")
 		.attr("pointer-events", "none")
 		.attr("visibility", "hidden")

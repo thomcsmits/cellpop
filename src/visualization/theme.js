@@ -5,7 +5,8 @@ export function getTheme(theme) {
         themeColors.background = 'black';
         themeColors.heatmapZero = 'black';
         themeColors.heatmapMax = '#69b3a2';
-        themeColors.heatmapGrid = 'white'
+        themeColors.heatmapGrid = 'white';
+        themeColors.heatmapHighlight = 'white';
         themeColors.bars = 'white';
         themeColors.text = 'white';
     }
@@ -15,6 +16,7 @@ export function getTheme(theme) {
         themeColors.heatmapZero = 'white';
         themeColors.heatmapMax = '#69b3a2';
         themeColors.heatmapGrid = 'white';
+        themeColors.heatmapHighlight = 'black';
         themeColors.bars = 'black';
         themeColors.text = 'black';
     }
