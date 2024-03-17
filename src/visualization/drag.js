@@ -75,7 +75,7 @@ export function dragged(event, d, data, y, allowClick) {
 
 
 // Drag end function
-export function dragended(event, d, data, dimensions, x, y, allowClick) {
+export function dragended(event, d, data, dimensions, themeColors, x, y, allowClick) {
     const rects = d3.selectAll(".heatmap-rects");
     const rowsBehind = d3.selectAll(".heatmap-rows");
 
@@ -92,6 +92,6 @@ export function dragended(event, d, data, dimensions, x, y, allowClick) {
 
     // if the row hasn't moved, create extending bar chart
     if (allowClick){
-        createBarChart(data, d.row, dimensions, x);
+        createBarChart(data, d.row, dimensions, x, themeColors);
     }
 }

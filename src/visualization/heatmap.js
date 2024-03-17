@@ -6,7 +6,7 @@ import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
 import { getUpperBound } from "./util";
 
 
-export function renderHeatmap(data, dimensions, fraction=false, theme) {
+export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
 	let countsMatrix = data.countsMatrix;
 	if (fraction) {
 		countsMatrix = data.countsMatrixFractions.row;
@@ -39,7 +39,8 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 		.selectAll("text")
 			.attr("transform", "translate(-10,0)rotate(-45)")
 			.style("text-anchor", "end")
-			.style("font-size", dimensions.textSize.tick);
+			.style("font-size", dimensions.textSize.tick)
+			.style("fill", themeColors.text);
 
 	svg.append("text")
         .attr("class", "x-label")
@@ -47,7 +48,8 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
         .attr("x", width / 2)
         .attr("y", height + dimensions.heatmap.margin.bottom - 10)
         .text("Cell type")
-		.style("font-size", dimensions.textSize.label);
+		.style("font-size", dimensions.textSize.label)
+		.style("fill", themeColors.text);
 
 
 	// Add y-axis
@@ -61,7 +63,8 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 		.attr("transform", "translate(" + width + ",0)")
 		.call(d3.axisRight(y))
 		.selectAll("text")
-			.style("font-size", dimensions.textSize.tick);
+			.style("font-size", dimensions.textSize.tick)
+			.style("fill", themeColors.text);
 
     svg.append("text")
 		.attr("class", "y-label")
@@ -71,7 +74,8 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
 		.text("Sample")
-		.style("font-size", dimensions.textSize.label);
+		.style("font-size", dimensions.textSize.label)
+		.style("fill", themeColors.text);
 
 	// add metadata scale
 	// let y_meta = d3.scaleOrdinal()
@@ -84,7 +88,8 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 	// 	.call(d3.axisRight(y_meta))
 	// 	.selectAll("text")
 	// 		.attr("transform", "translate(0,150)")
-	// 		.style("font-size", dimensions.textSize.tick);
+	// 		.style("font-size", dimensions.textSize.tick)
+	//		.style("fill", themeColors.text);
 
 	// svg.append("text")
 	// 	.attr("class", "y-label")
@@ -94,12 +99,13 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 	// 	.attr("dy", ".75em")
 	// 	.attr("transform", "rotate(-90)")
 	// 	.text("Metadata")
-	// 	.style("font-size", dimensions.textSize.label);
+	// 	.style("font-size", dimensions.textSize.label)
+	//	.style("fill", themeColors.text);
 
 
 	// Add color
 	let colorRange = d3.scaleLinear()
-		.range(["white", "#69b3a2"])
+		.range([themeColors.heatmapZero, themeColors.heatmapMax])
 		.domain([0,getUpperBound(countsMatrix.map(r => r.value))])
 
 	let gradient = svg.append("g")
@@ -126,19 +132,22 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 	gradient.append("text")
 		.attr("y", -10)
 		.text(colorAxisLabel)
-		.style("font-size", dimensions.textSize.label);
+		.style("font-size", dimensions.textSize.label)
+		.style("fill", themeColors.text);
 
 	gradient.append("text")
 		.attr("x", colorAxisWidth)
 		.attr("y", colorAxisSize)
 		.text(0)
-		.style("font-size", dimensions.textSize.tick);
+		.style("font-size", dimensions.textSize.tick)
+		.style("fill", themeColors.text);
 
 	gradient.append("text")
 		.attr("x", colorAxisWidth)
 		.attr("y", 0)
 		.text(getUpperBound(countsMatrix.map(r => r.value)))
-		.style("font-size", dimensions.textSize.tick);
+		.style("font-size", dimensions.textSize.tick)
+		.style("fill", themeColors.text);
 
 	// Add rows and columns behind
 	let colsBehind = svg.selectAll()
@@ -150,7 +159,7 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 			.attr("y", 0)
 			.attr("width", x.bandwidth() )
 			.attr("height", height )
-			.style("fill", colorRange(0))
+			.style("fill", themeColors.heatmapGrid);
 
 
 	let rowsBehind = svg.selectAll()
@@ -162,7 +171,7 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 			.attr("y", function(d) { return y(d.row) })
 			.attr("width", width )
 			.attr("height", y.bandwidth() )
-			.style("fill", colorRange(0))
+			.style("fill", themeColors.heatmapGrid);
 
 
 	// Read the data
@@ -175,7 +184,7 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 			.attr("y", function(d) { return y(d.row) })
 			.attr("width", x.bandwidth() )
 			.attr("height", y.bandwidth() )
-			.style("fill", function(d) { return colorRange(d.value)} )
+			.style("fill", function(d) { return colorRange(d.value)} );
 
 
     // Add highlight
@@ -185,7 +194,7 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 		.attr("y", 0)
 		.attr("width", width)
 		.attr("height", height)
-		.attr("stroke", "black")
+		.attr("stroke", themeColors.heatmapHighlight)
 		.attr("fill", "none")
 		.attr("pointer-events", "none")
 		.attr("visibility", "hidden")
@@ -236,12 +245,15 @@ export function renderHeatmap(data, dimensions, fraction=false, theme) {
 			.attr("class", "axisright")
 			.call(d3.axisRight(y))
 			.attr("transform", "translate(" + width + ",0)")
+			.selectAll("text")
+				.style("font-size", dimensions.textSize.tick)
+				.style("fill", themeColors.text);
 
 		// Update left bar
-		renderLeftBar(data, dimensions, y);
+		renderLeftBar(data, dimensions, y, themeColors);
 	})
     .on("end", function(event, d) { 
-		dragended(event, d, data, dimensions, x, y, allowClick); 
+		dragended(event, d, data, dimensions, themeColors, x, y, allowClick); 
 	})
 
 	// Apply drag behavior to rows
