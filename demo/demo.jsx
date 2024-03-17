@@ -48,21 +48,21 @@ function Demo() {
 	// console.log(uuids.length)
 
 	// useEffect to make sure the data only loads once
-	// useEffect(() => {
-	// 	loadHuBMAPData(uuids).then((data) => {
-	// 		setData(data);
-	// 		console.log('data', data);
-	// 		// getMainVis(data);
-	// 		}).catch(error => {
-	// 			console.error(error);
-	// 	});
-	// }, [])
-
 	useEffect(() => {
-		let dataLoaded = loadDataWithCounts(counts);
-        dataLoaded.metadata = {rows: metadata};
-		setData(dataLoaded)
+		loadHuBMAPData(uuids).then((data) => {
+			setData(data);
+			console.log('data', data);
+			// getMainVis(data);
+			}).catch(error => {
+				console.error(error);
+		});
 	}, [])
+
+	// useEffect(() => {
+	// 	let dataLoaded = loadDataWithCounts(counts);
+    //     dataLoaded.metadata = {rows: metadata};
+	// 	setData(dataLoaded)
+	// }, [])
 
 	// const props = {
 	// 	data: null,
