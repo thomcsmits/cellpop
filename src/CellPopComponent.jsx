@@ -82,9 +82,9 @@ export const CellPop = (props) => {
 		renderLeftBar(props.data, props.dimensions, y, themeColors);
 	}, [theme, fraction, metadataField])
 
-	// temp: remove stacked bar when theme change
+	// temp: remove layered bar when theme change
 	useEffect(() => {
-		resetStackedBar();
+		resetLayeredBar();
 	}, [theme])
 
 	// resizing hooks
@@ -111,7 +111,7 @@ export const CellPop = (props) => {
 		setMetadataField(event.target.value);
 	}
 
-	function resetStackedBar() {
+	function resetLayeredBar() {
 		d3.selectAll('.bardetail').remove();
 	}
 
@@ -124,7 +124,7 @@ export const CellPop = (props) => {
 		<div>
 			<Stack spacing={6} direction="row">
 
-				<Button variant="outlined" onClick={resetStackedBar}>Reset stacked bar chart</Button>
+				<Button variant="outlined" onClick={resetLayeredBar}>Reset layered bar chart</Button>
 			
 				<ToggleButtonGroup
 					color="primary"
