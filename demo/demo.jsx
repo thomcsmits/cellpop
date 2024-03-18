@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from "react";
-// import * as d3 from "d3";
-// import { getMainVis } from "./src/visualization";
-// import { showAnimation } from "./src/visualization/animation";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
 import { CellPop } from "../src/CellPopComponent";
-import { counts } from "../dataLocal/counts";
-import { metadata } from "../dataLocal/metadata";
-import { loadDataWithCounts } from "../src/dataLoading/dataWrangling";
 
 
 function Demo() {
@@ -44,9 +38,6 @@ function Demo() {
 	'8d631eee88855ac59155edca2a3bc1ca',
 	'1ea6c0ac5ba60fe35bf63af8699b6fbe']
 
-	// uuids = uuids.slice(0, 3);
-	// console.log(uuids.length)
-
 	// useEffect to make sure the data only loads once
 	useEffect(() => {
 		loadHuBMAPData(uuids).then((data) => {
@@ -57,12 +48,6 @@ function Demo() {
 				console.error(error);
 		});
 	}, [])
-
-	// useEffect(() => {
-	// 	let dataLoaded = loadDataWithCounts(counts);
-    //     dataLoaded.metadata = {rows: metadata};
-	// 	setData(dataLoaded)
-	// }, [])
 
 	// const props = {
 	// 	data: null,
@@ -89,7 +74,6 @@ function Demo() {
 		graph: {offsetWidth: widthLeft, offsetHeight: height, width: widthRight, height: heightTop, margin: {top: 0, right: 200, bottom: 0, left: 0}},
 		detailBar: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: height, margin: {top: 50, right: 200, bottom: 50, left: 0}},
 		textSize: {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
-		// barLeft: {offsetWidth: 100, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 50, right: 0, bottom: 0, left: 100}},
 	};
 
 	return (

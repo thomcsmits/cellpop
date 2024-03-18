@@ -25,7 +25,7 @@ The demo folder contains three demo's:
 - Animation.js shows an animation of how a stacked bar chart converts to the CellPop view.
 
 
-The React demo is available (here)[thomcsmits.github.io/cellpop].
+The React demo is available [here](thomcsmits.github.io/cellpop).
 
 The main view and interactions:
 ![Screen shot of cell pop with 29 samples and arrows explaining interactions.](assets/cellpop_example.png)
