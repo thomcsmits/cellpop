@@ -2,7 +2,7 @@
   "name": "cellpop",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://thomcsmits.github.io/",
+  "homepage": "https://hms-dbmi.github.io/",
   "type": "module",
   "scripts": {
     "dev": "vite",
