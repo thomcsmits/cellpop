@@ -3,15 +3,49 @@ import * as d3 from "d3";
 import { getUpperBound } from "./util";
 
 export function showAnimation(data) {
-    let data2 = {
-        countsMatrix: data.countsMatrix,
-        rowNames: data.rowNames,
-        colNames: data.colNames,
+    // delete any old
+    d3.selectAll(".animate-svg").remove();
+
+    // create new svg
+    let svg = d3.select("#app")
+        .append("svg")
+            .attr("class", "animate-svg")
+            .attr("width", 2000)
+            .attr("height", 2000)
+
+    let dimensions = {
+        width: 1000,
+        height: 1000,
+        marginLeft: 150,
+        marginTop: 300,
+        moveWidth: 650,
+        moveTop: 750
     }
-    createStackedBar(data2);
 
-
+    createStackedBar(svg, data, dimensions);
 }
+
+export function showAnimationBox(data, width, height) {
+    // select svg
+    let svg = d3.select(".animate-svg");
+    
+    // delete any old grouping
+    svg.selectAll(".animate").remove();
+    
+    console.log('test', svg)
+
+    let dimensions = {
+        width: width,
+        height: height,
+        marginLeft: width / 5,
+        marginTop: height / 5,
+        moveWidth: width / 3,
+        moveTop: height / 1.5
+    }
+    
+    createStackedBar(svg, data, dimensions);
+}
+
 
 // test data
 // let data2 = {
@@ -31,9 +65,9 @@ export function showAnimation(data) {
     //     colNames: ['cellZ', 'cellY', 'cellX', 'cellW']
     // }
 
-function createStackedBar(data) {
-    let width = 1000;
-    let height = 1000;
+function createStackedBar(svgBase, data, dimensionsAnimation) {
+    let width = dimensionsAnimation.width / 2;
+    let height = dimensionsAnimation.height / 2;
 
     // determine the start and end of each rect for the stacked bar chart
     const rowValsCounter = [];
@@ -49,15 +83,10 @@ function createStackedBar(data) {
         rowValsCounter.filter(r => r.row === entry.row)[0].counter = newVal;
     }
 
-    // create new svg
-    let svg = d3.select("#app")
-        .append("svg")
-            .attr("width", 2000)
-            .attr("height", 2000)
-        .append("g")
-            .attr("class", "animate")
-            .attr("transform", 
-                 "translate(300,150)")
+    let svg = svgBase.append("g")
+        .attr("class", "animate")
+        .attr("transform", 
+            "translate(" + dimensionsAnimation.marginLeft + "," + dimensionsAnimation.marginTop + ")")
 
     // add x axis
     let x = d3.scaleBand()
@@ -107,7 +136,7 @@ function createStackedBar(data) {
         .duration(2000)
         .delay(2000)
         // .attr("transform", "translate(500,0)")
-        .attr("transform", "rotate(90, 650, 750)")
+        .attr("transform", "rotate(90, " + dimensionsAnimation.moveWidth + ", " + dimensionsAnimation.moveTop + ")") //650, 750
 
     // rotate x-labels the other way
     d3.select(".animate")

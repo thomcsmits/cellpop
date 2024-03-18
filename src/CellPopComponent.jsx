@@ -10,10 +10,13 @@ import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
+import { Unstable_Popup as Popup } from '@mui/base/Unstable_Popup';
+// import { ClickAwayListener } from '@mui/base/ClickAwayListener';
+
 
 import * as d3 from "d3";
 // import { getMainVis } from "./visualization";
-// import { showAnimation } from "./src/visualization/animation";
+import { showAnimation, showAnimationBox } from "./visualization/animation";
 import { loadHuBMAPData } from "./dataLoading/dataHuBMAP"; 
 import { getPossibleMetadataSelections } from "./visualization/metadata";
 import { renderHeatmap } from "./visualization/heatmap";
@@ -36,6 +39,8 @@ export const CellPop = (props) => {
 	const [dimensions, setDimensions] = useState(props.dimensions);
 	const [fraction, setFraction] = useState(false);
 	const [metadataField, setMetadataField] = useState("None");
+
+	const [animationAnchor, setAnimationAnchor] = useState(null);
 
 	// get metadata options
 	const metadataFields = getPossibleMetadataSelections(props.data);
@@ -109,7 +114,12 @@ export const CellPop = (props) => {
 	function resetStackedBar() {
 		d3.selectAll('.bardetail').remove();
 	}
-	
+
+	// animation pop-up
+	const handleAnimantionPopup = (event) => {
+		setAnimationAnchor(animationAnchor ? null : event.currentTarget);
+	};
+
 	return (
 		<div>
 			<Stack spacing={6} direction="row">
@@ -153,8 +163,27 @@ export const CellPop = (props) => {
 					<ToggleButton value="light">Light</ToggleButton>
 					<ToggleButton value="dark">Dark</ToggleButton>
 				</ToggleButtonGroup>
-				
+
+				<Button variant="outlined" onClick={handleAnimantionPopup}>
+					Show animation
+				</Button>
+
 			</Stack>
+
+			<Popup open={animationAnchor ? true : false} anchor={animationAnchor} placement="bottom-end">
+				<div aria-label="Pop up animation" style={{border: 'solid black 2px', backgroundColor: "white"}}>
+					<Button variant="outlined" onClick={() => showAnimationBox(props.data, props.dimensions.global.width / 2, props.dimensions.global.height / 2)}>Play animation</Button>
+					<div>
+						<svg className="animate-svg" width={props.dimensions.global.width / 2} height={props.dimensions.global.height / 2}></svg>
+					</div>
+
+				</div>
+			</Popup>
+				
+
+			{/* <Box sx={{position: 'relative'}}>
+				{animationAnchor ? <svg className="animate-svg" width={props.dimensions.global.width / 2} height={props.dimensions.global.height / 2}></svg> : null}
+			</Box> */}
 
 			<div id='cellpopvis' ref={cellPopRef}></div>
 
