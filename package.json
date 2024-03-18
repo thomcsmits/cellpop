@@ -8,17 +8,18 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "predeploy" : "npm run build",
-    "deploy" : "gh-pages -d dist"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
     "gh-pages": "^6.1.1",
-    "vite": "^5.0.8",
-    "@vitejs/plugin-react": "^4.2.1"
+    "vite": "^5.0.8"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
+    "@mui/base": "5.0.0-beta.39",
     "@mui/material": "^5.15.13",
     "@vitessce/zarr": "^3.3.2",
     "d3": "^6.7.0",
