@@ -20,7 +20,8 @@ import { showAnimation, showAnimationBox } from "./visualization/animation";
 import { loadHuBMAPData } from "./dataLoading/dataHuBMAP"; 
 import { getPossibleMetadataSelections } from "./visualization/metadata";
 import { renderHeatmap } from "./visualization/heatmap";
-import { renderTopBar, renderTopViolin } from "./visualization/barTop";
+import { renderTopBar } from "./visualization/barTop";
+import { renderTopViolin } from "./visualization/violinTop";
 import { renderLeftBar } from "./visualization/barSide";
 import { renderGraph } from "./visualization/graph";
 import { getTheme } from "./visualization/theme";
@@ -76,7 +77,8 @@ export const CellPop = (props) => {
 		let [x, y, colorRange] = renderHeatmap(props.data, props.dimensions, fraction, themeColors, metadataField);
 
 		// create top barchart
-		renderTopBar(props.data, props.dimensions, x, themeColors);
+		renderTopViolin(props.data, props.dimensions, x, themeColors, fraction);
+		// renderTopBar(props.data, props.dimensions, x, themeColors);
 
 		// create left barchart
 		renderLeftBar(props.data, props.dimensions, y, themeColors);
