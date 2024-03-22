@@ -4,9 +4,10 @@ import { getUpperBound } from "./util";
 import { defineTooltipBarSide, addTooltipBarSide, removeTooltipBarSide } from "./tooltips";
 
 export function renderLeftBar(dataFull, dimensions, y, themeColors) {
-	// Remove any prior barcharts
+	// Remove any prior barcharts and violin plots
 	d3.select("g.barleft").remove();
-
+    d3.select("g.violinleft").remove();
+	
 	// Create svg element
 	let svg = d3.select("g.main")
 		.append("g")
