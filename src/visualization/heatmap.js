@@ -199,11 +199,12 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
 		.attr("pointer-events", "none")
 		.attr("visibility", "hidden")
 
-	defineTooltip()
+	defineTooltip();
+	defineContextMenu();
 
 
 	// Define mouse functions
-    const mouseover = function(event,d) {
+    const mouseover = function(event, d) {
         if (event.ctrlKey) {
 			if (event.target.classList[0].includes('heatmap-rects')) {}
 			addTooltip(event, d);
@@ -211,16 +212,22 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
         	addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
         }
     }
-    const mouseleave = function(event,d) {
+    const mouseleave = function(event, d) {
 		removeTooltip();
         removeHighlight(event,d);
     }
+
+	const contextmenu = function(event, d) {
+		event.preventDefault();
+		addContextMenu(event, d, data, y);
+	}
 
     rects.on("mouseover", mouseover);
 	rowsBehind.on("mouseover", mouseover);
     rects.on("mouseleave", mouseleave);
 	rowsBehind.on("mouseleave", mouseleave);
-
+	rects.on("contextmenu", contextmenu);
+	rowsBehind.on("contextmenu", contextmenu);
 
 	// allowClick is a variable set to true at each dragstart
 	// if no row is moved, it remains true, otherwise it's set to false
@@ -230,6 +237,7 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
 	// Define drag behavior
 	let drag = d3.drag()
 	.on("start", function(event, d) { 
+		removeContextMenu();
 		dragstarted(event, d); 
 		allowClick = true;
 	})
@@ -282,3 +290,72 @@ function removeHighlight(event, d) {
 	d3.select(".highlight")
 		.attr("visibility", "hidden")
 }
+
+
+
+// Add context menu
+export function defineContextMenu() {
+	d3.select("#cellpopvis")
+		.append("div")
+		.attr("class", "context-menu")
+		.style("background-color", "#FFFFFF")
+		.attr("opacity", 0)
+		.style("border", "solid")
+		.style("border-width", "1px")
+		.style("border-radius", "5px")
+		.style("padding", "5px")
+		.attr("pointer-events", "none")
+		.style("position", "absolute")
+}
+
+
+export function addContextMenu(event, d, data, y) {
+	const menu = d3.select(".context-menu")
+		.html(`Options:<br>`)
+		.style("opacity", 1)
+		.attr("visibility", "shown")
+		.style("left", `${event.x + window.scrollX}px`)
+		.style("top", `${event.y + window.scrollY}px`)
+	const buttonMoveTop = menu.append("input")
+		.attr("type", "button")
+		.attr("name", "move-top")
+		.attr("value", "move row to top")
+
+	const buttonMoveBottom = menu.append("input")
+		.attr("type", "button")
+		.attr("name", "move-bottom")
+		.attr("value", "remove row to bottom")
+
+	const buttonRemove = menu.append("input")
+		.attr("type", "button")
+		.attr("name", "remove-button")
+		.attr("value", "remove row")
+
+	buttonMoveTop.on("click", function(r) {return moveRowTop(event, d, data, y, r)})
+	buttonMoveBottom.on("click", function(r) {return moveRowBottom(event, d, data, y, r)})
+	buttonRemove.on("click", function(r) {return removeRow(event, d, data, y, r)})
+}
+
+export function removeContextMenu() {
+	d3.select(".context-menu")
+		.html(``)
+		.style("opacity", 0)
+}
+
+function moveRowTop(eventRect, dataRect, data, y, eventButton) {
+	console.log('move row to top')
+}
+
+function moveRowBottom(eventRect, dataRect, data, y, eventButton) {
+	console.log('move row to bottom')
+}
+
+function removeRow(eventRect, dataRect, data, y, eventButton) {
+	console.log('remove row')
+	console.log(eventButton)
+
+	// // Update the ordering of rowNames
+	// data.rowNames = reorderArray(data.rowNames, currentIndex, newIndex);
+	// wrapRowNames(data);
+}
+
