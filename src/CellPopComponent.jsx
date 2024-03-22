@@ -77,8 +77,11 @@ export const CellPop = (props) => {
 		let [x, y, colorRange] = renderHeatmap(props.data, props.dimensions, fraction, themeColors, metadataField);
 
 		// create top barchart
-		renderTopViolin(props.data, props.dimensions, x, themeColors, fraction);
-		// renderTopBar(props.data, props.dimensions, x, themeColors);
+		if (fraction) {
+			renderTopViolin(props.data, props.dimensions, x, themeColors, fraction);
+		} else {
+			renderTopBar(props.data, props.dimensions, x, themeColors);
+		}
 
 		// create left barchart
 		renderLeftBar(props.data, props.dimensions, y, themeColors);
