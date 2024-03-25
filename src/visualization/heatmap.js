@@ -258,77 +258,86 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 	// allowClick is a variable set to true at each dragstart
 	// if no row is moved, it remains true, otherwise it's set to false
 	// at dragend, if allowClick is true, a layered bar chart is created
-	let allowClick;
+	let allowClickRow;
+	let allowClickCol;
 
 	// Define drag behavior
-	let dragRows = d3.drag()
+	let drag = d3.drag()
 	.on("start", function(event, d) { 
+		console.log(event)
 		removeContextMenu();
-		dragstartedRows(event, d); 
-		allowClick = true;
+		if (event.sourceEvent.shiftKey) {
+			dragstartedRows(event, d); 
+			allowClickRow = true;
+		}
+		if (event.sourceEvent.altKey) {
+			dragstartedCols(event, d); 
+			allowClickCol = true;
+		}
 	})
     .on("drag", function(event, d) {
-		// Update data
-		let dataAndClick = draggedRows(event, d, data, y, allowClick);
-		data = dataAndClick[0];
-		allowClick = dataAndClick[1];
-		// Update the y-domain
-		y = y.domain(data.rowNames);
-		svg.select("g.axisright").remove()
-		svg.append("g")
-			.attr("class", "axisright")
-			.call(d3.axisRight(y))
-			.attr("transform", "translate(" + width + ",0)")
-			.selectAll("text")
-				.style("font-size", dimensions.textSize.tick)
-				.style("fill", themeColors.text);
 
-		// Update left bar
-		renderCellPopVisualizationLeft(data, dimensions, y, themeColors, fraction);
+		// Rows
+		if (event.sourceEvent.shiftKey) {
+			// Update data
+			let dataAndClick = draggedRows(event, d, data, y, allowClickRow);
+			data = dataAndClick[0];
+			allowClickRow = dataAndClick[1];
+			// Update the y-domain
+			y = y.domain(data.rowNames);
+			svg.select("g.axisright").remove()
+			svg.append("g")
+				.attr("class", "axisright")
+				.call(d3.axisRight(y))
+				.attr("transform", "translate(" + width + ",0)")
+				.selectAll("text")
+					.style("font-size", dimensions.textSize.tick)
+					.style("fill", themeColors.text);
+
+			// Update left bar
+			renderCellPopVisualizationLeft(data, dimensions, y, themeColors, fraction);
+		}
+
+		// Cols
+		if (event.sourceEvent.altKey) {
+			// Update data
+			let dataAndClick = draggedCols(event, d, data, x, allowClickCol);
+			data = dataAndClick[0];
+			allowClickCol = dataAndClick[1];
+			// Update the y-domain
+			x = x.domain(data.colNames);
+			svg.select("g.axisbottom").remove()
+			svg.append("g")
+				.attr("class", "axisbottom")
+				.call(d3.axisBottom(x))
+				.attr("transform", "translate(0," + height + ")")
+				.selectAll("text")
+					.attr("transform", "translate(-10,0)rotate(-45)")
+					.style("text-anchor", "end")
+					.style("font-size", dimensions.textSize.tick)
+					.style("fill", themeColors.text);
+
+			// Update top bar
+			renderCellPopVisualizationTop(data, dimensions, x, themeColors, fraction);
+		}
+		
 	})
     .on("end", function(event, d) { 
-		dragendedRows(event, d, data, dimensions, themeColors, x, y, allowClick); 
-	})
+		// todo: case when key is lifted before the click
 
-	// Define drag behavior
-	let dragCols = d3.drag()
-	.on("start", function(event, d) { 
-		removeContextMenu();
-		dragstartedCols(event, d); 
-		allowClick = true;
-	})
-    .on("drag", function(event, d) {
-		// Update data
-		let dataAndClick = draggedCols(event, d, data, x, allowClick);
-		data = dataAndClick[0];
-		allowClick = dataAndClick[1];
-		// Update the y-domain
-		x = x.domain(data.colNames);
-		svg.select("g.axisbottom").remove()
-		svg.append("g")
-			.attr("class", "axisbottom")
-			.call(d3.axisBottom(x))
-			.attr("transform", "translate(0," + height + ")")
-			.selectAll("text")
-				.attr("transform", "translate(-10,0)rotate(-45)")
-				.style("text-anchor", "end")
-				.style("font-size", dimensions.textSize.tick)
-				.style("fill", themeColors.text);
+		if (event.sourceEvent.shiftKey) {
+			dragendedRows(event, d, data, dimensions, themeColors, x, y, allowClickRow); 
+		}
 
-		// Update top bar
-		renderCellPopVisualizationTop(data, dimensions, x, themeColors, fraction);
+		if (event.sourceEvent.altKey) {
+			dragendedCols(event, d, data, dimensions, themeColors, x, y, allowClickCol); 
+		}
 	})
-    .on("end", function(event, d) { 
-		dragendedCols(event, d, data, dimensions, themeColors, x, y, allowClick); 
-	})
-
-	// // Apply drag behavior to rows
-	// rowsBehind.call(dragRows);
-	// rects.call(dragRows);
-
-	// Apply drag behavior to cols
-	colsBehind.call(dragCols);
-	rects.call(dragCols);
+	
+	// Apply drag behavior to rows
+	rowsBehind.call(drag);
+	colsBehind.call(drag);
+	rects.call(drag);
 
     return [x,y,colorRange];
 }
