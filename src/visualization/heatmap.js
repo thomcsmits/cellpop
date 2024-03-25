@@ -359,6 +359,9 @@ function moveRowTop(dataRect, data, dimensions, fraction, themeColors, metadataF
 
 	// Re-render
 	renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
+
+	// Remove context menu
+	removeContextMenu();
 }
 
 function moveRowBottom(dataRect, data, dimensions, fraction, themeColors, metadataField) {
@@ -371,6 +374,9 @@ function moveRowBottom(dataRect, data, dimensions, fraction, themeColors, metada
 	
 	// Re-render
 	renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
+
+	// Remove context menu
+	removeContextMenu();
 }
 
 function removeRow(dataRect, data, dimensions, fraction, themeColors, metadataField) {
@@ -383,6 +389,9 @@ function removeRow(dataRect, data, dimensions, fraction, themeColors, metadataFi
 
 	// Re-render
 	renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
+
+	// Remove context menu
+	removeContextMenu();
 }
 
 function resetData(data) {
