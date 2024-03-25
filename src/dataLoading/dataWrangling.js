@@ -56,6 +56,11 @@ function loadDataWrapper(data, ordering={}) {
     wrapRowNames(data);
     wrapColNames(data);
     calculateFractions(data);
+
+    // copy's
+    data.rowNamesRaw = data.rowNames;
+    data.colNamesRaw = data.colNames;
+    
     return data;
 }
 

@@ -1,8 +1,10 @@
 import * as d3 from "d3";
 
 import { renderLeftBar } from "./barSide";
+import { renderLeftViolin } from "./violinSide";
 import { dragstarted, dragged, dragended } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
+import { wrapRowNames } from "../dataLoading/dataWrangling";
 import { getUpperBound } from "./util";
 
 
@@ -219,7 +221,7 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
 
 	const contextmenu = function(event, d) {
 		event.preventDefault();
-		addContextMenu(event, d, data, y);
+		addContextMenu(event, d, data, dimensions, fraction, themeColors, y);
 	}
 
     rects.on("mouseover", mouseover);
@@ -309,7 +311,7 @@ export function defineContextMenu() {
 }
 
 
-export function addContextMenu(event, d, data, y) {
+export function addContextMenu(event, d, data, dimensions, fraction, themeColors, y) {
 	const menu = d3.select(".context-menu")
 		.html(`Options:<br>`)
 		.style("opacity", 1)
@@ -333,7 +335,7 @@ export function addContextMenu(event, d, data, y) {
 
 	buttonMoveTop.on("click", function(r) {return moveRowTop(event, d, data, y, r)})
 	buttonMoveBottom.on("click", function(r) {return moveRowBottom(event, d, data, y, r)})
-	buttonRemove.on("click", function(r) {return removeRow(event, d, data, y, r)})
+	buttonRemove.on("click", function(r) {return removeRow(d, data, dimensions, fraction, themeColors)})
 }
 
 export function removeContextMenu() {
@@ -350,12 +352,21 @@ function moveRowBottom(eventRect, dataRect, data, y, eventButton) {
 	console.log('move row to bottom')
 }
 
-function removeRow(eventRect, dataRect, data, y, eventButton) {
-	console.log('remove row')
-	console.log(eventButton)
+function removeRow(dataRect, data, dimensions, fraction, themeColors) {
+	let currentIndex = data.rowNames.indexOf(dataRect.row);
+	data.rowNames.splice(currentIndex, 1);
+	wrapRowNames(data);
 
-	// // Update the ordering of rowNames
-	// data.rowNames = reorderArray(data.rowNames, currentIndex, newIndex);
-	// wrapRowNames(data);
+	// re-render the heatmap
+	let [x, y, colorRange] = renderHeatmap(data, dimensions, fraction, themeColors)
+
+	// create side chart
+	if (fraction) {
+		// create left violin
+		renderLeftViolin(data, dimensions, y, themeColors, fraction);
+	} else {
+		// create left barchart
+		renderLeftBar(data, dimensions, y, themeColors);
+	}
 }
 

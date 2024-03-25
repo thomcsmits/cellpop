@@ -121,6 +121,10 @@ export const CellPop = (props) => {
 		setMetadataField(event.target.value);
 	}
 
+	function resetData() {
+
+	}
+
 	function resetLayeredBar() {
 		d3.selectAll('.bardetail').remove();
 	}
@@ -133,6 +137,8 @@ export const CellPop = (props) => {
 	return (
 		<div>
 			<Stack spacing={6} direction="row">
+
+				<Button variant="outlined" onClick={resetData}>Reset data</Button>
 
 				<Button variant="outlined" onClick={resetLayeredBar}>Reset layered bar chart</Button>
 			
@@ -213,3 +219,25 @@ export const CellPop = (props) => {
 // 	getMainVis(data);
 // }
 
+
+
+function makeComponent(data, dimensions, fraction, theme, metadataField) {
+	let themeColors = getTheme(theme);
+
+	// create main heatmap
+	let [x, y, colorRange] = renderHeatmap(data, dimensions, fraction, themeColors, metadataField);
+
+	// create top/side charts
+	if (fraction) {
+		// create top violin
+		renderTopViolin(data, dimensions, x, themeColors, fraction);
+		// create left violin
+		renderLeftViolin(data, dimensions, y, themeColors, fraction);
+	} else {
+		// create top barchart
+		renderTopBar(data, dimensions, x, themeColors);
+		// create left barchart
+		renderLeftBar(data, dimensions, y, themeColors);
+	}
+
+}
