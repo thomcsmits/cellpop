@@ -1,10 +1,8 @@
-
 import React, { useEffect, useState, useRef } from "react";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
@@ -13,19 +11,12 @@ import Stack from '@mui/material/Stack';
 import { Unstable_Popup as Popup } from '@mui/base/Unstable_Popup';
 // import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 
-
 import * as d3 from "d3";
-// import { getMainVis } from "./visualization";
-import { showAnimation, showAnimationBox } from "./visualization/animation";
-import { loadHuBMAPData } from "./dataLoading/dataHuBMAP"; 
+import { renderCellPopVisualization } from "./visualization";
+import { showAnimationBox } from "./visualization/animation";
 import { getPossibleMetadataSelections } from "./visualization/metadata";
-import { renderHeatmap } from "./visualization/heatmap";
-import { renderTopBar } from "./visualization/barTop";
-import { renderTopViolin } from "./visualization/violinTop";
-import { renderLeftBar } from "./visualization/barSide";
-import { renderLeftViolin } from "./visualization/violinSide";
-import { renderGraph } from "./visualization/graph";
 import { getTheme } from "./visualization/theme";
+import { resetRowNames } from "./dataLoading/dataWrangling";
 
 
 export const CellPop = (props) => {
@@ -67,29 +58,17 @@ export const CellPop = (props) => {
 			.attr("height", props.dimensions.global.height)
 	}, [])
 
-	// call functions on updates
+	// call renderCellPopVisualization on updates
 	useEffect(() => {
+		// get theme colors
 		let themeColors = getTheme(theme);
 
 		// change background theme
 		d3.selectAll(".background").attr("fill", themeColors.background);
 
-		// create main heatmap
-		let [x, y, colorRange] = renderHeatmap(props.data, props.dimensions, fraction, themeColors, metadataField);
-
-		// create top/side charts
-		if (fraction) {
-			// create top violin
-			renderTopViolin(props.data, props.dimensions, x, themeColors, fraction);
-			// create left violin
-			renderLeftViolin(props.data, props.dimensions, y, themeColors, fraction);
-		} else {
-			// create top barchart
-			renderTopBar(props.data, props.dimensions, x, themeColors);
-			// create left barchart
-			renderLeftBar(props.data, props.dimensions, y, themeColors);
-		}
-
+		// create main visualization
+		renderCellPopVisualization(props.data, props.dimensions, fraction, themeColors, metadataField);
+		
 	}, [theme, fraction, metadataField])
 
 	// temp: remove layered bar when theme change
@@ -121,6 +100,16 @@ export const CellPop = (props) => {
 		setMetadataField(event.target.value);
 	}
 
+	function resetData() {
+		// get theme colors
+		let themeColors = getTheme(theme);
+
+		// // change background theme
+		// d3.selectAll(".background").attr("fill", themeColors.background);
+
+		renderCellPopVisualization(props.data, props.dimensions, fraction, themeColors, metadataField, true);
+	}
+
 	function resetLayeredBar() {
 		d3.selectAll('.bardetail').remove();
 	}
@@ -133,6 +122,8 @@ export const CellPop = (props) => {
 	return (
 		<div>
 			<Stack spacing={6} direction="row">
+
+				<Button variant="outlined" onClick={resetData}>Reset data</Button>
 
 				<Button variant="outlined" onClick={resetLayeredBar}>Reset layered bar chart</Button>
 			
@@ -200,16 +191,3 @@ export const CellPop = (props) => {
 		</div>
 	)
 }
-
-// loadHuBMAPData(uuids).then((data) => {
-// 	console.log('data', data);
-// 	getMainVis(data);
-// }).catch(error => {
-// 	console.error(error);
-// });
-
-
-// export function CellPop(data) {
-// 	getMainVis(data);
-// }
-

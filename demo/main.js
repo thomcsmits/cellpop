@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { getMainVis } from "../src/visualization";
+import { getMainVis } from "../src/cellpop";
 import { showAnimation } from "../src/visualization/animation";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP"; 
 

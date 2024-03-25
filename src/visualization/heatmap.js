@@ -1,12 +1,19 @@
 import * as d3 from "d3";
 
 import { renderLeftBar } from "./barSide";
+import { renderLeftViolin } from "./violinSide";
 import { dragstarted, dragged, dragended } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
+import { resetRowNames, resetColNames } from "../dataLoading/dataWrangling";
+import { defineContextMenu, addContextMenu, removeContextMenu } from "./contextMenu";
 import { getUpperBound } from "./util";
 
 
-export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
+export function renderHeatmap(data, dimensions, fraction=false, themeColors, metadataField, reset=false) {
+	if (reset) {
+		resetData(data);
+	}
+
 	let countsMatrix = data.countsMatrix;
 	if (fraction) {
 		countsMatrix = data.countsMatrixFractions.row;
@@ -199,11 +206,12 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
 		.attr("pointer-events", "none")
 		.attr("visibility", "hidden")
 
-	defineTooltip()
+	defineTooltip();
+	defineContextMenu();
 
 
 	// Define mouse functions
-    const mouseover = function(event,d) {
+    const mouseover = function(event, d) {
         if (event.ctrlKey) {
 			if (event.target.classList[0].includes('heatmap-rects')) {}
 			addTooltip(event, d);
@@ -211,16 +219,22 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
         	addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
         }
     }
-    const mouseleave = function(event,d) {
+    const mouseleave = function(event, d) {
 		removeTooltip();
         removeHighlight(event,d);
     }
+
+	const contextmenu = function(event, d) {
+		event.preventDefault();
+		addContextMenu(event, d, data, dimensions, fraction, themeColors, metadataField, y);
+	}
 
     rects.on("mouseover", mouseover);
 	rowsBehind.on("mouseover", mouseover);
     rects.on("mouseleave", mouseleave);
 	rowsBehind.on("mouseleave", mouseleave);
-
+	rects.on("contextmenu", contextmenu);
+	rowsBehind.on("contextmenu", contextmenu);
 
 	// allowClick is a variable set to true at each dragstart
 	// if no row is moved, it remains true, otherwise it's set to false
@@ -230,6 +244,7 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors) {
 	// Define drag behavior
 	let drag = d3.drag()
 	.on("start", function(event, d) { 
+		removeContextMenu();
 		dragstarted(event, d); 
 		allowClick = true;
 	})
@@ -281,4 +296,9 @@ function removeHighlight(event, d) {
 
 	d3.select(".highlight")
 		.attr("visibility", "hidden")
+}
+
+export function resetData(data) {
+	resetRowNames(data);
+	resetColNames(data);
 }

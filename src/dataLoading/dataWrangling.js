@@ -56,6 +56,11 @@ function loadDataWrapper(data, ordering={}) {
     wrapRowNames(data);
     wrapColNames(data);
     calculateFractions(data);
+
+    // copy's
+    data.rowNamesRaw = [...data.rowNames];
+    data.colNamesRaw = [...data.colNames];
+
     return data;
 }
 
@@ -120,6 +125,15 @@ export function wrapColNames(data) {
     data.colNamesWrapped = data.colNames.map(d => {return {col: d}});
 }
 
+export function resetRowNames(data) {
+    data.rowNames = [...data.rowNamesRaw];
+    wrapRowNames(data);
+}
+
+export function resetColNames(data) {
+    data.colNames = [...data.colNamesRaw];
+    wrapColNames(data);
+}
 
 export function calculateFractions(data) {
     const countsMatrixRowFractions = [];
