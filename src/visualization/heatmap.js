@@ -6,7 +6,7 @@ import { renderCellPopVisualization } from "./index";
 import { dragstarted, dragged, dragended } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
 import { wrapRowNames, wrapColNames, resetRowNames, resetColNames } from "../dataLoading/dataWrangling";
-import { getUpperBound } from "./util";
+import { getUpperBound, reorderArray } from "./util";
 
 
 export function renderHeatmap(data, dimensions, fraction=false, themeColors, metadataField, reset=false) {
@@ -338,8 +338,8 @@ export function addContextMenu(event, d, data, dimensions, fraction, themeColors
 		.attr("name", "remove-button")
 		.attr("value", "remove row")
 
-	buttonMoveTop.on("click", function(r) {return moveRowTop(event, d, data, y, r)})
-	buttonMoveBottom.on("click", function(r) {return moveRowBottom(event, d, data, y, r)})
+	buttonMoveTop.on("click", function(r) {return moveRowTop(d, data, dimensions, fraction, themeColors, metadataField)})
+	buttonMoveBottom.on("click", function(r) {return moveRowBottom(d, data, dimensions, fraction, themeColors, metadataField)})
 	buttonRemove.on("click", function(r) {return removeRow(d, data, dimensions, fraction, themeColors, metadataField)})
 }
 
@@ -349,22 +349,39 @@ export function removeContextMenu() {
 		.style("opacity", 0)
 }
 
-function moveRowTop(eventRect, dataRect, data, y, eventButton) {
-	console.log('move row to top')
+function moveRowTop(dataRect, data, dimensions, fraction, themeColors, metadataField) {
+	// Get current index
+	let currentIndex = data.rowNames.indexOf(dataRect.row);
+	
+	// Update the ordering of rowNames
+    data.rowNames = reorderArray(data.rowNames, currentIndex, data.rowNames.length-1);
+    wrapRowNames(data);
+
+	// Re-render
+	renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
 }
 
-function moveRowBottom(eventRect, dataRect, data, y, eventButton) {
-	console.log('move row to bottom')
+function moveRowBottom(dataRect, data, dimensions, fraction, themeColors, metadataField) {
+	// Get current index
+	let currentIndex = data.rowNames.indexOf(dataRect.row);
+
+	// Update the ordering of rowNames
+    data.rowNames = reorderArray(data.rowNames, currentIndex, 0);
+    wrapRowNames(data);
+	
+	// Re-render
+	renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
 }
 
 function removeRow(dataRect, data, dimensions, fraction, themeColors, metadataField) {
+	// Get current index
 	let currentIndex = data.rowNames.indexOf(dataRect.row);
+
+	// Remove row
 	data.rowNames.splice(currentIndex, 1);
 	wrapRowNames(data);
 
-	console.log(data.rowNames.length)
-	console.log(data.rowNamesRaw.length)
-
+	// Re-render
 	renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
 }
 
