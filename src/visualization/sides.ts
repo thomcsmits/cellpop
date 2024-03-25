@@ -3,8 +3,9 @@ import { renderTopViolin } from "./violinTop";
 import { renderLeftBar } from "./barSide";
 import { renderLeftViolin } from "./violinSide";
 import { renderGraph } from "./graph";
+import { CellPopData, CellPopDimensions, CellPopThemeColors } from "../cellpop-schema";
 
-export function renderCellPopVisualizationTop(data, dimensions, x, themeColors, fraction) {
+export function renderCellPopVisualizationTop(data: CellPopData, dimensions: CellPopDimensions, x: d3.ScaleBand<string>, themeColors: CellPopThemeColors, fraction: boolean) {
 	// create top chart
 	if (fraction) {
 		// create top violin
@@ -15,7 +16,7 @@ export function renderCellPopVisualizationTop(data, dimensions, x, themeColors, 
 	}
 }
 
-export function renderCellPopVisualizationLeft(data, dimensions, y, themeColors, fraction) {
+export function renderCellPopVisualizationLeft(data: CellPopData, dimensions: CellPopDimensions, y: d3.ScaleBand<string>, themeColors: CellPopThemeColors, fraction: boolean) {
 	// create side chart
 	if (fraction) {
 		// create left violin

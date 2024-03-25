@@ -1,5 +1,7 @@
 import * as d3 from "d3";
 
+import { CountsMatrixValue, CountsTotalRowValue, CountsTotalColValue } from "../cellpop-schema";
+
 // heatmap tooltip
 
 // Add tooltip
@@ -19,7 +21,7 @@ export function defineTooltip() {
 }
 
 
-export function addTooltip(event, d) {
+export function addTooltip(event: MouseEvent, d: CountsMatrixValue) {
 	d3.select(".tooltip")
 		.html(`Row: ${d.row}<br>Column: ${d.col}<br>Value: ${d.value}`)
 		.style("opacity", 0.8)
@@ -53,9 +55,9 @@ export function defineTooltipBarSide() {
 }
 
 
-export function addTooltipBarSide(event, d, metadata) {
-	let metadataText = Object.keys(metadata).map(k => `${k}: ${metadata[k]}`)
-	metadataText = metadataText.join('<br>')
+export function addTooltipBarSide(event: MouseEvent, d: CountsTotalRowValue, metadata: any) {
+	const metadataTextArray = Object.keys(metadata).map(k => `${k}: ${metadata[k]}`)
+	const metadataText = metadataTextArray.join('<br>')
 	
 	d3.select(".tooltip-axis-y")
 		.html(`Row: ${d.row}<br>Total count: ${d.countTotal}<br>Metadata:<br>${metadataText}`)
@@ -88,7 +90,7 @@ export function defineTooltipBarTop() {
 }
 
 
-export function addTooltipBarTop(event, d) {
+export function addTooltipBarTop(event: MouseEvent, d: CountsTotalColValue, metadata: any) {
 	d3.select(".tooltip-axis-x")
 		.html(`Column: ${d.col}<br>Total count: ${d.countTotal}`)
 		.style("opacity", 0.8)

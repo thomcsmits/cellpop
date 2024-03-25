@@ -8,9 +8,10 @@ import { resetRowNames, resetColNames } from "../dataLoading/dataWrangling";
 import { defineContextMenu, addContextMenu, removeContextMenu } from "./contextMenu";
 import { renderCellPopVisualizationLeft, renderCellPopVisualizationTop } from "./sides";
 import { getUpperBound } from "./util";
+import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, RowNamesWrapped } from "../cellpop-schema";
 
 
-export function renderHeatmap(data, dimensions, fraction=false, themeColors, metadataField, reset=false) {
+export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, fraction=false, themeColors: CellPopThemeColors, metadataField: string, reset=false): [d3.ScaleBand<string>, d3.ScaleBand<string>, d3.ScaleLinear<string,number,never>] {
 	if (reset) {
 		resetData(data);
 	}
@@ -26,7 +27,7 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 	let svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + eval(dimensions.heatmap.offsetWidth + dimensions.heatmap.margin.left) + "," + eval(dimensions.heatmap.offsetHeight + dimensions.heatmap.margin.top) + ")")
+				"translate(" + (dimensions.heatmap.offsetWidth + dimensions.heatmap.margin.left).toString() + "," + (dimensions.heatmap.offsetHeight + dimensions.heatmap.margin.top).toString() + ")")
 			.attr("class", "heatmap")
 
 
@@ -35,7 +36,7 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
 
 	// Add x-axis
-	let x = d3.scaleBand()
+	let x: d3.ScaleBand<string> = d3.scaleBand()
 		.range([ 0, width ])
 		.domain(data.colNames)
 		.padding(0.01);
@@ -61,7 +62,7 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 
 
 	// Add y-axis
-	let y = d3.scaleBand()
+	let y = d3.scaleBand<string>()
 		.range([ height, 0 ])
 		.domain(data.rowNames)
 		.padding(0.01);
@@ -112,19 +113,18 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 
 
 	// Add color
-	let colorRange = d3.scaleLinear()
+	let colorRange = d3.scaleLinear<string, number>()
 		.range([themeColors.heatmapZero, themeColors.heatmapMax])
 		.domain([0,getUpperBound(countsMatrix.map(r => r.value))])
 
 	let gradient = svg.append("g")
 		.attr("class", "axiscolor")
-		.attr("transform", "translate(" + eval(width+150) + ",10)")
+		.attr("transform", "translate(" + (width+150).toString() + ",10)")
 
 	let colorAxisSize = 100;
 	let colorAxisSteps = 100;
 	let colorAxisWidth = 100;
 
-	console.log(gradient)
 	for (let i = 0; i < colorAxisSteps; i++) {
 		const color = colorRange(i * getUpperBound(countsMatrix.map(r => r.value)) / colorAxisSteps);
 		gradient.append("rect")
@@ -157,39 +157,41 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 		.style("font-size", dimensions.textSize.tick)
 		.style("fill", themeColors.text);
 
+	// let rectGenerator = d3.
+
 	// Add rows and columns behind
-	let colsBehind = svg.selectAll()
+	let colsBehind = svg.selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols")
 		.data(data.colNamesWrapped, function(d) {return d.col;})
 		.enter()
 		.append("rect")
 			.attr("class", "heatmap-cols")
-			.attr("x", function(d) { return x(d.col) })
+			.attr("x", d => x(d.col))
 			.attr("y", 0)
 			.attr("width", x.bandwidth() )
 			.attr("height", height )
 			.style("fill", themeColors.heatmapGrid);
 
 
-	let rowsBehind = svg.selectAll()
+	let rowsBehind = svg.selectAll<SVGRectElement, RowNamesWrapped>(".heatmap-rows")
 		.data(data.rowNamesWrapped, function(d) {return d.row;})
 		.enter()
 		.append("rect")
 			.attr("class", "heatmap-rows")
 			.attr("x", 0)
-			.attr("y", function(d) { return y(d.row) })
+			.attr("y", d => y(d.row))
 			.attr("width", width )
 			.attr("height", y.bandwidth() )
 			.style("fill", themeColors.heatmapGrid);
 
 
 	// Read the data
-	let rects = svg.selectAll()
+	let rects = svg.selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects")
 		.data(countsMatrix, function(d) {return d.row+":"+d.col;})
 		.enter()
 		.append("rect")
 			.attr("class", "heatmap-rects")
-			.attr("x", function(d) { return x(d.col) })
-			.attr("y", function(d) { return y(d.row) })
+			.attr("x", d => x(d.col))
+			.attr("y", d => y(d.row))
 			.attr("width", x.bandwidth() )
 			.attr("height", y.bandwidth() )
 			.style("fill", function(d) { return colorRange(d.value)} );
@@ -224,10 +226,12 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 
 
 	// Define mouse functions
-    const mouseover = function(event, d) {
-		// console.log(event)
+    const mouseover = function(event: MouseEvent, d: CountsMatrixValue) {
+		if (!(event.target) ||  !(event.target instanceof SVGRectElement)) {
+			return;
+		}
         if (event.ctrlKey) {
-			if (event.target.classList[0].includes('heatmap-rects')) {}
+			if (event.target?.classList[0].includes('heatmap-rects')) {}
 			addTooltip(event, d);
         } 
 		if (event.shiftKey) {
@@ -237,34 +241,36 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 			addHighlightCol(event.target.x.animVal.value, event.target.width.animVal.value);
 		}
     }
-    const mouseleave = function(event, d) {
+    const mouseleave = function(event: MouseEvent, d: CountsMatrixValue) {
 		removeTooltip();
-        removeHighlightRow(event,d);
-		removeHighlightCol(event,d);
+        removeHighlightRow(event);
+		removeHighlightCol(event);
     }
 
-	const contextmenu = function(event, d) {
+	const contextmenu = function(event: MouseEvent, d: CountsMatrixValue) {
 		event.preventDefault();
-		addContextMenu(event, d, data, dimensions, fraction, themeColors, metadataField, y);
+		addContextMenu(event, d, data, dimensions, fraction, themeColors, metadataField);
 	}
 
     rects.on("mouseover", mouseover);
-	rowsBehind.on("mouseover", mouseover);
+	// rowsBehind.on("mouseover", mouseover);
     rects.on("mouseleave", mouseleave);
-	rowsBehind.on("mouseleave", mouseleave);
+	// rowsBehind.on("mouseleave", mouseleave);
 	rects.on("contextmenu", contextmenu);
-	rowsBehind.on("contextmenu", contextmenu);
+	// rowsBehind.on("contextmenu", contextmenu);
 
 	// allowClick is a variable set to true at each dragstart
 	// if no row is moved, it remains true, otherwise it's set to false
 	// at dragend, if allowClick is true, a layered bar chart is created
-	let allowClickRow;
-	let allowClickCol;
+	let allowClickRow: boolean;
+	let allowClickCol: boolean;
 
 	// Define drag behavior
-	let drag = d3.drag()
-	.on("start", function(event, d) { 
-		console.log(event)
+	let drag = d3.drag<SVGRectElement, CountsMatrixValue>()
+	.on("start", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) { 
+		// if (!(event.target) ||  !(event.target instanceof SVGRectElement)) {
+		// 	return;
+		// }
 		removeContextMenu();
 		if (event.sourceEvent.shiftKey) {
 			dragstartedRows(event, d); 
@@ -275,8 +281,8 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 			allowClickCol = true;
 		}
 	})
-    .on("drag", function(event, d) {
-
+    .on("drag", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) {
+		console.log("event drag", event)
 		// Rows
 		if (event.sourceEvent.shiftKey) {
 			// Update data
@@ -322,7 +328,8 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 		}
 		
 	})
-    .on("end", function(event, d) { 
+    .on("end", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) { 
+		console.log("event end", event)
 		// todo: case when key is lifted before the click
 
 		if (event.sourceEvent.shiftKey) {
@@ -334,9 +341,7 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 		}
 	})
 	
-	// Apply drag behavior to rows
-	rowsBehind.call(drag);
-	colsBehind.call(drag);
+	// Apply drag behavior to rects
 	rects.call(drag);
 
     return [x,y,colorRange];
@@ -344,7 +349,7 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 
 
 // heatmap highlight
-function addHighlightRow(y, currHeight) {
+function addHighlightRow(y: number, currHeight: number) {
 	d3.select(".highlight-rows")
 		.attr("visibility", "shown")
 		.attr("y", y)
@@ -352,7 +357,7 @@ function addHighlightRow(y, currHeight) {
 		.raise()
 }
 
-function removeHighlightRow(event, d) {
+function removeHighlightRow(event: MouseEvent) {
 	// makes sure the highlight stays when dragging
 	if (event.defaultPrevented) {
 		return;
@@ -363,7 +368,7 @@ function removeHighlightRow(event, d) {
 }
 
 // heatmap highlight
-function addHighlightCol(x, currWidth) {
+function addHighlightCol(x: number, currWidth: number) {
 	d3.select(".highlight-cols")
 		.attr("visibility", "shown")
 		.attr("x", x)
@@ -371,7 +376,7 @@ function addHighlightCol(x, currWidth) {
 		.raise()
 }
 
-function removeHighlightCol(event, d) {
+function removeHighlightCol(event: MouseEvent) {
 	// makes sure the highlight stays when dragging
 	if (event.defaultPrevented) {
 		return;
@@ -381,7 +386,7 @@ function removeHighlightCol(event, d) {
 		.attr("visibility", "hidden")
 }
 
-export function resetData(data) {
+export function resetData(data: CellPopData) {
 	resetRowNames(data);
 	resetColNames(data);
 }

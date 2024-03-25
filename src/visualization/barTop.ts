@@ -2,8 +2,9 @@ import * as d3 from "d3";
 
 import { getUpperBound } from "./util";
 import { defineTooltipBarTop, addTooltipBarTop, removeTooltipBarTop } from "./tooltips";
+import { CellPopData, CellPopDimensions, CellPopThemeColors, CountsTotalColValue } from "../cellpop-schema";
 
-export function renderTopBar(dataFull, dimensions, x, themeColors) {
+export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimensions, x: d3.ScaleBand<string>, themeColors: CellPopThemeColors) {
 	// Remove any prior barcharts and violin plots
 	d3.select("g.bartop").remove();
     d3.select("g.violintop").remove();
@@ -12,19 +13,17 @@ export function renderTopBar(dataFull, dimensions, x, themeColors) {
 	let svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + eval(dimensions.barTop.offsetWidth + dimensions.barTop.margin.left) + "," + eval(dimensions.barTop.offsetHeight + dimensions.barTop.margin.top) + ")")
+				"translate(" + (dimensions.barTop.offsetWidth + dimensions.barTop.margin.left).toString() + "," + (dimensions.barTop.offsetHeight + dimensions.barTop.margin.top).toString() + ")")
 			.attr("class", "bartop")
 
 	// Get dimensions
 	let width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;
 	let height = dimensions.barTop.height - dimensions.barTop.margin.top - dimensions.barTop.margin.bottom;
 
-	const data = []
+	const data = [] as CountsTotalColValue[];
 	for (const col of dataFull.colNames) {
 		data.push({col: col, countTotal: dataFull.countsMatrix.filter(r => r.col === col).map(r => r.value).reduce((a, b) => a + b, 0)})
 	}
-	// console.log(data)
-	// console.log("here", data)
 
 	let upperbound = getUpperBound(data.map(c => c.countTotal));
 
@@ -65,14 +64,15 @@ export function renderTopBar(dataFull, dimensions, x, themeColors) {
 			.attr("y", d => y(d.countTotal))
 			.attr("width", x.bandwidth())
 			.attr("height", d => height - y(d.countTotal))
-			.attr("fill", themeColors.bars);
+			.attr("fill", themeColors.sideCharts);
 
 	defineTooltipBarTop();
 
 	// Define mouse functions
-    const mouseover = function(event,d) {
+    const mouseover = function(event: MouseEvent, d: CountsTotalColValue) {
+		const metadataCol = dataFull.metadata.cols.filter(r => r.col === d.col)[0].metadata;
         if (event.ctrlKey) {
-			addTooltipBarTop(event, d);
+			addTooltipBarTop(event, d, metadataCol);
         }
     }
     const mouseleave = function() {

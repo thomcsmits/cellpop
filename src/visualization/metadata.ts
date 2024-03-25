@@ -1,4 +1,6 @@
-export function getPossibleMetadataSelections(data) {
+import { CellPopData } from "../cellpop-schema";
+
+export function getPossibleMetadataSelections(data: CellPopData) {
     const rowsMeta = data.metadata.rows;
     const rowsMetaOptionsShown = [];
 
@@ -16,7 +18,7 @@ export function getPossibleMetadataSelections(data) {
     return rowsMetaOptionsShown;
 }
 
-export function sortByMetadata(data, op) {
+export function sortByMetadata(data: CellPopData, op: string) {
     const rowsMeta = data.metadata.rows;
     console.log(rowsMeta)
 

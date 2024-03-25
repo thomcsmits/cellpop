@@ -1,6 +1,7 @@
 import * as d3 from "d3";
+import { CellPopData, CellPopDimensions } from "../cellpop-schema";
 
-export function renderGraph(dataFull, dimensions, x) {
+export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions, x: d3.ScaleBand<string>) {
 	// Remove any prior barcharts
 	d3.select("g.graph").remove();
 
@@ -8,7 +9,7 @@ export function renderGraph(dataFull, dimensions, x) {
 	let svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + eval(dimensions.graph.offsetWidth + dimensions.graph.margin.left) + "," + eval(dimensions.graph.offsetHeight + dimensions.graph.margin.top) + ")")
+				"translate(" + (dimensions.graph.offsetWidth + dimensions.graph.margin.left).toString() + "," + (dimensions.graph.offsetHeight + dimensions.graph.margin.top).toString() + ")")
 			.attr("class", "graph")
 
     // Get dimensions
@@ -95,7 +96,7 @@ export function renderGraph(dataFull, dimensions, x) {
         }
     
         // reverse the y-coordinates
-        node.y = heightGraph - node.y;
+        node.y = dimensions.graph.height - node.y;
     
         node.collapsed = false;
         node.hidden = false;

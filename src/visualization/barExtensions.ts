@@ -1,9 +1,11 @@
 import * as d3 from "d3";
 
 import { getUpperBound } from "./util";
+import { CellPopData, CellPopDimensions, CellPopThemeColors } from "../cellpop-schema";
 
 // add bar chart
-export function createBarChart(dataFull, selectedRow, dimensions, x, themeColors) {
+export function createBarChart(dataFull: CellPopData, selectedRow: string, dimensions: CellPopDimensions, x: d3.ScaleBand<string>, themeColors: CellPopThemeColors) {
+
     let width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
 	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
 
@@ -26,7 +28,7 @@ export function createBarChart(dataFull, selectedRow, dimensions, x, themeColors
 
         // X axis
         svgBar.append("g")
-            .attr("transform", `translate(${eval(dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left)}, ${height})`)
+            .attr("transform", "translate(" + (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left).toString() + "," + height + ")")
             .call(d3.axisBottom(x))
             .selectAll("text")
                 .attr("transform", "translate(-10,0)rotate(-45)")
@@ -63,8 +65,7 @@ export function createBarChart(dataFull, selectedRow, dimensions, x, themeColors
         // make all existing ones smaller
         for (let i = 0; i < nBars-1; i++) {
             let sample_i = d3.select(`.sample-${i+1}`);
-            sample_i.attr("transform",
-                `translate(${eval(dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left)},${i * heightInd})`)
+            sample_i.attr("transform", "translate(" + (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left).toString() + "," + (i*heightInd).toString() + ")")
             let sample_i_rects = sample_i.select(".rects");
             sample_i_rects.attr("transform",
                 `scale(${1},${1 / nBars})`);
@@ -80,8 +81,7 @@ export function createBarChart(dataFull, selectedRow, dimensions, x, themeColors
     // create new chart
     let svgBarSample = svgBar.append("g")
         .attr("class", `bardetailsample sample-${nBars}`)
-        .attr("transform",
-            `translate(${eval(dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left)},${(nBars-1)*heightInd})`);
+        .attr("transform", "translate(" + (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left).toString() + "," + (nBars-1*heightInd).toString() + ")")
 
     const data = dataFull.countsMatrix.filter((o) => o.row === selectedRow)
     
