@@ -1,14 +1,11 @@
 import * as d3 from "d3";
 
-import { renderHeatmap } from "./heatmap";
-import { renderTopBar, renderTopViolin } from "./barTop";
-import { renderLeftBar } from "./barSide";
-import { renderGraph } from "./graph";
-import { getPossibleMetadataSelections, sortByMetadata } from "./metadata";
-import { getTheme } from './theme';
+import { renderCellPopVisualization } from "./visualization";
+import { getPossibleMetadataSelections, sortByMetadata } from "./visualization/metadata";
+import { getTheme } from './visualization/theme';
 
 // visualization
-export function getMainVis(data, dimensions=null, theme='light') {
+export function getMainVis(data, dimensions=null, theme='light', fraction=false) {
 	if (!dimensions) {
 		// set the dimensions of the graph
 		let widthRatio = 0.9;
@@ -38,7 +35,7 @@ export function getMainVis(data, dimensions=null, theme='light') {
 		// var width = data.countsMatrix.length * 5;
 		// var height = data.counts.length * 20;
 		// var margin = {top: 100, right: 100, bottom: 100, left: 150};
-		let dimensions = {
+		dimensions = {
 			global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
 			heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 200, bottom: 100, left: 0}},
 			barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
@@ -111,30 +108,21 @@ export function getMainVis(data, dimensions=null, theme='light') {
 	// append the svg object to the body of the page
 	let svg = d3.select("#cellpopvis")
 	.append("svg")
-		.attr("width", width)
-		.attr("height", height)
+		.attr("width", dimensions.global.width)
+		.attr("height", dimensions.global.height)
 	.append("g")
 		.attr("class", "main")
 	
 	// add background
 	svg.append("rect")
 		.attr("class", "background")
-		.attr("width", width)
-		.attr("height", height)
+		.attr("width", dimensions.global.width)
+		.attr("height", dimensions.global.height)
 		.style("fill", themeColors.background);
      
-	// create main heatmap
-	let [x, y, colorRange] = renderHeatmap(data, dimensions, false, themeColors)
-
-	// create top barchart
-	renderTopBar(data, dimensions, x, themeColors)
-
-	// create left barchart
-	renderLeftBar(data, dimensions, y, themeColors)
-
-	// // create graph
-	// renderGraph(data, dimensions)
-
+	// create main CellPopVisualization
+	renderCellPopVisualization(data, dimensions, fraction, theme)
+	
 	// svg.attr("resize", "both")
 
 	console.log(svg)
