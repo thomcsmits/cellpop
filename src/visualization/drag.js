@@ -2,30 +2,33 @@ import * as d3 from "d3";
 
 import { reorderArray } from "./util";
 import { createBarChart } from "./barExtensions";
-import { wrapRowNames } from "../dataLoading/dataWrangling";
+import { wrapRowNames, wrapColNames } from "../dataLoading/dataWrangling";
 
+
+
+/** DRAG FUNCTION FOR ROWS */
 
 // Drag start function
-export function dragstarted(event, d) {
+export function dragstartedRows(event, d) {
     const rects = d3.selectAll(".heatmap-rects");
     const rowsBehind = d3.selectAll(".heatmap-rows");
 
     // Set dragged elements to active
     rowsBehind.filter(r => r.row === d.row).raise().classed("active", true);
     rects.filter(r => r.row === d.row).raise().classed("active", true);
-    d3.select(".highlight").raise().classed("active", true);
+    d3.select(".highlight-rows").raise().classed("active", true);
 }
 
 
 // Dragging function
-export function dragged(event, d, data, y, allowClick) {
+export function draggedRows(event, d, data, y, allowClick) {
     const rects = d3.selectAll(".heatmap-rects");
     const rowsBehind = d3.selectAll(".heatmap-rows");
 
     // Let the selected row and rects on that row and highlight move with the cursor
     rowsBehind.filter(r => r.row === d.row).attr("y", d.y = event.y);
     rects.filter(r => r.row === d.row).attr("y", d.y = event.y)
-    d3.select(".highlight").attr("y", event.y)
+    d3.select(".highlight-rows").attr("y", event.y)
 
     // Calculate the current index of the dragged row
     let currentIndex = data.rowNames.indexOf(d.row);
@@ -39,7 +42,7 @@ export function dragged(event, d, data, y, allowClick) {
         newIndex = 0;
     }
     if (newIndex >= data.rowNames.length) {
-        newIndex = data.rowNames.length - 1
+        newIndex = data.rowNames.length - 1;
     }
 
     // If row stays at the same place, return
@@ -75,7 +78,7 @@ export function dragged(event, d, data, y, allowClick) {
 
 
 // Drag end function
-export function dragended(event, d, data, dimensions, themeColors, x, y, allowClick) {
+export function dragendedRows(event, d, data, dimensions, themeColors, x, y, allowClick) {
     const rects = d3.selectAll(".heatmap-rects");
     const rowsBehind = d3.selectAll(".heatmap-rows");
 
@@ -83,15 +86,109 @@ export function dragended(event, d, data, dimensions, themeColors, x, y, allowCl
     let currentIndex = data.rowNames.indexOf(d.row);
     rowsBehind.filter(r => r.row === d.row).attr("y", y(data.rowNames[currentIndex]));
     rects.filter(r => r.row === d.row).attr("y", y(data.rowNames[currentIndex]));
-    d3.select(".highlight").attr("y", y(data.rowNames[currentIndex]));
+    d3.select(".highlight-rows").attr("y", y(data.rowNames[currentIndex]));
 
     // Set dragged elements to inactive
     rowsBehind.filter(r => r.row === d.row).classed("active", false);
     rects.filter(r => r.row === d.row).classed("active", false);
-    d3.select(".highlight").classed("active", false);
+    d3.select(".highlight-rows").classed("active", false);
 
     // if the row hasn't moved, create extending bar chart
     if (allowClick){
         createBarChart(data, d.row, dimensions, x, themeColors);
+    }
+}
+
+
+/** DRAG FUNCTION FOR COLS */
+
+// Drag start function
+export function dragstartedCols(event, d) {
+    const rects = d3.selectAll(".heatmap-rects");
+    const colsBehind = d3.selectAll(".heatmap-cols");
+
+    // Set dragged elements to active
+    colsBehind.filter(r => r.col === d.col).raise().classed("active", true);
+    rects.filter(r => r.col === d.col).raise().classed("active", true);
+    d3.select(".highlight-cols").raise().classed("active", true);
+}
+
+
+// Dragging function
+export function draggedCols(event, d, data, x, allowClick) {
+    const rects = d3.selectAll(".heatmap-rects");
+    const colsBehind = d3.selectAll(".heatmap-cols");
+
+    // Let the selected col and rects on that col and highlight move with the cursor
+    colsBehind.filter(r => r.col === d.col).attr("x", d.x = event.x);
+    rects.filter(r => r.col === d.col).attr("x", d.x = event.x)
+    d3.select(".highlight-cols").attr("x", event.x)
+
+    // Calculate the current index of the dragged col
+    let currentIndex = data.colNames.indexOf(d.col);
+    
+    // Calculate the new index based on the x-coordinate of the drag event
+    let colSize = x(data.colNames[1]) - x(data.colNames[0]);
+    let newIndex = Math.ceil((event.x - x.paddingOuter()*x.bandwidth()) / colSize);
+
+    // If col goes beyond boundaries, set it to the first/last item
+    if (newIndex < 0) {
+        newIndex = 0;
+    }
+    if (newIndex >= data.colNames.length) {
+        newIndex = data.colNames.length - 1;
+    }
+
+    // If col stays at the same place, return
+    if (newIndex === currentIndex) {
+        return [data, allowClick];
+    }
+
+    // Calculate the displacement of the dragged col
+    let displacement = newIndex - currentIndex;
+
+    // For each col, calculate the new y position
+    colsBehind.each(function(colName) {
+        let colIndex = data.colNames.indexOf(colName.col);
+        // Get the cols that are affected (between the currentIndex and newIndex)
+        if (colIndex !== currentIndex && colIndex >= Math.min(currentIndex, newIndex) && colIndex <= Math.max(currentIndex, newIndex)) {
+            // Shift the col up or down depending on the direction of the moved col
+            if (displacement > 0) {
+                colsBehind.filter(r => r.col === colName.col).attr("x", x(data.colNames[colIndex - 1]));
+                rects.filter(r => r.col === colName.col).attr("x", x(data.colNames[colIndex - 1]));
+            } else {
+                colsBehind.filter(r => r.col === colName.col).attr("x", x(data.colNames[colIndex + 1]));
+                rects.filter(r => r.col === colName.col).attr("x", x(data.colNames[colIndex + 1]));
+            }
+        }
+    })
+
+    // Update the ordering of colNames
+    data.colNames = reorderArray(data.colNames, currentIndex, newIndex);
+    wrapColNames(data);
+    
+    return [data, false];
+}
+
+
+// Drag end function
+export function dragendedCols(event, d, data, dimensions, themeColors, x, y, allowClick) {
+    const rects = d3.selectAll(".heatmap-rects");
+    const colsBehind = d3.selectAll(".heatmap-cols");
+
+    // Get the current index and set the x-coordinate of this col when drag ends
+    let currentIndex = data.colNames.indexOf(d.col);
+    colsBehind.filter(r => r.col === d.col).attr("x", x(data.colNames[currentIndex]));
+    rects.filter(r => r.col === d.col).attr("x", x(data.colNames[currentIndex]));
+    d3.select(".highlight-cols").attr("x", x(data.colNames[currentIndex]));
+
+    // Set dragged elements to inactive
+    colsBehind.filter(r => r.col === d.col).classed("active", false);
+    rects.filter(r => r.col === d.col).classed("active", false);
+    d3.select(".highlight-cols").classed("active", false);
+
+    // if the col hasn't moved, color the bar chart
+    if (allowClick){
+        // createBarChart(data, d.col, dimensions, x, themeColors);
     }
 }
