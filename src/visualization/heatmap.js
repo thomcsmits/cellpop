@@ -2,10 +2,11 @@ import * as d3 from "d3";
 
 import { renderLeftBar } from "./barSide";
 import { renderLeftViolin } from "./violinSide";
-import { dragstarted, dragged, dragended } from "./drag";
+import { dragstartedRows, draggedRows, dragendedRows, dragstartedCols, draggedCols, dragendedCols } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
 import { resetRowNames, resetColNames } from "../dataLoading/dataWrangling";
 import { defineContextMenu, addContextMenu, removeContextMenu } from "./contextMenu";
+import { renderCellPopVisualizationLeft, renderCellPopVisualizationTop } from "./sides";
 import { getUpperBound } from "./util";
 
 
@@ -194,9 +195,21 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 			.style("fill", function(d) { return colorRange(d.value)} );
 
 
-    // Add highlight
+    // Add highlight for rows
     svg.append("rect")
-		.attr("class", "highlight")
+		.attr("class", "highlight-rows")
+		.attr("x", 0)
+		.attr("y", 0)
+		.attr("width", width)
+		.attr("height", height)
+		.attr("stroke", themeColors.heatmapHighlight)
+		.attr("fill", "none")
+		.attr("pointer-events", "none")
+		.attr("visibility", "hidden")
+
+	// Add highlight for cols
+    svg.append("rect")
+		.attr("class", "highlight-cols")
 		.attr("x", 0)
 		.attr("y", 0)
 		.attr("width", width)
@@ -212,16 +225,22 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 
 	// Define mouse functions
     const mouseover = function(event, d) {
+		// console.log(event)
         if (event.ctrlKey) {
 			if (event.target.classList[0].includes('heatmap-rects')) {}
 			addTooltip(event, d);
-        } else {
-        	addHighlight(event.target.y.animVal.value, event.target.height.animVal.value);
+        } 
+		if (event.shiftKey) {
+        	addHighlightRow(event.target.y.animVal.value, event.target.height.animVal.value);
         }
+		if (event.altKey) {
+			addHighlightCol(event.target.x.animVal.value, event.target.width.animVal.value);
+		}
     }
     const mouseleave = function(event, d) {
 		removeTooltip();
-        removeHighlight(event,d);
+        removeHighlightRow(event,d);
+		removeHighlightCol(event,d);
     }
 
 	const contextmenu = function(event, d) {
@@ -242,15 +261,15 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 	let allowClick;
 
 	// Define drag behavior
-	let drag = d3.drag()
+	let dragRows = d3.drag()
 	.on("start", function(event, d) { 
 		removeContextMenu();
-		dragstarted(event, d); 
+		dragstartedRows(event, d); 
 		allowClick = true;
 	})
     .on("drag", function(event, d) {
 		// Update data
-		let dataAndClick = dragged(event, d, data, y, allowClick);
+		let dataAndClick = draggedRows(event, d, data, y, allowClick);
 		data = dataAndClick[0];
 		allowClick = dataAndClick[1];
 		// Update the y-domain
@@ -265,36 +284,91 @@ export function renderHeatmap(data, dimensions, fraction=false, themeColors, met
 				.style("fill", themeColors.text);
 
 		// Update left bar
-		renderLeftBar(data, dimensions, y, themeColors);
+		renderCellPopVisualizationLeft(data, dimensions, y, themeColors, fraction);
 	})
     .on("end", function(event, d) { 
-		dragended(event, d, data, dimensions, themeColors, x, y, allowClick); 
+		dragendedRows(event, d, data, dimensions, themeColors, x, y, allowClick); 
 	})
 
-	// Apply drag behavior to rows
-	rowsBehind.call(drag)
-	rects.call(drag)
+	// Define drag behavior
+	let dragCols = d3.drag()
+	.on("start", function(event, d) { 
+		removeContextMenu();
+		dragstartedCols(event, d); 
+		allowClick = true;
+	})
+    .on("drag", function(event, d) {
+		// Update data
+		let dataAndClick = draggedCols(event, d, data, x, allowClick);
+		data = dataAndClick[0];
+		allowClick = dataAndClick[1];
+		// Update the y-domain
+		x = x.domain(data.colNames);
+		svg.select("g.axisbottom").remove()
+		svg.append("g")
+			.attr("class", "axisbottom")
+			.call(d3.axisBottom(x))
+			.attr("transform", "translate(0," + height + ")")
+			.selectAll("text")
+				.attr("transform", "translate(-10,0)rotate(-45)")
+				.style("text-anchor", "end")
+				.style("font-size", dimensions.textSize.tick)
+				.style("fill", themeColors.text);
+
+		// Update top bar
+		renderCellPopVisualizationTop(data, dimensions, x, themeColors, fraction);
+	})
+    .on("end", function(event, d) { 
+		dragendedCols(event, d, data, dimensions, themeColors, x, y, allowClick); 
+	})
+
+	// // Apply drag behavior to rows
+	// rowsBehind.call(dragRows);
+	// rects.call(dragRows);
+
+	// Apply drag behavior to cols
+	colsBehind.call(dragCols);
+	rects.call(dragCols);
 
     return [x,y,colorRange];
 }
 
 
 // heatmap highlight
-function addHighlight(y, currHeight) {
-	d3.select(".highlight")
+function addHighlightRow(y, currHeight) {
+	d3.select(".highlight-rows")
 		.attr("visibility", "shown")
 		.attr("y", y)
 		.attr("height", currHeight)
 		.raise()
 }
 
-function removeHighlight(event, d) {
+function removeHighlightRow(event, d) {
 	// makes sure the highlight stays when dragging
 	if (event.defaultPrevented) {
 		return;
 	}
 
-	d3.select(".highlight")
+	d3.select(".highlight-rows")
+		.attr("visibility", "hidden")
+}
+
+// heatmap highlight
+function addHighlightCol(x, currWidth) {
+	d3.select(".highlight-cols")
+		.attr("visibility", "shown")
+		.attr("x", x)
+		.attr("width", currWidth)
+		.raise()
+}
+
+function removeHighlightCol(event, d) {
+	// makes sure the highlight stays when dragging
+	if (event.defaultPrevented) {
+		return;
+	}
+
+	d3.select(".highlight-cols")
 		.attr("visibility", "hidden")
 }
 

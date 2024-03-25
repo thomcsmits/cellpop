@@ -1,5 +1,3 @@
-import * as d3 from "d3";
-
 import { renderHeatmap } from "./heatmap";
 import { renderTopBar } from "./barTop";
 import { renderTopViolin } from "./violinTop";
