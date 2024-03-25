@@ -121,7 +121,7 @@ export function getMainVis(data, dimensions=null, theme='light', fraction=false)
 		.style("fill", themeColors.background);
      
 	// create main CellPopVisualization
-	renderCellPopVisualization(data, dimensions, fraction, theme)
+	renderCellPopVisualization(data, dimensions, fraction, themeColors);
 	
 	// svg.attr("resize", "both")
 

@@ -8,11 +8,10 @@ import { renderLeftViolin } from "./violinSide";
 import { renderGraph } from "./graph";
 import { getTheme } from "./theme";
 
-export function renderCellPopVisualization(data, dimensions, fraction, theme, metadataField) {
-	let themeColors = getTheme(theme);
+export function renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField, reset=false) {
 
 	// create main heatmap
-	let [x, y, colorRange] = renderHeatmap(data, dimensions, fraction, themeColors, metadataField);
+	let [x, y, colorRange] = renderHeatmap(data, dimensions, fraction, themeColors, metadataField, reset);
 
 	// create top/side charts
 	if (fraction) {

@@ -16,6 +16,7 @@ import { renderCellPopVisualization } from "./visualization";
 import { showAnimationBox } from "./visualization/animation";
 import { getPossibleMetadataSelections } from "./visualization/metadata";
 import { getTheme } from "./visualization/theme";
+import { resetRowNames } from "./dataLoading/dataWrangling";
 
 
 export const CellPop = (props) => {
@@ -59,12 +60,14 @@ export const CellPop = (props) => {
 
 	// call renderCellPopVisualization on updates
 	useEffect(() => {
-		// change background theme
+		// get theme colors
 		let themeColors = getTheme(theme);
+
+		// change background theme
 		d3.selectAll(".background").attr("fill", themeColors.background);
 
 		// create main visualization
-		renderCellPopVisualization(props.data, props.dimensions, fraction, theme, metadataField);
+		renderCellPopVisualization(props.data, props.dimensions, fraction, themeColors, metadataField);
 		
 	}, [theme, fraction, metadataField])
 
@@ -98,7 +101,13 @@ export const CellPop = (props) => {
 	}
 
 	function resetData() {
+		// get theme colors
+		let themeColors = getTheme(theme);
 
+		// // change background theme
+		// d3.selectAll(".background").attr("fill", themeColors.background);
+
+		renderCellPopVisualization(props.data, props.dimensions, fraction, themeColors, metadataField, true);
 	}
 
 	function resetLayeredBar() {
