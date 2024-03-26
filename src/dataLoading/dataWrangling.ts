@@ -64,6 +64,9 @@ function loadDataWrapper(data: CellPopData, ordering?: dataOrdering) {
     data.rowNamesRaw = [...data.rowNames];
     data.colNamesRaw = [...data.colNames];
 
+    // save extended chart
+    data.extendedChart = {rowNames: [], colNames: []};
+
     return data;
 }
 

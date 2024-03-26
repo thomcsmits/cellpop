@@ -16,7 +16,8 @@ export type CellPopData = {
     colNamesWrapped: ColNamesWrapped[],
     countsMatrix: CountsMatrixValue[],
     countsMatrixFractions: CountsMatrixFractions,
-    metadata: MetaData
+    metadata: MetaData,
+    extendedChart: extendedChart
 }
 
 export type RowNamesWrapped = { row: string };
@@ -47,6 +48,11 @@ export type CountsMatrixFractions = {
 export type MetaData = {
     rows?: {row: string, metadata: any}[],
     cols?: {col: string, metadata: any}[]
+}
+
+export type extendedChart = {
+    rowNames: string[],
+    colNames: string[]
 }
 
 export type dataOrdering = {

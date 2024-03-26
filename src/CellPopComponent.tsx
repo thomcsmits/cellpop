@@ -16,7 +16,8 @@ import { showAnimationBox } from "./visualization/animation";
 import { getPossibleMetadataSelections } from "./visualization/metadata";
 import { getTheme } from "./visualization/theme";
 import { resetRowNames } from "./dataLoading/dataWrangling";
-import { CellPopProps, CellPopDimensions, CellPopTheme } from "./cellpop-schema";
+import { resetExtensionChart } from "./visualization/barExtensions";
+import { CellPopProps, CellPopDimensions, CellPopTheme, CellPopData } from "./cellpop-schema";
 
 
 export const CellPop = (props: CellPopProps) => {
@@ -43,9 +44,11 @@ export const CellPop = (props: CellPopProps) => {
 	useEffect(() => {
 		const app = d3.select(cellPopRef.current);
 
-		// add svg element
-		const svg = app
-		.append("svg")
+		// on the first render, we want to make sure there aren't any svg's
+		app.selectAll("svg").remove();
+
+		// add svg element for main
+		const svg = app.append("svg")
 			.attr("width", props.dimensions.global.width)
 			.attr("height", props.dimensions.global.height)
 		.append("g")
@@ -56,6 +59,10 @@ export const CellPop = (props: CellPopProps) => {
 			.attr("class", "background")
 			.attr("width", props.dimensions.global.width)
 			.attr("height", props.dimensions.global.height)
+
+		// add svg element for extension
+		const svgExtension = app.append("svg")
+			.attr("class", "extension")
 	}, [])
 
 	// call renderCellPopVisualization on updates
@@ -64,7 +71,7 @@ export const CellPop = (props: CellPopProps) => {
 		const themeColors = getTheme(theme);
 
 		// change background theme
-		d3.selectAll(".background").attr("fill", themeColors.background);
+		d3.selectAll(".background").style("fill", themeColors.background);
 
 		// create main visualization
 		renderCellPopVisualization(props.data, props.dimensions, fraction, themeColors, metadataField);
@@ -105,13 +112,15 @@ export const CellPop = (props: CellPopProps) => {
 		const themeColors = getTheme(theme);
 
 		// // change background theme
-		// d3.selectAll(".background").attr("fill", themeColors.background);
+		d3.selectAll(".background").style("fill", themeColors.background);
+
+		resetLayeredBar();
 
 		renderCellPopVisualization(props.data, props.dimensions, fraction, themeColors, metadataField, true);
 	}
 
 	function resetLayeredBar() {
-		d3.selectAll('.bardetail').remove();
+		resetExtensionChart(props.data);
 	}
 	
 	// animation pop-up
