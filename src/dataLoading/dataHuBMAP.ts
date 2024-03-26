@@ -4,7 +4,7 @@ import { getCountsFromObsSetsList } from "./dataLoaders";
 import { loadDataWithCounts } from "./dataWrangling";
 import { HuBMAPMetaData, ObsSets, dataOrdering } from "../cellpop-schema";
 
-export function loadHuBMAPData(uuids: string[], ordering: dataOrdering, metadataFields: string[]) {
+export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering, metadataFields?: string[]) {
 	// let t0 = performance.now()
     const urls = uuids.map(getHuBMAPURL);
     // for each url, check if predicted_CLID or predicted_label
