@@ -93,6 +93,12 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
                 .style("font-size", dimensions.textSize.tick)
                 .style("fill", themeColors.text);
 
+        // add color range for bars
+        const colorRange = d3.scaleOrdinal<string, string>()
+            .domain(data.extendedChart.colNames)
+            .range(themeColors.extensionRange)
+            .unknown(themeColors.extensionDefault)
+        
         // Add bars
         svgBarRow.append("g")
             .attr("class", "rects")
@@ -103,7 +109,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
                 .attr("y", d => y(d.value))
                 .attr("width", x.bandwidth())
                 .attr("height", d => heightInd - heightMargin - y(d.value))
-                .attr("fill", themeColors.heatmapMax);
+                .attr("fill", d => colorRange(d.col));
     }
 }
 

@@ -98,7 +98,6 @@ export function dragendedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrix
     if (allowClick){
         data.extendedChart.rowNames.push(d.row);
         renderExtensionChart(data, dimensions, themeColors, x);
-        // createBarChart(data, d.row, dimensions, x, themeColors);
     }
 }
 
@@ -193,6 +192,6 @@ export function dragendedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrix
     // if the col hasn't moved, color the bar chart
     if (allowClick){
         data.extendedChart.colNames.push(d.col);
-        // createBarChart(data, d.col, dimensions, x, themeColors);
+        renderExtensionChart(data, dimensions, themeColors, x);
     }
 }

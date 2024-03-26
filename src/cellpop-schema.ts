@@ -130,7 +130,9 @@ export type CellPopThemeColors = {
     heatmapGrid: string,
     heatmapHighlight: string,
     sideCharts: string,
-    text: string
+    text: string,
+    extensionDefault: string,
+    extensionRange: string[]
 }
 
 export type CellPopKeys = {
