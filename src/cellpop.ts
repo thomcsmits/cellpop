@@ -3,9 +3,10 @@ import * as d3 from "d3";
 import { renderCellPopVisualization } from "./visualization";
 import { getPossibleMetadataSelections, sortByMetadata } from "./visualization/metadata";
 import { getTheme } from './visualization/theme';
+import { CellPopData, CellPopDimensions, CellPopTheme } from "./cellpop-schema";
 
 // visualization
-export function getMainVis(data, dimensions=null, theme='light', fraction=false) {
+export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, theme?: CellPopTheme, fraction?: false) {
 	if (!dimensions) {
 		// set the dimensions of the graph
 		let widthRatio = 0.9;
@@ -51,6 +52,12 @@ export function getMainVis(data, dimensions=null, theme='light', fraction=false)
 		// var dimensionsHeatmap = {width: widthRight, height: heightBottom, margin: {top: 50, right: 50, bottom: 50, left: 50}}
 		// var marginHeatmap = {top: 100, right: 100, bottom: 100, left: 150};
 	}
+	if (!theme) {
+		theme = 'light';
+	}
+	if (!fraction) {
+		fraction = false;
+	}
 
 	console.log('data', data);
 	const app = document.getElementById('app');
@@ -60,12 +67,12 @@ export function getMainVis(data, dimensions=null, theme='light', fraction=false)
 	let buttonFractionOn = document.createElement('button');
 	buttonFractionOn.textContent = 'Change to fraction';
 	app.appendChild(buttonFractionOn);
-	buttonFractionOn.addEventListener('click', () => renderHeatmap(data, dimensions, true));
+	buttonFractionOn.addEventListener('click', () => renderCellPopVisualization(data, dimensions, true, themeColors));
 
 	let buttonFractionOff = document.createElement('button');
 	buttonFractionOff.textContent = 'Change to absolute';
 	app.appendChild(buttonFractionOff);
-	buttonFractionOff.addEventListener('click', () => renderHeatmap(data, dimensions, false));
+	buttonFractionOff.addEventListener('click', () => renderCellPopVisualization(data, dimensions, false, themeColors));
 
 	// add a button for resetting the bottom thing
 	let buttonReset = document.createElement('button');
@@ -82,7 +89,7 @@ export function getMainVis(data, dimensions=null, theme='light', fraction=false)
 	buttonMetadata.appendChild(buttonMetadataText);
 	for (const op of [['None', 0], ...rowsMetaOptionsShown]) {
 		let label = document.createElement("label");
-		label.innerText = op[0];
+		label.innerText = op[0] as string;
 		let input = document.createElement("input");
 		input.type = "radio";
 		input.name = "meta";

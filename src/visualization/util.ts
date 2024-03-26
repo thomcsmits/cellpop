@@ -1,10 +1,10 @@
 /**
  * Find the upper bound for the axis for an array with values.
- * arr: array with values
- * Returns the first 5- or 1- value that is higher
+ * @param arr: array with values
+ * @returns the first 5- or 1- value that is higher
  * E.g. if the max value is 97, it returns 100. If the max value is 147, it returns 500.
  */
-export function getUpperBound(arr) {
+export function getUpperBound(arr: number[]): number {
 	let maxValue = Math.max(...arr);
 	if (maxValue > 1) {
 		return getUpperBoundInner(maxValue);
@@ -18,10 +18,10 @@ export function getUpperBound(arr) {
 
 /**
  * Helper function for getUpperBound
- * @param {} maxValue number to find the nearest 2.5/5/10 above
+ * @param maxValue number to find the nearest 2.5/5/10 above
  * @returns number that is the nearest 2.5/5/10 above maxValue
  */
-function getUpperBoundInner(maxValue) {
+function getUpperBoundInner(maxValue: number): number {
 	const maxValueRound = Math.round(maxValue);
 	const lengthValue = maxValueRound.toString().length;
 	const bound10 = Math.pow(10, lengthValue);
@@ -36,7 +36,14 @@ function getUpperBoundInner(maxValue) {
 	return bound10;
 }
 
-export function reorderArray(arr, currentIndex, newIndex) {
+/**
+ * Move an element from one position to another in an array and return a copy
+ * @param arr array with strings to be ordered
+ * @param currentIndex index of the item to be moved
+ * @param newIndex index where the item should be moved to
+ * @returns copy of the array with new ordering
+ */
+export function reorderArray(arr: string[], currentIndex: number, newIndex: number): string[] {
 	let selectedElement = arr[currentIndex];
 	let arrCopy = [...arr.slice(0, currentIndex), ...arr.slice(currentIndex + 1)];
 	arrCopy = [...arrCopy.slice(0, newIndex), selectedElement, ...arrCopy.slice(newIndex)];

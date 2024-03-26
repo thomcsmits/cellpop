@@ -1,5 +1,7 @@
-export function getTheme(theme) {
-    let themeColors = new Object;
+import { CellPopTheme, CellPopThemeColors } from "../cellpop-schema";
+
+export function getTheme(theme: CellPopTheme) {
+    let themeColors = new Object() as CellPopThemeColors;
 
     if (theme === 'dark') {
         themeColors.background = 'black';
@@ -7,7 +9,7 @@ export function getTheme(theme) {
         themeColors.heatmapMax = '#69b3a2';
         themeColors.heatmapGrid = 'white';
         themeColors.heatmapHighlight = 'white';
-        themeColors.bars = 'white';
+        themeColors.sideCharts = 'white';
         themeColors.text = 'white';
     }
     // if (t === 'light') {
@@ -17,7 +19,7 @@ export function getTheme(theme) {
         themeColors.heatmapMax = '#69b3a2';
         themeColors.heatmapGrid = 'white';
         themeColors.heatmapHighlight = 'black';
-        themeColors.bars = 'black';
+        themeColors.sideCharts = 'black';
         themeColors.text = 'black';
     }
 

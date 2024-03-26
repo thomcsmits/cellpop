@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, ChangeEvent } from "react";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import InputLabel from '@mui/material/InputLabel';
@@ -17,23 +17,24 @@ import { showAnimationBox } from "./visualization/animation";
 import { getPossibleMetadataSelections } from "./visualization/metadata";
 import { getTheme } from "./visualization/theme";
 import { resetRowNames } from "./dataLoading/dataWrangling";
+import { CellPopProps, CellPopDimensions, CellPopTheme } from "./cellpop-schema";
 
 
-export const CellPop = (props) => {
+export const CellPop = (props: CellPopProps) => {
 	console.log(props);
 	if (!props.data) {
 		return <></>;
 	}
 
-	const cellPopRef = useRef();
+	const cellPopRef = useRef<HTMLDivElement>(null);
 	
 	// const [data, setData] = useState(props.data);
-	const [theme, setTheme] = useState(props.theme);
-	const [dimensions, setDimensions] = useState(props.dimensions);
-	const [fraction, setFraction] = useState(false);
-	const [metadataField, setMetadataField] = useState("None");
+	const [theme, setTheme] = useState<CellPopTheme>(props.theme);
+	const [dimensions, setDimensions] = useState<CellPopDimensions>(props.dimensions);
+	const [fraction, setFraction] = useState<boolean>(false);
+	const [metadataField, setMetadataField] = useState<string>("None");
 
-	const [animationAnchor, setAnimationAnchor] = useState(null);
+	const [animationAnchor, setAnimationAnchor] = useState<HTMLElement>(null);
 
 	// get metadata options
 	const metadataFields = getPossibleMetadataSelections(props.data);
@@ -84,19 +85,19 @@ export const CellPop = (props) => {
 	
 
 	// create MUI buttons with callback functions to e.g. change theme
-	function changeTheme(event, newTheme) {
+	function changeTheme(event: React.MouseEvent<HTMLInputElement, MouseEvent>, newTheme: CellPopTheme | null) {
 		if (newTheme !== null) {
 			setTheme(newTheme);
 		}
 	}
 
-	function changeFraction(event, newFraction) {
+	function changeFraction(event: React.MouseEvent<HTMLInputElement, MouseEvent>, newFraction: boolean | null) {
 		if (newFraction !== null) {
 			setFraction(newFraction);
 		}
 	}
 
-	function changeMetadataField(event) {
+	function changeMetadataField(event: React.ChangeEvent<HTMLInputElement>) {
 		setMetadataField(event.target.value);
 	}
 
@@ -113,10 +114,11 @@ export const CellPop = (props) => {
 	function resetLayeredBar() {
 		d3.selectAll('.bardetail').remove();
 	}
-
+	
 	// animation pop-up
-	const handleAnimantionPopup = (event) => {
+	const handleAnimantionPopup = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		setAnimationAnchor(animationAnchor ? null : event.currentTarget);
+		console.log(event.currentTarget)
 	};
 
 	return (

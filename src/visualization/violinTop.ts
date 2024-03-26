@@ -2,10 +2,11 @@ import * as d3 from "d3";
 
 import { getUpperBound } from "./util";
 import { defineTooltipBarTop, addTooltipBarTop, removeTooltipBarTop } from "./tooltips";
+import { CellPopData, CellPopDimensions, CellPopThemeColors } from "../cellpop-schema";
 
 
 
-export function renderTopViolin(data, dimensions, x, themeColors, fraction) {
+export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions, x: d3.ScaleBand<string>, themeColors: CellPopThemeColors, fraction: boolean) {
     let countsMatrix = data.countsMatrix;
 	if (fraction) {
 		countsMatrix = data.countsMatrixFractions.row;
@@ -18,7 +19,7 @@ export function renderTopViolin(data, dimensions, x, themeColors, fraction) {
 	let svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + eval(dimensions.barTop.offsetWidth + dimensions.barTop.margin.left) + "," + eval(dimensions.barTop.offsetHeight + dimensions.barTop.margin.top) + ")")
+				"translate(" + (dimensions.barTop.offsetWidth + dimensions.barTop.margin.left).toString() + "," + (dimensions.barTop.offsetHeight + dimensions.barTop.margin.top).toString() + ")")
 			.attr("class", "violintop")
 
 	// Get dimensions
@@ -61,21 +62,21 @@ export function renderTopViolin(data, dimensions, x, themeColors, fraction) {
         .style("font-size", dimensions.textSize.labelSmall)
         .style("fill", themeColors.text);
 
-    function kde(kernel, thds) {
+    function kde(kernel, thds: number[]) {
         return V => thds.map(t => [t, d3.mean(V, d => kernel(t - d))])
     }
 
-    function epanechnikov(bandwidth) {
+    function epanechnikov(bandwidth: number) {
         return x => Math.abs(x /= bandwidth) <= 1 ? 0.75 * (1 - x * x) / bandwidth : 0;
     }
 
     const bandwidth = 0.1;
-    const thds = y.ticks(100)
-    const density = kde(epanechnikov(bandwidth), thds)
+    const thds = y.ticks(100);
+    const density = kde(epanechnikov(bandwidth), thds);
 
     const violins = d3.rollup(countsMatrix, v => density(v.map(g => g.value)), d => d.col)
 
-    var allNum = [];
+    var allNum = [] as number[];
     [...violins.values()].forEach((d,i) => allNum = allNum.concat([...violins.values()][i].map(d => d[1])))
     const xNum  = d3.scaleLinear()
         .domain([-d3.max(allNum), d3.max(allNum)])
@@ -96,7 +97,7 @@ export function renderTopViolin(data, dimensions, x, themeColors, fraction) {
         .append('path')
           .datum(d => d[1])
           .style('stroke', 'none')
-          .style('fill', themeColors.bars)
+          .style('fill', themeColors.sideCharts)
           .attr('d', area)
     
 }

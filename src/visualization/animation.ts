@@ -1,8 +1,9 @@
 import * as d3 from "d3";
 
 import { getUpperBound } from "./util";
+import { AnimationDimensions, CellPopData, CountsMatrixValueAnimation } from "../cellpop-schema";
 
-export function showAnimation(data) {
+export function showAnimation(data: CellPopData) {
     // delete any old
     d3.selectAll(".animate-svg").remove();
 
@@ -25,7 +26,7 @@ export function showAnimation(data) {
     createStackedBar(svg, data, dimensions);
 }
 
-export function showAnimationBox(data, width, height) {
+export function showAnimationBox(data: CellPopData, width: number, height: number) {
     // select svg
     let svg = d3.select(".animate-svg");
     
@@ -41,7 +42,7 @@ export function showAnimationBox(data, width, height) {
         marginTop: height / 5,
         moveWidth: width / 3,
         moveTop: height / 1.5
-    }
+    } as AnimationDimensions;
     
     createStackedBar(svg, data, dimensions);
 }
@@ -65,7 +66,8 @@ export function showAnimationBox(data, width, height) {
     //     colNames: ['cellZ', 'cellY', 'cellX', 'cellW']
     // }
 
-function createStackedBar(svgBase, data, dimensionsAnimation) {
+function createStackedBar(svgBase: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, data: CellPopData, dimensionsAnimation: AnimationDimensions) {
+    let countsMatrixAnimation = data.countsMatrix as CountsMatrixValueAnimation[];
     let width = dimensionsAnimation.width / 2;
     let height = dimensionsAnimation.height / 2;
 
@@ -75,7 +77,7 @@ function createStackedBar(svgBase, data, dimensionsAnimation) {
         rowValsCounter.push({row: row, counter: 0});
     }
 
-    for (const entry of data.countsMatrix) {
+    for (const entry of countsMatrixAnimation) {
         let currVal = rowValsCounter.filter(r => r.row === entry.row)[0].counter;
         let newVal = currVal + entry.value;
         entry.start = currVal;
@@ -92,7 +94,7 @@ function createStackedBar(svgBase, data, dimensionsAnimation) {
     let x = d3.scaleBand()
         .domain(data.rowNames)
         .range([0,width])
-        .padding([0.01])
+        .padding(0.01)
 
     svg.append("g")
         .attr("class", "axisbottom")
@@ -109,16 +111,14 @@ function createStackedBar(svgBase, data, dimensionsAnimation) {
         .call(d3.axisLeft(y));
     
     // add color
-    var color = d3.scaleOrdinal()
+    var color = d3.scaleOrdinal<string, string>()
         .domain(data.colNames)
         .range(["#1A2A22", "#79FFFC", "#8F5D4E", "#FFFF7C", "#FFFF7C", 
                 "#C665BF", "#8AFF79", "#4E5C35", "#A4FCE5", "#FF8095", "#7A85FE"])
 
 
-    // add all rectangles
-    svg.append("g").selectAll()
-        .attr("class", "bars")
-        .data(data.countsMatrix, function(d) {return d.row+":"+d.col;})
+    svg.append("g").selectAll<SVGRectElement, CountsMatrixValueAnimation>(".bar-rects")
+        .data(countsMatrixAnimation, function(d) {return d.row+":"+d.col;})
         .enter()
         .append("rect")
             .attr("class", "bar-rects")
@@ -165,11 +165,12 @@ function createStackedBar(svgBase, data, dimensionsAnimation) {
         .select("g.axisleft")
         .transition()
         .delay(5000)
+        // @ts-ignore
         .call(d3.axisLeft(y2))
         
     // move the rects
     d3.selectAll(".animate")
-        .selectAll(".bar-rects")
+        .selectAll<SVGRectElement, CountsMatrixValueAnimation>(".bar-rects")
         .transition()
         .delay(6000)
         .ease(d3.easeLinear)
@@ -178,14 +179,14 @@ function createStackedBar(svgBase, data, dimensionsAnimation) {
 
 
     // Color axis
-	let colorRange = d3.scaleLinear()
+	let colorRange = d3.scaleLinear<string, number>()
         .range(["white", "#69b3a2"])
         .domain([0,2000])
 
 
     // change the color of the rects
     d3.selectAll(".animate")
-        .selectAll(".bar-rects")
+        .selectAll<SVGRectElement, CountsMatrixValueAnimation>(".bar-rects")
         .transition()
         .delay(7500)
         .attr("fill", function(d) {return colorRange(d.value)})

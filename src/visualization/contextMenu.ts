@@ -3,6 +3,7 @@ import * as d3 from "d3";
 import { wrapRowNames, wrapColNames } from "../dataLoading/dataWrangling";
 import { renderCellPopVisualization } from "./index";
 import { reorderArray } from "./util";
+import { CellPopData, CountsMatrixValue, RowNamesWrapped, ColNamesWrapped, CellPopDimensions, CellPopThemeColors } from "../cellpop-schema";
 
 // Add context menu
 export function defineContextMenu() {
@@ -19,8 +20,7 @@ export function defineContextMenu() {
 		.style("position", "absolute")
 }
 
-
-export function addContextMenu(event, d, data, dimensions, fraction, themeColors, metadataField, y) {
+export function addContextMenu(event: MouseEvent, d: CountsMatrixValue, data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField: string) {
 	const menu = d3.select(".context-menu")
 		.html(`Options:<br>`)
 		.style("opacity", 1)
@@ -81,7 +81,8 @@ export function removeContextMenu() {
 }
 
 
-function moveRowTop(dataRect, data, dimensions, fraction, themeColors, metadataField) {
+function moveRowTop(dataRect: CountsMatrixValue, data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField: string) {
+	console.log('datarect', dataRect)
 	// Get current index
 	let currentIndex = data.rowNames.indexOf(dataRect.row);
 	
@@ -97,7 +98,7 @@ function moveRowTop(dataRect, data, dimensions, fraction, themeColors, metadataF
 }
 
 
-function moveRowBottom(dataRect, data, dimensions, fraction, themeColors, metadataField) {
+function moveRowBottom(dataRect: CountsMatrixValue, data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField: string) {
 	// Get current index
 	let currentIndex = data.rowNames.indexOf(dataRect.row);
 
@@ -113,7 +114,7 @@ function moveRowBottom(dataRect, data, dimensions, fraction, themeColors, metada
 }
 
 
-function removeRow(dataRect, data, dimensions, fraction, themeColors, metadataField) {
+function removeRow(dataRect: CountsMatrixValue, data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField: string) {
 	// Get current index
 	let currentIndex = data.rowNames.indexOf(dataRect.row);
 
@@ -129,7 +130,7 @@ function removeRow(dataRect, data, dimensions, fraction, themeColors, metadataFi
 }
 
 
-function moveColLeft(dataRect, data, dimensions, fraction, themeColors, metadataField) {
+function moveColLeft(dataRect: CountsMatrixValue, data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField: string) {
 	// Get current index
 	let currentIndex = data.colNames.indexOf(dataRect.col);
 	
@@ -145,7 +146,7 @@ function moveColLeft(dataRect, data, dimensions, fraction, themeColors, metadata
 }
 
 
-function moveColRight(dataRect, data, dimensions, fraction, themeColors, metadataField) {
+function moveColRight(dataRect: CountsMatrixValue, data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField: string) {
 	// Get current index
 	let currentIndex = data.colNames.indexOf(dataRect.col);
 
@@ -161,7 +162,7 @@ function moveColRight(dataRect, data, dimensions, fraction, themeColors, metadat
 }
 
 
-function removeCol(dataRect, data, dimensions, fraction, themeColors, metadataField) {
+function removeCol(dataRect: CountsMatrixValue, data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField: string) {
 	// Get current index
 	let currentIndex = data.colNames.indexOf(dataRect.col);
 

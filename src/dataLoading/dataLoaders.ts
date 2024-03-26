@@ -1,11 +1,13 @@
+// @ts-ignore
 import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
+import { MetaData, ObsSets } from "../cellpop-schema";
 
 export function loadData() {
     // create a wrapper for all data loaders?
 }
 
 
-export function loadDataWithVitessce(obsSetsList, rowNames, metadata={}) {
+export function loadDataWithVitessce(obsSetsList: ObsSets[], rowNames: string[], metadata?: MetaData) {
     // options: anndata/zarr, csv, json
 
     // const counts = getCountsFromObsSetsList(obsSetsList, rowNames);
@@ -16,8 +18,8 @@ export function loadDataWithVitessce(obsSetsList, rowNames, metadata={}) {
 }
 
 
-export function getCountsFromObsSetsList(obsSetsList, rowNames) {
-    const counts = new Object();
+export function getCountsFromObsSetsList(obsSetsList: ObsSets[], rowNames: string[]) {
+    const counts = new Object() as any;
 	for (let i = 0; i < rowNames.length; i++) {
 		counts[rowNames[i]] = getCountsPerType(obsSetsList[i].tree[0].children);
 	}
@@ -26,8 +28,8 @@ export function getCountsFromObsSetsList(obsSetsList, rowNames) {
 
 
 // get the counts per cell type
-function getCountsPerType(o) {
-	let dict = new Object();
+function getCountsPerType(o: any) {
+	let dict = new Object() as any;
 	for(const t of o) {
 		dict[t.name] = t.set.length;
 	}

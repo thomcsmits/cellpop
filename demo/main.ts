@@ -2,6 +2,7 @@ import * as d3 from "d3";
 import { getMainVis } from "../src/cellpop";
 import { showAnimation } from "../src/visualization/animation";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP"; 
+import { CellPopData } from "../src/cellpop-schema";
 
 // data
 var uuids = ['ad693f99fb9006e68a53e97598da1509',
@@ -38,7 +39,7 @@ var uuids = ['ad693f99fb9006e68a53e97598da1509',
 // Load data directly as demo
 loadHuBMAPData(uuids).then((data) => {
 	console.log('data', data);
-	getMainVis(data);
+	getMainVis(data!);
 }).catch(error => {
 	console.error(error);
 });

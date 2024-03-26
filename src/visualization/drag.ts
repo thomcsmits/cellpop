@@ -3,15 +3,16 @@ import * as d3 from "d3";
 import { reorderArray } from "./util";
 import { createBarChart } from "./barExtensions";
 import { wrapRowNames, wrapColNames } from "../dataLoading/dataWrangling";
+import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, RowNamesWrapped } from "../cellpop-schema";
 
 
 
 /** DRAG FUNCTION FOR ROWS */
 
 // Drag start function
-export function dragstartedRows(event, d) {
-    const rects = d3.selectAll(".heatmap-rects");
-    const rowsBehind = d3.selectAll(".heatmap-rows");
+export function dragstartedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue & {y?: number}) {
+    const rects = d3.selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects");
+    const rowsBehind = d3.selectAll<SVGRectElement, RowNamesWrapped>(".heatmap-rows");
 
     // Set dragged elements to active
     rowsBehind.filter(r => r.row === d.row).raise().classed("active", true);
@@ -21,9 +22,9 @@ export function dragstartedRows(event, d) {
 
 
 // Dragging function
-export function draggedRows(event, d, data, y, allowClick) {
-    const rects = d3.selectAll(".heatmap-rects");
-    const rowsBehind = d3.selectAll(".heatmap-rows");
+export function draggedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue & {y?: number}, data: CellPopData, y: d3.ScaleBand<string>, allowClick: boolean): [CellPopData, boolean] {
+    const rects = d3.selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects");
+    const rowsBehind = d3.selectAll<SVGRectElement, RowNamesWrapped>(".heatmap-rows");
 
     // Let the selected row and rects on that row and highlight move with the cursor
     rowsBehind.filter(r => r.row === d.row).attr("y", d.y = event.y);
@@ -54,7 +55,7 @@ export function draggedRows(event, d, data, y, allowClick) {
     let displacement = newIndex - currentIndex;
 
     // For each row, calculate the new y position
-    rowsBehind.each(function(rowName) {
+    rowsBehind.each(function(rowName: RowNamesWrapped) {
         let rowIndex = data.rowNames.indexOf(rowName.row);
         // Get the rows that are affected (between the currentIndex and newIndex)
         if (rowIndex !== currentIndex && rowIndex >= Math.min(currentIndex, newIndex) && rowIndex <= Math.max(currentIndex, newIndex)) {
@@ -78,9 +79,9 @@ export function draggedRows(event, d, data, y, allowClick) {
 
 
 // Drag end function
-export function dragendedRows(event, d, data, dimensions, themeColors, x, y, allowClick) {
-    const rects = d3.selectAll(".heatmap-rects");
-    const rowsBehind = d3.selectAll(".heatmap-rows");
+export function dragendedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue & {y?: number}, data: CellPopData, dimensions: CellPopDimensions, themeColors: CellPopThemeColors, x: d3.ScaleBand<string>, y: d3.ScaleBand<string>, allowClick: boolean) {
+    const rects = d3.selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects");
+    const rowsBehind = d3.selectAll<SVGRectElement, RowNamesWrapped>(".heatmap-rows");
 
     // Get the current index and set the y-coordinate of this row when drag ends
     let currentIndex = data.rowNames.indexOf(d.row);
@@ -103,9 +104,9 @@ export function dragendedRows(event, d, data, dimensions, themeColors, x, y, all
 /** DRAG FUNCTION FOR COLS */
 
 // Drag start function
-export function dragstartedCols(event, d) {
-    const rects = d3.selectAll(".heatmap-rects");
-    const colsBehind = d3.selectAll(".heatmap-cols");
+export function dragstartedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue & {x?: number}) {
+    const rects = d3.selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects");
+    const colsBehind = d3.selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols");
 
     // Set dragged elements to active
     colsBehind.filter(r => r.col === d.col).raise().classed("active", true);
@@ -115,9 +116,9 @@ export function dragstartedCols(event, d) {
 
 
 // Dragging function
-export function draggedCols(event, d, data, x, allowClick) {
-    const rects = d3.selectAll(".heatmap-rects");
-    const colsBehind = d3.selectAll(".heatmap-cols");
+export function draggedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue & {x?: number}, data: CellPopData, x: d3.ScaleBand<string>, allowClick: boolean): [CellPopData, boolean] {
+    const rects = d3.selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects");
+    const colsBehind = d3.selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols");
 
     // Let the selected col and rects on that col and highlight move with the cursor
     colsBehind.filter(r => r.col === d.col).attr("x", d.x = event.x);
@@ -172,9 +173,9 @@ export function draggedCols(event, d, data, x, allowClick) {
 
 
 // Drag end function
-export function dragendedCols(event, d, data, dimensions, themeColors, x, y, allowClick) {
-    const rects = d3.selectAll(".heatmap-rects");
-    const colsBehind = d3.selectAll(".heatmap-cols");
+export function dragendedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue & {x?: number}, data: CellPopData, dimensions: CellPopDimensions, themeColors: CellPopThemeColors, x: d3.ScaleBand<string>, y: d3.ScaleBand<string>, allowClick: boolean) {
+    const rects = d3.selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects");
+    const colsBehind = d3.selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols");
 
     // Get the current index and set the x-coordinate of this col when drag ends
     let currentIndex = data.colNames.indexOf(d.col);

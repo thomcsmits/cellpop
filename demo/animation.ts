@@ -35,7 +35,7 @@ var uuids = ['ad693f99fb9006e68a53e97598da1509',
 
 // Load data directly as demo
 loadHuBMAPData(uuids).then((data) => {
-	showAnimation(data);
+	showAnimation(data!);
 }).catch(error => {
 	console.error(error);
 });
