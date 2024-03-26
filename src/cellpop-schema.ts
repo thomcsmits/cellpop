@@ -134,3 +134,22 @@ export type CellPopKeys = {
 // metadataOptions: array
 // metadataField: string
 // boundsKeys: object 
+
+
+/** Animation */
+export type CountsMatrixValueAnimation = {
+    row: string,
+    col: string,
+    value: number,
+    start?: number,
+    end?: number
+}
+
+export type AnimationDimensions = {
+    width: number,
+    height: number,
+    marginLeft: number,
+    marginTop: number,
+    moveWidth: number,
+    moveTop: number
+}
