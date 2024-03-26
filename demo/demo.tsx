@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
 import { CellPop } from "../src/CellPopComponent";
+import { CellPopData, CellPopDimensions } from "../src/cellpop-schema";
 
 
 function Demo() {
 
-	const [data, setData] = useState();
+	const [data, setData] = useState<CellPopData>();
 
 	// data
 	var uuids = ['ad693f99fb9006e68a53e97598da1509',
@@ -41,7 +42,7 @@ function Demo() {
 	// useEffect to make sure the data only loads once
 	useEffect(() => {
 		loadHuBMAPData(uuids).then((data) => {
-			setData(data);
+			setData(data!);
 			console.log('data', data);
 			// getMainVis(data);
 			}).catch(error => {
@@ -76,11 +77,11 @@ function Demo() {
 		graph: {offsetWidth: widthLeft, offsetHeight: height, width: widthRight, height: heightTop, margin: {top: 0, right: 200, bottom: 0, left: 0}},
 		detailBar: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: height, margin: {top: 50, right: 200, bottom: 50, left: 0}},
 		textSize: {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
-	};
+	} as CellPopDimensions;
 
 	return (
 		<>
-			<CellPop data={data} theme={'light'} dimensions={dimensions}/>
+			{data ? <CellPop data={data} theme={'light'} dimensions={dimensions}/> : <div>Loading...</div>}
 		</>
 	)
 }
