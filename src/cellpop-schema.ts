@@ -38,8 +38,33 @@ export type CountsMatrixFractions = {
 }
 
 export type MetaData = {
-    rows: {row: string, metadata: any}[],
-    cols: {col: string, metadata: any}[]
+    rows?: {row: string, metadata: any}[],
+    cols?: {col: string, metadata: any}[]
+}
+
+export type dataOrdering = {
+    rowNamesOrder?: string[],
+    colNamesOrder?: string[]
+}
+
+export type ObsSets = {
+    version: string,
+    datatype: string,
+    tree: {
+        name: string,
+        children: {
+            name: string,
+            set: [any, any][]
+        }
+    }[]
+}
+
+export type HuBMAPMetaData = {
+    _id: string,
+    _index?: string,
+    _score?: number,
+    _type?: string,
+    _source: any
 }
 
 /** OPTIONS */
