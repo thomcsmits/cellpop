@@ -5,7 +5,7 @@
  * E.g. if the max value is 97, it returns 100. If the max value is 147, it returns 500.
  */
 export function getUpperBound(arr: number[]): number {
-	let maxValue = Math.max(...arr);
+	const maxValue = Math.max(...arr);
 	if (maxValue > 1) {
 		return getUpperBoundInner(maxValue);
 	} else {
@@ -44,7 +44,7 @@ function getUpperBoundInner(maxValue: number): number {
  * @returns copy of the array with new ordering
  */
 export function reorderArray(arr: string[], currentIndex: number, newIndex: number): string[] {
-	let selectedElement = arr[currentIndex];
+	const selectedElement = arr[currentIndex];
 	let arrCopy = [...arr.slice(0, currentIndex), ...arr.slice(currentIndex + 1)];
 	arrCopy = [...arrCopy.slice(0, newIndex), selectedElement, ...arrCopy.slice(newIndex)];
 	return arrCopy;

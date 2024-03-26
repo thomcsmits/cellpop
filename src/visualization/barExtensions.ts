@@ -6,8 +6,8 @@ import { CellPopData, CellPopDimensions, CellPopThemeColors } from "../cellpop-s
 // add bar chart
 export function createBarChart(dataFull: CellPopData, selectedRow: string, dimensions: CellPopDimensions, x: d3.ScaleBand<string>, themeColors: CellPopThemeColors) {
 
-    let width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
-	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
+    const width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
+	const height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
 
     let nBars = 0;
     let heightInd = height;
@@ -64,14 +64,14 @@ export function createBarChart(dataFull: CellPopData, selectedRow: string, dimen
 
         // make all existing ones smaller
         for (let i = 0; i < nBars-1; i++) {
-            let sample_i = d3.select(`.sample-${i+1}`);
+            const sample_i = d3.select(`.sample-${i+1}`);
             sample_i.attr("transform", "translate(" + (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left).toString() + "," + (i*heightInd).toString() + ")")
-            let sample_i_rects = sample_i.select(".rects");
+            const sample_i_rects = sample_i.select(".rects");
             sample_i_rects.attr("transform",
                 `scale(${1},${1 / nBars})`);
 
             // todo: figure out how to get new domain to draw new axis
-            let sample_i_y_axis = sample_i.select(".axisleft")
+            const sample_i_y_axis = sample_i.select(".axisleft")
             sample_i_y_axis.attr("transform",
                 `scale(${1},${1 / nBars})`);
         }
@@ -79,7 +79,7 @@ export function createBarChart(dataFull: CellPopData, selectedRow: string, dimen
     }
    
     // create new chart
-    let svgBarSample = svgBar.append("g")
+    const svgBarSample = svgBar.append("g")
         .attr("class", `bardetailsample sample-${nBars}`)
         .attr("transform", "translate(" + (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left).toString() + "," + (nBars-1*heightInd).toString() + ")")
 
@@ -98,7 +98,7 @@ export function createBarChart(dataFull: CellPopData, selectedRow: string, dimen
         
 
     // Add Y axis
-    let upperbound = getUpperBound(data.map(c => c.value));
+    const upperbound = getUpperBound(data.map(c => c.value));
 
     const y = d3.scaleLinear()
         .domain([0, upperbound])
@@ -124,7 +124,7 @@ export function createBarChart(dataFull: CellPopData, selectedRow: string, dimen
             .attr("fill", themeColors.heatmapMax);
 
     // Resize bars
-    let sample = d3.selectAll(`.sample-${nBars}`)
+    const sample = d3.selectAll(`.sample-${nBars}`)
     sample.select(".rects")
         .attr("transform",
             `scale(${1},${1 / nBars})`);

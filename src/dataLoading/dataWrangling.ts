@@ -12,7 +12,7 @@ import { CellPopData, CountsMatrixValue, MetaData, dataOrdering } from "../cellp
 
 export function loadDataWithCounts(counts: any, metadata?: MetaData, ordering?: dataOrdering) {
     const countsMatrix = getCountsMatrixFromCounts(counts);
-    let data = {countsMatrix: countsMatrix} as CellPopData;
+    const data = {countsMatrix: countsMatrix} as CellPopData;
     loadDataWrapper(data, ordering);
     data.metadata = metadata;
     return data;
@@ -20,7 +20,7 @@ export function loadDataWithCounts(counts: any, metadata?: MetaData, ordering?: 
 
 
 export function loadDataWithCountsMatrix(countsMatrix: CountsMatrixValue[], metadata?: MetaData, ordering?: dataOrdering) {
-    let data = {countsMatrix: countsMatrix} as CellPopData;
+    const data = {countsMatrix: countsMatrix} as CellPopData;
     loadDataWrapper(data, ordering);
     data.metadata = metadata;
     return data;

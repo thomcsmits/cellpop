@@ -16,17 +16,17 @@ export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions
     d3.select("g.violintop").remove();
 
 	// Create svg element
-	let svg = d3.select("g.main")
+	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
 				"translate(" + (dimensions.barTop.offsetWidth + dimensions.barTop.margin.left).toString() + "," + (dimensions.barTop.offsetHeight + dimensions.barTop.margin.top).toString() + ")")
 			.attr("class", "violintop")
 
 	// Get dimensions
-	let width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;
-	let height = dimensions.barTop.height - dimensions.barTop.margin.top - dimensions.barTop.margin.bottom;
+	const width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;
+	const height = dimensions.barTop.height - dimensions.barTop.margin.top - dimensions.barTop.margin.bottom;
 
-	let upperbound = getUpperBound(countsMatrix.map(r => r.value));
+	const upperbound = getUpperBound(countsMatrix.map(r => r.value));
 
     const x_changed = x.paddingInner(0.25)
 
@@ -62,7 +62,7 @@ export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions
         .style("font-size", dimensions.textSize.labelSmall)
         .style("fill", themeColors.text);
 
-    function kde(kernel, thds: number[]) {
+    function kde(kernel: any, thds: number[]) {
         return V => thds.map(t => [t, d3.mean(V, d => kernel(t - d))])
     }
 
@@ -76,7 +76,7 @@ export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions
 
     const violins = d3.rollup(countsMatrix, v => density(v.map(g => g.value)), d => d.col)
 
-    var allNum = [] as number[];
+    let allNum = [] as number[];
     [...violins.values()].forEach((d,i) => allNum = allNum.concat([...violins.values()][i].map(d => d[1])))
     const xNum  = d3.scaleLinear()
         .domain([-d3.max(allNum), d3.max(allNum)])

@@ -1,7 +1,7 @@
 import { CellPopTheme, CellPopThemeColors } from "../cellpop-schema";
 
 export function getTheme(theme: CellPopTheme) {
-    let themeColors = new Object() as CellPopThemeColors;
+    const themeColors = new Object() as CellPopThemeColors;
 
     if (theme === 'dark') {
         themeColors.background = 'black';

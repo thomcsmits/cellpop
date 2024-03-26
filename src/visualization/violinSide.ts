@@ -15,18 +15,18 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
     d3.select("g.violinleft").remove();
 
 	// Create svg element
-	let svg = d3.select("g.main")
+	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
 				"translate(" + (dimensions.barLeft.offsetWidth + dimensions.barLeft.margin.left).toString() + "," + (dimensions.barLeft.offsetHeight + dimensions.barLeft.margin.top).toString() + ")")
 			.attr("class", "violinleft")
 
 	// Get dimensions
-	let width = dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right;
-	let height = dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom;
+	const width = dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right;
+	const height = dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom;
 
 	// Determine upper bound
-    let upperbound = getUpperBound(countsMatrix.map(r => r.value));
+    const upperbound = getUpperBound(countsMatrix.map(r => r.value));
 
     const y_changed = y.paddingInner(0.25)
 
@@ -71,7 +71,7 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
 
     const violins = d3.rollup(countsMatrix, v => density(v.map(g => g.value)), d => d.row)
 
-    var allNum = [] as number[];
+    let allNum = [] as number[];
     [...violins.values()].forEach((d,i) => allNum = allNum.concat([...violins.values()][i].map(d => d[1])))
     const xNum  = d3.scaleLinear()
         .domain([-d3.max(allNum), d3.max(allNum)])

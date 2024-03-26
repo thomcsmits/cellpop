@@ -6,20 +6,20 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
 	d3.select("g.graph").remove();
 
 	// Create svg element
-	let svg = d3.select("g.main")
+	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
 				"translate(" + (dimensions.graph.offsetWidth + dimensions.graph.margin.left).toString() + "," + (dimensions.graph.offsetHeight + dimensions.graph.margin.top).toString() + ")")
 			.attr("class", "graph")
 
     // Get dimensions
-	let width = dimensions.graph.width - dimensions.graph.margin.left - dimensions.graph.margin.right;
-	let height = dimensions.graph.height - dimensions.graph.margin.top - dimensions.graph.margin.bottom;
+	const width = dimensions.graph.width - dimensions.graph.margin.left - dimensions.graph.margin.right;
+	const height = dimensions.graph.height - dimensions.graph.margin.top - dimensions.graph.margin.bottom;
 
     
     // Random data
     // Random data
-    let data = {
+    const data = {
         name: "cell", 
         children: [
             {

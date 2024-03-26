@@ -10,22 +10,22 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
     d3.select("g.violintop").remove();
 
 	// Create svg element
-	let svg = d3.select("g.main")
+	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
 				"translate(" + (dimensions.barTop.offsetWidth + dimensions.barTop.margin.left).toString() + "," + (dimensions.barTop.offsetHeight + dimensions.barTop.margin.top).toString() + ")")
 			.attr("class", "bartop")
 
 	// Get dimensions
-	let width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;
-	let height = dimensions.barTop.height - dimensions.barTop.margin.top - dimensions.barTop.margin.bottom;
+	const width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;
+	const height = dimensions.barTop.height - dimensions.barTop.margin.top - dimensions.barTop.margin.bottom;
 
 	const data = [] as CountsTotalColValue[];
 	for (const col of dataFull.colNames) {
 		data.push({col: col, countTotal: dataFull.countsMatrix.filter(r => r.col === col).map(r => r.value).reduce((a, b) => a + b, 0)})
 	}
 
-	let upperbound = getUpperBound(data.map(c => c.countTotal));
+	const upperbound = getUpperBound(data.map(c => c.countTotal));
 
 	// import x-axis
 	// const x = eval(axes.x);
@@ -57,7 +57,7 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
 		.style("fill", themeColors.text);
 
     // Bars
-    let bars = svg.selectAll()
+    const bars = svg.selectAll()
 		.data(data)
 		.join("rect")
 			.attr("x", d => x_changed(d.col))

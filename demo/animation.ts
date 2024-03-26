@@ -1,8 +1,7 @@
-import * as d3 from "d3";
 import { showAnimation } from "../src/visualization/animation";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP"; 
 // data
-var uuids = ['ad693f99fb9006e68a53e97598da1509',
+const uuids = ['ad693f99fb9006e68a53e97598da1509',
     '173de2e80adf6a73ac8cff5ccce20dfc',
 	'b95f34761c252ebbd1e482cd9afae73f',
 	'5a5ca03fa623602d9a859224aa40ace4',

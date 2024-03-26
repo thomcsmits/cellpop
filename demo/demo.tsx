@@ -9,7 +9,7 @@ function Demo() {
 	const [data, setData] = useState<CellPopData>();
 
 	// data
-	var uuids = ['ad693f99fb9006e68a53e97598da1509',
+	const uuids = ['ad693f99fb9006e68a53e97598da1509',
 	'173de2e80adf6a73ac8cff5ccce20dfc',
 	'b95f34761c252ebbd1e482cd9afae73f',
 	'5a5ca03fa623602d9a859224aa40ace4',
@@ -55,19 +55,19 @@ function Demo() {
 	// 	theme: 'light',
 	// }
 
-	let widthRatio = 0.8;
-	let heightRatio = 0.8; 
+	const widthRatio = 0.8;
+	const heightRatio = 0.8; 
 
-	let widthRight = 45 * 25;
-	let heightBottom =  20 * 40;
+	const widthRight = 45 * 25;
+	const heightBottom =  20 * 40;
 
-	let width = widthRight / widthRatio;
-	let height = heightBottom / heightRatio;
+	const width = widthRight / widthRatio;
+	const height = heightBottom / heightRatio;
 
-	let widthLeft = width - widthRight;
-	let heightTop = height - heightBottom;
+	const widthLeft = width - widthRight;
+	const heightTop = height - heightBottom;
 
-	let dimensions = {
+	const dimensions = {
 		global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
 		heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 400, bottom: 100, left: 0}},
 		barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},

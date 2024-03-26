@@ -4,13 +4,12 @@ import { renderTopViolin } from "./violinTop";
 import { renderLeftBar } from "./barSide";
 import { renderLeftViolin } from "./violinSide";
 import { renderGraph } from "./graph";
-import { getTheme } from "./theme";
 import { CellPopData, CellPopDimensions, CellPopThemeColors } from "../cellpop-schema";
 
 export function renderCellPopVisualization(data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField?: string, reset?: boolean) {
 
 	// create main heatmap
-	let [x, y, colorRange] = renderHeatmap(data, dimensions, fraction, themeColors, metadataField, reset);
+	const [x, y, colorRange] = renderHeatmap(data, dimensions, fraction, themeColors, metadataField, reset);
 
 	// create top/side charts
 	if (fraction) {
