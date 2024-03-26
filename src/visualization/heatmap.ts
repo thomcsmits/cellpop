@@ -131,7 +131,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			.attr("y", colorAxisSize - i * colorAxisSize / colorAxisSteps)
 			.attr("width", colorAxisWidth * 0.9)
 			.attr("height", colorAxisSize / colorAxisSteps)
-			.attr("fill", color)
+			.style("fill", color)
 	}
 
 	const colorAxisLabel = fraction ? 'Fraction' : 'Count'; 
@@ -202,8 +202,8 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.attr("y", 0)
 		.attr("width", width)
 		.attr("height", height)
-		.attr("stroke", themeColors.heatmapHighlight)
-		.attr("fill", "none")
+		.style("stroke", themeColors.heatmapHighlight)
+		.style("fill", "none")
 		.attr("pointer-events", "none")
 		.attr("visibility", "hidden")
 
@@ -214,8 +214,8 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.attr("y", 0)
 		.attr("width", width)
 		.attr("height", height)
-		.attr("stroke", themeColors.heatmapHighlight)
-		.attr("fill", "none")
+		.style("stroke", themeColors.heatmapHighlight)
+		.style("fill", "none")
 		.attr("pointer-events", "none")
 		.attr("visibility", "hidden")
 
@@ -282,7 +282,6 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		}
 	})
     .on("drag", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) {
-		console.log("event drag", event)
 		// Rows
 		if (event.sourceEvent.shiftKey) {
 			// Update data
@@ -329,7 +328,6 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		
 	})
     .on("end", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) { 
-		console.log("event end", event)
 		// todo: case when key is lifted before the click
 
 		if (event.sourceEvent.shiftKey) {

@@ -4,6 +4,7 @@ import { renderTopViolin } from "./violinTop";
 import { renderLeftBar } from "./barSide";
 import { renderLeftViolin } from "./violinSide";
 import { renderGraph } from "./graph";
+import { renderExtensionChart } from "./barExtensions";
 import { CellPopData, CellPopDimensions, CellPopThemeColors } from "../cellpop-schema";
 
 export function renderCellPopVisualization(data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField?: string, reset?: boolean) {
@@ -22,5 +23,9 @@ export function renderCellPopVisualization(data: CellPopData, dimensions: CellPo
 		renderTopBar(data, dimensions, x, themeColors);
 		// create left barchart
 		renderLeftBar(data, dimensions, y, themeColors);
+	}
+
+	if (data.extendedChart.rowNames.length > 0) {
+		renderExtensionChart(data, dimensions, themeColors, x);
 	}
 }

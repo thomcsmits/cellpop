@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 
 import { reorderArray } from "./util";
-import { createBarChart } from "./barExtensions";
+import { renderExtensionChart } from "./barExtensions";
 import { wrapRowNames, wrapColNames } from "../dataLoading/dataWrangling";
 import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, RowNamesWrapped } from "../cellpop-schema";
 
@@ -96,7 +96,8 @@ export function dragendedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrix
 
     // if the row hasn't moved, create extending bar chart
     if (allowClick){
-        createBarChart(data, d.row, dimensions, x, themeColors);
+        data.extendedChart.rowNames.push(d.row);
+        renderExtensionChart(data, dimensions, themeColors, x);
     }
 }
 
@@ -190,6 +191,7 @@ export function dragendedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrix
 
     // if the col hasn't moved, color the bar chart
     if (allowClick){
-        // createBarChart(data, d.col, dimensions, x, themeColors);
+        data.extendedChart.colNames.push(d.col);
+        renderExtensionChart(data, dimensions, themeColors, x);
     }
 }
