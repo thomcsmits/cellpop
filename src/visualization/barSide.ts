@@ -10,15 +10,15 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
     d3.select("g.violinleft").remove();
 	
 	// Create svg element
-	let svg = d3.select("g.main")
+	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
 				"translate(" + (dimensions.barLeft.offsetWidth + dimensions.barLeft.margin.left).toString() + "," + (dimensions.barLeft.offsetHeight + dimensions.barLeft.margin.top).toString() + ")")
 			.attr("class", "barleft")
 
 	// Get dimensions
-	let width = dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right;
-	let height = dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom;
+	const width = dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right;
+	const height = dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom;
 
 	// Get accumulated data
 	const data = [] as CountsTotalRowValue[];
@@ -27,7 +27,7 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
 	}
 
 	// Determine upper bound
-	let upperbound = getUpperBound(data.map(c => c.countTotal));
+	const upperbound = getUpperBound(data.map(c => c.countTotal));
 
 	// Add y-axis
 	const x = d3.scaleLinear()
@@ -57,7 +57,7 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
 		.style("fill", themeColors.text);
 
     // // Bars
-    let bars = svg.selectAll()
+    const bars = svg.selectAll()
 		.data(data)
 		.join("rect")
 			.attr("x", d => x(d.countTotal))

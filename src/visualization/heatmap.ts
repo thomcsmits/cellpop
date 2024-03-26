@@ -1,7 +1,5 @@
 import * as d3 from "d3";
 
-import { renderLeftBar } from "./barSide";
-import { renderLeftViolin } from "./violinSide";
 import { dragstartedRows, draggedRows, dragendedRows, dragstartedCols, draggedCols, dragendedCols } from "./drag";
 import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
 import { resetRowNames, resetColNames } from "../dataLoading/dataWrangling";
@@ -24,7 +22,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 	d3.select("g.heatmap").remove();
 
 	// Create svg element
-	let svg = d3.select("g.main")
+	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
 				"translate(" + (dimensions.heatmap.offsetWidth + dimensions.heatmap.margin.left).toString() + "," + (dimensions.heatmap.offsetHeight + dimensions.heatmap.margin.top).toString() + ")")
@@ -32,8 +30,8 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 
 
 	// Get dimensions
-	let width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
-	let height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
+	const width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
+	const height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
 
 	// Add x-axis
 	let x: d3.ScaleBand<string> = d3.scaleBand()
@@ -113,17 +111,17 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 
 
 	// Add color
-	let colorRange = d3.scaleLinear<string, number>()
+	const colorRange = d3.scaleLinear<string, number>()
 		.range([themeColors.heatmapZero, themeColors.heatmapMax])
 		.domain([0,getUpperBound(countsMatrix.map(r => r.value))])
 
-	let gradient = svg.append("g")
+	const gradient = svg.append("g")
 		.attr("class", "axiscolor")
 		.attr("transform", "translate(" + (width+150).toString() + ",10)")
 
-	let colorAxisSize = 100;
-	let colorAxisSteps = 100;
-	let colorAxisWidth = 100;
+	const colorAxisSize = 100;
+	const colorAxisSteps = 100;
+	const colorAxisWidth = 100;
 
 	for (let i = 0; i < colorAxisSteps; i++) {
 		const color = colorRange(i * getUpperBound(countsMatrix.map(r => r.value)) / colorAxisSteps);
@@ -160,7 +158,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 	// let rectGenerator = d3.
 
 	// Add rows and columns behind
-	let colsBehind = svg.selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols")
+	const colsBehind = svg.selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols")
 		.data(data.colNamesWrapped, function(d) {return d.col;})
 		.enter()
 		.append("rect")
@@ -172,7 +170,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			.style("fill", themeColors.heatmapGrid);
 
 
-	let rowsBehind = svg.selectAll<SVGRectElement, RowNamesWrapped>(".heatmap-rows")
+	const rowsBehind = svg.selectAll<SVGRectElement, RowNamesWrapped>(".heatmap-rows")
 		.data(data.rowNamesWrapped, function(d) {return d.row;})
 		.enter()
 		.append("rect")
@@ -185,7 +183,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 
 
 	// Read the data
-	let rects = svg.selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects")
+	const rects = svg.selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects")
 		.data(countsMatrix, function(d) {return d.row+":"+d.col;})
 		.enter()
 		.append("rect")
@@ -231,17 +229,19 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			return;
 		}
         if (event.ctrlKey) {
-			if (event.target?.classList[0].includes('heatmap-rects')) {}
+			if (event.target?.classList[0].includes('heatmap-rects')) {
+				// remove?
+			}
 			addTooltip(event, d);
         } 
 		if (event.shiftKey) {
-        	addHighlightRow(event.target.y.animVal.value, event.target.height.animVal.value);
+			addHighlightRow(event.target.y.animVal.value, event.target.height.animVal.value);
         }
 		if (event.altKey) {
 			addHighlightCol(event.target.x.animVal.value, event.target.width.animVal.value);
 		}
     }
-    const mouseleave = function(event: MouseEvent, d: CountsMatrixValue) {
+    const mouseleave = function(event: MouseEvent) {
 		removeTooltip();
         removeHighlightRow(event);
 		removeHighlightCol(event);
@@ -266,7 +266,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 	let allowClickCol: boolean;
 
 	// Define drag behavior
-	let drag = d3.drag<SVGRectElement, CountsMatrixValue>()
+	const drag = d3.drag<SVGRectElement, CountsMatrixValue>()
 	.on("start", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) { 
 		// if (!(event.target) ||  !(event.target instanceof SVGRectElement)) {
 		// 	return;
@@ -286,7 +286,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		// Rows
 		if (event.sourceEvent.shiftKey) {
 			// Update data
-			let dataAndClick = draggedRows(event, d, data, y, allowClickRow);
+			const dataAndClick = draggedRows(event, d, data, y, allowClickRow);
 			data = dataAndClick[0];
 			allowClickRow = dataAndClick[1];
 			// Update the y-domain
@@ -307,7 +307,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		// Cols
 		if (event.sourceEvent.altKey) {
 			// Update data
-			let dataAndClick = draggedCols(event, d, data, x, allowClickCol);
+			const dataAndClick = draggedCols(event, d, data, x, allowClickCol);
 			data = dataAndClick[0];
 			allowClickCol = dataAndClick[1];
 			// Update the y-domain

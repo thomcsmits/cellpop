@@ -32,10 +32,10 @@ export function draggedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrixVa
     d3.select(".highlight-rows").attr("y", event.y)
 
     // Calculate the current index of the dragged row
-    let currentIndex = data.rowNames.indexOf(d.row);
+    const currentIndex = data.rowNames.indexOf(d.row);
     
     // Calculate the new index based on the y-coordinate of the drag event
-    let rowSize = y(data.rowNames[0]) - y(data.rowNames[1]);
+    const rowSize = y(data.rowNames[0]) - y(data.rowNames[1]);
     let newIndex = data.rowNames.length - Math.ceil((event.y - y.paddingOuter()*y.bandwidth()) / rowSize);
     
     // If row goes beyond boundaries, set it to the first/last item
@@ -52,11 +52,11 @@ export function draggedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrixVa
     }
 
     // Calculate the displacement of the dragged row
-    let displacement = newIndex - currentIndex;
+    const displacement = newIndex - currentIndex;
 
     // For each row, calculate the new y position
     rowsBehind.each(function(rowName: RowNamesWrapped) {
-        let rowIndex = data.rowNames.indexOf(rowName.row);
+        const rowIndex = data.rowNames.indexOf(rowName.row);
         // Get the rows that are affected (between the currentIndex and newIndex)
         if (rowIndex !== currentIndex && rowIndex >= Math.min(currentIndex, newIndex) && rowIndex <= Math.max(currentIndex, newIndex)) {
             // Shift the row up or down depending on the direction of the moved row
@@ -126,10 +126,10 @@ export function draggedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrixVa
     d3.select(".highlight-cols").attr("x", event.x)
 
     // Calculate the current index of the dragged col
-    let currentIndex = data.colNames.indexOf(d.col);
+    const currentIndex = data.colNames.indexOf(d.col);
     
     // Calculate the new index based on the x-coordinate of the drag event
-    let colSize = x(data.colNames[1]) - x(data.colNames[0]);
+    const colSize = x(data.colNames[1]) - x(data.colNames[0]);
     let newIndex = Math.ceil((event.x - x.paddingOuter()*x.bandwidth()) / colSize);
 
     // If col goes beyond boundaries, set it to the first/last item
@@ -146,11 +146,11 @@ export function draggedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrixVa
     }
 
     // Calculate the displacement of the dragged col
-    let displacement = newIndex - currentIndex;
+    const displacement = newIndex - currentIndex;
 
     // For each col, calculate the new y position
     colsBehind.each(function(colName) {
-        let colIndex = data.colNames.indexOf(colName.col);
+        const colIndex = data.colNames.indexOf(colName.col);
         // Get the cols that are affected (between the currentIndex and newIndex)
         if (colIndex !== currentIndex && colIndex >= Math.min(currentIndex, newIndex) && colIndex <= Math.max(currentIndex, newIndex)) {
             // Shift the col up or down depending on the direction of the moved col
@@ -178,7 +178,7 @@ export function dragendedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrix
     const colsBehind = d3.selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols");
 
     // Get the current index and set the x-coordinate of this col when drag ends
-    let currentIndex = data.colNames.indexOf(d.col);
+    const currentIndex = data.colNames.indexOf(d.col);
     colsBehind.filter(r => r.col === d.col).attr("x", x(data.colNames[currentIndex]));
     rects.filter(r => r.col === d.col).attr("x", x(data.colNames[currentIndex]));
     d3.select(".highlight-cols").attr("x", x(data.colNames[currentIndex]));

@@ -9,17 +9,17 @@ import { CellPopData, CellPopDimensions, CellPopTheme } from "./cellpop-schema";
 export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, theme?: CellPopTheme, fraction?: false) {
 	if (!dimensions) {
 		// set the dimensions of the graph
-		let widthRatio = 0.9;
-		let heightRatio = 0.8; 
+		const widthRatio = 0.9;
+		const heightRatio = 0.8; 
 
-		let widthRight = data.colNames.length * 25;
-		let heightBottom =  data.rowNames.length * 40;
+		const widthRight = data.colNames.length * 25;
+		const heightBottom =  data.rowNames.length * 40;
 
-		let width = widthRight / widthRatio;
-		let height = heightBottom / heightRatio;
+		const width = widthRight / widthRatio;
+		const height = heightBottom / heightRatio;
 
-		let widthLeft = width - widthRight;
-		let heightTop = height - heightBottom;
+		const widthLeft = width - widthRight;
+		const heightTop = height - heightBottom;
 
 		// height = height + 400;
 
@@ -64,18 +64,18 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 
 	
 	// add a (temporary) button for switch between % and n
-	let buttonFractionOn = document.createElement('button');
+	const buttonFractionOn = document.createElement('button');
 	buttonFractionOn.textContent = 'Change to fraction';
 	app.appendChild(buttonFractionOn);
 	buttonFractionOn.addEventListener('click', () => renderCellPopVisualization(data, dimensions, true, themeColors));
 
-	let buttonFractionOff = document.createElement('button');
+	const buttonFractionOff = document.createElement('button');
 	buttonFractionOff.textContent = 'Change to absolute';
 	app.appendChild(buttonFractionOff);
 	buttonFractionOff.addEventListener('click', () => renderCellPopVisualization(data, dimensions, false, themeColors));
 
 	// add a button for resetting the bottom thing
-	let buttonReset = document.createElement('button');
+	const buttonReset = document.createElement('button');
 	buttonReset.textContent = 'Reset stacked bar charts';
 	app.appendChild(buttonReset);
 	buttonReset.addEventListener('click', () => d3.selectAll('.bardetail').remove())
@@ -83,14 +83,14 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 	// add a (temporary) button for metadata
 	const rowsMetaOptionsShown = getPossibleMetadataSelections(data);
 
-	let buttonMetadata = document.createElement('div');
-	let buttonMetadataText = document.createElement('p');
+	const buttonMetadata = document.createElement('div');
+	const buttonMetadataText = document.createElement('p');
 	buttonMetadataText.innerText = "Group by metadata";
 	buttonMetadata.appendChild(buttonMetadataText);
 	for (const op of [['None', 0], ...rowsMetaOptionsShown]) {
-		let label = document.createElement("label");
+		const label = document.createElement("label");
 		label.innerText = op[0] as string;
-		let input = document.createElement("input");
+		const input = document.createElement("input");
 		input.type = "radio";
 		input.name = "meta";
 		input.checked = false;
@@ -105,15 +105,15 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 	app.appendChild(buttonMetadata);
 
 	// sortByMetadata(data, ['sex', ['Female', 'Male']])
-	let themeColors = getTheme(theme);
+	const themeColors = getTheme(theme);
 
 	// add div for visualization
-	let mainVis = document.createElement('div');
+	const mainVis = document.createElement('div');
 	mainVis.id = 'cellpopvis';
 	app.appendChild(mainVis);
 
 	// append the svg object to the body of the page
-	let svg = d3.select("#cellpopvis")
+	const svg = d3.select("#cellpopvis")
 	.append("svg")
 		.attr("width", dimensions.global.width)
 		.attr("height", dimensions.global.height)

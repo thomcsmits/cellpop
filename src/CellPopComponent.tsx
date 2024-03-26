@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, ChangeEvent } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import InputLabel from '@mui/material/InputLabel';
@@ -6,7 +6,6 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import { Unstable_Popup as Popup } from '@mui/base/Unstable_Popup';
 // import { ClickAwayListener } from '@mui/base/ClickAwayListener';
@@ -45,7 +44,7 @@ export const CellPop = (props: CellPopProps) => {
 		const app = d3.select(cellPopRef.current);
 
 		// add svg element
-		let svg = app
+		const svg = app
 		.append("svg")
 			.attr("width", props.dimensions.global.width)
 			.attr("height", props.dimensions.global.height)
@@ -62,7 +61,7 @@ export const CellPop = (props: CellPopProps) => {
 	// call renderCellPopVisualization on updates
 	useEffect(() => {
 		// get theme colors
-		let themeColors = getTheme(theme);
+		const themeColors = getTheme(theme);
 
 		// change background theme
 		d3.selectAll(".background").attr("fill", themeColors.background);
@@ -103,7 +102,7 @@ export const CellPop = (props: CellPopProps) => {
 
 	function resetData() {
 		// get theme colors
-		let themeColors = getTheme(theme);
+		const themeColors = getTheme(theme);
 
 		// // change background theme
 		// d3.selectAll(".background").attr("fill", themeColors.background);

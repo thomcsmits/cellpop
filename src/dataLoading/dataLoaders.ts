@@ -29,7 +29,7 @@ export function getCountsFromObsSetsList(obsSetsList: ObsSets[], rowNames: strin
 
 // get the counts per cell type
 function getCountsPerType(o: any) {
-	let dict = new Object() as any;
+	const dict = new Object() as any;
 	for(const t of o) {
 		dict[t.name] = t.set.length;
 	}
