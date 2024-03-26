@@ -1,5 +1,12 @@
-/** DATA */
+/** COMPONENT */
+export type CellPopProps = {
+    data: CellPopData,
+    theme: CellPopTheme,
+    dimensions: CellPopDimensions
+}
 
+
+/** DATA */
 export type CellPopData = {
     rowNames: string[],
     rowNamesRaw: string[],
