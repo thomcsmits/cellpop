@@ -57,7 +57,7 @@ export function defineTooltipBarSide() {
 
 export function addTooltipBarSide(event: MouseEvent, d: CountsTotalRowValue, metadata: any) {
 	const metadataTextArray = Object.keys(metadata).map(k => `${k}: ${metadata[k]}`)
-	const metadataText = metadataTextArray.join('<br>')
+	const metadataText = metadataTextArray.join("<br>")
 	
 	d3.select(".tooltip-axis-y")
 		.html(`Row: ${d.row}<br>Total count: ${d.countTotal}<br>Metadata:<br>${metadataText}`)

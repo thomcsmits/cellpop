@@ -86,7 +86,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 
 	// add metadata scale
 	// let y_meta = d3.scaleOrdinal()
-	// 	.domain(['right', 'left'])
+	// 	.domain(["right", "left"])
 	// 	.range([0, 300, height])
 
 	// svg.append("g")
@@ -134,7 +134,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			.style("fill", color)
 	}
 
-	const colorAxisLabel = fraction ? 'Fraction' : 'Count'; 
+	const colorAxisLabel = fraction ? "Fraction" : "Count"; 
 	gradient.append("text")
 		.attr("y", -10)
 		.text(colorAxisLabel)
@@ -229,7 +229,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			return;
 		}
         if (event.ctrlKey) {
-			if (event.target?.classList[0].includes('heatmap-rects')) {
+			if (event.target?.classList[0].includes("heatmap-rects")) {
 				// remove?
 			}
 			addTooltip(event, d);

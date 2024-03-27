@@ -89,15 +89,15 @@ export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions
         .y(d => y(d[0]))
         .curve(d3.curveBumpY)
 
-    svg.append('g')
-        .selectAll('g')
+    svg.append("g")
+        .selectAll("g")
         .data([...violins])
-        .join('g')
-          .attr('transform', d => `translate(${x_changed(d[0])}, 0)`)
-        .append('path')
+        .join("g")
+          .attr("transform", d => `translate(${x_changed(d[0])}, 0)`)
+        .append("path")
           .datum(d => d[1])
-          .style('stroke', 'none')
-          .style('fill', themeColors.sideCharts)
-          .attr('d', area)
+          .style("stroke", "none")
+          .style("fill", themeColors.sideCharts)
+          .attr("d", area);
     
 }

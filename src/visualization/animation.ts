@@ -48,20 +48,20 @@ export function showAnimationBox(data: CellPopData, width: number, height: numbe
 
 // test data
 // let data2 = {
-    //     countsMatrix: [{row: 'sampleA', col: 'cellZ', value: 10},
-    //              {row: 'sampleB', col: 'cellZ', value: 5},
-    //             //  {row: 'sampleC', col: 'cellZ', value: 10},
-    //              {row: 'sampleA', col: 'cellY', value: 20},
-    //              {row: 'sampleB', col: 'cellY', value: 3},
-    //              {row: 'sampleC', col: 'cellY', value: 15},
-    //              {row: 'sampleA', col: 'cellX', value: 10},
-    //              {row: 'sampleB', col: 'cellX', value: 5},
-    //              {row: 'sampleC', col: 'cellX', value: 10},
-    //              {row: 'sampleA', col: 'cellW', value: 20},
-    //              {row: 'sampleB', col: 'cellW', value: 3},
-    //              {row: 'sampleC', col: 'cellW', value: 15},],
-    //     rowNames: ['sampleA', 'sampleB', 'sampleC'],
-    //     colNames: ['cellZ', 'cellY', 'cellX', 'cellW']
+    //     countsMatrix: [{row: "sampleA", col: "cellZ", value: 10},
+    //              {row: "sampleB", col: "cellZ", value: 5},
+    //             //  {row: "sampleC", col: "cellZ", value: 10},
+    //              {row: "sampleA", col: "cellY", value: 20},
+    //              {row: "sampleB", col: "cellY", value: 3},
+    //              {row: "sampleC", col: "cellY", value: 15},
+    //              {row: "sampleA", col: "cellX", value: 10},
+    //              {row: "sampleB", col: "cellX", value: 5},
+    //              {row: "sampleC", col: "cellX", value: 10},
+    //              {row: "sampleA", col: "cellW", value: 20},
+    //              {row: "sampleB", col: "cellW", value: 3},
+    //              {row: "sampleC", col: "cellW", value: 15},],
+    //     rowNames: ["sampleA", "sampleB", "sampleC"],
+    //     colNames: ["cellZ", "cellY", "cellX", "cellW"]
     // }
 
 function createStackedBar(svgBase: d3.Selection<d3.BaseType, unknown, HTMLElement, any>, data: CellPopData, dimensionsAnimation: AnimationDimensions) {

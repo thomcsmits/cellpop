@@ -120,9 +120,9 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
 
 //     let nBars = 0;
 //     let heightInd = height;
-//     let svgBar = d3.selectAll('.bardetail');
+//     let svgBar = d3.selectAll(".bardetail");
 //     if (svgBar.size() === 0) {
-//         svgBar = d3.select('#app')
+//         svgBar = d3.select("#app")
 //         .append("svg")
 //             .attr("width", dimensions.global.width)
 //             .attr("height", dimensions.detailBar.height + dimensions.detailBar.margin.top + dimensions.detailBar.margin.bottom)

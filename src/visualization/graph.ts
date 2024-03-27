@@ -49,7 +49,7 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
         ]
     }
 
-    let colNames = ['C1', 'C2', 'C5']
+    let colNames = ["C1", "C2", "C5"]
     let colNamesShown = colNames;
 
     // Create a layer for the links and a layer for the nodes.
@@ -107,8 +107,8 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
 
     function update() {
         // remove all current elements
-        d3.selectAll('circle').remove()
-        d3.selectAll('path').remove()
+        d3.selectAll("circle").remove()
+        d3.selectAll("path").remove()
 
         // create nodes
         const node = gNode.selectAll()
@@ -135,7 +135,7 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
             .attr("stroke-width", 2);
         
         // add interaction
-        node.on('click', change);
+        node.on("click", change);
     }
     update();
 }
@@ -153,7 +153,7 @@ function change(event,d) {
 function hideNode(event,d) {
     d.collapsed = true;
     setVisibilityChildren(d, true);
-    d3.select(event.target).attr('fill', 'red');
+    d3.select(event.target).attr("fill", "red");
     update();
 }
 
@@ -161,7 +161,7 @@ function hideNode(event,d) {
 function showNode(event,d) {
     d.collapsed = false;
     setVisibilityChildren(d, false);
-    d3.select(event.target).attr('fill', 'black');
+    d3.select(event.target).attr("fill", "black");
     update();
 }
 

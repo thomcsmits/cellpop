@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import { Unstable_Popup as Popup } from '@mui/base/Unstable_Popup';
-// import { ClickAwayListener } from '@mui/base/ClickAwayListener';
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import { Unstable_Popup as Popup } from "@mui/base/Unstable_Popup";
+// import { ClickAwayListener } from "@mui/base/ClickAwayListener";
 
 import * as d3 from "d3";
 import { renderCellPopVisualization } from "./visualization";
@@ -182,7 +182,7 @@ export const CellPop = (props: CellPopProps) => {
 			</Stack>
 
 			<Popup open={animationAnchor ? true : false} anchor={animationAnchor} placement="bottom-end">
-				<div aria-label="Pop up animation" style={{border: 'solid black 2px', backgroundColor: "white"}}>
+				<div aria-label="Pop up animation" style={{border: "solid black 2px", backgroundColor: "white"}}>
 					<Button variant="outlined" onClick={() => showAnimationBox(props.data, props.dimensions.global.width / 2, props.dimensions.global.height / 2)}>Play animation</Button>
 					<div>
 						<svg className="animate-svg" width={props.dimensions.global.width / 2} height={props.dimensions.global.height / 2}></svg>
@@ -192,11 +192,11 @@ export const CellPop = (props: CellPopProps) => {
 			</Popup>
 				
 
-			{/* <Box sx={{position: 'relative'}}>
+			{/* <Box sx={{position: "relative"}}>
 				{animationAnchor ? <svg className="animate-svg" width={props.dimensions.global.width / 2} height={props.dimensions.global.height / 2}></svg> : null}
 			</Box> */}
 
-			<div id='cellpopvis' ref={cellPopRef}></div>
+			<div id="cellpopvis" ref={cellPopRef}></div>
 
 		</div>
 	)
