@@ -17,6 +17,7 @@ import { getPossibleMetadataSelections } from "./visualization/metadata";
 import { getTheme } from "./visualization/theme";
 import { resetRowNames } from "./dataLoading/dataWrangling";
 import { resetExtensionChart } from "./visualization/barExtensions";
+import { drawSizeBoundaries, removeSizeBoundaries } from "./visualization/size";
 import { CellPopProps, CellPopDimensions, CellPopTheme, CellPopData } from "./cellpop-schema";
 
 
@@ -35,6 +36,7 @@ export const CellPop = (props: CellPopProps) => {
 	const [metadataField, setMetadataField] = useState<string>("None");
 
 	const [animationAnchor, setAnimationAnchor] = useState<HTMLElement>(null);
+	const [boundary, setBoundary] = useState<boolean>(false);
 
 	// get metadata options
 	const metadataFields = getPossibleMetadataSelections(props.data);
@@ -129,6 +131,17 @@ export const CellPop = (props: CellPopProps) => {
 		console.log(event.currentTarget)
 	};
 
+	function showBoundary() {
+		const themeColors = getTheme(theme);
+		drawSizeBoundaries(props.data, props.dimensions, fraction, themeColors, metadataField);
+		setBoundary(true);
+	}
+
+	function removeBoundary() {
+		removeSizeBoundaries()
+		setBoundary(false);
+	}
+
 	return (
 		<div>
 			<Stack spacing={6} direction="row">
@@ -174,6 +187,11 @@ export const CellPop = (props: CellPopProps) => {
 					<ToggleButton value="light">Light</ToggleButton>
 					<ToggleButton value="dark">Dark</ToggleButton>
 				</ToggleButtonGroup>
+
+				{boundary ? 
+					<Button variant="outlined" onClick={removeBoundary}>Remove boundary boxes</Button>
+					: <Button variant="outlined" onClick={showBoundary}>Show boundary boxes</Button> 
+				}
 
 				<Button variant="outlined" onClick={handleAnimantionPopup}>
 					Show animation
