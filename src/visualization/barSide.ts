@@ -8,13 +8,13 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
 	// Remove any prior barcharts and violin plots
 	d3.select("g.barleft").remove();
     d3.select("g.violinleft").remove();
-	
+
 	// Create svg element
 	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
 				"translate(" + (dimensions.barLeft.offsetWidth + dimensions.barLeft.margin.left).toString() + "," + (dimensions.barLeft.offsetHeight + dimensions.barLeft.margin.top).toString() + ")")
-			.attr("class", "barleft")
+			.attr("class", "barleft");
 
 	// Get dimensions
 	const width = dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right;
@@ -23,7 +23,7 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
 	// Get accumulated data
 	const data = [] as CountsTotalRowValue[];
 	for (const row of dataFull.rowNames) {
-		data.push({row: row, countTotal: dataFull.countsMatrix.filter(r => r.row === row).map(r => r.value).reduce((a, b) => a + b, 0)})
+		data.push({row: row, countTotal: dataFull.countsMatrix.filter(r => r.row === row).map(r => r.value).reduce((a, b) => a + b, 0)});
 	}
 
 	// Determine upper bound
@@ -32,10 +32,10 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
 	// Add y-axis
 	const x = d3.scaleLinear()
 		.range([ width, 0 ])
-		.domain([ 0, upperbound])
+		.domain([ 0, upperbound]);
 
-	const y_changed = y.paddingInner(0.25)
-	
+	const y_changed = y.paddingInner(0.25);
+
 	svg.append("g")
 		.call(d3.axisBottom(x))
 		.attr("transform", "translate(0," + height + ")")
@@ -74,12 +74,11 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
         if (event.ctrlKey) {
 			addTooltipBarSide(event, d, metadataRow);
         }
-    }
+    };
     const mouseleave = function() {
 		removeTooltipBarSide();
-    }
+    };
 
 	bars.on("mouseover", mouseover);
 	bars.on("mouseleave", mouseleave);
-		
 }

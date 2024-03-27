@@ -11,7 +11,6 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering, metadat
 
 	const obsSetsListPromises = getPromiseData(urls);
 	const promiseData = Promise.all(obsSetsListPromises).then(obsSetsListWrapped => {
-		console.log('obsSetsListWrapped', obsSetsListWrapped)
 		// wrangle data
 		const obsSetsList = obsSetsListWrapped.map((o) => o.data.obsSets);
 		return obsSetsList as ObsSets[];
@@ -32,7 +31,7 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering, metadat
     }).catch(error => {
         console.error(error);
     });
-    
+
     return hubmapData;
 }
 
@@ -45,16 +44,16 @@ function getHuBMAPURL(uuid: string) {
 // Get one Promise with all ObsSets
 function getPromiseData(urls: string[]) {
 	const obsSetsListPromises = [];
-	for (let i = 0; i < urls.length; i++) { 
-		const url = urls[i]
+	for (let i = 0; i < urls.length; i++) {
+		const url = urls[i];
 		const source = new AnnDataSource({ url });
 		const config = {
 			url,
-			fileType: 'obsSets.anndata.zarr',
+			fileType: "obsSets.anndata.zarr",
 			options: [
 				{
-					name: 'Cell Ontology Annotation',
-					path: 'obs/predicted_CLID' //'obs/predicted_label'
+					name: "Cell Ontology Annotation",
+					path: "obs/predicted_CLID" //"obs/predicted_label"
 				}
 			],
 		};
@@ -67,16 +66,16 @@ function getPromiseData(urls: string[]) {
 
 // get metadata
 function getPromiseMetadata(uuids: string[]): Promise<void | [string[], [string, any]]> {
-	const searchApi = 'https://search.api.hubmapconsortium.org/v3/portal/search';
+	const searchApi = "https://search.api.hubmapconsortium.org/v3/portal/search";
 	const queryBody = {
 		"size": 10000,
 		"query": {"ids": {"values": uuids}},
-	}
+	};
 
 	const requestOptions = {
-		method: 'POST',
+		method: "POST",
 		headers: {
-			'Content-Type': 'application/json',
+			"Content-Type": "application/json",
 		},
 		body: JSON.stringify(queryBody),
 	};
@@ -84,14 +83,13 @@ function getPromiseMetadata(uuids: string[]): Promise<void | [string[], [string,
 	const promiseMetadata = fetch(searchApi, requestOptions)
 		.then(response => {
 			if (!response.ok) {
-				throw new Error('Network response was not ok');
+				throw new Error("Network response was not ok");
 			}
 			return response.json();
 		})
 		.then(queryBody => {
 			const listAll = queryBody.hits.hits;
 			const metadata = listAll.map((l: HuBMAPMetaData) => {
-				console.log(l)
 				const ls = l._source;
 				const dmm = l._source.donor.mapped_metadata;
 				return {row: ls.hubmap_id, metadata: {title: ls.title, dataset_type: ls.dataset_type, anatomy_2: ls.anatomy_2[0], sex: dmm.sex[0], age: dmm.age_value[0]}};
@@ -100,7 +98,7 @@ function getPromiseMetadata(uuids: string[]): Promise<void | [string[], [string,
 			return [hubmapIDs, metadata] as [string[], [string, any]];
 		})
 		.catch(error => {
-			console.error('Error:', error);
+			console.error("Error:", error);
 		});
 	return promiseMetadata;
-} 
+}
