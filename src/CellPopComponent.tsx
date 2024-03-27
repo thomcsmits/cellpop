@@ -76,21 +76,10 @@ export const CellPop = (props: CellPopProps) => {
 		d3.selectAll(".background").style("fill", themeColors.background);
 
 		// create main visualization
-		renderCellPopVisualization(props.data, props.dimensions, fraction, themeColors, metadataField);
+		renderCellPopVisualization(props.data, dimensions, fraction, themeColors, metadataField);
 		
 	}, [theme, fraction, metadataField])
 
-	// temp: remove layered bar when theme change
-	useEffect(() => {
-		resetLayeredBar();
-	}, [theme])
-
-	// resizing hooks
-
-
-	// call function that wraps the renderXXX
-		// getMainVis(props.data);
-	
 
 	// create MUI buttons with callback functions to e.g. change theme
 	function changeTheme(event: React.MouseEvent<HTMLInputElement, MouseEvent>, newTheme: CellPopTheme | null) {
@@ -118,7 +107,7 @@ export const CellPop = (props: CellPopProps) => {
 
 		resetLayeredBar();
 
-		renderCellPopVisualization(props.data, props.dimensions, fraction, themeColors, metadataField, true);
+		renderCellPopVisualization(props.data, dimensions, fraction, themeColors, metadataField, true);
 	}
 
 	function resetLayeredBar() {
@@ -133,7 +122,8 @@ export const CellPop = (props: CellPopProps) => {
 
 	function showBoundary() {
 		const themeColors = getTheme(theme);
-		drawSizeBoundaries(props.data, props.dimensions, fraction, themeColors, metadataField);
+		const smth = drawSizeBoundaries(props.data, dimensions, fraction, themeColors, metadataField);
+		console.log('smth', smth)
 		setBoundary(true);
 	}
 
@@ -201,9 +191,9 @@ export const CellPop = (props: CellPopProps) => {
 
 			<Popup open={animationAnchor ? true : false} anchor={animationAnchor} placement="bottom-end">
 				<div aria-label="Pop up animation" style={{border: 'solid black 2px', backgroundColor: "white"}}>
-					<Button variant="outlined" onClick={() => showAnimationBox(props.data, props.dimensions.global.width / 2, props.dimensions.global.height / 2)}>Play animation</Button>
+					<Button variant="outlined" onClick={() => showAnimationBox(props.data, dimensions.global.width / 2, dimensions.global.height / 2)}>Play animation</Button>
 					<div>
-						<svg className="animate-svg" width={props.dimensions.global.width / 2} height={props.dimensions.global.height / 2}></svg>
+						<svg className="animate-svg" width={dimensions.global.width / 2} height={dimensions.global.height / 2}></svg>
 					</div>
 
 				</div>
@@ -211,7 +201,7 @@ export const CellPop = (props: CellPopProps) => {
 				
 
 			{/* <Box sx={{position: 'relative'}}>
-				{animationAnchor ? <svg className="animate-svg" width={props.dimensions.global.width / 2} height={props.dimensions.global.height / 2}></svg> : null}
+				{animationAnchor ? <svg className="animate-svg" width={dimensions.global.width / 2} height={dimensions.global.height / 2}></svg> : null}
 			</Box> */}
 
 			<div id='cellpopvis' ref={cellPopRef}></div>
