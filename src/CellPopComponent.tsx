@@ -27,7 +27,7 @@ export const CellPop = (props: CellPopProps) => {
 	}
 
 	const cellPopRef = useRef<HTMLDivElement>(null);
-	
+
 	// const [data, setData] = useState(props.data);
 	const [theme, setTheme] = useState<CellPopTheme>(props.theme);
 	const [dimensions, setDimensions] = useState<CellPopDimensions>(props.dimensions);
@@ -52,18 +52,18 @@ export const CellPop = (props: CellPopProps) => {
 			.attr("width", props.dimensions.global.width)
 			.attr("height", props.dimensions.global.height)
 		.append("g")
-			.attr("class", "main")
+			.attr("class", "main");
 
 		// add background
 		svg.append("rect")
 			.attr("class", "background")
 			.attr("width", props.dimensions.global.width)
-			.attr("height", props.dimensions.global.height)
+			.attr("height", props.dimensions.global.height);
 
 		// add svg element for extension
 		const svgExtension = app.append("svg")
-			.attr("class", "extension")
-	}, [])
+			.attr("class", "extension");
+	}, []);
 
 	// call renderCellPopVisualization on updates
 	useEffect(() => {
@@ -75,20 +75,20 @@ export const CellPop = (props: CellPopProps) => {
 
 		// create main visualization
 		renderCellPopVisualization(props.data, props.dimensions, fraction, themeColors, metadataField);
-		
-	}, [theme, fraction, metadataField])
+
+	}, [theme, fraction, metadataField]);
 
 	// temp: remove layered bar when theme change
 	useEffect(() => {
 		resetLayeredBar();
-	}, [theme])
+	}, [theme]);
 
 	// resizing hooks
 
 
 	// call function that wraps the renderXXX
-		// getMainVis(props.data);
-	
+	// getMainVis(props.data);
+
 
 	// create MUI buttons with callback functions to e.g. change theme
 	function changeTheme(event: React.MouseEvent<HTMLInputElement, MouseEvent>, newTheme: CellPopTheme | null) {
@@ -122,11 +122,11 @@ export const CellPop = (props: CellPopProps) => {
 	function resetLayeredBar() {
 		resetExtensionChart(props.data);
 	}
-	
+
 	// animation pop-up
 	const handleAnimantionPopup = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		setAnimationAnchor(animationAnchor ? null : event.currentTarget);
-		console.log(event.currentTarget)
+		console.log(event.currentTarget);
 	};
 
 	return (
@@ -136,7 +136,7 @@ export const CellPop = (props: CellPopProps) => {
 				<Button variant="outlined" onClick={resetData}>Reset data</Button>
 
 				<Button variant="outlined" onClick={resetLayeredBar}>Reset layered bar chart</Button>
-			
+
 				<ToggleButtonGroup
 					color="primary"
 					value={fraction}
@@ -159,7 +159,7 @@ export const CellPop = (props: CellPopProps) => {
 					>
 						<MenuItem value="None" key="None">None</MenuItem>
 						{metadataFields.map(d => {
-							return <MenuItem value={d[0]} key={d[0]}>{d[0]}</MenuItem>
+							return <MenuItem value={d[0]} key={d[0]}>{d[0]}</MenuItem>;
 						})}
 					</Select>
 				</FormControl>
@@ -190,7 +190,7 @@ export const CellPop = (props: CellPopProps) => {
 
 				</div>
 			</Popup>
-				
+
 
 			{/* <Box sx={{position: "relative"}}>
 				{animationAnchor ? <svg className="animate-svg" width={props.dimensions.global.width / 2} height={props.dimensions.global.height / 2}></svg> : null}
@@ -199,5 +199,5 @@ export const CellPop = (props: CellPopProps) => {
 			<div id="cellpopvis" ref={cellPopRef}></div>
 
 		</div>
-	)
-}
+	);
+};

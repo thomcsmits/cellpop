@@ -82,7 +82,7 @@ function getCountsPerType(o: any) {
 // // Get one Promise with all ObsSets
 // function retrieveObsSets(urls) {
 // 	const obsSetsListPromises = [];
-// 	for (let i = 0; i < urls.length; i++) { 
+// 	for (let i = 0; i < urls.length; i++) {
 // 		const url = urls[i]
 // 		const source = new AnnDataSource({ url });
 // 		const config = {
@@ -192,7 +192,7 @@ function getCountsPerType(o: any) {
 // 			console.error("Error:", error);
 // 		});
 // 	return promiseMetadata;
-// } 
+// }
 
 // let promiseMetadata = getMetadata(uuids);
 

@@ -6,7 +6,7 @@ export function getPossibleMetadataSelections(data: CellPopData) {
 
     if (rowsMeta) {
         // get all the metadata fields (not all rows may have the same fields)
-        const rowsMetaOptions = [...new Set(rowsMeta.map(r => Object.keys(r.metadata)).flat())]
+        const rowsMetaOptions = [...new Set(rowsMeta.map(r => Object.keys(r.metadata)).flat())];
         for (const op of rowsMetaOptions) {
             const opVals = [...new Set(rowsMeta.map(r => r.metadata[op]))] as (string | number)[];
             // only include the option if fields are not all the same or all different
@@ -20,11 +20,11 @@ export function getPossibleMetadataSelections(data: CellPopData) {
 
 export function sortByMetadata(data: CellPopData, op: string) {
     const rowsMeta = data.metadata.rows;
-    console.log(rowsMeta)
+    console.log(rowsMeta);
 
     const opVals = rowsMeta.map(r => [r.row, r.metadata[op[0]]]);
     console.log(opVals);
-    
+
     // // Update the ordering of rowNames
     // data.rowNames = reorderArray(data.rowNames, currentIndex, newIndex);
     // data.rowNamesWrapped = reorderArray(data.rowNamesWrapped, currentIndex, newIndex);

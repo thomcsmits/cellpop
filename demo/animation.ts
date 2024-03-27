@@ -1,5 +1,5 @@
 import { showAnimation } from "../src/visualization/animation";
-import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP"; 
+import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
 // data
 const uuids = ["ad693f99fb9006e68a53e97598da1509",
     "173de2e80adf6a73ac8cff5ccce20dfc",
@@ -29,7 +29,7 @@ const uuids = ["ad693f99fb9006e68a53e97598da1509",
 	"6e1db473492095ccc2f1393d7259b9c0",
 	"fae9a1f2e7abefca2203765a3c7a5ba1",
 	"8d631eee88855ac59155edca2a3bc1ca",
-	"1ea6c0ac5ba60fe35bf63af8699b6fbe"]
+	"1ea6c0ac5ba60fe35bf63af8699b6fbe"];
 
 
 // Load data directly as demo

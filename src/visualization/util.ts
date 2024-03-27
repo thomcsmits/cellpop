@@ -28,7 +28,7 @@ function getUpperBoundInner(maxValue: number): number {
 	const bound5 = bound10 / 2;
 	const bound25 = bound5 /2;
 	if (maxValue < bound25) {
-		return bound25
+		return bound25;
 	}
 	if (maxValue < bound5) {
 		return bound5;

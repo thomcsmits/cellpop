@@ -17,7 +17,7 @@ export function defineTooltip() {
 		.style("padding", "5px")
 		.attr("pointer-events", "none")
 		// .attr("visibility", "hidden")
-		.style("position", "absolute")
+		.style("position", "absolute");
 }
 
 
@@ -27,13 +27,13 @@ export function addTooltip(event: MouseEvent, d: CountsMatrixValue) {
 		.style("opacity", 0.8)
 		.attr("visibility", "shown")
 		.style("left", `${event.x + window.scrollX}px`)
-		.style("top", `${event.y + window.scrollY}px`)
+		.style("top", `${event.y + window.scrollY}px`);
 }
 
 export function removeTooltip() {
 	d3.select(".tooltip")
-		.html(``)
-		.style("opacity", 0)
+		.html("")
+		.style("opacity", 0);
 }
 
 
@@ -51,26 +51,26 @@ export function defineTooltipBarSide() {
 		.style("padding", "5px")
 		.attr("pointer-events", "none")
 		// .attr("visibility", "hidden")
-		.style("position", "absolute")
+		.style("position", "absolute");
 }
 
 
 export function addTooltipBarSide(event: MouseEvent, d: CountsTotalRowValue, metadata: any) {
-	const metadataTextArray = Object.keys(metadata).map(k => `${k}: ${metadata[k]}`)
-	const metadataText = metadataTextArray.join("<br>")
-	
+	const metadataTextArray = Object.keys(metadata).map(k => `${k}: ${metadata[k]}`);
+	const metadataText = metadataTextArray.join("<br>");
+
 	d3.select(".tooltip-axis-y")
 		.html(`Row: ${d.row}<br>Total count: ${d.countTotal}<br>Metadata:<br>${metadataText}`)
 		.style("opacity", 0.8)
 		.attr("visibility", "shown")
 		.style("left", `${event.x + window.scrollX}px`)
-		.style("top", `${event.y + window.scrollY}px`)
+		.style("top", `${event.y + window.scrollY}px`);
 }
 
 export function removeTooltipBarSide() {
 	d3.select(".tooltip-axis-y")
-		.html(``)
-		.style("opacity", 0)
+		.html("")
+		.style("opacity", 0);
 }
 
 // Add tooltip
@@ -86,7 +86,7 @@ export function defineTooltipBarTop() {
 		.style("padding", "5px")
 		.attr("pointer-events", "none")
 		// .attr("visibility", "hidden")
-		.style("position", "absolute")
+		.style("position", "absolute");
 }
 
 
@@ -96,11 +96,11 @@ export function addTooltipBarTop(event: MouseEvent, d: CountsTotalColValue, meta
 		.style("opacity", 0.8)
 		.attr("visibility", "shown")
 		.style("left", `${event.x + window.scrollX}px`)
-		.style("top", `${event.y + window.scrollY}px`)
+		.style("top", `${event.y + window.scrollY}px`);
 }
 
 export function removeTooltipBarTop() {
 	d3.select(".tooltip-axis-x")
-		.html(``)
-		.style("opacity", 0)
+		.html("")
+		.style("opacity", 0);
 }

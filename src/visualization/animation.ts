@@ -12,7 +12,7 @@ export function showAnimation(data: CellPopData) {
         .append("svg")
             .attr("class", "animate-svg")
             .attr("width", 2000)
-            .attr("height", 2000)
+            .attr("height", 2000);
 
             const dimensions = {
         width: 1000,
@@ -21,7 +21,7 @@ export function showAnimation(data: CellPopData) {
         marginTop: 300,
         moveWidth: 650,
         moveTop: 750
-    }
+    };
 
     createStackedBar(svg, data, dimensions);
 }
@@ -29,7 +29,7 @@ export function showAnimation(data: CellPopData) {
 export function showAnimationBox(data: CellPopData, width: number, height: number) {
     // select svg
     const svg = d3.select(".animate-svg");
-    
+
     // delete any old grouping
     svg.selectAll(".animate").remove();
 
@@ -41,7 +41,7 @@ export function showAnimationBox(data: CellPopData, width: number, height: numbe
         moveWidth: width / 3,
         moveTop: height / 1.5
     } as AnimationDimensions;
-    
+
     createStackedBar(svg, data, dimensions);
 }
 
@@ -85,14 +85,14 @@ function createStackedBar(svgBase: d3.Selection<d3.BaseType, unknown, HTMLElemen
 
     const svg = svgBase.append("g")
         .attr("class", "animate")
-        .attr("transform", 
-            "translate(" + dimensionsAnimation.marginLeft + "," + dimensionsAnimation.marginTop + ")")
+        .attr("transform",
+            "translate(" + dimensionsAnimation.marginLeft + "," + dimensionsAnimation.marginTop + ")");
 
     // add x axis
     const x = d3.scaleBand()
         .domain(data.rowNames)
         .range([0,width])
-        .padding(0.01)
+        .padding(0.01);
 
     svg.append("g")
         .attr("class", "axisbottom")
@@ -103,16 +103,16 @@ function createStackedBar(svgBase: d3.Selection<d3.BaseType, unknown, HTMLElemen
     const y = d3.scaleLinear()
         .domain([0, getUpperBound(rowValsCounter.map(d => d.counter))])
         .range([ height, 0 ]);
-    
+
     svg.append("g")
         .attr("class", "axisleft")
         .call(d3.axisLeft(y));
-    
+
     // add color
     const color = d3.scaleOrdinal<string, string>()
         .domain(data.colNames)
-        .range(["#1A2A22", "#79FFFC", "#8F5D4E", "#FFFF7C", "#FFFF7C", 
-                "#C665BF", "#8AFF79", "#4E5C35", "#A4FCE5", "#FF8095", "#7A85FE"])
+        .range(["#1A2A22", "#79FFFC", "#8F5D4E", "#FFFF7C", "#FFFF7C",
+                "#C665BF", "#8AFF79", "#4E5C35", "#A4FCE5", "#FF8095", "#7A85FE"]);
 
 
     svg.append("g").selectAll<SVGRectElement, CountsMatrixValueAnimation>(".bar-rects")
@@ -120,11 +120,11 @@ function createStackedBar(svgBase: d3.Selection<d3.BaseType, unknown, HTMLElemen
         .enter()
         .append("rect")
             .attr("class", "bar-rects")
-            .attr("x", function(d) {return x(d.row)})
-            .attr("y", function(d) {return y(d.end)})
+            .attr("x", function(d) {return x(d.row);})
+            .attr("y", function(d) {return y(d.end);})
             .attr("width", x.bandwidth())
-            .attr("height", function(d) {return y(d.start) - y(d.end)})
-            .attr("fill", function(d) {return color(d.col)})
+            .attr("height", function(d) {return y(d.start) - y(d.end);})
+            .attr("fill", function(d) {return color(d.col);});
 
 
     // animations
@@ -134,7 +134,7 @@ function createStackedBar(svgBase: d3.Selection<d3.BaseType, unknown, HTMLElemen
         .duration(2000)
         .delay(2000)
         // .attr("transform", "translate(500,0)")
-        .attr("transform", "rotate(90, " + dimensionsAnimation.moveWidth + ", " + dimensionsAnimation.moveTop + ")") //650, 750
+        .attr("transform", "rotate(90, " + dimensionsAnimation.moveWidth + ", " + dimensionsAnimation.moveTop + ")"); //650, 750
 
     // rotate x-labels the other way
     d3.select(".animate")
@@ -143,7 +143,7 @@ function createStackedBar(svgBase: d3.Selection<d3.BaseType, unknown, HTMLElemen
         .transition()
         .duration(2000)
         .delay(2000)
-        .attr("transform", "translate(-15,130)rotate(-90)")
+        .attr("transform", "translate(-15,130)rotate(-90)");
 
     // d3.selectAll(".animate")
     //     .select("g.axisleft")
@@ -151,35 +151,35 @@ function createStackedBar(svgBase: d3.Selection<d3.BaseType, unknown, HTMLElemen
     //         .delay(2000)
     //         .duration(1)
     //         .remove()
-            
+
 
     const y2 = d3.scaleBand()
             .range([ height, 0 ])
             .domain(data.colNames)
             .padding(0.01);
-    
+
     // call the new axis
     d3.selectAll(".animate")
         .select("g.axisleft")
         .transition()
         .delay(5000)
         // @ts-ignore
-        .call(d3.axisLeft(y2))
-        
+        .call(d3.axisLeft(y2));
+
     // move the rects
     d3.selectAll(".animate")
         .selectAll<SVGRectElement, CountsMatrixValueAnimation>(".bar-rects")
         .transition()
         .delay(6000)
         .ease(d3.easeLinear)
-        .attr("y", function(d) {return y2(d.col)})
-        .attr("height", y2.bandwidth())
+        .attr("y", function(d) {return y2(d.col);})
+        .attr("height", y2.bandwidth());
 
 
     // Color axis
 	const colorRange = d3.scaleLinear<string, number>()
         .range(["white", "#69b3a2"])
-        .domain([0,2000])
+        .domain([0,2000]);
 
 
     // change the color of the rects
@@ -187,6 +187,6 @@ function createStackedBar(svgBase: d3.Selection<d3.BaseType, unknown, HTMLElemen
         .selectAll<SVGRectElement, CountsMatrixValueAnimation>(".bar-rects")
         .transition()
         .delay(7500)
-        .attr("fill", function(d) {return colorRange(d.value)})
-        
+        .attr("fill", function(d) {return colorRange(d.value);});
+
 }

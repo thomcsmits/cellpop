@@ -8,10 +8,10 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   {
     "rules": {
-      "indent": ["error", 4],
       "linebreak-style": ["error", "unix"],
       "quotes": ["error", "double"],
       "semi": ["error", "always"],
+      "no-trailing-spaces": "error",
     }
   }
 );

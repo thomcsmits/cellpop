@@ -14,7 +14,7 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
 		.append("g")
 			.attr("transform",
 				"translate(" + (dimensions.barTop.offsetWidth + dimensions.barTop.margin.left).toString() + "," + (dimensions.barTop.offsetHeight + dimensions.barTop.margin.top).toString() + ")")
-			.attr("class", "bartop")
+			.attr("class", "bartop");
 
 	// Get dimensions
 	const width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;
@@ -22,18 +22,18 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
 
 	const data = [] as CountsTotalColValue[];
 	for (const col of dataFull.colNames) {
-		data.push({col: col, countTotal: dataFull.countsMatrix.filter(r => r.col === col).map(r => r.value).reduce((a, b) => a + b, 0)})
+		data.push({col: col, countTotal: dataFull.countsMatrix.filter(r => r.col === col).map(r => r.value).reduce((a, b) => a + b, 0)});
 	}
 
 	const upperbound = getUpperBound(data.map(c => c.countTotal));
 
 	// import x-axis
 	// const x = eval(axes.x);
-	
+
 	// Add y-axis
 	const y = d3.scaleLinear()
 		.range([ height, 0 ])
-		.domain([ 0, upperbound])
+		.domain([ 0, upperbound]);
 
 	svg.append("g")
 		.attr("class", "axisleft")
@@ -43,7 +43,7 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
 			.style("fill", themeColors.text);
 
 
-	const x_changed = x.paddingInner(0.25)
+	const x_changed = x.paddingInner(0.25);
 
     svg.append("text")
 		.attr("class", "y label")
@@ -74,10 +74,10 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
         if (event.ctrlKey) {
 			addTooltipBarTop(event, d, metadataCol);
         }
-    }
+    };
     const mouseleave = function() {
 		removeTooltipBarTop();
-    }
+    };
 
 	bars.on("mouseover", mouseover);
 	bars.on("mouseleave", mouseleave);

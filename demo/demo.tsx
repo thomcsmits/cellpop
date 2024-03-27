@@ -37,7 +37,7 @@ function Demo() {
 	"6e1db473492095ccc2f1393d7259b9c0",
 	"fae9a1f2e7abefca2203765a3c7a5ba1",
 	"8d631eee88855ac59155edca2a3bc1ca",
-	"1ea6c0ac5ba60fe35bf63af8699b6fbe"]
+	"1ea6c0ac5ba60fe35bf63af8699b6fbe"];
 
 	// useEffect to make sure the data only loads once
 	useEffect(() => {
@@ -48,7 +48,7 @@ function Demo() {
 			}).catch(error => {
 				console.error(error);
 		});
-	}, [])
+	}, []);
 
 	// const props = {
 	// 	data: null,
@@ -56,7 +56,7 @@ function Demo() {
 	// }
 
 	const widthRatio = 0.8;
-	const heightRatio = 0.8; 
+	const heightRatio = 0.8;
 
 	const widthRight = 45 * 25;
 	const heightBottom =  20 * 40;
@@ -83,7 +83,7 @@ function Demo() {
 		<>
 			{data ? <CellPop data={data} theme={"light"} dimensions={dimensions}/> : <div>Loading...</div>}
 		</>
-	)
+	);
 }
 
 export default Demo;

@@ -31,7 +31,7 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering, metadat
     }).catch(error => {
         console.error(error);
     });
-    
+
     return hubmapData;
 }
 
@@ -44,8 +44,8 @@ function getHuBMAPURL(uuid: string) {
 // Get one Promise with all ObsSets
 function getPromiseData(urls: string[]) {
 	const obsSetsListPromises = [];
-	for (let i = 0; i < urls.length; i++) { 
-		const url = urls[i]
+	for (let i = 0; i < urls.length; i++) {
+		const url = urls[i];
 		const source = new AnnDataSource({ url });
 		const config = {
 			url,
@@ -70,7 +70,7 @@ function getPromiseMetadata(uuids: string[]): Promise<void | [string[], [string,
 	const queryBody = {
 		"size": 10000,
 		"query": {"ids": {"values": uuids}},
-	}
+	};
 
 	const requestOptions = {
 		method: "POST",
@@ -101,4 +101,4 @@ function getPromiseMetadata(uuids: string[]): Promise<void | [string[], [string,
 			console.error("Error:", error);
 		});
 	return promiseMetadata;
-} 
+}

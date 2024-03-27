@@ -88,23 +88,23 @@ export type CellPopOptions = {
     themeColors: CellPopThemeColors,
     metadataOptions: string[],
     metadataField: string,
-    boundKeys: CellPopKeys   
+    boundKeys: CellPopKeys
 }
 
 export type CellPopDimensions = {
     global: {
-        width: number, 
+        width: number,
         widthSplit: [number, number],
         height: number,
         heightSplit: [number, number]
-    }, 
-    heatmap: CellPopDimensionsValue, 
+    },
+    heatmap: CellPopDimensionsValue,
     barTop: CellPopDimensionsValue,
     violinTop: CellPopDimensionsValue,
     barLeft: CellPopDimensionsValue,
     violinLeft: CellPopDimensionsValue,
     graph: CellPopDimensionsValue,
-    detailBar: CellPopDimensionsValue, 
+    detailBar: CellPopDimensionsValue,
     textSize: {
         title: string,
         label: string,
@@ -148,7 +148,7 @@ export type CellPopKeys = {
 // themeColors: object
 // metadataOptions: array
 // metadataField: string
-// boundsKeys: object 
+// boundsKeys: object
 
 
 /** Animation */

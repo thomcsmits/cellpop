@@ -10,7 +10,7 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 	if (!dimensions) {
 		// set the dimensions of the graph
 		const widthRatio = 0.9;
-		const heightRatio = 0.8; 
+		const heightRatio = 0.8;
 
 		const widthRight = data.colNames.length * 25;
 		const heightBottom =  data.rowNames.length * 40;
@@ -48,7 +48,7 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 			textSize: {title: "20px", label: "30px", labelSmall: "25px", tick: "10px"}
 			// barLeft: {offsetWidth: 100, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 50, right: 0, bottom: 0, left: 100}},
 		};
-		
+
 		// var dimensionsHeatmap = {width: widthRight, height: heightBottom, margin: {top: 50, right: 50, bottom: 50, left: 50}}
 		// var marginHeatmap = {top: 100, right: 100, bottom: 100, left: 150};
 	}
@@ -62,7 +62,7 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 	console.log("data", data);
 	const app = document.getElementById("app");
 
-	
+
 	// add a (temporary) button for switch between % and n
 	const buttonFractionOn = document.createElement("button");
 	buttonFractionOn.textContent = "Change to fraction";
@@ -78,7 +78,7 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 	const buttonReset = document.createElement("button");
 	buttonReset.textContent = "Reset stacked bar charts";
 	app.appendChild(buttonReset);
-	buttonReset.addEventListener("click", () => d3.selectAll(".bardetail").remove())
+	buttonReset.addEventListener("click", () => d3.selectAll(".bardetail").remove());
 
 	// add a (temporary) button for metadata
 	const rowsMetaOptionsShown = getPossibleMetadataSelections(data);
@@ -97,9 +97,9 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 		label.appendChild(input);
 		label.addEventListener("click", () => {
 			if (op[0] !== "None") {
-				console.log(op[0])
+				console.log(op[0]);
 			}
-		})
+		});
 		buttonMetadata.appendChild(label);
 	}
 	app.appendChild(buttonMetadata);
@@ -118,21 +118,21 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 		.attr("width", dimensions.global.width)
 		.attr("height", dimensions.global.height)
 	.append("g")
-		.attr("class", "main")
-	
+		.attr("class", "main");
+
 	// add background
 	svg.append("rect")
 		.attr("class", "background")
 		.attr("width", dimensions.global.width)
 		.attr("height", dimensions.global.height)
 		.style("fill", themeColors.background);
-     
+
 	// create main CellPopVisualization
 	renderCellPopVisualization(data, dimensions, fraction, themeColors);
-	
+
 	// svg.attr("resize", "both")
 
-	console.log(svg)
+	console.log(svg);
 
-	return svg
+	return svg;
 }
