@@ -27,10 +27,26 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
         .attr("height", height)
         .style("fill", "grey")
 
+    const rightBoundary = svg.append("rect")
+        .attr("class", "boundary-right")
+        .attr("x", width - 10)
+        .attr("y", 0)
+        .attr("width", 10)
+        .attr("height", height)
+        .style("fill", "grey")
+
     const topBoundary = svg.append("rect")
         .attr("class", "boundary-top")
         .attr("x", 0)
         .attr("y", heightTop - 5)
+        .attr("width", width)
+        .attr("height", 10)
+        .style("fill", "grey")
+    
+    const bottomBoundary = svg.append("rect")
+        .attr("class", "boundary-bottom")
+        .attr("x", 0)
+        .attr("y", height - 10)
         .attr("width", width)
         .attr("height", 10)
         .style("fill", "grey")
@@ -47,30 +63,44 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
     drag.on("drag", function(event) {
         const element = d3.select(`.${className}`)
         if (className === "boundary-left") {
-            element.attr("x", event.x)
+            element.attr("x", event.x);
             widthLeft = event.x;
             widthRight = width - widthLeft;
         }
+        if (className === "boundary-right") {
+            element.attr("x", event.x);
+            width = event.x;
+            widthRight = width - widthLeft;
+        }
         if (className === "boundary-top") {
-            element.attr("y", event.x)
+            element.attr("y", event.x);
             heightTop = event.y;
+            heightBottom = height - heightTop;
+        }
+        if (className === "boundary-bottom") {
+            element.attr("y", event.x);
+            height = event.y;
             heightBottom = height - heightTop;
         }
 
         let dimensionsNew = getDimensionsFromBase(width, height, widthLeft, widthRight, heightTop, heightBottom);
+        d3.selectAll("svg").attr("width", width).attr("height", height);
         renderCellPopVisualization(data, dimensionsNew, fraction, themeColors, metadataField);
         drawSizeBoundaries(data, dimensionsNew, fraction, themeColors, metadataField);
     })
     drag.on("end", function() {
         let dimensionsNew = getDimensionsFromBase(width, height, widthLeft, widthRight, heightTop, heightBottom);
+        d3.selectAll("svg").attr("width", width).attr("height", height);
         renderCellPopVisualization(data, dimensionsNew, fraction, themeColors, metadataField);
         drawSizeBoundaries(data, dimensionsNew, fraction, themeColors, metadataField);
         
         // set as inactive
         d3.select(`.${className}`).classed("active", false);
     })
-    leftBoundary.call(drag)
-    topBoundary.call(drag)
+    leftBoundary.call(drag);
+    rightBoundary.call(drag);
+    topBoundary.call(drag);
+    bottomBoundary.call(drag);
 
     // return new dimensions?
 }
