@@ -121,6 +121,37 @@ export type CellPopDimensionsValue = {
     margin: {top: number, right: number, bottom: number, left: number}
 }
 
+export type CellPopDimensionsGlobal = {
+    width: {
+        total: number,
+        parts: {
+            left: number,
+            middle: number,
+            right: number,
+        },
+        margins: {
+            left: number,
+            middleLeft: number,
+            middleRight: number,
+            right: number,
+        }
+    },
+    height: {
+        total: number,
+        parts: {
+            left: number,
+            middle: number,
+            right: number,
+        },
+        margins: {
+            left: number,
+            middleLeft: number,
+            middleRight: number,
+            right: number,
+        }
+    }
+}
+
 export type CellPopTheme = "light"| "dark";
 
 export type CellPopThemeColors = {
