@@ -75,12 +75,12 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
             widthRight = width - widthLeft;
         }
         if (className === "boundary-top") {
-            element.attr("y", event.x);
+            element.attr("y", event.y);
             heightTop = event.y;
             heightBottom = height - heightTop;
         }
         if (className === "boundary-bottom") {
-            element.attr("y", event.x);
+            element.attr("y", event.y);
             height = event.y;
             heightBottom = height - heightTop;
         }
