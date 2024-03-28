@@ -139,15 +139,15 @@ export type CellPopDimensionsGlobal = {
     height: {
         total: number,
         parts: {
-            left: number,
+            top: number,
             middle: number,
-            right: number,
+            bottom: number,
         },
         margins: {
-            left: number,
-            middleLeft: number,
-            middleRight: number,
-            right: number,
+            top: number,
+            middleTop: number,
+            middleBottom: number,
+            bottom: number,
         }
     }
 }
