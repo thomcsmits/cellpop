@@ -86,16 +86,19 @@ export const CellPop = (props: CellPopProps) => {
 		if (newTheme !== null) {
 			setTheme(newTheme);
 		}
+		removeBoundary();
 	}
 
 	function changeFraction(event: React.MouseEvent<HTMLInputElement, MouseEvent>, newFraction: boolean | null) {
 		if (newFraction !== null) {
 			setFraction(newFraction);
 		}
+		removeBoundary();
 	}
 
 	function changeMetadataField(event: React.ChangeEvent<HTMLInputElement>) {
 		setMetadataField(event.target.value);
+		removeBoundary();
 	}
 
 	function resetData() {
@@ -108,16 +111,19 @@ export const CellPop = (props: CellPopProps) => {
 		resetLayeredBar();
 
 		renderCellPopVisualization(props.data, dimensions, fraction, themeColors, metadataField, true);
+		removeBoundary();
 	}
 
 	function resetLayeredBar() {
 		resetExtensionChart(props.data);
+		removeBoundary();
 	}
 	
 	// animation pop-up
 	const handleAnimantionPopup = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		setAnimationAnchor(animationAnchor ? null : event.currentTarget);
 		console.log(event.currentTarget)
+		removeBoundary();
 	};
 
 	function showBoundary() {
@@ -128,7 +134,7 @@ export const CellPop = (props: CellPopProps) => {
 	}
 
 	function removeBoundary() {
-		removeSizeBoundaries()
+		removeSizeBoundaries();
 		setBoundary(false);
 	}
 
