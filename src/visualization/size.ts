@@ -135,6 +135,12 @@ function updateDimensions(dimensions: CellPopDimensions, width: number, height: 
 
 /** START DIMENSIONS */
 
+// two options
+// a 'CellPopDimensions' object
+//      Check if it has all the requirements, then use this
+// a list of dimensions
+//      Create a 'CellPopDimensions' object with this
+
 // export function getDimensions(width: number, height: number, widthLeft: number, widthRight: number, heightTop: number, heightBottom: number): CellPopDimensions {
 //      // fill in all required dimensions
 //      const dimensions = {
@@ -151,6 +157,32 @@ function updateDimensions(dimensions: CellPopDimensions, width: number, height: 
 
 //     return dimensions;
 // }
+
+export function getDimensions(
+    width?: number, 
+    widthLeft?: number, 
+    widhtMiddle?: number,
+    widthRight?: number, 
+    widthMarginLeft?: number,
+    widthMarginMiddleLeft?: number,
+    widthMarginMiddleRight?: number,
+    widthMarginRight?: number,
+    height?: number, 
+    heightTop?: number, 
+    heightMiddle?: number,
+    heightBottom?: number,
+    heightMarginTop?: number,
+    heightMarginMiddleTop?: number,
+    heightMarginMiddleBottom?: number,
+    heightMarginBottom?: number,
+    heightExtension?: number,
+    heightExtensionMarginTop?: number,
+    heightExtensionMarginBottom?: number
+) {
+    const dimensionsGlobal = getDimensionsGlobal(width, widthLeft, widhtMiddle, widthRight, widthMarginLeft, widthMarginMiddleLeft, widthMarginMiddleRight, widthMarginRight, height, heightTop, heightMiddle, heightBottom, heightMarginTop, heightMarginMiddleTop, heightMarginMiddleBottom, heightMarginBottom, heightExtension, heightExtensionMarginTop, heightExtensionMarginBottom);
+
+    
+}
 
 
 export function getDimensionsGlobal(
@@ -195,7 +227,6 @@ export function getDimensionsGlobal(
                 top: heightTop,
                 middle: heightMiddle,
                 bottom: heightBottom,
-                extension: heightExtension,
             },
             margins: {
                 top: heightMarginTop,
@@ -205,6 +236,11 @@ export function getDimensionsGlobal(
                 extensionTop: heightExtensionMarginTop,
                 extensionBottom: heightExtensionMarginBottom,
             },
+        },
+        extension: {
+            height: heightExtension,
+            heightMarginTop: heightExtensionMarginTop,
+            heightMarginBottom: heightExtensionMarginBottom,
         }
     } as CellPopDimensionsGlobal;
 
@@ -218,98 +254,91 @@ export function getDimensionsGlobal(
 export function getDimensionsFull(dimensionsGlobal: CellPopDimensionsGlobal) {
     
     // fill in all required dimensions
+
+    // if total width is not specified, set it to default
     if (!dimensionsGlobal.width.total) {
         dimensionsGlobal.width.total = 1000;
     }
 
+    // if total height is not specified, set it to default
     if (!dimensionsGlobal.height.total) {
         dimensionsGlobal.height.total = 1000;
     }
 
-    for (const widthOption of Object.keys(dimensionsGlobal.width.parts) as ('left' | 'middle' | 'right')[]) {
-        if (!dimensionsGlobal.width.parts[widthOption]) {
-            dimensionsGlobal.width.parts[widthOption] = 0.3;
+    // for all width and height options, check if specified. If not, set to default. 
+    // if specified as ratio (0-1), set it to aboslute size.
+    for (const widthOption of Object.keys(dimensionsGlobal.width.parts)) {
+        if (!dimensionsGlobal.width.parts[widthOption as keyof typeof dimensionsGlobal.width.parts]) {
+            dimensionsGlobal.width.parts[widthOption as keyof typeof dimensionsGlobal.width.parts] = 0.3;
         }
-        if (dimensionsGlobal.width.parts[widthOption] < 1) {
-            dimensionsGlobal.width.parts[widthOption] = dimensionsGlobal.width.parts[widthOption] * dimensionsGlobal.width.total;
-        }
-    }
-
-    for (let widthOption of Object.keys(dimensionsGlobal.width.margins) as ('left' | 'middleLeft' | 'middleRight' | 'right')[]) {
-        if (!dimensionsGlobal.width.margins[widthOption]) {
-            dimensionsGlobal.width.margins[widthOption] = 0.05;
-        }
-        if (dimensionsGlobal.width.margins[widthOption] < 1) {
-            dimensionsGlobal.width.margins[widthOption] = dimensionsGlobal.width.margins[widthOption] * dimensionsGlobal.width.total;
+        if (dimensionsGlobal.width.parts[widthOption as keyof typeof dimensionsGlobal.width.parts] < 1) {
+            dimensionsGlobal.width.parts[widthOption as keyof typeof dimensionsGlobal.width.parts] *= dimensionsGlobal.width.total;
         }
     }
 
-    for (let heightOption of Object.keys(dimensionsGlobal.height.parts) as ('top' | 'middle' | 'bottom')[]) {
-        if (!dimensionsGlobal.height.parts[heightOption]) {
-            dimensionsGlobal.height.parts[heightOption] = 0.3;
+    for (let widthOption of Object.keys(dimensionsGlobal.width.margins)) {
+        if (!dimensionsGlobal.width.margins[widthOption as keyof typeof dimensionsGlobal.width.margins]) {
+            dimensionsGlobal.width.margins[widthOption as keyof typeof dimensionsGlobal.width.margins] = 0.05;
         }
-        if (dimensionsGlobal.height.parts[heightOption] < 1) {
-            dimensionsGlobal.height.parts[heightOption] = dimensionsGlobal.height.parts[heightOption] * dimensionsGlobal.height.total;
-        }
-    }
-
-    for (let heightOption of Object.keys(dimensionsGlobal.height.margins) as ('top' | 'middleTop' | 'middleBottom' | 'bottom')[]) {
-        if (!dimensionsGlobal.height.margins[heightOption]) {
-            dimensionsGlobal.height.margins[heightOption] = 0.05;
-        }
-        if (dimensionsGlobal.height.margins[heightOption] < 1) {
-            dimensionsGlobal.height.margins[heightOption] = dimensionsGlobal.height.margins[heightOption] * dimensionsGlobal.height.total;
+        if (dimensionsGlobal.width.margins[widthOption as keyof typeof dimensionsGlobal.width.margins] < 1) {
+            dimensionsGlobal.width.margins[widthOption as keyof typeof dimensionsGlobal.width.margins] *= dimensionsGlobal.width.total;
         }
     }
 
-    // tomorrow: try this:
-    // for (let widthOption in dimensionsGlobal.width.parts) {
-    //     if (!dimensionsGlobal.width.parts[widthOption as keyof typeof dimensionsGlobal.width.parts]) {
-    //         dimensionsGlobal.width.parts[widthOption as keyof typeof dimensionsGlobal.width.parts] = 1;
-    //     }
-    // }
+    for (let heightOption of Object.keys(dimensionsGlobal.height.parts)) {
+        if (!dimensionsGlobal.height.parts[heightOption as keyof typeof dimensionsGlobal.height.parts]) {
+            dimensionsGlobal.height.parts[heightOption as keyof typeof dimensionsGlobal.height.parts] = 0.3;
+        }
+        if (dimensionsGlobal.height.parts[heightOption as keyof typeof dimensionsGlobal.height.parts] < 1) {
+            dimensionsGlobal.height.parts[heightOption as keyof typeof dimensionsGlobal.height.parts] *= dimensionsGlobal.height.total;
+        }
+    }
+
+    for (let heightOption of Object.keys(dimensionsGlobal.height.margins)) {
+        if (!dimensionsGlobal.height.margins[heightOption as keyof typeof dimensionsGlobal.height.margins]) {
+            dimensionsGlobal.height.margins[heightOption as keyof typeof dimensionsGlobal.height.margins] = 0.05;
+        }
+        if (dimensionsGlobal.height.margins[heightOption as keyof typeof dimensionsGlobal.height.margins] < 1) {
+            dimensionsGlobal.height.margins[heightOption as keyof typeof dimensionsGlobal.height.margins] *= dimensionsGlobal.height.total;
+        }
+    }
 
 
-
-
-    // check if make up total, otherwise resize
-    const widthTotal = dimensionsGlobal.width.parts.left + dimensionsGlobal.width.parts.middle + dimensionsGlobal.width.parts.right + dimensionsGlobal.width.margins.left + dimensionsGlobal.width.margins.middleLeft + dimensionsGlobal.width.margins.middleRight + dimensionsGlobal.width.margins.right;
-    if (dimensionsGlobal.width.total !== (widthTotal)) {
-        const widthScale = widthTotal / dimensionsGlobal.width.total;
+    // check if all widths combine to the total width, otherwise resize
+    const widthTotal = [...Object.values(dimensionsGlobal.width.parts), ...Object.values(dimensionsGlobal.width.margins)].reduce((a,b) => a+b, 0);
+    if (dimensionsGlobal.width.total !== widthTotal) {
+        const widthScale = dimensionsGlobal.width.total / widthTotal;
         // divide all by widthScale
-
-        // temporary 
-        dimensionsGlobal.width.total = widthTotal;
+        for (const widthOption of Object.keys(dimensionsGlobal.width.parts)) {
+            dimensionsGlobal.width.parts[widthOption as keyof typeof dimensionsGlobal.width.parts] *= widthScale;
+        }
+    
+        for (let widthOption of Object.keys(dimensionsGlobal.width.margins)) {
+            dimensionsGlobal.width.margins[widthOption as keyof typeof dimensionsGlobal.width.margins] *= widthScale;
+        }
     }
 
-     // check if make up total, otherwise resize
-     const heightTotal = dimensionsGlobal.height.parts.top + dimensionsGlobal.height.parts.middle + dimensionsGlobal.height.parts.bottom + dimensionsGlobal.height.margins.top + dimensionsGlobal.height.margins.middleTop + dimensionsGlobal.height.margins.middleBottom + dimensionsGlobal.height.margins.bottom; 
-     if (dimensionsGlobal.width.total !== (widthTotal)) {
-         const heightScale = heightTotal / dimensionsGlobal.height.total;
-         // divide all by heightScale
- 
-         // temporary 
-         dimensionsGlobal.height.total = heightTotal;
-     }
-
-     return dimensionsGlobal;
+    // check if all heights combine to the total height, otherwise resize
+    const heightTotal = [...Object.values(dimensionsGlobal.height.parts), ...Object.values(dimensionsGlobal.height.margins)].reduce((a,b) => a+b, 0);
+    if (dimensionsGlobal.height.total !== heightTotal) {
+        const heightScale = dimensionsGlobal.height.total / heightTotal;
+        // divide all by widthScale
+        for (const heightOption of Object.keys(dimensionsGlobal.height.parts)) {
+            dimensionsGlobal.height.parts[heightOption as keyof typeof dimensionsGlobal.height.parts] *= heightScale;
+        }
+    
+        for (let heightOption of Object.keys(dimensionsGlobal.height.margins)) {
+            dimensionsGlobal.height.margins[heightOption as keyof typeof dimensionsGlobal.height.margins] *= heightScale;
+        }
+    }
 }
 
 
 
 
 export function smth(dimensionsGlobal: CellPopDimensionsGlobal) {
-
-    // const offsetWidth0 = dimensionsGlobal.width.margins.left;
-    // const offsetWidth1 = offsetWidth0 + dimensionsGlobal.width.parts.left + dimensionsGlobal.width.margins.middleLeft;
-    // const offsetWidth2 = offsetWidth1 + dimensionsGlobal.width.parts.middle + dimensionsGlobal.width.margins.middleRight;
-
-    // const offsetHeight0 = dimensionsGlobal.height.margins.top;
-    // const offsetHeight1 = offsetHeight0 + dimensionsGlobal.height.parts.top + dimensionsGlobal.height.margins.middleTop;
-    // const offsetHeight2 = offsetHeight1 + dimensionsGlobal.height.parts.middle + dimensionsGlobal.height.margins.middleBottom;
-    
     const offsetWidth1 = dimensionsGlobal.width.margins.left + dimensionsGlobal.width.parts.left;
-    const offsetWidth2 = offsetWidth1 + + dimensionsGlobal.width.margins.middleLeft + dimensionsGlobal.width.parts.middle;
+    const offsetWidth2 = offsetWidth1 + dimensionsGlobal.width.margins.middleLeft + dimensionsGlobal.width.parts.middle;
 
     const offsetHeight1 = dimensionsGlobal.height.margins.top + dimensionsGlobal.height.parts.top;
     const offsetHeight2 = offsetHeight1 + dimensionsGlobal.height.margins.middleTop + dimensionsGlobal.height.parts.middle;
@@ -323,135 +352,9 @@ export function smth(dimensionsGlobal: CellPopDimensionsGlobal) {
 		barLeft: {offsetWidth: 0, offsetWidth1: offsetHeight1, width: dimensionsGlobal.width.parts.left, height: dimensionsGlobal.height.parts.middle, margin: {left: dimensionsGlobal.width.margins.left, right: dimensionsGlobal.width.margins.middleLeft, top: dimensionsGlobal.height.margins.middleTop, bottom: dimensionsGlobal.height.margins.middleBottom}},
 		violinLeft: {offsetWidth: 0, offsetHeight: offsetHeight1, width: dimensionsGlobal.width.parts.left, height: dimensionsGlobal.height.parts.middle, margin: {left: dimensionsGlobal.width.margins.left, right: dimensionsGlobal.width.margins.middleLeft, top: dimensionsGlobal.height.margins.middleTop, bottom: dimensionsGlobal.height.margins.middleBottom}},
 		graph: {offsetWidth: offsetWidth1, offsetHeight: offsetHeight2, width: dimensionsGlobal.width.parts.left, height: dimensionsGlobal.height.parts.bottom, margin: {left: dimensionsGlobal.width.margins.middleLeft, right: dimensionsGlobal.width.margins.middleRight, top: dimensionsGlobal.height.margins.middleBottom, bottom: dimensionsGlobal.height.margins.bottom}},
-		detailBar: {offsetWidth: offsetWidth1, offsetHeight: 0, width: dimensionsGlobal.width.parts.middle, height: dimensionsGlobal.height.parts.extension, margin: {left: dimensionsGlobal.width.margins.middleLeft, right: dimensionsGlobal.width.margins.middleRight, top: dimensionsGlobal.height.margins.extensionTop, bottom: dimensionsGlobal.height.margins.extensionBottom}},
+		detailBar: {offsetWidth: offsetWidth1, offsetHeight: 0, width: dimensionsGlobal.width.parts.middle, height: dimensionsGlobal.extension.height, margin: {left: dimensionsGlobal.width.margins.middleLeft, right: dimensionsGlobal.width.margins.middleRight, top: dimensionsGlobal.extension.heightMarginTop, bottom: dimensionsGlobal.extension.heightMarginBottom}},
 		textSize: {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
 	};
 
     return dimensions;
 }
-// const dimensions = {
-//     global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
-//     heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 400, bottom: 100, left: 0}},
-//     barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
-//     violinTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
-//     barLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
-//     violinLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
-//     graph: {offsetWidth: widthLeft, offsetHeight: height, width: widthRight, height: heightTop, margin: {top: 0, right: 200, bottom: 0, left: 0}},
-//     detailBar: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: height, margin: {top: 50, right: 200, bottom: 50, left: 0}},
-//     textSize: {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
-// } as CellPopDimensions;
-
-
-// export function getDimensionsFull(dimensionsGlobal: CellPopDimensionsGlobal) {
-    
-//     // fill in all required dimensions
-//     for (let widthOption of [widthLeft, widhtMiddle, widthRight]) {
-//         if (!widthOption) {
-//             widthOption = 0.3 * width;
-//         }
-//     }
-
-//     for (let widthOption of [widthMarginLeft, widthMarginMiddleLeft, widthMarginMiddleRight, widthMarginRight]) {
-//         if (!widthOption) {
-//             widthOption = 0.05 * width;
-//         }
-//     }
-
-//     for (let heightOption of [heightTop, heightMiddle, heightBottom]) {
-//         if (!heightOption) {
-//             heightOption = 0.3 * height;
-//         }
-//     }
-
-
-
-//     // check if there are any fractions
-//     for (let widthOption of [widthLeft, widhtMiddle, widthRight, widthMarginLeft, widthMarginMiddleLeft, widthMarginMiddleRight, widthMarginRight]) {
-//         if (widthOption < 1) {
-//             widthOption = widthOption * width;
-//         }
-//     }
-
-//     for (let heightOption of [heightTop, heightMiddle, heightBottom, heightMarginTop, heightMarginMiddleTop, heightMarginMiddleBottom, heightMarginBottom]) {
-//         if (heightOption < 1) {
-//             heightOption = heightOption * height;
-//         }
-//     }
-
-//     // check if the parts combine to the total width/height
-//     // if not, keep width & height and readjust all other
-    
-
-//     const dim = {
-//         width: {
-//             total: 0,
-//             parts: {
-//                 left: 0,
-//                 middle: 0,
-//                 right: 0,
-//             },
-//             margins: {
-//                 left: 0,
-//                 middleLeft: 0,
-//                 middleRight: 0,
-//                 right: 0
-//             }
-//         },
-//         height: {
-//             total: 0,
-//             parts: {
-//                 left: 0,
-//                 middle: 0,
-//                 right: 0,
-//             },
-//             margins: {
-//                 left: 0,
-//                 middleLeft: 0,
-//                 middleRight: 0,
-//                 right: 0
-//             }
-
-//         }
-//     }
-
-
-
-
-// function getDimensionsFromDimensions(dimensions: CellPopDimensions) {
-//     // check that it has all global -> change type
-
-//     // get parameters
-//     const width = dimensions.global.width;
-//     const height = dimensions.global.height;
-//     const widthLeft = dimensions.global.widthSplit[0];
-//     const widthRight = dimensions.global.widthSplit[1];
-//     const heightTop = dimensions.global.heightSplit[0];
-//     const heightBottom = dimensions.global.heightSplit[1];
-
-//     // fill in all required dimensions
-//     const dimensionsExtended = {
-//         global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
-//         heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 400, bottom: 100, left: 0}},
-//         barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
-//         violinTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
-//         barLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
-//         violinLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
-//         graph: {offsetWidth: widthLeft, offsetHeight: height, width: widthRight, height: heightTop, margin: {top: 0, right: 200, bottom: 0, left: 0}},
-//         detailBar: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: height, margin: {top: 50, right: 200, bottom: 50, left: 0}},
-//         textSize: {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
-//     } as CellPopDimensions;
-
-//     return dimensionsExtended;
-// }
-
-// const dimensions = {
-	// 	global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
-	// 	heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 400, bottom: 100, left: 0}},
-	// 	barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
-	// 	violinTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
-	// 	barLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
-	// 	violinLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
-	// 	graph: {offsetWidth: widthLeft, offsetHeight: height, width: widthRight, height: heightTop, margin: {top: 0, right: 200, bottom: 0, left: 0}},
-	// 	detailBar: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: height, margin: {top: 50, right: 200, bottom: 50, left: 0}},
-	// 	textSize: {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
-	// } as CellPopDimensions;
