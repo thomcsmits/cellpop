@@ -92,12 +92,7 @@ export type CellPopOptions = {
 }
 
 export type CellPopDimensions = {
-    global: {
-        width: number, 
-        widthSplit: [number, number],
-        height: number,
-        heightSplit: [number, number]
-    }, 
+    global: CellPopDimensionsGlobal,
     heatmap: CellPopDimensionsValue, 
     barTop: CellPopDimensionsValue,
     violinTop: CellPopDimensionsValue,

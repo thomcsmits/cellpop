@@ -51,16 +51,16 @@ export const CellPop = (props: CellPopProps) => {
 
 		// add svg element for main
 		const svg = app.append("svg")
-			.attr("width", props.dimensions.global.width)
-			.attr("height", props.dimensions.global.height)
+			.attr("width", props.dimensions.global.width.total)
+			.attr("height", props.dimensions.global.height.total)
 		.append("g")
 			.attr("class", "main")
 
 		// add background
 		svg.append("rect")
 			.attr("class", "background")
-			.attr("width", props.dimensions.global.width)
-			.attr("height", props.dimensions.global.height)
+			.attr("width", props.dimensions.global.width.total)
+			.attr("height", props.dimensions.global.height.total)
 
 		// add svg element for extension
 		const svgExtension = app.append("svg")
@@ -197,9 +197,9 @@ export const CellPop = (props: CellPopProps) => {
 
 			<Popup open={animationAnchor ? true : false} anchor={animationAnchor} placement="bottom-end">
 				<div aria-label="Pop up animation" style={{border: 'solid black 2px', backgroundColor: "white"}}>
-					<Button variant="outlined" onClick={() => showAnimationBox(props.data, dimensions.global.width / 2, dimensions.global.height / 2)}>Play animation</Button>
+					<Button variant="outlined" onClick={() => showAnimationBox(props.data, dimensions.global.width.total / 2, dimensions.global.height.total / 2)}>Play animation</Button>
 					<div>
-						<svg className="animate-svg" width={dimensions.global.width / 2} height={dimensions.global.height / 2}></svg>
+						<svg className="animate-svg" width={dimensions.global.width.total / 2} height={dimensions.global.height.total / 2}></svg>
 					</div>
 
 				</div>
