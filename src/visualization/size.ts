@@ -181,7 +181,9 @@ export function getDimensions(
 ) {
     const dimensionsGlobal = getDimensionsGlobal(width, widthLeft, widhtMiddle, widthRight, widthMarginLeft, widthMarginMiddleLeft, widthMarginMiddleRight, widthMarginRight, height, heightTop, heightMiddle, heightBottom, heightMarginTop, heightMarginMiddleTop, heightMarginMiddleBottom, heightMarginBottom, heightExtension, heightExtensionMarginTop, heightExtensionMarginBottom);
 
+    const dimensions = getDimensionsFromGlobal(dimensionsGlobal);
     
+    return dimensions;
 }
 
 
@@ -245,13 +247,12 @@ export function getDimensionsGlobal(
     } as CellPopDimensionsGlobal;
 
 
-    getDimensionsFull(dimensionsGlobal);
-
+    checkDimensionsGlobal(dimensionsGlobal);
     
     return dimensionsGlobal;
 }
 
-export function getDimensionsFull(dimensionsGlobal: CellPopDimensionsGlobal) {
+export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal) {
     
     // fill in all required dimensions
 
@@ -336,7 +337,7 @@ export function getDimensionsFull(dimensionsGlobal: CellPopDimensionsGlobal) {
 
 
 
-export function smth(dimensionsGlobal: CellPopDimensionsGlobal) {
+export function getDimensionsFromGlobal(dimensionsGlobal: CellPopDimensionsGlobal) {
     const offsetWidth1 = dimensionsGlobal.width.margins.left + dimensionsGlobal.width.parts.left;
     const offsetWidth2 = offsetWidth1 + dimensionsGlobal.width.margins.middleLeft + dimensionsGlobal.width.parts.middle;
 
