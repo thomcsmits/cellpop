@@ -93,7 +93,8 @@ export type CellPopOptions = {
 
 export type CellPopDimensions = {
     global: CellPopDimensionsGlobal,
-    heatmap: CellPopDimensionsValue, 
+    heatmap: CellPopDimensionsValue,
+    heatmapLegend: CellPopDimensionsValue,
     barTop: CellPopDimensionsValue,
     violinTop: CellPopDimensionsValue,
     barLeft: CellPopDimensionsValue,

@@ -169,23 +169,6 @@ export function removeSizeBoundaries() {
 }
 
 
-function updateDimensions(dimensions: CellPopDimensions, width: number, height: number, widthLeft: number, widthRight: number, heightTop: number, heightBottom: number) {
-    // fill in all required dimensions
-    // dimensions.global = {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]};
-    // dimensions.heatmap = {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 400, bottom: 100, left: 0}};
-    // dimensions.barTop = {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}};
-    // dimensions.violinTop = {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}};
-    // dimensions.barLeft = {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}};
-    // dimensions.violinLeft = {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}};
-    // dimensions.graph = {offsetWidth: widthLeft, offsetHeight: height, width: widthRight, height: heightTop, margin: {top: 0, right: 200, bottom: 0, left: 0}};
-    // dimensions.detailBar = {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: height, margin: {top: 50, right: 200, bottom: 50, left: 0}};
-    // dimensions.textSize = {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'};
-}
-
-
-
-
-
 
 /** START DIMENSIONS */
 
@@ -495,7 +478,7 @@ export function getDimensionsFromGlobal(dimensionsGlobal: CellPopDimensionsGloba
     const dimensions = {
 		global: dimensionsGlobal,
         heatmap: getDimType(dimensionsGlobal, 1, 1),
-        // heatmapLegend: getDimType(dimensionsGlobal, 2, 1),
+        heatmapLegend: getDimType(dimensionsGlobal, 2, 1),
         barTop: getDimType(dimensionsGlobal, 1, 0),
         violinTop: getDimType(dimensionsGlobal, 1, 0),
         barLeft: getDimType(dimensionsGlobal, 0, 1),
@@ -528,7 +511,7 @@ export function updateDimensionsWithGlobal(dimensions: CellPopDimensions): CellP
     const dimensionsGlobal = dimensions.global;
 
     dimensions.heatmap = getDimType(dimensionsGlobal, 1, 1),
-    //dimensions.heatmapLegend = getDimType(dimensionsGlobal, 2, 1),
+    dimensions.heatmapLegend = getDimType(dimensionsGlobal, 2, 1),
     dimensions.barTop = getDimType(dimensionsGlobal, 1, 0),
     dimensions.violinTop = getDimType(dimensionsGlobal, 1, 0),
     dimensions.barLeft = getDimType(dimensionsGlobal, 0, 1),
