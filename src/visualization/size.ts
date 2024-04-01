@@ -8,8 +8,11 @@ import { CellPopData, CellPopDimensions, CellPopDimensionsGlobal, CellPopDimensi
 export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField?: string) {
 
     const dimensionsGlobal = dimensions.global;
-
     console.log('dimensionsGlobal', dimensionsGlobal)
+    updateOffsets(dimensionsGlobal);
+    console.log('dimensionsGlobal', dimensionsGlobal)
+
+
     // // get parameters
     // let width = dimensions.global.width.total;
     // let height = dimensions.global.height.total;
@@ -41,73 +44,89 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
         const element = d3.select(`.${className}`)
         console.log('classname', className)
         switch(className) {
-            case 'boundary-width0':
-                if (event.x > 0 && event.x < dimensionsGlobal.width.offsets[1]) {
+            case 'boundary-width0': // between side and margin 0
+                if (event.x < 0) {
+                    // make svg bigger
+                }
+                if (event.x > 0 && event.x < dimensionsGlobal.width.parts.offsets[0]) {
+                    // make svg smaller
+
                     // element.attr("x", event.x);
+                    // dimensionsGlobal.width.margins.offsets[0] = event.x;
+                    // dimensionsGlobal.width.margins.lengths[0] = event.x;
+                    // dimensionsGlobal.width.parts
                     // dimensionsGlobal.width.offsets[1] = event.x;
                     // dimensionsGlobal.width.lengths[1] = dimensionsGlobal.width.offsets[1] - dimensionsGlobal.width.offsets[0];
                     // dimensionsGlobal.width.lengths[2] = dimensionsGlobal.width.offsets[2] - dimensionsGlobal.width.offsets[1];
                 }
                 break;
-            case 'boundary-width1':
-                if (event.x > dimensionsGlobal.width.offsets[0] && event.x < dimensionsGlobal.width.offsets[2]) {
+            case 'boundary-width1': // between margin 0 and part 0
+                if (event.x > 0 && event.x < dimensionsGlobal.width.margins.offsets[1]) {
                     element.attr("x", event.x);
-                    dimensionsGlobal.width.offsets[1] = event.x;
-                    dimensionsGlobal.width.lengths[1] = dimensionsGlobal.width.offsets[1] - dimensionsGlobal.width.offsets[0];
-                    dimensionsGlobal.width.lengths[2] = dimensionsGlobal.width.offsets[2] - dimensionsGlobal.width.offsets[1];
-                    console.log(dimensionsGlobal)
+                    dimensionsGlobal.width.parts.offsets[0] = event.x;
+                    dimensionsGlobal.width.margins.lengths[0] = event.x;
+                    dimensionsGlobal.width.parts.lengths[0] = dimensionsGlobal.width.margins.offsets[1] - event.x;
                 }
                 break;
-            case 'boundary-width2':
-                if (event.x > dimensionsGlobal.width.offsets[1] && event.x < dimensionsGlobal.width.offsets[3]) {
+            case 'boundary-width2': // between part 0 and margin 1
+                if (event.x > dimensionsGlobal.width.parts.offsets[0] && event.x < dimensionsGlobal.width.parts.offsets[1]) {
                     element.attr("x", event.x);
-                    dimensionsGlobal.width.offsets[2] = event.x;
-                    dimensionsGlobal.width.lengths[2] = dimensionsGlobal.width.offsets[2] - dimensionsGlobal.width.offsets[1];
-                    dimensionsGlobal.width.lengths[3] = dimensionsGlobal.width.offsets[3] - dimensionsGlobal.width.offsets[2];
+                    dimensionsGlobal.width.margins.offsets[1] = event.x;
+                    dimensionsGlobal.width.parts.lengths[0] = event.x - dimensionsGlobal.width.parts.offsets[0];
+                    dimensionsGlobal.width.margins.lengths[1] = dimensionsGlobal.width.parts.offsets[1] - event.x;
                 }
                 break;
-            case 'boundary-width3':
+            case 'boundary-width3': // between margin 1 and part 2
+                if (event.x > dimensionsGlobal.width.margins.offsets[1] && event.x < dimensionsGlobal.width.margins.offsets[2]) {
+                    element.attr("x", event.x);
+                    dimensionsGlobal.width.parts.offsets[1] = event.x;
+                    dimensionsGlobal.width.margins.lengths[1] = event.x - dimensionsGlobal.width.margins.offsets[1];
+                    dimensionsGlobal.width.parts.lengths[1] = dimensionsGlobal.width.margins.offsets[2] - event.x;
+                }
                 break;
-            case 'boundary-width4':
+            case 'boundary-width4': // between part 2 and margin 2
+                if (event.x > dimensionsGlobal.width.parts.offsets[1] && event.x < dimensionsGlobal.width.parts.offsets[2]) {
+                    element.attr("x", event.x);
+                    dimensionsGlobal.width.margins.offsets[2] = event.x;
+                    dimensionsGlobal.width.parts.lengths[1] = event.x - dimensionsGlobal.width.parts.offsets[1];
+                    dimensionsGlobal.width.margins.lengths[2] = dimensionsGlobal.width.parts.offsets[2] - event.x;
+                }
                 break;
-            case 'boundary-width5':
+            case 'boundary-width5': // between margin 2 and part 3
+                if (event.x > dimensionsGlobal.width.margins.offsets[2] && event.x < dimensionsGlobal.width.margins.offsets[3]) {
+                    element.attr("x", event.x);
+                    dimensionsGlobal.width.parts.offsets[2] = event.x;
+                    dimensionsGlobal.width.margins.lengths[2] = event.x - dimensionsGlobal.width.margins.offsets[2];
+                    dimensionsGlobal.width.parts.lengths[2] = dimensionsGlobal.width.margins.offsets[3] - event.x;
+                }
                 break;
-            case 'boundary-width6':
+            case 'boundary-width6': // between part 3 and margin 4
+                if (event.x > dimensionsGlobal.width.parts.offsets[2] && event.x < dimensionsGlobal.width.parts.offsets[3]) {
+                    element.attr("x", event.x);
+                    dimensionsGlobal.width.margins.offsets[3] = event.x;
+                    dimensionsGlobal.width.parts.lengths[2] = event.x - dimensionsGlobal.width.parts.offsets[2];
+                    dimensionsGlobal.width.margins.lengths[3] = dimensionsGlobal.width.parts.offsets[3] - event.x;
+                }
                 break;
-            case 'boundary-width7':
+            case 'boundary-width7': // between margin 4 and side
+                if (event.x > dimensionsGlobal.width.margins.offsets[3] && event.x < dimensionsGlobal.width.margins.offsets[4]) {
+                    // make svg smaller
+                }
+                if (event.x > dimensionsGlobal.width.margins.offsets[4]) {
+                    // make svg bigger
+                }
                 break;
             default:
                 
         } 
-        // if (className === "boundary-left") {
-        //     element.attr("x", event.x);
-        //     widthLeft = event.x;
-        //     widthRight = width - widthLeft;
-        // }
-        // if (className === "boundary-right") {
-        //     element.attr("x", event.x);
-        //     width = event.x;
-        //     widthRight = width - widthLeft;
-        // }
-        // if (className === "boundary-top") {
-        //     element.attr("y", event.y);
-        //     heightTop = event.y;
-        //     heightBottom = height - heightTop;
-        // }
-        // if (className === "boundary-bottom") {
-        //     element.attr("y", event.y);
-        //     height = event.y;
-        //     heightBottom = height - heightTop;
-        // }
+       
         updateDimensionsWithGlobal(dimensions)
-        //updateDimensions(dimensions, width, height, widthLeft, widthRight, heightTop, heightBottom)
-        // d3.selectAll("svg").attr("width", dimensionsGlobal.width.total).attr("height", dimensionsGlobal.height.total);
-        // renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
-        // drawSizeBoundaries(data, dimensions, fraction, themeColors, metadataField);
+        d3.selectAll("svg").attr("width", dimensionsGlobal.width.total).attr("height", dimensionsGlobal.height.total);
+        renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
+        drawSizeBoundaries(data, dimensions, fraction, themeColors, metadataField);
     })
     drag.on("end", function() {
         updateDimensionsWithGlobal(dimensions);
-        //updateDimensions(dimensions, width, height, widthLeft, widthRight, heightTop, heightBottom)
         d3.selectAll("svg").attr("width", dimensionsGlobal.width.total).attr("height", dimensionsGlobal.height.total);
         renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
         drawSizeBoundaries(data, dimensions, fraction, themeColors, metadataField);
@@ -116,27 +135,21 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
         d3.select(`.${className}`).classed("active", false);
     })
 
-     const lineSize = 5;
+    const lineSize = 5;
     const lineSizeHalf = lineSize / 2
     const colorLine = 'grey';
+    const colorSide = 'red';
     const colorCorner = 'red';
 
-    // todo: create array with all the offsets of each line
-    
-    // createLine(svg, drag, 'width0', lineSize + dimensionsGlobal.width.offsets[0], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    // createLine(svg, drag, 'width1', lineSizeHalf + dimensionsGlobal.width.offsets[1], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    // createLine(svg, drag, 'width2', lineSizeHalf + dimensionsGlobal.width.offsets[2], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    // createLine(svg, drag, 'width3', lineSizeHalf + dimensionsGlobal.width.offsets[3], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    // createLine(svg, drag, 'width4', lineSizeHalf + dimensionsGlobal.width.offsets[4], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    // createLine(svg, drag, 'width5', lineSizeHalf + dimensionsGlobal.width.offsets[5], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    // createLine(svg, drag, 'width6', lineSizeHalf + dimensionsGlobal.width.offsets[6], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    // createLine(svg, drag, 'width7', lineSizeHalf + dimensionsGlobal.width.offsets[7], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    // createLine(svg, drag, 'width8', - lineSizeHalf + dimensionsGlobal.width.offsets[8], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-
-    // leftBoundary.call(drag);
-    // rightBoundary.call(drag);
-    // topBoundary.call(drag);
-    // bottomBoundary.call(drag);
+    createLine(svg, drag, 'width0', lineSize + dimensionsGlobal.width.margins.offsets[0], 0, lineSize, dimensionsGlobal.height.total, colorSide);
+    createLine(svg, drag, 'width1', lineSizeHalf + dimensionsGlobal.width.parts.offsets[0], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    createLine(svg, drag, 'width2', lineSizeHalf + dimensionsGlobal.width.margins.offsets[1], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    createLine(svg, drag, 'width3', lineSizeHalf + dimensionsGlobal.width.parts.offsets[1], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    createLine(svg, drag, 'width4', lineSizeHalf + dimensionsGlobal.width.margins.offsets[2], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    createLine(svg, drag, 'width5', lineSizeHalf + dimensionsGlobal.width.parts.offsets[2], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    createLine(svg, drag, 'width6', lineSizeHalf + dimensionsGlobal.width.margins.offsets[3], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    createLine(svg, drag, 'width7', lineSizeHalf + dimensionsGlobal.width.parts.offsets[3], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    createLine(svg, drag, 'width8', - lineSize + dimensionsGlobal.width.total, 0, lineSize, dimensionsGlobal.height.total, colorSide);
 }
 
 function createLine(svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>, drag: d3.DragBehavior<Element, unknown, unknown>, className: string, x: number, y: number, width: number, height: number, color: string) {
@@ -224,6 +237,8 @@ export function getDimensions(
     const dimensionsGlobal = getDimensionsGlobal(width, widthLeft, widhtMiddle, widthRight, widthMarginLeft, widthMarginMiddleLeft, widthMarginMiddleRight, widthMarginRight, height, heightTop, heightMiddle, heightBottom, heightMarginTop, heightMarginMiddleTop, heightMarginMiddleBottom, heightMarginBottom, heightExtension, heightExtensionMiddle, heightExtensionMarginTop, heightExtensionMarginBottom);
 
     const dimensions = getDimensionsFromGlobal(dimensionsGlobal);
+
+    console.log('dimensions', dimensions)
     
     return dimensions;
 }
@@ -463,7 +478,7 @@ function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
     }
 
     // height margins
-    dimensionsGlobal.width.margins.offsets = [0];
+    dimensionsGlobal.height.margins.offsets = [0];
     currHeightSum = 0;
     for (let i = 0; i < dimensionsGlobal.height.margins.lengths.length - 1; i++) {
         currHeightSum += dimensionsGlobal.height.margins.lengths[i];
