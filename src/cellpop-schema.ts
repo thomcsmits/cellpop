@@ -119,36 +119,42 @@ export type CellPopDimensionsValue = {
 export type CellPopDimensionsGlobal = {
     width: {
         total: number,
-        parts: {
-            left: number,
-            middle: number,
-            right: number,
-        },
-        margins: {
-            left: number,
-            middleLeft: number,
-            middleRight: number,
-            right: number,
-        }
+        // parts: {
+        //     left: number,
+        //     middle: number,
+        //     right: number,
+        // },
+        // margins: {
+        //     left: number,
+        //     middleLeft: number,
+        //     middleRight: number,
+        //     right: number,
+        // }
+        lengths: number[],
+        offsets: number[],
     },
     height: {
         total: number,
-        parts: {
-            top: number,
-            middle: number,
-            bottom: number,
-        },
-        margins: {
-            top: number,
-            middleTop: number,
-            middleBottom: number,
-            bottom: number,
-        }
+        // parts: {
+        //     top: number,
+        //     middle: number,
+        //     bottom: number,
+        // },
+        // margins: {
+        //     top: number,
+        //     middleTop: number,
+        //     middleBottom: number,
+        //     bottom: number,
+        // },
+        lengths: number[],
+        offsets: number[],
     },
     extension: {
-        height: number,
-        heightMarginTop: number,
-        heightMarginBottom: number,
+        total: number,
+        lengths: number[],
+        offsets: number[],
+        // heightMarginTop: number,
+        // heightMarginBottom: number,
     }
 }
 
