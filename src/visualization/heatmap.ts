@@ -25,13 +25,13 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + (dimensions.heatmap.offsetWidth + dimensions.heatmap.margin.left).toString() + "," + (dimensions.heatmap.offsetHeight + dimensions.heatmap.margin.top).toString() + ")")
+				"translate(" + dimensions.heatmap.offsetWidth + "," + dimensions.heatmap.offsetHeight + ")")
 			.attr("class", "heatmap")
 
 
 	// Get dimensions
-	const width = dimensions.heatmap.width - dimensions.heatmap.margin.left - dimensions.heatmap.margin.right;
-	const height = dimensions.heatmap.height - dimensions.heatmap.margin.top - dimensions.heatmap.margin.bottom;
+	const width = dimensions.heatmap.width;
+	const height = dimensions.heatmap.height;
 
 	// Add x-axis
 	let x: d3.ScaleBand<string> = d3.scaleBand()
@@ -115,47 +115,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.range([themeColors.heatmapZero, themeColors.heatmapMax])
 		.domain([0,getUpperBound(countsMatrix.map(r => r.value))])
 
-	const gradient = svg.append("g")
-		.attr("class", "axiscolor")
-		.attr("transform", "translate(" + (width+150).toString() + ",10)")
-
-	const colorAxisSize = 100;
-	const colorAxisSteps = 100;
-	const colorAxisWidth = 100;
-
-	for (let i = 0; i < colorAxisSteps; i++) {
-		const color = colorRange(i * getUpperBound(countsMatrix.map(r => r.value)) / colorAxisSteps);
-		gradient.append("rect")
-			.attr("class", "colorlabelrect")
-			.attr("x", 0)
-			.attr("y", colorAxisSize - i * colorAxisSize / colorAxisSteps)
-			.attr("width", colorAxisWidth * 0.9)
-			.attr("height", colorAxisSize / colorAxisSteps)
-			.style("fill", color)
-	}
-
-	const colorAxisLabel = fraction ? 'Fraction' : 'Count'; 
-	gradient.append("text")
-		.attr("y", -10)
-		.text(colorAxisLabel)
-		.style("font-size", dimensions.textSize.label)
-		.style("fill", themeColors.text);
-
-	gradient.append("text")
-		.attr("x", colorAxisWidth)
-		.attr("y", colorAxisSize)
-		.text(0)
-		.style("font-size", dimensions.textSize.tick)
-		.style("fill", themeColors.text);
-
-	gradient.append("text")
-		.attr("x", colorAxisWidth)
-		.attr("y", 0)
-		.text(getUpperBound(countsMatrix.map(r => r.value)))
-		.style("font-size", dimensions.textSize.tick)
-		.style("fill", themeColors.text);
-
-	// let rectGenerator = d3.
+	renderHeatmapLegend(countsMatrix, dimensions, fraction, themeColors, colorRange);
 
 	// Add rows and columns behind
 	const colsBehind = svg.selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols")
@@ -387,4 +347,54 @@ function removeHighlightCol(event: MouseEvent) {
 export function resetData(data: CellPopData) {
 	resetRowNames(data);
 	resetColNames(data);
+}
+
+
+function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, colorRange: d3.ScaleLinear<string, number>) {
+	d3.select("g.axiscolor").remove();
+	const gradient = d3.select("g.main")
+		.append("g")
+		.attr("transform", 
+			"translate(" + dimensions.heatmapLegend.offsetWidth + "," + dimensions.heatmapLegend.offsetHeight + ")")
+		.attr("class", "axiscolor")
+
+	const width = dimensions.heatmapLegend.width;
+	const height = 10;
+
+	const colorAxisSize = 100;
+	const colorAxisSteps = 100;
+	const colorAxisWidth = width / 2;
+	const colorAxisOffsetWidth = width / 4;
+
+	for (let i = 0; i < colorAxisSteps; i++) {
+		const color = colorRange(i * getUpperBound(countsMatrix.map(r => r.value)) / colorAxisSteps);
+		gradient.append("rect")
+			.attr("class", "colorlabelrect")
+			.attr("x", colorAxisOffsetWidth)
+			.attr("y", colorAxisSize - i * colorAxisSize / colorAxisSteps)
+			.attr("width", colorAxisWidth)
+			.attr("height", colorAxisSize / colorAxisSteps)
+			.style("fill", color)
+	}
+
+	const colorAxisLabel = fraction ? 'Fraction' : 'Count'; 
+	gradient.append("text")
+		.attr("y", -10)
+		.text(colorAxisLabel)
+		.style("font-size", dimensions.textSize.label)
+		.style("fill", themeColors.text);
+
+	gradient.append("text")
+		.attr("x", colorAxisOffsetWidth + colorAxisWidth)
+		.attr("y", colorAxisSize)
+		.text(0)
+		.style("font-size", dimensions.textSize.tick)
+		.style("fill", themeColors.text);
+
+	gradient.append("text")
+		.attr("x", colorAxisOffsetWidth + colorAxisWidth)
+		.attr("y", 0)
+		.text(getUpperBound(countsMatrix.map(r => r.value)))
+		.style("font-size", dimensions.textSize.tick)
+		.style("fill", themeColors.text);
 }
