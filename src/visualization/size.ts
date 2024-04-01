@@ -445,7 +445,7 @@ function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
     }
 
     // width margins
-    dimensionsGlobal.width.parts.offsets = [0];
+    dimensionsGlobal.width.margins.offsets = [0];
     currWidthSum = 0;
     for (let i = 0; i < dimensionsGlobal.width.margins.lengths.length - 1; i++) {
         currWidthSum += dimensionsGlobal.width.margins.lengths[i];
@@ -463,7 +463,7 @@ function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
     }
 
     // height margins
-    dimensionsGlobal.width.parts.offsets = [0];
+    dimensionsGlobal.width.margins.offsets = [0];
     currHeightSum = 0;
     for (let i = 0; i < dimensionsGlobal.height.margins.lengths.length - 1; i++) {
         currHeightSum += dimensionsGlobal.height.margins.lengths[i];
