@@ -18,7 +18,7 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
 	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + (dimensions.barLeft.offsetWidth + dimensions.barLeft.margin.left).toString() + "," + (dimensions.barLeft.offsetHeight + dimensions.barLeft.margin.top).toString() + ")")
+				"translate(" + dimensions.barLeft.offsetWidth + "," + dimensions.barLeft.offsetHeight + ")")
 			.attr("class", "violinleft")
 
 	// Get dimensions

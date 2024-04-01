@@ -19,7 +19,7 @@ export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions
 	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + (dimensions.barTop.offsetWidth + dimensions.barTop.margin.left).toString() + "," + (dimensions.barTop.offsetHeight + dimensions.barTop.margin.top).toString() + ")")
+				"translate(" + dimensions.barTop.offsetWidth + "," + dimensions.barTop.offsetHeight + ")")
 			.attr("class", "violintop")
 
 	// Get dimensions

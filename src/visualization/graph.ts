@@ -9,7 +9,7 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
 	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + (dimensions.graph.offsetWidth + dimensions.graph.margin.left).toString() + "," + (dimensions.graph.offsetHeight + dimensions.graph.margin.top).toString() + ")")
+				"translate(" + dimensions.graph.offsetWidth + "," + dimensions.graph.offsetHeight + ")")
 			.attr("class", "graph")
 
     // Get dimensions

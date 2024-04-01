@@ -13,12 +13,12 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
 	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + (dimensions.barLeft.offsetWidth + dimensions.barLeft.margin.left).toString() + "," + (dimensions.barLeft.offsetHeight + dimensions.barLeft.margin.top).toString() + ")")
+				"translate(" + dimensions.barLeft.offsetWidth + "," + dimensions.barLeft.offsetHeight + ")")
 			.attr("class", "barleft")
 
 	// Get dimensions
-	const width = dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right;
-	const height = dimensions.barLeft.height - dimensions.barLeft.margin.top - dimensions.barLeft.margin.bottom;
+	const width = dimensions.barLeft.width;
+	const height = dimensions.barLeft.height;
 
 	// Get accumulated data
 	const data = [] as CountsTotalRowValue[];
