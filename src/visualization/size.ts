@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { renderCellPopVisualization } from ".";
-import { CellPopData, CellPopDimensions, CellPopDimensionsGlobal, CellPopThemeColors } from "../cellpop-schema";
+import { CellPopData, CellPopDimensions, CellPopDimensionsGlobal, CellPopDimensionsValue, CellPopThemeColors } from "../cellpop-schema";
 
 
 /** UPDATE DIMENSIONS */
@@ -123,14 +123,14 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
 
     // todo: create array with all the offsets of each line
     
-    createLine(svg, drag, 'width0', lineSize + dimensionsGlobal.width.offsets[0], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width1', lineSizeHalf + dimensionsGlobal.width.offsets[1], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width2', lineSizeHalf + dimensionsGlobal.width.offsets[2], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width3', lineSizeHalf + dimensionsGlobal.width.offsets[3], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width4', lineSizeHalf + dimensionsGlobal.width.offsets[4], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width5', lineSizeHalf + dimensionsGlobal.width.offsets[5], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width6', lineSizeHalf + dimensionsGlobal.width.offsets[6], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width7', lineSizeHalf + dimensionsGlobal.width.offsets[7], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    // createLine(svg, drag, 'width0', lineSize + dimensionsGlobal.width.offsets[0], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    // createLine(svg, drag, 'width1', lineSizeHalf + dimensionsGlobal.width.offsets[1], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    // createLine(svg, drag, 'width2', lineSizeHalf + dimensionsGlobal.width.offsets[2], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    // createLine(svg, drag, 'width3', lineSizeHalf + dimensionsGlobal.width.offsets[3], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    // createLine(svg, drag, 'width4', lineSizeHalf + dimensionsGlobal.width.offsets[4], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    // createLine(svg, drag, 'width5', lineSizeHalf + dimensionsGlobal.width.offsets[5], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    // createLine(svg, drag, 'width6', lineSizeHalf + dimensionsGlobal.width.offsets[6], 0, lineSize, dimensionsGlobal.height.total, colorLine);
+    // createLine(svg, drag, 'width7', lineSizeHalf + dimensionsGlobal.width.offsets[7], 0, lineSize, dimensionsGlobal.height.total, colorLine);
     // createLine(svg, drag, 'width8', - lineSizeHalf + dimensionsGlobal.width.offsets[8], 0, lineSize, dimensionsGlobal.height.total, colorLine);
 
     // leftBoundary.call(drag);
@@ -252,59 +252,39 @@ export function getDimensionsGlobal(
     heightExtensionMarginBottom?: number
 ): CellPopDimensionsGlobal {
 
-    // [5, 100, 5, 100, 5, 100, 5, 100, 5]
-    // [0, 5, 105, 110, 210, 215, ...]
-
     const dimensionsGlobal = {
         width: {
             total: width,
-            // parts: {
-            //     left: widthLeft,
-            //     middle: widhtMiddle,
-            //     right: widthRight,
-            // },
-            // margins: {
-            //     left: widthMarginLeft,
-            //     middleLeft: widthMarginMiddleLeft,
-            //     middleRight: widthMarginMiddleRight,
-            //     right: widthMarginRight,
-            // },
-            lengths: [widthMarginLeft, widthLeft, widthMarginMiddleLeft, widhtMiddle, widthMarginMiddleRight, widthRight, widthMarginRight],
-            offsets: [],
-            // offsets: [0, widthMarginLeft, widthMarginLeft+widthLeft, widthMarginLeft+widthLeft+widthMarginMiddleLeft, widthMarginLeft+widthLeft+widthMarginMiddleLeft+widhtMiddle, 
-            //     widthMarginLeft+widthLeft+widthMarginMiddleLeft+widhtMiddle+widthMarginMiddleRight, widthMarginLeft+widthLeft+widthMarginMiddleLeft+widhtMiddle+widthMarginMiddleRight+widthRight,
-            //     widthMarginLeft+widthLeft+widthMarginMiddleLeft+widhtMiddle+widthMarginMiddleRight+widthRight+widthMarginRight,
-            // ]
+            parts: {
+                lengths: [widthLeft, widhtMiddle, widthRight],
+                offsets: [] as number[],
+            },
+            margins: {
+                lengths: [widthMarginLeft, widthMarginMiddleLeft, widthMarginMiddleRight, widthMarginRight],
+                offsets: [] as number[],
+            },
         },
         height: {
             total: height,
-            // parts: {
-            //     top: heightTop,
-            //     middle: heightMiddle,
-            //     bottom: heightBottom,
-            // },
-            // margins: {
-            //     top: heightMarginTop,
-            //     middleTop: heightMarginMiddleTop,
-            //     middleBottom: heightMarginMiddleBottom,
-            //     bottom: heightMarginBottom,
-            //     // extensionTop: heightExtensionMarginTop,
-            //     // extensionBottom: heightExtensionMarginBottom,
-            // },
-            lengths: [heightMarginTop, heightTop, heightMarginMiddleTop, heightMiddle, heightMarginMiddleBottom, heightBottom, heightMarginBottom],
-            offsets: [],
-            // offsets: [0, heightMarginTop, heightMarginTop+heightTop, heightMarginTop+heightTop+heightMarginMiddleTop, heightMarginTop+heightTop+heightMarginMiddleTop+heightMiddle, 
-            //     heightMarginTop+heightTop+heightMarginMiddleTop+heightMiddle+heightMarginMiddleBottom, heightMarginTop+heightTop+heightMarginMiddleTop+heightMiddle+heightMarginMiddleBottom+heightBottom,
-            //     heightMarginTop+heightTop+heightMarginMiddleTop+heightMiddle+heightMarginMiddleBottom+heightBottom+heightMarginBottom,
-            // ]
+            parts: {
+                lengths: [heightTop, heightMiddle, heightBottom],
+                offsets: [] as number[],
+            },
+            margins: {
+                lengths: [heightMarginTop, heightMarginMiddleTop, heightMarginMiddleBottom, heightMarginBottom],
+                offsets: [] as number[],
+            },
         },
         extension: {
             total: heightExtension,
-            lengths: [heightExtensionMarginTop, heightExtensionMiddle, heightExtensionMarginBottom],
-            offsets: [],
-            // offsets: [0, heightExtensionMarginTop, heightExtensionMarginTop+heightExtensionMiddle],
-            // heightMarginTop: heightExtensionMarginTop,
-            // heightMarginBottom: heightExtensionMarginBottom,
+            parts: {
+                lengths: [heightExtensionMiddle],
+                offsets: [] as number[],
+            },
+            margins: {
+                lengths: [heightExtensionMarginTop, heightExtensionMarginBottom],
+                offsets: [] as number[],
+            },
         }
     } as CellPopDimensionsGlobal;
 
@@ -320,20 +300,23 @@ export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal)
 
     // if total width is not specified, set it to default
     if (!dimensionsGlobal.width.total) {
-        if (dimensionsGlobal.width.lengths.filter(i => i).length === dimensionsGlobal.width.lengths.length) {
-            dimensionsGlobal.width.total = dimensionsGlobal.width.lengths.reduce((a,b) => a+b, 0);
-        } else {
+        // if (dimensionsGlobal.width.parts.lengths.filter(i => i).length === dimensionsGlobal.width.parts.lengths.length) {
+        //     if ()
+        // }
+        // if (dimensionsGlobal.width.lengths.filter(i => i).length === dimensionsGlobal.width.lengths.length) {
+        //     dimensionsGlobal.width.total = dimensionsGlobal.width.lengths.reduce((a,b) => a+b, 0);
+        // } else {
             dimensionsGlobal.width.total = 1000;
-        }
+        // }
     }
 
     // if total height is not specified, set it to default
     if (!dimensionsGlobal.height.total) {
-        if (dimensionsGlobal.height.lengths.filter(i => i).length === dimensionsGlobal.height.lengths.length) {
-            dimensionsGlobal.height.total = dimensionsGlobal.height.lengths.reduce((a,b) => a+b, 0);
-        } else {
+        // if (dimensionsGlobal.height.lengths.filter(i => i).length === dimensionsGlobal.height.lengths.length) {
+        //     dimensionsGlobal.height.total = dimensionsGlobal.height.lengths.reduce((a,b) => a+b, 0);
+        // } else {
             dimensionsGlobal.height.total = 1000;
-        }
+        // }
     }
 
     // // for all width and height options, check if specified. If not, set to default. 
@@ -373,31 +356,48 @@ export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal)
     //         dimensionsGlobal.height.margins[heightOption as keyof typeof dimensionsGlobal.height.margins] *= dimensionsGlobal.height.total;
     //     }
     // }
-    for (let i = 0; i < dimensionsGlobal.width.lengths.length; i++) {
-        if (!dimensionsGlobal.width.lengths[i]) {
-            if (i % 2 === 0) {
-                dimensionsGlobal.width.lengths[i] *= 0.3;
-            } else {
-                dimensionsGlobal.width.lengths[i] *= 0.05; 
-            }
+    for (let i = 0; i < dimensionsGlobal.width.parts.lengths.length; i++) {
+        if (!dimensionsGlobal.width.parts.lengths[i]) {
+            dimensionsGlobal.width.parts.lengths[i] = 0.3 * dimensionsGlobal.width.total;
+        }
+    }
+
+    for (let i = 0; i < dimensionsGlobal.width.margins.lengths.length; i++) {
+        if (!dimensionsGlobal.width.margins.lengths[i]) {
+            dimensionsGlobal.width.margins.lengths[i] = 0.05 * dimensionsGlobal.width.total;
+        }
+    }
+
+    for (let i = 0; i < dimensionsGlobal.height.parts.lengths.length; i++) {
+        if (!dimensionsGlobal.height.parts.lengths[i]) {
+            dimensionsGlobal.height.parts.lengths[i] = 0.3 * dimensionsGlobal.height.total;
+        }
+    }
+
+    for (let i = 0; i < dimensionsGlobal.height.margins.lengths.length; i++) {
+        if (!dimensionsGlobal.height.margins.lengths[i]) {
+            dimensionsGlobal.height.margins.lengths[i] = 0.05 * dimensionsGlobal.height.total;
         }
     }
 
     // check if all widths combine to the total width, otherwise resize
-    const widthSum = dimensionsGlobal.width.lengths.reduce((a,b) => a+b, 0);
+    const widthSum = [...dimensionsGlobal.width.parts.lengths, ...dimensionsGlobal.width.margins.lengths].reduce((a,b) => a+b, 0);
     if (widthSum !== dimensionsGlobal.width.total) {
         const widthScale = dimensionsGlobal.width.total / widthSum;
-        for (let i = 0; i < dimensionsGlobal.width.lengths.length; i++) {
-            dimensionsGlobal.width.lengths[i] *= widthScale;
+        for (let i = 0; i < dimensionsGlobal.width.parts.lengths.length; i++) {
+            dimensionsGlobal.width.parts.lengths[i] *= widthScale;
+        }
+        for (let i = 0; i < dimensionsGlobal.width.margins.lengths.length; i++) {
+            dimensionsGlobal.width.margins.lengths[i] *= widthScale;
         }
     }
 
     // check if all heights combine to the total height, otherwise resize
-    const heightSum = dimensionsGlobal.height.lengths.reduce((a,b) => a+b, 0);
+    const heightSum = [...dimensionsGlobal.height.parts.lengths, ...dimensionsGlobal.height.margins.lengths].reduce((a,b) => a+b, 0);
     if (heightSum !== dimensionsGlobal.height.total) {
         const heightScale = dimensionsGlobal.height.total / heightSum;
-        for (let i = 0; i < dimensionsGlobal.height.lengths.length; i++) {
-            dimensionsGlobal.height.lengths[i] *= heightScale;
+        for (let i = 0; i < dimensionsGlobal.height.parts.lengths.length; i++) {
+            dimensionsGlobal.height.margins.lengths[i] *= heightScale;
         }
     }
 
@@ -430,61 +430,96 @@ export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal)
     // }
 
     // create the offsets
-    let currWidthSum = 0;
-    const widthOffsets = [0];
-    for (let i = 0; i < dimensionsGlobal.width.lengths.length - 1; i++) {
-        currWidthSum += dimensionsGlobal.width.lengths[i];
-        widthOffsets.push(currWidthSum);
-    }
-    dimensionsGlobal.width.offsets = widthOffsets;
+    updateOffsets(dimensionsGlobal);
+}
 
-    let currHeightSum = 0;
-    const heightOffsets = [0];
-    for (let i = 0; i < dimensionsGlobal.height.lengths.length - 1; i++) {
-        currHeightSum += dimensionsGlobal.height.lengths[i];
-        heightOffsets.push(currHeightSum);
+function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
+
+    // width parts
+    dimensionsGlobal.width.parts.offsets = [dimensionsGlobal.width.margins.lengths[0]];
+    let currWidthSum = dimensionsGlobal.width.margins.lengths[0];
+    for (let i = 0; i < dimensionsGlobal.width.parts.lengths.length - 1; i++) {
+        currWidthSum += dimensionsGlobal.width.parts.lengths[i];
+        currWidthSum += dimensionsGlobal.width.margins.lengths[i+1];
+        dimensionsGlobal.width.parts.offsets.push(currWidthSum);
     }
-    dimensionsGlobal.height.offsets = heightOffsets;
+
+    // width margins
+    dimensionsGlobal.width.parts.offsets = [0];
+    currWidthSum = 0;
+    for (let i = 0; i < dimensionsGlobal.width.margins.lengths.length - 1; i++) {
+        currWidthSum += dimensionsGlobal.width.margins.lengths[i];
+        currWidthSum += dimensionsGlobal.width.parts.lengths[i];
+        dimensionsGlobal.width.margins.offsets.push(currWidthSum);
+    }
+
+    // height parts
+    dimensionsGlobal.height.parts.offsets = [dimensionsGlobal.height.margins.lengths[0]];
+    let currHeightSum = dimensionsGlobal.height.margins.lengths[0];
+    for (let i = 0; i < dimensionsGlobal.height.parts.lengths.length - 1; i++) {
+        currHeightSum += dimensionsGlobal.height.parts.lengths[i];
+        currHeightSum += dimensionsGlobal.height.margins.lengths[i+1];
+        dimensionsGlobal.height.parts.offsets.push(currHeightSum);
+    }
+
+    // height margins
+    dimensionsGlobal.width.parts.offsets = [0];
+    currHeightSum = 0;
+    for (let i = 0; i < dimensionsGlobal.height.margins.lengths.length - 1; i++) {
+        currHeightSum += dimensionsGlobal.height.margins.lengths[i];
+        currHeightSum += dimensionsGlobal.height.parts.lengths[i];
+        dimensionsGlobal.height.margins.offsets.push(currHeightSum);
+    }
 }
 
 
 
 
 export function getDimensionsFromGlobal(dimensionsGlobal: CellPopDimensionsGlobal): CellPopDimensions {
-    // const offsetWidth1 = dimensionsGlobal.width.margins.left + dimensionsGlobal.width.parts.left;
-    // const offsetWidth2 = offsetWidth1 + dimensionsGlobal.width.margins.middleLeft + dimensionsGlobal.width.parts.middle;
-
-    // const offsetHeight1 = dimensionsGlobal.height.margins.top + dimensionsGlobal.height.parts.top;
-    // const offsetHeight2 = offsetHeight1 + dimensionsGlobal.height.margins.middleTop + dimensionsGlobal.height.parts.middle;
     
     const dimensions = {
 		global: dimensionsGlobal,
-		heatmap: {offsetWidth: dimensionsGlobal.width.offsets[2], offsetHeight: dimensionsGlobal.height.offsets[2], width: dimensionsGlobal.width.lengths[3], height: dimensionsGlobal.height.lengths[3], margin: {left: dimensionsGlobal.width.lengths[2], right: dimensionsGlobal.width.lengths[4], top: dimensionsGlobal.height.lengths[2], bottom: dimensionsGlobal.height.lengths[4]}},
-        //heatmapLegend: {offsetWidth: offsetWidth2, offsetHeight: offsetHeight1, width: dimensionsGlobal.width.parts.right, height: dimensionsGlobal.height.parts.middle, margin: {left: dimensionsGlobal.width.margins.middleRight, right: dimensionsGlobal.width.margins.right, top: dimensionsGlobal.height.margins.middleTop, bottom: dimensionsGlobal.height.margins.middleBottom}},
-		barTop: {offsetWidth: dimensionsGlobal.width.offsets[2], offsetHeight: dimensionsGlobal.height.offsets[0], width: dimensionsGlobal.width.lengths[3], height: dimensionsGlobal.height.lengths[1], margin: {left: dimensionsGlobal.width.lengths[2], right: dimensionsGlobal.width.lengths[4], top: dimensionsGlobal.height.lengths[0], bottom: dimensionsGlobal.height.lengths[2]}},
-		violinTop: {offsetWidth: dimensionsGlobal.width.offsets[2], offsetHeight: dimensionsGlobal.height.offsets[0], width: dimensionsGlobal.width.lengths[3], height: dimensionsGlobal.height.lengths[1], margin: {left: dimensionsGlobal.width.lengths[2], right: dimensionsGlobal.width.lengths[4], top: dimensionsGlobal.height.lengths[0], bottom: dimensionsGlobal.height.lengths[2]}},
-		barLeft: {offsetWidth: dimensionsGlobal.width.offsets[0], offsetHeight: dimensionsGlobal.height.offsets[2], width: dimensionsGlobal.width.lengths[1], height: dimensionsGlobal.height.lengths[3], margin: {left: dimensionsGlobal.width.lengths[0], right: dimensionsGlobal.width.lengths[2], top: dimensionsGlobal.height.lengths[2], bottom: dimensionsGlobal.height.lengths[4]}},
-		violinLeft: {offsetWidth: dimensionsGlobal.width.offsets[0], offsetHeight: dimensionsGlobal.height.offsets[2], width: dimensionsGlobal.width.lengths[1], height: dimensionsGlobal.height.lengths[3], margin: {left: dimensionsGlobal.width.lengths[0], right: dimensionsGlobal.width.lengths[2], top: dimensionsGlobal.height.lengths[2], bottom: dimensionsGlobal.height.lengths[4]}},
-		graph: {offsetWidth: dimensionsGlobal.width.offsets[2], offsetHeight: dimensionsGlobal.height.offsets[4], width: dimensionsGlobal.width.lengths[1], height: dimensionsGlobal.height.lengths[5], margin: {left: dimensionsGlobal.width.lengths[2], right: dimensionsGlobal.width.lengths[4], top: dimensionsGlobal.height.lengths[4], bottom: dimensionsGlobal.height.lengths[6]}},
-		detailBar: {offsetWidth: dimensionsGlobal.width.offsets[2], offsetHeight: dimensionsGlobal.extension.offsets[0], width: dimensionsGlobal.width.lengths[3], height: dimensionsGlobal.extension.lengths[1], margin: {left: dimensionsGlobal.width.lengths[2], right: dimensionsGlobal.width.lengths[4], top: dimensionsGlobal.extension.lengths[0], bottom: dimensionsGlobal.extension.lengths[2]}},
+        heatmap: getDimType(dimensionsGlobal, 1, 1),
+        // heatmapLegend: getDimType(dimensionsGlobal, 2, 1),
+        barTop: getDimType(dimensionsGlobal, 1, 0),
+        violinTop: getDimType(dimensionsGlobal, 1, 0),
+        barLeft: getDimType(dimensionsGlobal, 0, 1),
+        violinLeft: getDimType(dimensionsGlobal, 0, 1),
+        graph: getDimType(dimensionsGlobal, 1, 2),
+		detailBar: {offsetWidth: dimensionsGlobal.width.parts.offsets[1], offsetHeight: dimensionsGlobal.height.parts.offsets[0], width: dimensionsGlobal.width.parts.lengths[1], height: dimensionsGlobal.extension.parts.lengths[0], margin: {left: dimensionsGlobal.width.margins.lengths[1], right: dimensionsGlobal.width.margins.lengths[2], top: dimensionsGlobal.extension.margins.lengths[0], bottom: dimensionsGlobal.extension.margins.lengths[1]}},
 		textSize: {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
 	} as CellPopDimensions;
 
     return dimensions;
 }
 
+function getDimType(dimensionsGlobal: CellPopDimensionsGlobal, widthPosition: number, heightPosition: number) {
+    let dim = {} as CellPopDimensionsValue;
+    dim.width = dimensionsGlobal.width.parts.lengths[widthPosition];
+    dim.offsetWidth = dimensionsGlobal.width.parts.offsets[widthPosition];
+    dim.height = dimensionsGlobal.height.parts.lengths[heightPosition];
+    dim.offsetHeight = dimensionsGlobal.height.parts.offsets[heightPosition];
+    dim.margin = {
+        left: dimensionsGlobal.width.margins.lengths[widthPosition],
+        right: dimensionsGlobal.width.margins.lengths[widthPosition+1],
+        top: dimensionsGlobal.height.margins.lengths[heightPosition],
+        bottom: dimensionsGlobal.height.margins.lengths[heightPosition+1],
+    }
+    return dim;
+}
+
 
 export function updateDimensionsWithGlobal(dimensions: CellPopDimensions): CellPopDimensions {
     const dimensionsGlobal = dimensions.global;
 
-	dimensions.heatmap = {offsetWidth: dimensionsGlobal.width.offsets[2], offsetHeight: dimensionsGlobal.height.offsets[2], width: dimensionsGlobal.width.lengths[3], height: dimensionsGlobal.height.lengths[3], margin: {left: dimensionsGlobal.width.lengths[2], right: dimensionsGlobal.width.lengths[4], top: dimensionsGlobal.height.lengths[2], bottom: dimensionsGlobal.height.lengths[4]}},
-    //dimensions.heatmapLegend = {offsetWidth: offsetWidth2, offsetHeight: offsetHeight1, width: dimensionsGlobal.width.parts.right, height: dimensionsGlobal.height.parts.middle, margin: {left: dimensionsGlobal.width.margins.middleRight, right: dimensionsGlobal.width.margins.right, top: dimensionsGlobal.height.margins.middleTop, bottom: dimensionsGlobal.height.margins.middleBottom}},
-	dimensions.barTop = {offsetWidth: dimensionsGlobal.width.offsets[2], offsetHeight: dimensionsGlobal.height.offsets[0], width: dimensionsGlobal.width.lengths[3], height: dimensionsGlobal.height.lengths[1], margin: {left: dimensionsGlobal.width.lengths[2], right: dimensionsGlobal.width.lengths[4], top: dimensionsGlobal.height.lengths[0], bottom: dimensionsGlobal.height.lengths[2]}},
-	dimensions.violinTop = {offsetWidth: dimensionsGlobal.width.offsets[2], offsetHeight: dimensionsGlobal.height.offsets[0], width: dimensionsGlobal.width.lengths[3], height: dimensionsGlobal.height.lengths[1], margin: {left: dimensionsGlobal.width.lengths[2], right: dimensionsGlobal.width.lengths[4], top: dimensionsGlobal.height.lengths[0], bottom: dimensionsGlobal.height.lengths[2]}},
-	dimensions.barLeft = {offsetWidth: dimensionsGlobal.width.offsets[0], offsetHeight: dimensionsGlobal.height.offsets[2], width: dimensionsGlobal.width.lengths[1], height: dimensionsGlobal.height.lengths[3], margin: {left: dimensionsGlobal.width.lengths[0], right: dimensionsGlobal.width.lengths[2], top: dimensionsGlobal.height.lengths[2], bottom: dimensionsGlobal.height.lengths[4]}},
-	dimensions.violinLeft = {offsetWidth: dimensionsGlobal.width.offsets[0], offsetHeight: dimensionsGlobal.height.offsets[2], width: dimensionsGlobal.width.lengths[1], height: dimensionsGlobal.height.lengths[3], margin: {left: dimensionsGlobal.width.lengths[0], right: dimensionsGlobal.width.lengths[2], top: dimensionsGlobal.height.lengths[2], bottom: dimensionsGlobal.height.lengths[4]}},
-	dimensions.graph = {offsetWidth: dimensionsGlobal.width.offsets[2], offsetHeight: dimensionsGlobal.height.offsets[4], width: dimensionsGlobal.width.lengths[1], height: dimensionsGlobal.height.lengths[5], margin: {left: dimensionsGlobal.width.lengths[2], right: dimensionsGlobal.width.lengths[4], top: dimensionsGlobal.height.lengths[4], bottom: dimensionsGlobal.height.lengths[6]}},
-	dimensions.detailBar = {offsetWidth: dimensionsGlobal.width.offsets[2], offsetHeight: dimensionsGlobal.extension.offsets[0], width: dimensionsGlobal.width.lengths[3], height: dimensionsGlobal.extension.lengths[1], margin: {left: dimensionsGlobal.width.lengths[2], right: dimensionsGlobal.width.lengths[4], top: dimensionsGlobal.extension.lengths[0], bottom: dimensionsGlobal.extension.lengths[2]}},
+    dimensions.heatmap = getDimType(dimensionsGlobal, 1, 1),
+    //dimensions.heatmapLegend = getDimType(dimensionsGlobal, 2, 1),
+    dimensions.barTop = getDimType(dimensionsGlobal, 1, 0),
+    dimensions.violinTop = getDimType(dimensionsGlobal, 1, 0),
+    dimensions.barLeft = getDimType(dimensionsGlobal, 0, 1),
+    dimensions.violinLeft = getDimType(dimensionsGlobal, 0, 1),
+    dimensions.graph = getDimType(dimensionsGlobal, 1, 2),
+    dimensions.detailBar = {offsetWidth: dimensionsGlobal.width.parts.offsets[1], offsetHeight: dimensionsGlobal.height.parts.offsets[0], width: dimensionsGlobal.width.parts.lengths[1], height: dimensionsGlobal.extension.parts.lengths[0], margin: {left: dimensionsGlobal.width.margins.lengths[1], right: dimensionsGlobal.width.margins.lengths[2], top: dimensionsGlobal.extension.margins.lengths[0], bottom: dimensionsGlobal.extension.margins.lengths[1]}},
 	dimensions.textSize = {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
 
     return dimensions;
