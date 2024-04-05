@@ -420,12 +420,14 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
         updateDimensionsWithGlobal(dimensions)
         d3.selectAll("svg").attr("width", dimensionsGlobal.width.total).attr("height", dimensionsGlobal.height.total);
         renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
+        resizeLabels(dimensions);
         drawSizeBoundaries(data, dimensions, fraction, themeColors, metadataField);
     })
     drag.on("end", function() {
         updateDimensionsWithGlobal(dimensions);
         d3.selectAll("svg").attr("width", dimensionsGlobal.width.total).attr("height", dimensionsGlobal.height.total);
         renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
+        resizeLabels(dimensions);
         drawSizeBoundaries(data, dimensions, fraction, themeColors, metadataField);
         
         // set as inactive
@@ -463,4 +465,28 @@ function createLine(svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>, d
 export function removeSizeBoundaries() {
     // Remove any prior size
 	d3.select("g.boundary").remove();
+}
+
+function resizeLabels(dimensions: CellPopDimensions) {
+    // select text from right axis
+    const axisrightText = d3.select(".axisright").selectAll("text");
+    // calculate the maximum size of the labels
+    const axisrightTextMaxWidth = d3.max(axisrightText.nodes(), n => (n as SVGTextElement).getComputedTextLength());
+
+    // if the labels are larger than the margin space, resize
+    if (axisrightTextMaxWidth > dimensions.heatmap.margin.right) {
+        // todo: resize properly
+        axisrightText.style("font-size", 5);
+    }
+    
+
+    // select text from bottom axis
+    const axisbottomText = d3.select(".axisbottom").selectAll("text");
+    // calculate the maximum size of the labels
+    const axisbottomTextMaxWidth = d3.max(axisbottomText.nodes(), n => (n as SVGTextElement).getComputedTextLength());
+
+    // if the labels are larger than the margin space, resize
+    if (axisbottomTextMaxWidth > dimensions.heatmap.margin.bottom) {
+        axisbottomText.style("font-size", 5);
+    }
 }
