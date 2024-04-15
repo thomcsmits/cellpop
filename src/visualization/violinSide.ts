@@ -5,7 +5,6 @@ import { defineTooltipBarSide, addTooltipBarSide, removeTooltipBarSide } from ".
 import { CellPopData, CellPopDimensions, CellPopThemeColors } from "../cellpop-schema";
 
 export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimensions, y: d3.ScaleBand<string>, themeColors: CellPopThemeColors, fraction: boolean) {
-    console.log('here')
     let countsMatrix = data.countsMatrix;
 	if (fraction) {
 		countsMatrix = data.countsMatrixFractions.row;
@@ -61,7 +60,6 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
     }
 
     function epanechnikov(bandwidth: number) {
-		console.log('bandwidth', bandwidth)
         return x => Math.abs(x /= bandwidth) <= 1 ? 0.75 * (1 - x * x) / bandwidth : 0;
     }
 

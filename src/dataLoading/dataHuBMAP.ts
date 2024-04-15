@@ -11,7 +11,6 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering, metadat
 
 	const obsSetsListPromises = getPromiseData(urls);
 	const promiseData = Promise.all(obsSetsListPromises).then(obsSetsListWrapped => {
-		console.log('obsSetsListWrapped', obsSetsListWrapped)
 		// wrangle data
 		const obsSetsList = obsSetsListWrapped.map((o) => o.data.obsSets);
 		return obsSetsList as ObsSets[];
@@ -91,7 +90,6 @@ function getPromiseMetadata(uuids: string[]): Promise<void | [string[], [string,
 		.then(queryBody => {
 			const listAll = queryBody.hits.hits;
 			const metadata = listAll.map((l: HuBMAPMetaData) => {
-				console.log(l)
 				const ls = l._source;
 				const dmm = l._source.donor.mapped_metadata;
 				return {row: ls.hubmap_id, metadata: {title: ls.title, dataset_type: ls.dataset_type, anatomy_2: ls.anatomy_2[0], sex: dmm.sex[0], age: dmm.age_value[0]}};

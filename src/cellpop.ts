@@ -59,7 +59,6 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 		fraction = false;
 	}
 
-	console.log('data', data);
 	const app = document.getElementById('app');
 
 	
@@ -97,7 +96,8 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 		label.appendChild(input);
 		label.addEventListener('click', () => {
 			if (op[0] !== 'None') {
-				console.log(op[0])
+				// todo: fix
+				// console.log(op[0])
 			}
 		})
 		buttonMetadata.appendChild(label);
@@ -131,8 +131,6 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 	renderCellPopVisualization(data, dimensions, fraction, themeColors);
 	
 	// svg.attr("resize", "both")
-
-	console.log(svg)
 
 	return svg
 }

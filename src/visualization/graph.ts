@@ -101,7 +101,7 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
         node.collapsed = false;
         node.hidden = false;
     
-        console.log(node.x, node.y)
+        // console.log(node.x, node.y)
     })
 
 

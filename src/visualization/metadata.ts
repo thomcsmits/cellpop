@@ -20,10 +20,8 @@ export function getPossibleMetadataSelections(data: CellPopData) {
 
 export function sortByMetadata(data: CellPopData, op: string) {
     const rowsMeta = data.metadata.rows;
-    console.log(rowsMeta)
 
     const opVals = rowsMeta.map(r => [r.row, r.metadata[op[0]]]);
-    console.log(opVals);
     
     // // Update the ordering of rowNames
     // data.rowNames = reorderArray(data.rowNames, currentIndex, newIndex);

@@ -62,8 +62,6 @@ export function getDimensions(
     const dimensionsGlobal = getDimensionsGlobal(width, widthLeft, widhtMiddle, widthRight, widthMarginLeft, widthMarginMiddleLeft, widthMarginMiddleRight, widthMarginRight, height, heightTop, heightMiddle, heightBottom, heightMarginTop, heightMarginMiddleTop, heightMarginMiddleBottom, heightMarginBottom, heightExtension, heightExtensionMiddle, heightExtensionMarginTop, heightExtensionMarginBottom);
 
     const dimensions = getDimensionsFromGlobal(dimensionsGlobal);
-
-    console.log('dimensions', dimensions)
     
     return dimensions;
 }

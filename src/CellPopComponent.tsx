@@ -22,7 +22,6 @@ import { CellPopProps, CellPopDimensions, CellPopTheme, CellPopData } from "./ce
 
 
 export const CellPop = (props: CellPopProps) => {
-	console.log(props);
 	if (!props.data) {
 		return <></>;
 	}
@@ -122,14 +121,12 @@ export const CellPop = (props: CellPopProps) => {
 	// animation pop-up
 	const handleAnimantionPopup = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		setAnimationAnchor(animationAnchor ? null : event.currentTarget);
-		console.log(event.currentTarget)
 		removeBoundary();
 	};
 
 	function showBoundary() {
 		const themeColors = getTheme(theme);
 		const smth = drawSizeBoundaries(props.data, dimensions, fraction, themeColors, metadataField);
-		console.log('smth', smth)
 		setBoundary(true);
 	}
 

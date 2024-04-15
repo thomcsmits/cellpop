@@ -35,7 +35,6 @@ const uuids = ['ad693f99fb9006e68a53e97598da1509',
 
 // Load data directly as demo
 loadHuBMAPData(uuids).then((data) => {
-	console.log('data', data);
 	getMainVis(data!);
 }).catch(error => {
 	console.error(error);

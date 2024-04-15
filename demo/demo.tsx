@@ -44,7 +44,6 @@ function Demo() {
 	useEffect(() => {
 		loadHuBMAPData(uuids).then((data) => {
 			setData(data!);
-			console.log('data', data);
 			// getMainVis(data);
 			}).catch(error => {
 				console.error(error);
