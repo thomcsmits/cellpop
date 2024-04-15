@@ -339,7 +339,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
     })
     drag.on("drag", function(event) {
         const element = d3.select(`.${className}`)
-        console.log('classname', className)
         switch(className) {
             case 'boundary-width0': // between side and margin 0
                 if (event.x < 0) {
@@ -452,7 +451,7 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
 }
 
 function createLine(svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>, drag: d3.DragBehavior<Element, unknown, unknown>, className: string, x: number, y: number, width: number, height: number, color: string) {
-    svg.append("rect")
+    const line = svg.append("rect")
         .attr("class", `boundary-${className}`)
         .attr("x", x)
         .attr("y", y)
@@ -460,6 +459,15 @@ function createLine(svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>, d
         .attr("height", height)
         .style("fill", color)
         .call(drag)
+
+    line.on("mouseover", (event) => {
+        d3.select(event.target).style("opacity", 0.7)
+    })
+
+    line.on("mouseout", (event) => {
+        d3.select(event.target).style("opacity", 1)
+    })
+    
 }
 
 export function removeSizeBoundaries() {
