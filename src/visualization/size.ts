@@ -222,6 +222,8 @@ export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal)
 
 function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
 
+    // todo: add 5px around sides
+
     // width parts
     dimensionsGlobal.width.parts.offsets = [dimensionsGlobal.width.margins.lengths[0]];
     let currWidthSum = dimensionsGlobal.width.margins.lengths[0];
@@ -448,6 +450,7 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
     const colorSide = 'red';
     const colorCorner = 'red';
 
+    // width lines
     createLine(svg, drag, 'width0', lineSize + dimensionsGlobal.width.margins.offsets[0], 0, lineSize, dimensionsGlobal.height.total, colorSide);
     createLine(svg, drag, 'width1', lineSizeHalf + dimensionsGlobal.width.parts.offsets[0], 0, lineSize, dimensionsGlobal.height.total, colorLine);
     createLine(svg, drag, 'width2', lineSizeHalf + dimensionsGlobal.width.margins.offsets[1], 0, lineSize, dimensionsGlobal.height.total, colorLine);
@@ -456,6 +459,16 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
     createLine(svg, drag, 'width5', lineSizeHalf + dimensionsGlobal.width.parts.offsets[2], 0, lineSize, dimensionsGlobal.height.total, colorLine);
     createLine(svg, drag, 'width6', lineSizeHalf + dimensionsGlobal.width.margins.offsets[3], 0, lineSize, dimensionsGlobal.height.total, colorLine);
     createLine(svg, drag, 'width7', - lineSize + dimensionsGlobal.width.total, 0, lineSize, dimensionsGlobal.height.total, colorSide);
+
+    // height lines
+    createLine(svg, drag, 'height0', 0, lineSize + dimensionsGlobal.height.margins.offsets[0], dimensionsGlobal.height.total, lineSize, colorSide);
+    createLine(svg, drag, 'height1', 0, - lineSizeHalf + dimensionsGlobal.height.parts.offsets[0], dimensionsGlobal.height.total, lineSize, colorLine);
+    createLine(svg, drag, 'height2', 0, - lineSizeHalf + dimensionsGlobal.height.margins.offsets[1], dimensionsGlobal.height.total, lineSize, colorLine);
+    createLine(svg, drag, 'height3', 0, - lineSizeHalf + dimensionsGlobal.height.parts.offsets[1], dimensionsGlobal.height.total, lineSize, colorLine);
+    createLine(svg, drag, 'height4', 0, - lineSizeHalf + dimensionsGlobal.height.margins.offsets[2], dimensionsGlobal.height.total, lineSize, colorLine);
+    createLine(svg, drag, 'height5', 0, - lineSizeHalf + dimensionsGlobal.height.parts.offsets[2], dimensionsGlobal.height.total, lineSize, colorLine);
+    createLine(svg, drag, 'height6', 0, - lineSizeHalf + dimensionsGlobal.height.margins.offsets[3], dimensionsGlobal.height.total, lineSize, colorLine);
+    createLine(svg, drag, 'height7', 0, - lineSize + dimensionsGlobal.height.total, dimensionsGlobal.height.total, lineSize, colorSide);
 }
 
 function createLine(svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>, drag: d3.DragBehavior<Element, unknown, unknown>, className: string, x: number, y: number, width: number, height: number, color: string) {
