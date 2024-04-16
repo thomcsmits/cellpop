@@ -341,17 +341,18 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
             case 'boundary-width0': // between side and margin 0
                 if (event.x < 0) {
                     // make svg bigger
+                    dimensionsGlobal.width.total += 0 - event.x;
+                    dimensionsGlobal.width.margins.lengths[0] += 0 - event.x;
+                    // update all offsets
+                    updateOffsets(dimensionsGlobal);
+
                 }
                 if (event.x > 0 && event.x < dimensionsGlobal.width.parts.offsets[0]) {
                     // make svg smaller
-
-                    // element.attr("x", event.x);
-                    // dimensionsGlobal.width.margins.offsets[0] = event.x;
-                    // dimensionsGlobal.width.margins.lengths[0] = event.x;
-                    // dimensionsGlobal.width.parts
-                    // dimensionsGlobal.width.offsets[1] = event.x;
-                    // dimensionsGlobal.width.lengths[1] = dimensionsGlobal.width.offsets[1] - dimensionsGlobal.width.offsets[0];
-                    // dimensionsGlobal.width.lengths[2] = dimensionsGlobal.width.offsets[2] - dimensionsGlobal.width.offsets[1];
+                    dimensionsGlobal.width.total -= event.x;
+                    dimensionsGlobal.width.margins.lengths[0] -= event.x;
+                    // update all offsets
+                    updateOffsets(dimensionsGlobal);
                 }
                 break;
             case 'boundary-width1': // between margin 0 and part 0
@@ -395,19 +396,29 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 }
                 break;
             case 'boundary-width6': // between part 3 and margin 4
-                if (event.x > dimensionsGlobal.width.parts.offsets[2] && event.x < dimensionsGlobal.width.parts.offsets[3]) {
+                if (event.x > dimensionsGlobal.width.parts.offsets[2] && event.x < dimensionsGlobal.width.total) {
                     element.attr("x", event.x);
                     dimensionsGlobal.width.margins.offsets[3] = event.x;
                     dimensionsGlobal.width.parts.lengths[2] = event.x - dimensionsGlobal.width.parts.offsets[2];
-                    dimensionsGlobal.width.margins.lengths[3] = dimensionsGlobal.width.parts.offsets[3] - event.x;
+                    dimensionsGlobal.width.margins.lengths[3] = dimensionsGlobal.width.total - event.x;
                 }
                 break;
             case 'boundary-width7': // between margin 4 and side
-                if (event.x > dimensionsGlobal.width.margins.offsets[3] && event.x < dimensionsGlobal.width.margins.offsets[4]) {
+                 console.log('here')
+                 console.log(dimensionsGlobal.width)
+                if (event.x > dimensionsGlobal.width.margins.offsets[3] && event.x < dimensionsGlobal.width.total) {
                     // make svg smaller
+                    dimensionsGlobal.width.total -= event.x - dimensionsGlobal.width.margins.offsets[3];
+                    dimensionsGlobal.width.margins.lengths[3] -= event.x - dimensionsGlobal.width.margins.offsets[3];
+                    // update all offsets
+                    updateOffsets(dimensionsGlobal);
                 }
-                if (event.x > dimensionsGlobal.width.margins.offsets[4]) {
+                if (event.x > dimensionsGlobal.width.total) {
                     // make svg bigger
+                    dimensionsGlobal.width.total = event.x;
+                    dimensionsGlobal.width.margins.lengths[3] += event.x - dimensionsGlobal.width.margins.offsets[3];
+                    // update all offsets
+                    updateOffsets(dimensionsGlobal);
                 }
                 break;
             default:
@@ -444,8 +455,7 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
     createLine(svg, drag, 'width4', lineSizeHalf + dimensionsGlobal.width.margins.offsets[2], 0, lineSize, dimensionsGlobal.height.total, colorLine);
     createLine(svg, drag, 'width5', lineSizeHalf + dimensionsGlobal.width.parts.offsets[2], 0, lineSize, dimensionsGlobal.height.total, colorLine);
     createLine(svg, drag, 'width6', lineSizeHalf + dimensionsGlobal.width.margins.offsets[3], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width7', lineSizeHalf + dimensionsGlobal.width.parts.offsets[3], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width8', - lineSize + dimensionsGlobal.width.total, 0, lineSize, dimensionsGlobal.height.total, colorSide);
+    createLine(svg, drag, 'width7', - lineSize + dimensionsGlobal.width.total, 0, lineSize, dimensionsGlobal.height.total, colorSide);
 }
 
 function createLine(svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>, drag: d3.DragBehavior<Element, unknown, unknown>, className: string, x: number, y: number, width: number, height: number, color: string) {
