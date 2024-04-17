@@ -101,6 +101,7 @@ export function getDimensionsGlobal(
                 lengths: [widthMarginLeft, widthMarginMiddleLeft, widthMarginMiddleRight, widthMarginRight],
                 offsets: [] as number[],
             },
+            border: 10,
         },
         height: {
             total: height,
@@ -112,6 +113,7 @@ export function getDimensionsGlobal(
                 lengths: [heightMarginTop, heightMarginMiddleTop, heightMarginMiddleBottom, heightMarginBottom],
                 offsets: [] as number[],
             },
+            border: 10,
         },
         extension: {
             total: heightExtension,
@@ -161,7 +163,7 @@ export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal)
     // Check if fraction, if so, set to absolute.
     for (let i = 0; i < dimensionsGlobal.width.parts.lengths.length; i++) {
         if (!dimensionsGlobal.width.parts.lengths[i]) {
-            dimensionsGlobal.width.parts.lengths[i] = 0.3 * dimensionsGlobal.width.total;
+            dimensionsGlobal.width.parts.lengths[i] = 0.25 * dimensionsGlobal.width.total;
         }
         if (dimensionsGlobal.width.parts.lengths[i] < 1) {
             dimensionsGlobal.width.parts.lengths[i] *= dimensionsGlobal.width.total;
@@ -179,7 +181,7 @@ export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal)
 
     for (let i = 0; i < dimensionsGlobal.height.parts.lengths.length; i++) {
         if (!dimensionsGlobal.height.parts.lengths[i]) {
-            dimensionsGlobal.height.parts.lengths[i] = 0.3 * dimensionsGlobal.height.total;
+            dimensionsGlobal.height.parts.lengths[i] = 0.25 * dimensionsGlobal.height.total;
         }
         if (dimensionsGlobal.height.parts.lengths[i] < 1) {
             dimensionsGlobal.height.parts.lengths[i] *= dimensionsGlobal.height.total;
@@ -197,8 +199,8 @@ export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal)
 
     // check if all widths combine to the total width, otherwise resize
     const widthSum = [...dimensionsGlobal.width.parts.lengths, ...dimensionsGlobal.width.margins.lengths].reduce((a,b) => a+b, 0);
-    if (widthSum !== dimensionsGlobal.width.total) {
-        const widthScale = dimensionsGlobal.width.total / widthSum;
+    if (widthSum !== (dimensionsGlobal.width.total - 2 * dimensionsGlobal.width.border)) {
+        const widthScale = (dimensionsGlobal.width.total - 2 * dimensionsGlobal.width.border) / widthSum;
         for (let i = 0; i < dimensionsGlobal.width.parts.lengths.length; i++) {
             dimensionsGlobal.width.parts.lengths[i] *= widthScale;
         }
@@ -209,24 +211,32 @@ export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal)
 
     // check if all heights combine to the total height, otherwise resize
     const heightSum = [...dimensionsGlobal.height.parts.lengths, ...dimensionsGlobal.height.margins.lengths].reduce((a,b) => a+b, 0);
-    if (heightSum !== dimensionsGlobal.height.total) {
-        const heightScale = dimensionsGlobal.height.total / heightSum;
+    if (heightSum !== dimensionsGlobal.height.total - 2 * dimensionsGlobal.height.border) {
+        const heightScale = (dimensionsGlobal.height.total - 2 * dimensionsGlobal.height.border) / heightSum;
         for (let i = 0; i < dimensionsGlobal.height.parts.lengths.length; i++) {
+            dimensionsGlobal.height.parts.lengths[i] *= heightScale;
+        }
+        for (let i = 0; i < dimensionsGlobal.height.margins.lengths.length; i++) {
             dimensionsGlobal.height.margins.lengths[i] *= heightScale;
         }
     }
 
     // create the offsets
     updateOffsets(dimensionsGlobal);
+    console.log('gl', dimensionsGlobal)
 }
 
 function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
 
-    // todo: add 5px around sides
+    // add border around sides
+    const borderWidth = dimensionsGlobal.height.border;
+    const borderHeight = dimensionsGlobal.width.border;
+
 
     // width parts
-    dimensionsGlobal.width.parts.offsets = [dimensionsGlobal.width.margins.lengths[0]];
-    let currWidthSum = dimensionsGlobal.width.margins.lengths[0];
+    dimensionsGlobal.width.parts.offsets = [borderWidth + dimensionsGlobal.width.margins.lengths[0]];
+    console.log( dimensionsGlobal.width.parts.offsets)
+    let currWidthSum = borderWidth + dimensionsGlobal.width.margins.lengths[0];
     for (let i = 0; i < dimensionsGlobal.width.parts.lengths.length - 1; i++) {
         currWidthSum += dimensionsGlobal.width.parts.lengths[i];
         currWidthSum += dimensionsGlobal.width.margins.lengths[i+1];
@@ -234,8 +244,8 @@ function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
     }
 
     // width margins
-    dimensionsGlobal.width.margins.offsets = [0];
-    currWidthSum = 0;
+    dimensionsGlobal.width.margins.offsets = [borderWidth];
+    currWidthSum = borderWidth;
     for (let i = 0; i < dimensionsGlobal.width.margins.lengths.length - 1; i++) {
         currWidthSum += dimensionsGlobal.width.margins.lengths[i];
         currWidthSum += dimensionsGlobal.width.parts.lengths[i];
@@ -243,8 +253,8 @@ function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
     }
 
     // height parts
-    dimensionsGlobal.height.parts.offsets = [dimensionsGlobal.height.margins.lengths[0]];
-    let currHeightSum = dimensionsGlobal.height.margins.lengths[0];
+    dimensionsGlobal.height.parts.offsets = [borderHeight + dimensionsGlobal.height.margins.lengths[0]];
+    let currHeightSum = borderHeight + dimensionsGlobal.height.margins.lengths[0];
     for (let i = 0; i < dimensionsGlobal.height.parts.lengths.length - 1; i++) {
         currHeightSum += dimensionsGlobal.height.parts.lengths[i];
         currHeightSum += dimensionsGlobal.height.margins.lengths[i+1];
@@ -252,8 +262,8 @@ function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
     }
 
     // height margins
-    dimensionsGlobal.height.margins.offsets = [0];
-    currHeightSum = 0;
+    dimensionsGlobal.height.margins.offsets = [borderHeight];
+    currHeightSum = borderHeight;
     for (let i = 0; i < dimensionsGlobal.height.margins.lengths.length - 1; i++) {
         currHeightSum += dimensionsGlobal.height.margins.lengths[i];
         currHeightSum += dimensionsGlobal.height.parts.lengths[i];
@@ -358,7 +368,7 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 }
                 break;
             case 'boundary-width1': // between margin 0 and part 0
-                if (event.x > 0 && event.x < dimensionsGlobal.width.margins.offsets[1]) {
+                if (event.x > dimensionsGlobal.width.border && event.x < dimensionsGlobal.width.margins.offsets[1]) {
                     element.attr("x", event.x);
                     dimensionsGlobal.width.parts.offsets[0] = event.x;
                     dimensionsGlobal.width.margins.lengths[0] = event.x;
@@ -398,7 +408,7 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 }
                 break;
             case 'boundary-width6': // between part 3 and margin 4
-                if (event.x > dimensionsGlobal.width.parts.offsets[2] && event.x < dimensionsGlobal.width.total) {
+                if (event.x > dimensionsGlobal.width.parts.offsets[2] && event.x < dimensionsGlobal.width.total - dimensionsGlobal.width.border) {
                     element.attr("x", event.x);
                     dimensionsGlobal.width.margins.offsets[3] = event.x;
                     dimensionsGlobal.width.parts.lengths[2] = event.x - dimensionsGlobal.width.parts.offsets[2];
@@ -450,25 +460,30 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
     const colorSide = 'red';
     const colorCorner = 'red';
 
-    // width lines
-    createLine(svg, drag, 'width0', lineSize + dimensionsGlobal.width.margins.offsets[0], 0, lineSize, dimensionsGlobal.height.total, colorSide);
-    createLine(svg, drag, 'width1', lineSizeHalf + dimensionsGlobal.width.parts.offsets[0], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width2', lineSizeHalf + dimensionsGlobal.width.margins.offsets[1], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width3', lineSizeHalf + dimensionsGlobal.width.parts.offsets[1], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width4', lineSizeHalf + dimensionsGlobal.width.margins.offsets[2], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width5', lineSizeHalf + dimensionsGlobal.width.parts.offsets[2], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width6', lineSizeHalf + dimensionsGlobal.width.margins.offsets[3], 0, lineSize, dimensionsGlobal.height.total, colorLine);
-    createLine(svg, drag, 'width7', - lineSize + dimensionsGlobal.width.total, 0, lineSize, dimensionsGlobal.height.total, colorSide);
+    const lineHeight = dimensionsGlobal.height.total - 2 * dimensionsGlobal.height.border;
+    const lineWidth = dimensionsGlobal.width.total - 2 * dimensionsGlobal.width.border;
 
+    // width lines
+    createLine(svg, drag, 'width0', 0, dimensionsGlobal.height.border, dimensionsGlobal.width.border, dimensionsGlobal.height.total, colorSide);
+    createLine(svg, drag, 'width7', dimensionsGlobal.width.total - dimensionsGlobal.width.border, dimensionsGlobal.height.border, dimensionsGlobal.width.border, dimensionsGlobal.height.total, colorSide);
+
+    createLine(svg, drag, 'width1', - lineSizeHalf + dimensionsGlobal.width.parts.offsets[0], dimensionsGlobal.height.border, lineSize, lineHeight, colorLine);
+    createLine(svg, drag, 'width2', - lineSizeHalf + dimensionsGlobal.width.margins.offsets[1], dimensionsGlobal.height.border, lineSize, lineHeight, colorLine);
+    createLine(svg, drag, 'width3', - lineSizeHalf + dimensionsGlobal.width.parts.offsets[1], dimensionsGlobal.height.border, lineSize, lineHeight, colorLine);
+    createLine(svg, drag, 'width4', - lineSizeHalf + dimensionsGlobal.width.margins.offsets[2], dimensionsGlobal.height.border, lineSize, lineHeight, colorLine);
+    createLine(svg, drag, 'width5', - lineSizeHalf + dimensionsGlobal.width.parts.offsets[2], dimensionsGlobal.height.border, lineSize, lineHeight, colorLine);
+    createLine(svg, drag, 'width6', - lineSizeHalf + dimensionsGlobal.width.margins.offsets[3], dimensionsGlobal.height.border, lineSize, lineHeight, colorLine);
+    
     // height lines
-    createLine(svg, drag, 'height0', 0, lineSize + dimensionsGlobal.height.margins.offsets[0], dimensionsGlobal.height.total, lineSize, colorSide);
-    createLine(svg, drag, 'height1', 0, - lineSizeHalf + dimensionsGlobal.height.parts.offsets[0], dimensionsGlobal.height.total, lineSize, colorLine);
-    createLine(svg, drag, 'height2', 0, - lineSizeHalf + dimensionsGlobal.height.margins.offsets[1], dimensionsGlobal.height.total, lineSize, colorLine);
-    createLine(svg, drag, 'height3', 0, - lineSizeHalf + dimensionsGlobal.height.parts.offsets[1], dimensionsGlobal.height.total, lineSize, colorLine);
-    createLine(svg, drag, 'height4', 0, - lineSizeHalf + dimensionsGlobal.height.margins.offsets[2], dimensionsGlobal.height.total, lineSize, colorLine);
-    createLine(svg, drag, 'height5', 0, - lineSizeHalf + dimensionsGlobal.height.parts.offsets[2], dimensionsGlobal.height.total, lineSize, colorLine);
-    createLine(svg, drag, 'height6', 0, - lineSizeHalf + dimensionsGlobal.height.margins.offsets[3], dimensionsGlobal.height.total, lineSize, colorLine);
-    createLine(svg, drag, 'height7', 0, - lineSize + dimensionsGlobal.height.total, dimensionsGlobal.height.total, lineSize, colorSide);
+    createLine(svg, drag, 'height0', dimensionsGlobal.width.border, 0, dimensionsGlobal.width.total, dimensionsGlobal.height.border, colorSide);
+    createLine(svg, drag, 'height7', dimensionsGlobal.width.border, dimensionsGlobal.height.total - dimensionsGlobal.height.border, dimensionsGlobal.width.total, dimensionsGlobal.height.border, colorSide);
+
+    createLine(svg, drag, 'height1', dimensionsGlobal.width.border, - lineSizeHalf + dimensionsGlobal.height.parts.offsets[0], lineWidth, lineSize, colorLine);
+    createLine(svg, drag, 'height2', dimensionsGlobal.width.border, - lineSizeHalf + dimensionsGlobal.height.margins.offsets[1], lineWidth, lineSize, colorLine);
+    createLine(svg, drag, 'height3', dimensionsGlobal.width.border, - lineSizeHalf + dimensionsGlobal.height.parts.offsets[1], lineWidth, lineSize, colorLine);
+    createLine(svg, drag, 'height4', dimensionsGlobal.width.border, - lineSizeHalf + dimensionsGlobal.height.margins.offsets[2], lineWidth, lineSize, colorLine);
+    createLine(svg, drag, 'height5', dimensionsGlobal.width.border, - lineSizeHalf + dimensionsGlobal.height.parts.offsets[2], lineWidth, lineSize, colorLine);
+    createLine(svg, drag, 'height6', dimensionsGlobal.width.border, - lineSizeHalf + dimensionsGlobal.height.margins.offsets[3], lineWidth, lineSize, colorLine);
 }
 
 function createLine(svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>, drag: d3.DragBehavior<Element, unknown, unknown>, className: string, x: number, y: number, width: number, height: number, color: string) {

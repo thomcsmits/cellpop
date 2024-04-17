@@ -132,7 +132,8 @@ export type CellPopDimensionsGlobalInner = {
     margins: {
         lengths: number[],
         offsets: number[]
-    }
+    },
+    border: number
 }
 
 export type CellPopTheme = "light"| "dark";
