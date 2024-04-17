@@ -207,7 +207,7 @@ export const CellPop = (props: CellPopProps) => {
 				{animationAnchor ? <svg className="animate-svg" width={dimensions.global.width / 2} height={dimensions.global.height / 2}></svg> : null}
 			</Box> */}
 
-			<div id='cellpopvis' ref={cellPopRef}></div>
+			<div id='cellpopvis' ref={cellPopRef} style={{position: "absolute", padding: "100px"}}></div>
 
 		</div>
 	)
