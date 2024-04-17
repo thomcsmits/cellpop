@@ -231,10 +231,8 @@ function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
     const borderWidth = dimensionsGlobal.height.border;
     const borderHeight = dimensionsGlobal.width.border;
 
-
     // width parts
     dimensionsGlobal.width.parts.offsets = [borderWidth + dimensionsGlobal.width.margins.lengths[0]];
-    console.log( dimensionsGlobal.width.parts.offsets)
     let currWidthSum = borderWidth + dimensionsGlobal.width.margins.lengths[0];
     for (let i = 0; i < dimensionsGlobal.width.parts.lengths.length - 1; i++) {
         currWidthSum += dimensionsGlobal.width.parts.lengths[i];
@@ -347,7 +345,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
         d3.select(`.${className}`).classed("active", true);
     })
     drag.on("drag", function(event) {
-        const element = d3.select(`.${className}`)
         switch(className) {
             case 'boundary-width0': // between side and margin 0
                 if (event.x < 0) {
@@ -368,7 +365,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-width1': // between margin 0 and part 0
                 if (event.x > dimensionsGlobal.width.border && event.x < dimensionsGlobal.width.margins.offsets[1]) {
-                    element.attr("x", event.x);
                     dimensionsGlobal.width.parts.offsets[0] = event.x;
                     dimensionsGlobal.width.margins.lengths[0] = event.x - dimensionsGlobal.width.border;
                     dimensionsGlobal.width.parts.lengths[0] = dimensionsGlobal.width.margins.offsets[1] - event.x;
@@ -376,7 +372,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-width2': // between part 0 and margin 1
                 if (event.x > dimensionsGlobal.width.parts.offsets[0] && event.x < dimensionsGlobal.width.parts.offsets[1]) {
-                    element.attr("x", event.x);
                     dimensionsGlobal.width.margins.offsets[1] = event.x;
                     dimensionsGlobal.width.parts.lengths[0] = event.x - dimensionsGlobal.width.parts.offsets[0];
                     dimensionsGlobal.width.margins.lengths[1] = dimensionsGlobal.width.parts.offsets[1] - event.x;
@@ -384,7 +379,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-width3': // between margin 1 and part 2
                 if (event.x > dimensionsGlobal.width.margins.offsets[1] && event.x < dimensionsGlobal.width.margins.offsets[2]) {
-                    element.attr("x", event.x);
                     dimensionsGlobal.width.parts.offsets[1] = event.x;
                     dimensionsGlobal.width.margins.lengths[1] = event.x - dimensionsGlobal.width.margins.offsets[1];
                     dimensionsGlobal.width.parts.lengths[1] = dimensionsGlobal.width.margins.offsets[2] - event.x;
@@ -392,7 +386,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-width4': // between part 2 and margin 2
                 if (event.x > dimensionsGlobal.width.parts.offsets[1] && event.x < dimensionsGlobal.width.parts.offsets[2]) {
-                    element.attr("x", event.x);
                     dimensionsGlobal.width.margins.offsets[2] = event.x;
                     dimensionsGlobal.width.parts.lengths[1] = event.x - dimensionsGlobal.width.parts.offsets[1];
                     dimensionsGlobal.width.margins.lengths[2] = dimensionsGlobal.width.parts.offsets[2] - event.x;
@@ -400,7 +393,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-width5': // between margin 2 and part 3
                 if (event.x > dimensionsGlobal.width.margins.offsets[2] && event.x < dimensionsGlobal.width.margins.offsets[3]) {
-                    element.attr("x", event.x);
                     dimensionsGlobal.width.parts.offsets[2] = event.x;
                     dimensionsGlobal.width.margins.lengths[2] = event.x - dimensionsGlobal.width.margins.offsets[2];
                     dimensionsGlobal.width.parts.lengths[2] = dimensionsGlobal.width.margins.offsets[3] - event.x;
@@ -408,23 +400,22 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-width6': // between part 3 and margin 4
                 if (event.x > dimensionsGlobal.width.parts.offsets[2] && event.x < dimensionsGlobal.width.total - dimensionsGlobal.width.border) {
-                    element.attr("x", event.x);
                     dimensionsGlobal.width.margins.offsets[3] = event.x;
                     dimensionsGlobal.width.parts.lengths[2] = event.x - dimensionsGlobal.width.parts.offsets[2];
                     dimensionsGlobal.width.margins.lengths[3] = dimensionsGlobal.width.total - event.x;
                 }
                 break;
             case 'boundary-width7': // between margin 4 and side
-                if (event.x > dimensionsGlobal.width.margins.offsets[3] && event.x < dimensionsGlobal.width.total) {
+                if (event.x > dimensionsGlobal.width.margins.offsets[3] && event.x < dimensionsGlobal.width.total - dimensionsGlobal.width.border) {
                     // make svg smaller
                     dimensionsGlobal.width.total -= event.x - dimensionsGlobal.width.margins.offsets[3];
                     dimensionsGlobal.width.margins.lengths[3] -= event.x - dimensionsGlobal.width.margins.offsets[3];
                     // update all offsets
                     updateOffsets(dimensionsGlobal);
                 }
-                if (event.x > dimensionsGlobal.width.total) {
+                if (event.x > dimensionsGlobal.width.total - dimensionsGlobal.width.border) {
                     // make svg bigger
-                    dimensionsGlobal.width.total = event.x;
+                    dimensionsGlobal.width.total = event.x + dimensionsGlobal.width.border;
                     dimensionsGlobal.width.margins.lengths[3] += event.x - dimensionsGlobal.width.margins.offsets[3];
                     // update all offsets
                     updateOffsets(dimensionsGlobal);
@@ -448,7 +439,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-height1': // between margin 0 and part 0
                 if (event.y > dimensionsGlobal.height.border && event.y < dimensionsGlobal.height.margins.offsets[1]) {
-                    element.attr("y", event.y);
                     dimensionsGlobal.height.parts.offsets[0] = event.y;
                     dimensionsGlobal.height.margins.lengths[0] = event.y - dimensionsGlobal.height.border;
                     dimensionsGlobal.height.parts.lengths[0] = dimensionsGlobal.height.margins.offsets[1] - event.y;
@@ -456,7 +446,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-height2': // between part 0 and margin 1
                 if (event.y > dimensionsGlobal.height.parts.offsets[0] && event.y < dimensionsGlobal.height.parts.offsets[1]) {
-                    element.attr("y", event.y);
                     dimensionsGlobal.height.margins.offsets[1] = event.y;
                     dimensionsGlobal.height.parts.lengths[0] = event.y - dimensionsGlobal.height.parts.offsets[0];
                     dimensionsGlobal.height.margins.lengths[1] = dimensionsGlobal.height.parts.offsets[1] - event.y;
@@ -464,7 +453,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-height3': // between margin 1 and part 2
                 if (event.y > dimensionsGlobal.height.margins.offsets[1] && event.y < dimensionsGlobal.height.margins.offsets[2]) {
-                    element.attr("y", event.y);
                     dimensionsGlobal.height.parts.offsets[1] = event.y;
                     dimensionsGlobal.height.margins.lengths[1] = event.y - dimensionsGlobal.height.margins.offsets[1];
                     dimensionsGlobal.height.parts.lengths[1] = dimensionsGlobal.height.margins.offsets[2] - event.y;
@@ -472,7 +460,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-height4': // between part 2 and margin 2
                 if (event.y > dimensionsGlobal.height.parts.offsets[1] && event.y < dimensionsGlobal.height.parts.offsets[2]) {
-                    element.attr("y", event.y);
                     dimensionsGlobal.height.margins.offsets[2] = event.y;
                     dimensionsGlobal.height.parts.lengths[1] = event.y - dimensionsGlobal.height.parts.offsets[1];
                     dimensionsGlobal.height.margins.lengths[2] = dimensionsGlobal.height.parts.offsets[2] - event.y;
@@ -480,7 +467,6 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-height5': // between margin 2 and part 3
                 if (event.y > dimensionsGlobal.height.margins.offsets[2] && event.y < dimensionsGlobal.height.margins.offsets[3]) {
-                    element.attr("y", event.y);
                     dimensionsGlobal.height.parts.offsets[2] = event.y;
                     dimensionsGlobal.height.margins.lengths[2] = event.y - dimensionsGlobal.height.margins.offsets[2];
                     dimensionsGlobal.height.parts.lengths[2] = dimensionsGlobal.height.margins.offsets[3] - event.y;
@@ -488,23 +474,22 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 break;
             case 'boundary-height6': // between part 3 and margin 4
                 if (event.y > dimensionsGlobal.height.parts.offsets[2] && event.y < dimensionsGlobal.height.total - dimensionsGlobal.height.border) {
-                    element.attr("y", event.y);
                     dimensionsGlobal.height.margins.offsets[3] = event.y;
                     dimensionsGlobal.height.parts.lengths[2] = event.y - dimensionsGlobal.height.parts.offsets[2];
                     dimensionsGlobal.height.margins.lengths[3] = dimensionsGlobal.height.total - event.y;
                 }
                 break;
             case 'boundary-height7': // between margin 4 and side
-                if (event.y > dimensionsGlobal.height.margins.offsets[3] && event.y < dimensionsGlobal.height.total) {
+                if (event.y > dimensionsGlobal.height.margins.offsets[3] && event.y < dimensionsGlobal.height.total - dimensionsGlobal.height.border) {
                     // make svg smaller
                     dimensionsGlobal.height.total -= event.y - dimensionsGlobal.height.margins.offsets[3];
                     dimensionsGlobal.height.margins.lengths[3] -= event.y - dimensionsGlobal.height.margins.offsets[3];
                     // update all offsets
                     updateOffsets(dimensionsGlobal);
                 }
-                if (event.y > dimensionsGlobal.height.total) {
+                if (event.y > dimensionsGlobal.height.total - dimensionsGlobal.height.border) {
                     // make svg bigger
-                    dimensionsGlobal.height.total = event.y;
+                    dimensionsGlobal.height.total = event.y + dimensionsGlobal.height.border;
                     dimensionsGlobal.height.margins.lengths[3] += event.y - dimensionsGlobal.height.margins.offsets[3];
                     // update all offsets
                     updateOffsets(dimensionsGlobal);
@@ -597,15 +582,15 @@ function createLine(svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>, d
 function updateLines(dimensionsGlobal: CellPopDimensionsGlobal) {
     // reposition gridlines
     const gridLines = getGridLines(dimensionsGlobal);
+    d3.select("g.boundary").raise();
     for (const line of gridLines) {
         const className = line[0];
         const sizing = line[1];
-        const element = d3.select("g.boundary").select(`boundary-${className}`)
+        const element = d3.select("g.boundary").select(`.boundary-${className}`)
         element.attr("x", sizing.x);
         element.attr("y", sizing.y);
         element.attr("width", sizing.width);
         element.attr("height", sizing.height);
-        element.raise();
     }
 }
 
