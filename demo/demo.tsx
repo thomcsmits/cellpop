@@ -79,7 +79,7 @@ function Demo() {
 	// 	textSize: {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
 	// } as CellPopDimensions;
 
-	const dimensions = getDimensions(1000, 300, 300, 300, 5, 5, 5, 5, 1000, 300, 300, 300, 5, 5, 5, 5, 1000, 900, 50, 50);
+	const dimensions = getDimensions(1500, 200, 400, 200, 5, 5, 100, 5, 1000, 200, 400, 0, 5, 5, 100, 5, 1000, 900, 50, 50);
 
 	return (
 		<>
