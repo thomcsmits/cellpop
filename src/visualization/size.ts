@@ -637,25 +637,35 @@ function resizeLabels(dimensions: CellPopDimensions) {
     const axisrightTextMaxWidth = d3.max(axisrightText.nodes(), n => (n as SVGTextElement).getComputedTextLength());
 
     // calculate possible size
-    // const sizeNow = dimensions.textSize.tick;
+    const sizePossible = 2/3 * dimensions.heatmap.margin.right;
+
+    if (axisrightTextMaxWidth > sizePossible) {
+        console.log('here')
+        const scale = sizePossible / axisrightTextMaxWidth;
+
+        const sizeNow = dimensions.textSize.ind.tickY;
+        const num = parseFloat(sizeNow.substring(0, sizeNow.length - 2));
+        const letr = sizeNow.substring(sizeNow.length - 2, sizeNow.length);
+        const sizeNew = `${num * scale}${letr}`;
+        
+        axisrightText.style("font-size", sizeNew);
+    }
+
+
+    // // if the labels are larger than the margin space, resize
+    // if (axisrightTextMaxWidth > dimensions.heatmap.margin.right) {
+    //     // todo: resize properly
+    //     axisrightText.style("font-size", 5);
+    // }
     
 
+    // // select text from bottom axis
+    // const axisbottomText = d3.select(".axisbottom").selectAll("text");
+    // // calculate the maximum size of the labels
+    // const axisbottomTextMaxWidth = d3.max(axisbottomText.nodes(), n => (n as SVGTextElement).getComputedTextLength());
 
-
-    // if the labels are larger than the margin space, resize
-    if (axisrightTextMaxWidth > dimensions.heatmap.margin.right) {
-        // todo: resize properly
-        axisrightText.style("font-size", 5);
-    }
-    
-
-    // select text from bottom axis
-    const axisbottomText = d3.select(".axisbottom").selectAll("text");
-    // calculate the maximum size of the labels
-    const axisbottomTextMaxWidth = d3.max(axisbottomText.nodes(), n => (n as SVGTextElement).getComputedTextLength());
-
-    // if the labels are larger than the margin space, resize
-    if (axisbottomTextMaxWidth > dimensions.heatmap.margin.bottom) {
-        axisbottomText.style("font-size", 5);
-    }
+    // // if the labels are larger than the margin space, resize
+    // if (axisbottomTextMaxWidth > dimensions.heatmap.margin.bottom) {
+    //     axisbottomText.style("font-size", 5);
+    // }
 }
