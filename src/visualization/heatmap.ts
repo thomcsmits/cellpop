@@ -86,7 +86,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 
 	// add metadata scale
 	// let y_meta = d3.scaleOrdinal()
-	// 	.domain(['right', 'left'])
+	// 	.domain(["right", "left"])
 	// 	.range([0, 300, height])
 
 	// svg.append("g")
@@ -113,7 +113,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 	// Add color
 	const colorRange = d3.scaleLinear<string, number>()
 		.range([themeColors.heatmapZero, themeColors.heatmapMax])
-		.domain([0,getUpperBound(countsMatrix.map(r => r.value))])
+		.domain([0,getUpperBound(countsMatrix.map(r => r.value))]);
 
 	renderHeatmapLegend(countsMatrix, dimensions, fraction, themeColors, colorRange);
 
@@ -152,7 +152,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			.attr("y", d => y(d.row))
 			.attr("width", x.bandwidth() )
 			.attr("height", y.bandwidth() )
-			.style("fill", function(d) { return colorRange(d.value)} );
+			.style("fill", function(d) { return colorRange(d.value);} );
 
 
     // Add highlight for rows
@@ -165,7 +165,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.style("stroke", themeColors.heatmapHighlight)
 		.style("fill", "none")
 		.attr("pointer-events", "none")
-		.attr("visibility", "hidden")
+		.attr("visibility", "hidden");
 
 	// Add highlight for cols
     svg.append("rect")
@@ -177,7 +177,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.style("stroke", themeColors.heatmapHighlight)
 		.style("fill", "none")
 		.attr("pointer-events", "none")
-		.attr("visibility", "hidden")
+		.attr("visibility", "hidden");
 
 	defineTooltip();
 	defineContextMenu();
@@ -189,28 +189,28 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			return;
 		}
         if (event.ctrlKey) {
-			if (event.target?.classList[0].includes('heatmap-rects')) {
+			if (event.target?.classList[0].includes("heatmap-rects")) {
 				// remove?
 			}
 			addTooltip(event, d);
-        } 
+        }
 		if (event.shiftKey) {
 			addHighlightRow(event.target.y.animVal.value, event.target.height.animVal.value);
         }
 		if (event.altKey) {
 			addHighlightCol(event.target.x.animVal.value, event.target.width.animVal.value);
 		}
-    }
+    };
     const mouseleave = function(event: MouseEvent) {
 		removeTooltip();
         removeHighlightRow(event);
 		removeHighlightCol(event);
-    }
+    };
 
 	const contextmenu = function(event: MouseEvent, d: CountsMatrixValue) {
 		event.preventDefault();
 		addContextMenu(event, d, data, dimensions, fraction, themeColors, metadataField);
-	}
+	};
 
     rects.on("mouseover", mouseover);
 	// rowsBehind.on("mouseover", mouseover);
@@ -227,17 +227,17 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 
 	// Define drag behavior
 	const drag = d3.drag<SVGRectElement, CountsMatrixValue>()
-	.on("start", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) { 
+	.on("start", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) {
 		// if (!(event.target) ||  !(event.target instanceof SVGRectElement)) {
 		// 	return;
 		// }
 		removeContextMenu();
 		if (event.sourceEvent.shiftKey) {
-			dragstartedRows(event, d); 
+			dragstartedRows(event, d);
 			allowClickRow = true;
 		}
 		if (event.sourceEvent.altKey) {
-			dragstartedCols(event, d); 
+			dragstartedCols(event, d);
 			allowClickCol = true;
 		}
 	})
@@ -248,9 +248,12 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			const dataAndClick = draggedRows(event, d, data, y, allowClickRow);
 			data = dataAndClick[0];
 			allowClickRow = dataAndClick[1];
+
 			// Update the y-domain
 			y = y.domain(data.rowNames);
-			svg.select("g.axisright").remove()
+
+			svg.select("g.axisright").remove();
+
 			svg.append("g")
 				.attr("class", "axisright")
 				.call(d3.axisRight(y))
@@ -269,9 +272,12 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			const dataAndClick = draggedCols(event, d, data, x, allowClickCol);
 			data = dataAndClick[0];
 			allowClickCol = dataAndClick[1];
+
 			// Update the y-domain
 			x = x.domain(data.colNames);
-			svg.select("g.axisbottom").remove()
+
+			svg.select("g.axisbottom").remove();
+
 			svg.append("g")
 				.attr("class", "axisbottom")
 				.call(d3.axisBottom(x))
@@ -285,20 +291,20 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			// Update top bar
 			renderCellPopVisualizationTop(data, dimensions, x, themeColors, fraction);
 		}
-		
+
 	})
-    .on("end", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) { 
+    .on("end", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) {
 		// todo: case when key is lifted before the click
 
 		if (event.sourceEvent.shiftKey) {
-			dragendedRows(event, d, data, dimensions, themeColors, x, y, allowClickRow); 
+			dragendedRows(event, d, data, dimensions, themeColors, x, y, allowClickRow);
 		}
 
 		if (event.sourceEvent.altKey) {
-			dragendedCols(event, d, data, dimensions, themeColors, x, y, allowClickCol); 
+			dragendedCols(event, d, data, dimensions, themeColors, x, y, allowClickCol);
 		}
-	})
-	
+	});
+
 	// Apply drag behavior to rects
 	rects.call(drag);
 
@@ -312,7 +318,7 @@ function addHighlightRow(y: number, currHeight: number) {
 		.attr("visibility", "shown")
 		.attr("y", y)
 		.attr("height", currHeight)
-		.raise()
+		.raise();
 }
 
 function removeHighlightRow(event: MouseEvent) {
@@ -322,7 +328,7 @@ function removeHighlightRow(event: MouseEvent) {
 	}
 
 	d3.select(".highlight-rows")
-		.attr("visibility", "hidden")
+		.attr("visibility", "hidden");
 }
 
 // heatmap highlight
@@ -331,7 +337,7 @@ function addHighlightCol(x: number, currWidth: number) {
 		.attr("visibility", "shown")
 		.attr("x", x)
 		.attr("width", currWidth)
-		.raise()
+		.raise();
 }
 
 function removeHighlightCol(event: MouseEvent) {
@@ -341,7 +347,7 @@ function removeHighlightCol(event: MouseEvent) {
 	}
 
 	d3.select(".highlight-cols")
-		.attr("visibility", "hidden")
+		.attr("visibility", "hidden");
 }
 
 export function resetData(data: CellPopData) {

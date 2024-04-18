@@ -17,58 +17,58 @@ export function defineContextMenu() {
 		.style("border-radius", "5px")
 		.style("padding", "5px")
 		.attr("pointer-events", "none")
-		.style("position", "absolute")
+		.style("position", "absolute");
 }
 
 export function addContextMenu(event: MouseEvent, d: CountsMatrixValue, data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField: string) {
 	const menu = d3.select(".context-menu")
-		.html(`Options:<br>`)
+		.html("Options:<br>")
 		.style("opacity", 1)
 		.attr("visibility", "shown")
 		.style("left", `${event.x + window.scrollX}px`)
-		.style("top", `${event.y + window.scrollY}px`)
+		.style("top", `${event.y + window.scrollY}px`);
 
 
 	if (event.shiftKey) {
 		const buttonMoveTop = menu.append("input")
 			.attr("type", "button")
 			.attr("name", "move-row-top")
-			.attr("value", "move row to top")
+			.attr("value", "move row to top");
 
 		const buttonMoveBottom = menu.append("input")
 			.attr("type", "button")
 			.attr("name", "move-row-bottom")
-			.attr("value", "remove row to bottom")
+			.attr("value", "remove row to bottom");
 
 		const buttonRemove = menu.append("input")
 			.attr("type", "button")
 			.attr("name", "remove-row-button")
-			.attr("value", "remove row")
+			.attr("value", "remove row");
 
-		buttonMoveTop.on("click", () => {return moveRowTop(d, data, dimensions, fraction, themeColors, metadataField)})
-		buttonMoveBottom.on("click", () => {return moveRowBottom(d, data, dimensions, fraction, themeColors, metadataField)})
-		buttonRemove.on("click", () => {return removeRow(d, data, dimensions, fraction, themeColors, metadataField)})
+		buttonMoveTop.on("click", () => {return moveRowTop(d, data, dimensions, fraction, themeColors, metadataField);});
+		buttonMoveBottom.on("click", () => {return moveRowBottom(d, data, dimensions, fraction, themeColors, metadataField);});
+		buttonRemove.on("click", () => {return removeRow(d, data, dimensions, fraction, themeColors, metadataField);});
 	}
 
 	if (event.altKey) {
 		const buttonMoveLeft = menu.append("input")
 			.attr("type", "button")
 			.attr("name", "move-col-left")
-			.attr("value", "move column to left")
+			.attr("value", "move column to left");
 
 		const buttonMoveRight = menu.append("input")
 			.attr("type", "button")
 			.attr("name", "move-col-right")
-			.attr("value", "remove column to right")
+			.attr("value", "remove column to right");
 
 		const buttonRemove = menu.append("input")
 			.attr("type", "button")
 			.attr("name", "remove-col-button")
-			.attr("value", "remove column")
+			.attr("value", "remove column");
 
-		buttonMoveLeft.on("click", () => {return moveColLeft(d, data, dimensions, fraction, themeColors, metadataField)})
-		buttonMoveRight.on("click", () => {return moveColRight(d, data, dimensions, fraction, themeColors, metadataField)})
-		buttonRemove.on("click", () => {return removeCol(d, data, dimensions, fraction, themeColors, metadataField)})
+		buttonMoveLeft.on("click", () => {return moveColLeft(d, data, dimensions, fraction, themeColors, metadataField);});
+		buttonMoveRight.on("click", () => {return moveColRight(d, data, dimensions, fraction, themeColors, metadataField);});
+		buttonRemove.on("click", () => {return removeCol(d, data, dimensions, fraction, themeColors, metadataField);});
 	}
 
 }
@@ -76,15 +76,15 @@ export function addContextMenu(event: MouseEvent, d: CountsMatrixValue, data: Ce
 
 export function removeContextMenu() {
 	d3.select(".context-menu")
-		.html(``)
-		.style("opacity", 0)
+		.html("")
+		.style("opacity", 0);
 }
 
 
 function moveRowTop(dataRect: CountsMatrixValue, data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField: string) {
 	// Get current index
 	const currentIndex = data.rowNames.indexOf(dataRect.row);
-	
+
 	// Update the ordering of rowNames
     data.rowNames = reorderArray(data.rowNames, currentIndex, data.rowNames.length-1);
     wrapRowNames(data);
@@ -104,7 +104,7 @@ function moveRowBottom(dataRect: CountsMatrixValue, data: CellPopData, dimension
 	// Update the ordering of rowNames
     data.rowNames = reorderArray(data.rowNames, currentIndex, 0);
     wrapRowNames(data);
-	
+
 	// Re-render
 	renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
 
@@ -132,7 +132,7 @@ function removeRow(dataRect: CountsMatrixValue, data: CellPopData, dimensions: C
 function moveColLeft(dataRect: CountsMatrixValue, data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField: string) {
 	// Get current index
 	const currentIndex = data.colNames.indexOf(dataRect.col);
-	
+
 	// Update the ordering of rowNames
     data.colNames = reorderArray(data.colNames, currentIndex, 0);
     wrapColNames(data);
@@ -152,7 +152,7 @@ function moveColRight(dataRect: CountsMatrixValue, data: CellPopData, dimensions
 	// Update the ordering of rowNames
     data.colNames = reorderArray(data.colNames, currentIndex, data.colNames.length-1);
     wrapColNames(data);
-	
+
 	// Re-render
 	renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
 

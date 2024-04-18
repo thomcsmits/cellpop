@@ -16,11 +16,10 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
 	const width = dimensions.graph.width - dimensions.graph.margin.left - dimensions.graph.margin.right;
 	const height = dimensions.graph.height - dimensions.graph.margin.top - dimensions.graph.margin.bottom;
 
-    
-    // Random data
+
     // Random data
     const data = {
-        name: "cell", 
+        name: "cell",
         children: [
             {
                 name: "C4",
@@ -47,9 +46,9 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
                 ]
             },
         ]
-    }
+    };
 
-    let colNames = ['C1', 'C2', 'C5']
+    let colNames = ["C1", "C2", "C5"];
     let colNamesShown = colNames;
 
     // Create a layer for the links and a layer for the nodes.
@@ -73,7 +72,7 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
 
     // d3.cluster creates a dendrogram, such that the y-coordinates of all levels align
     // the x will be overridden
-    var tree = d3.cluster().size([1, height]);
+    let tree = d3.cluster().size([1, height]);
     tree(root);
 
 
@@ -88,27 +87,24 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
                 let x_total = 0;
                 node.children.forEach(child => {
                     x_total += child.x;
-                })
+                });
                 node.x = x_total / node.data.children.length;
             // }
         } else {
-            console.warn(`Node ${node.data.name} is a leaf but not in the dataset.`)
+            console.warn(`Node ${node.data.name} is a leaf but not in the dataset.`);
         }
-    
+
         // reverse the y-coordinates
         node.y = dimensions.graph.height - node.y;
-    
+
         node.collapsed = false;
         node.hidden = false;
-    
-        // console.log(node.x, node.y)
-    })
 
 
     function update() {
         // remove all current elements
-        d3.selectAll('circle').remove()
-        d3.selectAll('path').remove()
+        d3.selectAll("circle").remove();
+        d3.selectAll("path").remove();
 
         // create nodes
         const node = gNode.selectAll()
@@ -116,8 +112,8 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
             .enter()
             .append("circle")
             .attr("r", 5)
-            .attr("cx", function(d) { return d.x })
-            .attr("cy", function(d) { return d.y })
+            .attr("cx", function(d) { return d.x; })
+            .attr("cy", function(d) { return d.y; })
             .attr("fill", "black");
 
         // create links
@@ -133,9 +129,9 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
             .attr("d", d => line([d.source, d.target]))
             .attr("stroke", "black")
             .attr("stroke-width", 2);
-        
+
         // add interaction
-        node.on('click', change);
+        node.on("click", change);
     }
     update();
 }
@@ -143,9 +139,9 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
 
 function change(event,d) {
     if (d.collapsed) {
-        showNode(event,d)
+        showNode(event,d);
     } else {
-        hideNode(event,d)
+        hideNode(event,d);
     }
 }
 
@@ -153,7 +149,7 @@ function change(event,d) {
 function hideNode(event,d) {
     d.collapsed = true;
     setVisibilityChildren(d, true);
-    d3.select(event.target).attr('fill', 'red');
+    d3.select(event.target).attr("fill", "red");
     update();
 }
 
@@ -161,7 +157,7 @@ function hideNode(event,d) {
 function showNode(event,d) {
     d.collapsed = false;
     setVisibilityChildren(d, false);
-    d3.select(event.target).attr('fill', 'black');
+    d3.select(event.target).attr("fill", "black");
     update();
 }
 

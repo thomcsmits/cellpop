@@ -88,7 +88,7 @@ export type CellPopOptions = {
     themeColors: CellPopThemeColors,
     metadataOptions: string[],
     metadataField: string,
-    boundKeys: CellPopKeys   
+    boundKeys: CellPopKeys
 }
 
 export type CellPopDimensions = {
@@ -100,7 +100,7 @@ export type CellPopDimensions = {
     barLeft: CellPopDimensionsValue,
     violinLeft: CellPopDimensionsValue,
     graph: CellPopDimensionsValue,
-    detailBar: CellPopDimensionsValue, 
+    detailBar: CellPopDimensionsValue,
     textSize: {
         title: string,
         label: string,
@@ -163,7 +163,7 @@ export type CellPopKeys = {
 // themeColors: object
 // metadataOptions: array
 // metadataField: string
-// boundsKeys: object 
+// boundsKeys: object
 
 
 /** Animation */

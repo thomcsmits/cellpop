@@ -6,7 +6,7 @@ export function getPossibleMetadataSelections(data: CellPopData) {
 
     if (rowsMeta) {
         // get all the metadata fields (not all rows may have the same fields)
-        const rowsMetaOptions = [...new Set(rowsMeta.map(r => Object.keys(r.metadata)).flat())]
+        const rowsMetaOptions = [...new Set(rowsMeta.map(r => Object.keys(r.metadata)).flat())];
         for (const op of rowsMetaOptions) {
             const opVals = [...new Set(rowsMeta.map(r => r.metadata[op]))] as (string | number)[];
             // only include the option if fields are not all the same or all different

@@ -9,11 +9,11 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
 	const height = dimensions.detailBar.height - dimensions.detailBar.margin.top - dimensions.detailBar.margin.bottom;
 
     // remove anything on this svg
-    d3.select(".extension").selectAll("*").remove()
+    d3.select(".extension").selectAll("*").remove();
 
     const svg = d3.select(".extension")
         .attr("width", dimensions.detailBar.width)
-        .attr("height", dimensions.detailBar.height)
+        .attr("height", dimensions.detailBar.height);
 
     svg.append("rect")
         .attr("class", "background")
@@ -22,7 +22,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
         .style("fill", themeColors.background);
 
     const svgBar = svg.append("g")
-        .attr("class", "bars")
+        .attr("class", "bars");
 
     // X axis
     svgBar.append("g")
@@ -55,7 +55,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
         .text("Number of cells")
         .style("font-size", dimensions.textSize.label)
         .style("fill", themeColors.text);
-			
+
     const nBars = data.extendedChart.rowNames.length;
     const heightInd = height / nBars;
     const heightMargin = heightInd / 10;
@@ -63,7 +63,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
     for (let i = 0; i < nBars; i++) {
         const svgBarRow = svgBar.append("g")
             .attr("class", `bardetailsample row-${i}`)
-            .attr("transform", "translate(" + (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left).toString() + "," + (i*heightInd + heightMargin).toString() + ")")
+            .attr("transform", "translate(" + (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left).toString() + "," + (i*heightInd + heightMargin).toString() + ")");
 
         const row = data.extendedChart.rowNames[i];
         const dataBar = data.countsMatrix.filter((o) => o.row === row);
@@ -77,7 +77,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
             .text(row)
             .style("font-size", dimensions.textSize.title)
             .style("fill", themeColors.text);
-        
+
 
         // Add Y axis
         const upperbound = getUpperBound(dataBar.map(c => c.value));
@@ -97,8 +97,8 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
         const colorRange = d3.scaleOrdinal<string, string>()
             .domain(data.extendedChart.colNames)
             .range(themeColors.extensionRange)
-            .unknown(themeColors.extensionDefault)
-        
+            .unknown(themeColors.extensionDefault);
+
         // Add bars
         svgBarRow.append("g")
             .attr("class", "rects")
@@ -120,9 +120,9 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
 
 //     let nBars = 0;
 //     let heightInd = height;
-//     let svgBar = d3.selectAll('.bardetail');
+//     let svgBar = d3.selectAll(".bardetail");
 //     if (svgBar.size() === 0) {
-//         svgBar = d3.select('#app')
+//         svgBar = d3.select("#app")
 //         .append("svg")
 //             .attr("width", dimensions.global.width)
 //             .attr("height", dimensions.detailBar.height + dimensions.detailBar.margin.top + dimensions.detailBar.margin.bottom)
@@ -165,7 +165,6 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
 //             .text("Number of cells")
 //             .style("font-size", dimensions.textSize.label)
 //             .style("fill", themeColors.text);
-        
 //         nBars = 1;
 //     } else {
 //         nBars = d3.selectAll(".bardetailsample").size() + 1;
@@ -184,18 +183,14 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
 //             sample_i_y_axis.attr("transform",
 //                 `scale(${1},${1 / nBars})`);
 //         }
-        
 //     }
-   
 //     // create new chart
 //     const svgBarSample = svgBar.append("g")
 //         .attr("class", `bardetailsample sample-${nBars}`)
 //         .attr("transform", "translate(" + (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left).toString() + "," + (nBars-1*heightInd).toString() + ")")
 
 //     const data = dataFull.countsMatrix.filter((o) => o.row === selectedRow)
-    
 //     // console.log(svgBar)
-    
 //     svgBarSample.append("text")
 // 		.attr("class", "title")
 // 		.attr("text-anchor", "start")
@@ -204,7 +199,6 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
 // 		.text(selectedRow)
 //         .style("font-size", dimensions.textSize.title)
 //         .style("fill", themeColors.text);
-        
 
 //     // Add Y axis
 //     const upperbound = getUpperBound(data.map(c => c.value));
@@ -246,13 +240,13 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
 
 export function resetExtensionChart(data: CellPopData) {
     // remove bars
-    d3.select(".extension").selectAll("*").remove()
+    d3.select(".extension").selectAll("*").remove();
 
     // resize svg (without deletion)
     d3.select(".extension")
         .attr("width", 0)
-        .attr("height", 0)
-    
+        .attr("height", 0);
+
     // reset data
     data.extendedChart = {rowNames: [], colNames: []};
 }

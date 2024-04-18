@@ -33,11 +33,11 @@ export function draggedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrixVa
 
     // Calculate the current index of the dragged row
     const currentIndex = data.rowNames.indexOf(d.row);
-    
+
     // Calculate the new index based on the y-coordinate of the drag event
     const rowSize = y(data.rowNames[0]) - y(data.rowNames[1]);
     let newIndex = data.rowNames.length - Math.ceil((event.y - y.paddingOuter()*y.bandwidth()) / rowSize);
-    
+
     // If row goes beyond boundaries, set it to the first/last item
     if (newIndex < 0) {
         newIndex = 0;
@@ -68,12 +68,12 @@ export function draggedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrixVa
                 rects.filter(r => r.row === rowName.row).attr("y", y(data.rowNames[rowIndex + 1]));
             }
         }
-    })
+    });
 
     // Update the ordering of rowNames
     data.rowNames = reorderArray(data.rowNames, currentIndex, newIndex);
     wrapRowNames(data);
-    
+
     return [data, false];
 }
 
@@ -84,7 +84,7 @@ export function dragendedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrix
     const rowsBehind = d3.selectAll<SVGRectElement, RowNamesWrapped>(".heatmap-rows");
 
     // Get the current index and set the y-coordinate of this row when drag ends
-    let currentIndex = data.rowNames.indexOf(d.row);
+    const currentIndex = data.rowNames.indexOf(d.row);
     rowsBehind.filter(r => r.row === d.row).attr("y", y(data.rowNames[currentIndex]));
     rects.filter(r => r.row === d.row).attr("y", y(data.rowNames[currentIndex]));
     d3.select(".highlight-rows").attr("y", y(data.rowNames[currentIndex]));
@@ -128,7 +128,7 @@ export function draggedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrixVa
 
     // Calculate the current index of the dragged col
     const currentIndex = data.colNames.indexOf(d.col);
-    
+
     // Calculate the new index based on the x-coordinate of the drag event
     const colSize = x(data.colNames[1]) - x(data.colNames[0]);
     let newIndex = Math.ceil((event.x - x.paddingOuter()*x.bandwidth()) / colSize);
@@ -163,12 +163,12 @@ export function draggedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrixVa
                 rects.filter(r => r.col === colName.col).attr("x", x(data.colNames[colIndex + 1]));
             }
         }
-    })
+    });
 
     // Update the ordering of colNames
     data.colNames = reorderArray(data.colNames, currentIndex, newIndex);
     wrapColNames(data);
-    
+
     return [data, false];
 }
 

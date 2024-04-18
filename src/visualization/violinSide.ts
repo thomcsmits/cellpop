@@ -27,14 +27,13 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
 	// Determine upper bound
     const upperbound = getUpperBound(countsMatrix.map(r => r.value));
 
-    const y_changed = y.paddingInner(0.25)
+    const y_changed = y.paddingInner(0.25);
 
 	// Add y-axis
 	const x = d3.scaleLinear()
 		.range([ width, 0 ])
-		.domain([ 0, upperbound])
+		.domain([ 0, upperbound]);
 
-	
 	svg.append("g")
 		.call(d3.axisBottom(x))
 		.attr("transform", "translate(0," + height + ")")
@@ -56,7 +55,7 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
 		.style("fill", themeColors.text);
 
     function kde(kernel: any, thds: number[]) {
-        return V => thds.map(t => [t, d3.mean(V, d => kernel(t - d))])
+        return V => thds.map(t => [t, d3.mean(V, d => kernel(t - d))]);
     }
 
     function epanechnikov(bandwidth: number) {
@@ -67,29 +66,28 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
     const thds = x.ticks(100);
     const density = kde(epanechnikov(bandwidth), thds);
 
-    const violins = d3.rollup(countsMatrix, v => density(v.map(g => g.value)), d => d.row)
+    const violins = d3.rollup(countsMatrix, v => density(v.map(g => g.value)), d => d.row);
 
     let allNum = [] as number[];
-    [...violins.values()].forEach((d,i) => allNum = allNum.concat([...violins.values()][i].map(d => d[1])))
+    [...violins.values()].forEach((d,i) => allNum = allNum.concat([...violins.values()][i].map(d => d[1])));
     const xNum  = d3.scaleLinear()
         .domain([-d3.max(allNum), d3.max(allNum)])
-        .range([0, y_changed.bandwidth()])
+        .range([0, y_changed.bandwidth()]);
 
-		
     const area = d3.area()
         .y0(d => xNum(-d[1]))
         .y1(d => xNum(d[1]))
         .x(d => x(d[0]))
-        .curve(d3.curveBumpY)
+        .curve(d3.curveBumpY);
 
-    svg.append('g')
-        .selectAll('g')
+    svg.append("g")
+        .selectAll("g")
         .data([...violins])
-        .join('g')
-            .attr('transform', d => `translate(0, ${y_changed(d[0])})`)
-        .append('path')
+        .join("g")
+            .attr("transform", d => `translate(0, ${y_changed(d[0])})`)
+        .append("path")
             .datum(d => d[1])
-            .style('stroke', 'none')
-            .style('fill', themeColors.sideCharts)
-            .attr('d', area)
+            .style("stroke", "none")
+            .style("fill", themeColors.sideCharts)
+            .attr("d", area);
 }

@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
-import ToggleButton from '@mui/material/ToggleButton';
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
-import { Unstable_Popup as Popup } from '@mui/base/Unstable_Popup';
-// import { ClickAwayListener } from '@mui/base/ClickAwayListener';
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import { Unstable_Popup as Popup } from "@mui/base/Unstable_Popup";
+// import { ClickAwayListener } from "@mui/base/ClickAwayListener";
 
 import * as d3 from "d3";
 import { renderCellPopVisualization } from "./visualization";
@@ -27,7 +27,7 @@ export const CellPop = (props: CellPopProps) => {
 	}
 
 	const cellPopRef = useRef<HTMLDivElement>(null);
-	
+
 	// const [data, setData] = useState(props.data);
 	const [theme, setTheme] = useState<CellPopTheme>(props.theme);
 	const [dimensions, setDimensions] = useState<CellPopDimensions>(props.dimensions);
@@ -53,7 +53,7 @@ export const CellPop = (props: CellPopProps) => {
 			.attr("width", props.dimensions.global.width.total)
 			.attr("height", props.dimensions.global.height.total)
 		.append("g")
-			.attr("class", "main")
+			.attr("class", "main");
 
 		// add background
 		svg.append("rect")
@@ -63,8 +63,8 @@ export const CellPop = (props: CellPopProps) => {
 
 		// add svg element for extension
 		const svgExtension = app.append("svg")
-			.attr("class", "extension")
-	}, [])
+			.attr("class", "extension");
+	}, []);
 
 	// call renderCellPopVisualization on updates
 	useEffect(() => {
@@ -76,7 +76,7 @@ export const CellPop = (props: CellPopProps) => {
 
 		// create main visualization
 		renderCellPopVisualization(props.data, dimensions, fraction, themeColors, metadataField);
-		
+    
 	}, [theme, fraction, metadataField])
 
 
@@ -117,7 +117,7 @@ export const CellPop = (props: CellPopProps) => {
 		resetExtensionChart(props.data);
 		removeBoundary();
 	}
-	
+
 	// animation pop-up
 	const handleAnimantionPopup = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		setAnimationAnchor(animationAnchor ? null : event.currentTarget);
@@ -142,7 +142,7 @@ export const CellPop = (props: CellPopProps) => {
 				<Button variant="outlined" onClick={resetData}>Reset data</Button>
 
 				<Button variant="outlined" onClick={resetLayeredBar}>Reset layered bar chart</Button>
-			
+
 				<ToggleButtonGroup
 					color="primary"
 					value={fraction}
@@ -165,7 +165,7 @@ export const CellPop = (props: CellPopProps) => {
 					>
 						<MenuItem value="None" key="None">None</MenuItem>
 						{metadataFields.map(d => {
-							return <MenuItem value={d[0]} key={d[0]}>{d[0]}</MenuItem>
+							return <MenuItem value={d[0]} key={d[0]}>{d[0]}</MenuItem>;
 						})}
 					</Select>
 				</FormControl>
@@ -193,7 +193,7 @@ export const CellPop = (props: CellPopProps) => {
 			</Stack>
 
 			<Popup open={animationAnchor ? true : false} anchor={animationAnchor} placement="bottom-end">
-				<div aria-label="Pop up animation" style={{border: 'solid black 2px', backgroundColor: "white"}}>
+				<div aria-label="Pop up animation" style={{border: "solid black 2px", backgroundColor: "white"}}>
 					<Button variant="outlined" onClick={() => showAnimationBox(props.data, dimensions.global.width.total / 2, dimensions.global.height.total / 2)}>Play animation</Button>
 					<div>
 						<svg className="animate-svg" width={dimensions.global.width.total / 2} height={dimensions.global.height.total / 2}></svg>
@@ -201,14 +201,13 @@ export const CellPop = (props: CellPopProps) => {
 
 				</div>
 			</Popup>
-				
 
-			{/* <Box sx={{position: 'relative'}}>
+			{/* <Box sx={{position: "relative"}}>
 				{animationAnchor ? <svg className="animate-svg" width={dimensions.global.width / 2} height={dimensions.global.height / 2}></svg> : null}
 			</Box> */}
 
-			<div id='cellpopvis' ref={cellPopRef} style={{position: "absolute", padding: "100px"}}></div>
-
+			<div id="cellpopvis" ref={cellPopRef} style={{position: "absolute", padding: "100px"}}></div>
+      
 		</div>
-	)
-}
+	);
+};
