@@ -40,7 +40,7 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
 		.selectAll("text")
 			.attr("transform", "translate(-10,0)rotate(-45)")
 			.style("text-anchor", "end")
-			.style("font-size", dimensions.textSize.tick)
+			.style("font-size", dimensions.textSize.ind.tickXSide)
 			.style("fill", themeColors.text);
 
 	svg.append("text")
@@ -51,7 +51,7 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
 		.attr("dy", ".75em")
 		.attr("transform", "translate(0," + height + ")")
 		.text("Fraction of cells")
-		.style("font-size", dimensions.textSize.labelSmall)
+		.style("font-size", dimensions.textSize.ind.labelXSide)
 		.style("fill", themeColors.text);
 
     function kde(kernel: any, thds: number[]) {

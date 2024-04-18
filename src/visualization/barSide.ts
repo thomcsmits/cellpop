@@ -42,7 +42,7 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
 		.selectAll("text")
 			.attr("transform", "translate(-10,0)rotate(-45)")
 			.style("text-anchor", "end")
-			.style("font-size", dimensions.textSize.tick)
+			.style("font-size", dimensions.textSize.ind.tickXSide)
 			.style("fill", themeColors.text);
 
 	svg.append("text")
@@ -53,7 +53,7 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
 		.attr("dy", ".75em")
 		.attr("transform", "translate(0," + height + ")")
 		.text("Total number of cells")
-		.style("font-size", dimensions.textSize.labelSmall)
+		.style("font-size", dimensions.textSize.ind.labelXSide)
 		.style("fill", themeColors.text);
 
     // // Bars

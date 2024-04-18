@@ -102,10 +102,25 @@ export type CellPopDimensions = {
     graph: CellPopDimensionsValue,
     detailBar: CellPopDimensionsValue,
     textSize: {
-        title: string,
-        label: string,
-        labelSmall: string,
-        tick: string
+        global: {
+            title: string,
+            label: string,
+            labelSmall: string,
+            tick: string
+        }
+        ind: {
+            title: string,
+            labelX: string,
+            labelY: string,
+            labelColor: string,
+            labelXSide: string,
+            labelYSide: string,
+            tickX: string,
+            tickY: string,
+            tickColor: string,
+            tickXSide: string,
+            tickYSide: string,
+        }
     }
 }
 

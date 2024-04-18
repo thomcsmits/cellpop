@@ -31,7 +31,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
         .selectAll("text")
             .attr("transform", "translate(-10,0)rotate(-45)")
             .style("text-anchor", "end")
-            .style("font-size", dimensions.textSize.tick)
+            .style("font-size", dimensions.textSize.ind.tickX)
             .style("fill", themeColors.text);
 
     // X axis label
@@ -41,7 +41,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
         .attr("x", dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left + width / 2)
         .attr("y", height + dimensions.heatmap.margin.bottom - 10)
         .text("Cell type")
-        .style("font-size", dimensions.textSize.label)
+        .style("font-size", dimensions.textSize.ind.labelX)
         .style("fill", themeColors.text);
 
     // Y axis label
@@ -53,7 +53,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
         .attr("dy", ".75em")
         .attr("transform", "rotate(-90)")
         .text("Number of cells")
-        .style("font-size", dimensions.textSize.label)
+        .style("font-size", dimensions.textSize.ind.labelY)
         .style("fill", themeColors.text);
 
     const nBars = data.extendedChart.rowNames.length;
@@ -75,7 +75,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
             .attr("x", 30)
             .attr("y", 50)
             .text(row)
-            .style("font-size", dimensions.textSize.title)
+            .style("font-size", dimensions.textSize.ind.title)
             .style("fill", themeColors.text);
 
 
@@ -90,7 +90,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
             .attr("class", "axisleft")
             .call(d3.axisLeft(y))
             .selectAll("text")
-                .style("font-size", dimensions.textSize.tick)
+                .style("font-size", dimensions.textSize.ind.tickY)
                 .style("fill", themeColors.text);
 
         // add color range for bars

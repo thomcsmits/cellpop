@@ -39,7 +39,7 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
 		.attr("class", "axisleft")
 		.call(d3.axisLeft(y))
 		.selectAll("text")
-			.style("font-size", dimensions.textSize.tick)
+			.style("font-size", dimensions.textSize.ind.tickYSide)
 			.style("fill", themeColors.text);
 
 
@@ -53,7 +53,7 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
 		.text("Total number of cells")
-		.style("font-size", dimensions.textSize.labelSmall)
+		.style("font-size", dimensions.textSize.ind.labelYSide)
 		.style("fill", themeColors.text);
 
     // Bars

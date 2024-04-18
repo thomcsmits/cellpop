@@ -46,7 +46,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.selectAll("text")
 			.attr("transform", "translate(-10,0)rotate(-45)")
 			.style("text-anchor", "end")
-			.style("font-size", dimensions.textSize.tick)
+			.style("font-size", dimensions.textSize.ind.tickX)
 			.style("fill", themeColors.text);
 
 	svg.append("text")
@@ -55,7 +55,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
         .attr("x", width / 2)
         .attr("y", height + dimensions.heatmap.margin.bottom - 10)
         .text("Cell type")
-		.style("font-size", dimensions.textSize.label)
+		.style("font-size", dimensions.textSize.ind.labelX)
 		.style("fill", themeColors.text);
 
 
@@ -70,7 +70,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.attr("transform", "translate(" + width + ",0)")
 		.call(d3.axisRight(y))
 		.selectAll("text")
-			.style("font-size", dimensions.textSize.tick)
+			.style("font-size", dimensions.textSize.ind.tickY)
 			.style("fill", themeColors.text);
 
     svg.append("text")
@@ -81,7 +81,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
 		.text("Sample")
-		.style("font-size", dimensions.textSize.label)
+		.style("font-size", dimensions.textSize.ind.labelY)
 		.style("fill", themeColors.text);
 
 	// add metadata scale
@@ -259,7 +259,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 				.call(d3.axisRight(y))
 				.attr("transform", "translate(" + width + ",0)")
 				.selectAll("text")
-					.style("font-size", dimensions.textSize.tick)
+					.style("font-size", dimensions.textSize.ind.tickY)
 					.style("fill", themeColors.text);
 
 			// Update left bar
@@ -285,7 +285,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 				.selectAll("text")
 					.attr("transform", "translate(-10,0)rotate(-45)")
 					.style("text-anchor", "end")
-					.style("font-size", dimensions.textSize.tick)
+					.style("font-size", dimensions.textSize.ind.tickX)
 					.style("fill", themeColors.text);
 
 			// Update top bar
@@ -387,20 +387,51 @@ function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: Cell
 	gradient.append("text")
 		.attr("y", -10)
 		.text(colorAxisLabel)
-		.style("font-size", dimensions.textSize.label)
+		.style("font-size", dimensions.textSize.ind.labelColor)
 		.style("fill", themeColors.text);
 
 	gradient.append("text")
 		.attr("x", colorAxisOffsetWidth + colorAxisWidth)
 		.attr("y", colorAxisSize)
 		.text(0)
-		.style("font-size", dimensions.textSize.tick)
+		.style("font-size", dimensions.textSize.ind.tickColor)
 		.style("fill", themeColors.text);
 
 	gradient.append("text")
 		.attr("x", colorAxisOffsetWidth + colorAxisWidth)
 		.attr("y", 0)
 		.text(getUpperBound(countsMatrix.map(r => r.value)))
-		.style("font-size", dimensions.textSize.tick)
+		.style("font-size", dimensions.textSize.ind.tickColor)
 		.style("fill", themeColors.text);
 }
+
+// function sizeLabels(dimensions: CellPopDimensions) {
+
+
+// }
+
+
+
+// function resizeLabels(dimensions: CellPopDimensions) {
+//     // select text from right axis
+//     const axisrightText = d3.select(".axisright").selectAll("text");
+//     // calculate the maximum size of the labels
+//     const axisrightTextMaxWidth = d3.max(axisrightText.nodes(), n => (n as SVGTextElement).getComputedTextLength());
+
+//     // if the labels are larger than the margin space, resize
+//     if (axisrightTextMaxWidth > dimensions.heatmap.margin.right) {
+//         // todo: resize properly
+//         axisrightText.style("font-size", 5);
+//     }
+    
+
+//     // select text from bottom axis
+//     const axisbottomText = d3.select(".axisbottom").selectAll("text");
+//     // calculate the maximum size of the labels
+//     const axisbottomTextMaxWidth = d3.max(axisbottomText.nodes(), n => (n as SVGTextElement).getComputedTextLength());
+
+//     // if the labels are larger than the margin space, resize
+//     if (axisbottomTextMaxWidth > dimensions.heatmap.margin.bottom) {
+//         axisbottomText.style("font-size", 5);
+//     }
+// }

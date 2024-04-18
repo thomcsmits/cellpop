@@ -268,12 +268,44 @@ function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
     }
 }
 
+function getDimensionsText() {
+    // todo: add these as params on top
+    const textSizeGlobal = {
+        title: '2em', 
+        label: '2em', 
+        labelSmall: '1em', 
+        tick: '1em'
+    }
+
+    const textSizeInd = {
+        title: textSizeGlobal.title,
+        labelX: textSizeGlobal.label,
+        labelY: textSizeGlobal.label,
+        labelColor: textSizeGlobal.label,
+        labelXSide: textSizeGlobal.labelSmall,
+        labelYSide: textSizeGlobal.labelSmall,
+        tickX: textSizeGlobal.tick,
+        tickY: textSizeGlobal.tick,
+        tickColor: textSizeGlobal.tick,
+        tickXSide: textSizeGlobal.tick,
+        tickYSide: textSizeGlobal.tick,
+    }
+
+    const textSize = {
+        global: textSizeGlobal,
+        ind: textSizeInd
+    }
+
+    return textSize;
+}
+
 /**
  * Using the dimensionsGlobal, fill in all dimensions of individual parts
  * @param dimensionsGlobal 
  * @returns CellPopDimensions
  */
 export function getDimensionsFromGlobal(dimensionsGlobal: CellPopDimensionsGlobal): CellPopDimensions {
+    
     const dimensions = {
 		global: dimensionsGlobal,
         heatmap: getDimType(dimensionsGlobal, 1, 1),
@@ -284,7 +316,7 @@ export function getDimensionsFromGlobal(dimensionsGlobal: CellPopDimensionsGloba
         violinLeft: getDimType(dimensionsGlobal, 0, 1),
         graph: getDimType(dimensionsGlobal, 1, 2),
 		detailBar: {offsetWidth: dimensionsGlobal.width.parts.offsets[1], offsetHeight: dimensionsGlobal.height.parts.offsets[0], width: dimensionsGlobal.width.parts.lengths[1], height: dimensionsGlobal.extension.parts.lengths[0], margin: {left: dimensionsGlobal.width.margins.lengths[1], right: dimensionsGlobal.width.margins.lengths[2], top: dimensionsGlobal.extension.margins.lengths[0], bottom: dimensionsGlobal.extension.margins.lengths[1]}},
-		textSize: {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
+		textSize: getDimensionsText(),
 	} as CellPopDimensions;
 
     return dimensions;
@@ -292,15 +324,15 @@ export function getDimensionsFromGlobal(dimensionsGlobal: CellPopDimensionsGloba
 
 export function updateDimensionsWithGlobal(dimensions: CellPopDimensions): CellPopDimensions {
     const dimensionsGlobal = dimensions.global;
-    dimensions.heatmap = getDimType(dimensionsGlobal, 1, 1),
-    dimensions.heatmapLegend = getDimType(dimensionsGlobal, 2, 1),
-    dimensions.barTop = getDimType(dimensionsGlobal, 1, 0),
-    dimensions.violinTop = getDimType(dimensionsGlobal, 1, 0),
-    dimensions.barLeft = getDimType(dimensionsGlobal, 0, 1),
-    dimensions.violinLeft = getDimType(dimensionsGlobal, 0, 1),
-    dimensions.graph = getDimType(dimensionsGlobal, 1, 2),
-    dimensions.detailBar = {offsetWidth: dimensionsGlobal.width.parts.offsets[1], offsetHeight: dimensionsGlobal.height.parts.offsets[0], width: dimensionsGlobal.width.parts.lengths[1], height: dimensionsGlobal.extension.parts.lengths[0], margin: {left: dimensionsGlobal.width.margins.lengths[1], right: dimensionsGlobal.width.margins.lengths[2], top: dimensionsGlobal.extension.margins.lengths[0], bottom: dimensionsGlobal.extension.margins.lengths[1]}},
-	dimensions.textSize = {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
+    dimensions.heatmap = getDimType(dimensionsGlobal, 1, 1);
+    dimensions.heatmapLegend = getDimType(dimensionsGlobal, 2, 1);
+    dimensions.barTop = getDimType(dimensionsGlobal, 1, 0);
+    dimensions.violinTop = getDimType(dimensionsGlobal, 1, 0);
+    dimensions.barLeft = getDimType(dimensionsGlobal, 0, 1);
+    dimensions.violinLeft = getDimType(dimensionsGlobal, 0, 1);
+    dimensions.graph = getDimType(dimensionsGlobal, 1, 2);
+    dimensions.detailBar = {offsetWidth: dimensionsGlobal.width.parts.offsets[1], offsetHeight: dimensionsGlobal.height.parts.offsets[0], width: dimensionsGlobal.width.parts.lengths[1], height: dimensionsGlobal.extension.parts.lengths[0], margin: {left: dimensionsGlobal.width.margins.lengths[1], right: dimensionsGlobal.width.margins.lengths[2], top: dimensionsGlobal.extension.margins.lengths[0], bottom: dimensionsGlobal.extension.margins.lengths[1]}};
+	// dimensions.textSize = {title: '20px', label: '30px', labelSmall: '20px', tick: '10px'}
 
     return dimensions;
 }
@@ -498,8 +530,7 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
             default:
                 
         } 
-       
-        updateDimensionsWithGlobal(dimensions)
+        updateDimensionsWithGlobal(dimensions);
         d3.selectAll("svg").attr("width", dimensionsGlobal.width.total).attr("height", dimensionsGlobal.height.total);
         renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
         resizeLabels(dimensions);
@@ -604,6 +635,12 @@ function resizeLabels(dimensions: CellPopDimensions) {
     const axisrightText = d3.select(".axisright").selectAll("text");
     // calculate the maximum size of the labels
     const axisrightTextMaxWidth = d3.max(axisrightText.nodes(), n => (n as SVGTextElement).getComputedTextLength());
+
+    // calculate possible size
+    // const sizeNow = dimensions.textSize.tick;
+    
+
+
 
     // if the labels are larger than the margin space, resize
     if (axisrightTextMaxWidth > dimensions.heatmap.margin.right) {
