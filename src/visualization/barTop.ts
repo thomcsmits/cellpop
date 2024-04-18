@@ -13,12 +13,12 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
 	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + (dimensions.barTop.offsetWidth + dimensions.barTop.margin.left).toString() + "," + (dimensions.barTop.offsetHeight + dimensions.barTop.margin.top).toString() + ")")
-			.attr("class", "bartop");
+				"translate(" + dimensions.barTop.offsetWidth + "," + dimensions.barTop.offsetHeight + ")")
+			.attr("class", "bartop")
 
 	// Get dimensions
-	const width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;
-	const height = dimensions.barTop.height - dimensions.barTop.margin.top - dimensions.barTop.margin.bottom;
+	const width = dimensions.barTop.width;
+	const height = dimensions.barTop.height;
 
 	const data = [] as CountsTotalColValue[];
 	for (const col of dataFull.colNames) {

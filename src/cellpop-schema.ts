@@ -92,13 +92,9 @@ export type CellPopOptions = {
 }
 
 export type CellPopDimensions = {
-    global: {
-        width: number,
-        widthSplit: [number, number],
-        height: number,
-        heightSplit: [number, number]
-    },
+    global: CellPopDimensionsGlobal,
     heatmap: CellPopDimensionsValue,
+    heatmapLegend: CellPopDimensionsValue,
     barTop: CellPopDimensionsValue,
     violinTop: CellPopDimensionsValue,
     barLeft: CellPopDimensionsValue,
@@ -119,6 +115,25 @@ export type CellPopDimensionsValue = {
     width: number,
     height: number,
     margin: {top: number, right: number, bottom: number, left: number}
+}
+
+export type CellPopDimensionsGlobal = {
+    width: CellPopDimensionsGlobalInner,
+    height: CellPopDimensionsGlobalInner,
+    extension: CellPopDimensionsGlobalInner
+}
+
+export type CellPopDimensionsGlobalInner = {
+    total: number,
+    parts: {
+        lengths: number[],
+        offsets: number[]
+    }, 
+    margins: {
+        lengths: number[],
+        offsets: number[]
+    },
+    border: number
 }
 
 export type CellPopTheme = "light"| "dark";

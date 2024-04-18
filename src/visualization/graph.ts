@@ -9,8 +9,8 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
 	const svg = d3.select("g.main")
 		.append("g")
 			.attr("transform",
-				"translate(" + (dimensions.graph.offsetWidth + dimensions.graph.margin.left).toString() + "," + (dimensions.graph.offsetHeight + dimensions.graph.margin.top).toString() + ")")
-			.attr("class", "graph");
+				"translate(" + dimensions.graph.offsetWidth + "," + dimensions.graph.offsetHeight + ")")
+			.attr("class", "graph")
 
     // Get dimensions
 	const width = dimensions.graph.width - dimensions.graph.margin.left - dimensions.graph.margin.right;
@@ -99,9 +99,6 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
 
         node.collapsed = false;
         node.hidden = false;
-
-        console.log(node.x, node.y);
-    });
 
 
     function update() {

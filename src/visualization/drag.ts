@@ -27,8 +27,8 @@ export function draggedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrixVa
     const rowsBehind = d3.selectAll<SVGRectElement, RowNamesWrapped>(".heatmap-rows");
 
     // Let the selected row and rects on that row and highlight move with the cursor
-    rowsBehind.filter(r => r.row === d.row).attr("y", d.y = event.y);
-    rects.filter(r => r.row === d.row).attr("y", d.y = event.y);
+    rowsBehind.filter(r => r.row === d.row).attr("y", event.y);
+    rects.filter(r => r.row === d.row).attr("y", event.y);
     d3.select(".highlight-rows").attr("y", event.y);
 
     // Calculate the current index of the dragged row
@@ -122,8 +122,8 @@ export function draggedCols(event: d3.D3DragEvent<SVGRectElement, CountsMatrixVa
     const colsBehind = d3.selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols");
 
     // Let the selected col and rects on that col and highlight move with the cursor
-    colsBehind.filter(r => r.col === d.col).attr("x", d.x = event.x);
-    rects.filter(r => r.col === d.col).attr("x", d.x = event.x);
+    colsBehind.filter(r => r.col === d.col).attr("x", event.x);
+    rects.filter(r => r.col === d.col).attr("x", event.x);
     d3.select(".highlight-cols").attr("x", event.x);
 
     // Calculate the current index of the dragged col
