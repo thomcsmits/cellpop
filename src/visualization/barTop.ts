@@ -39,6 +39,7 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
 		.attr("class", "axisleft")
 		.call(d3.axisLeft(y))
 		.selectAll("text")
+			.attr("class", "tickYSide")
 			.style("font-size", dimensions.textSize.ind.tickYSide)
 			.style("fill", themeColors.text);
 
@@ -46,7 +47,7 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
 	const x_changed = x.paddingInner(0.25);
 
     svg.append("text")
-		.attr("class", "y label")
+		.attr("class", "labelYSide")
 		.attr("text-anchor", "end")
 		.attr("x", 30)
 		.attr("y", -70)

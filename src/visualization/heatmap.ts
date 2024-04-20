@@ -44,13 +44,14 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.attr("transform", "translate(0," + height + ")")
 		.call(d3.axisBottom(x))
 		.selectAll("text")
+			.attr("class", "tickX")
 			.attr("transform", "translate(-10,0)rotate(-45)")
 			.style("text-anchor", "end")
 			.style("font-size", dimensions.textSize.ind.tickX)
 			.style("fill", themeColors.text);
 
 	svg.append("text")
-        .attr("class", "x-label")
+        .attr("class", "labelX")
         .attr("text-anchor", "end")
         .attr("x", width / 2)
         .attr("y", height + dimensions.heatmap.margin.bottom - 10)
@@ -70,11 +71,12 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.attr("transform", "translate(" + width + ",0)")
 		.call(d3.axisRight(y))
 		.selectAll("text")
+			.attr("class", "tickY")
 			.style("font-size", dimensions.textSize.ind.tickY)
 			.style("fill", themeColors.text);
 
     svg.append("text")
-		.attr("class", "y-label")
+		.attr("class", "labelY")
 		.attr("text-anchor", "end")
 		.attr("x", -height/2)
 		.attr("y", width + 120)
@@ -385,12 +387,14 @@ function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: Cell
 
 	const colorAxisLabel = fraction ? 'Fraction' : 'Count'; 
 	gradient.append("text")
+		.attr("class", "labelColor")
 		.attr("y", -10)
 		.text(colorAxisLabel)
 		.style("font-size", dimensions.textSize.ind.labelColor)
 		.style("fill", themeColors.text);
 
 	gradient.append("text")
+		.attr("class", "tickColor")
 		.attr("x", colorAxisOffsetWidth + colorAxisWidth)
 		.attr("y", colorAxisSize)
 		.text(0)
@@ -398,6 +402,7 @@ function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: Cell
 		.style("fill", themeColors.text);
 
 	gradient.append("text")
+		.attr("class", "tickColor")
 		.attr("x", colorAxisOffsetWidth + colorAxisWidth)
 		.attr("y", 0)
 		.text(getUpperBound(countsMatrix.map(r => r.value)))

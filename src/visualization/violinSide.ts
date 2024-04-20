@@ -38,13 +38,14 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
 		.call(d3.axisBottom(x))
 		.attr("transform", "translate(0," + height + ")")
 		.selectAll("text")
+			.attr("class", "tickXSide")
 			.attr("transform", "translate(-10,0)rotate(-45)")
 			.style("text-anchor", "end")
 			.style("font-size", dimensions.textSize.ind.tickXSide)
 			.style("fill", themeColors.text);
 
 	svg.append("text")
-		.attr("class", "x label")
+		.attr("class", "labelXSide")
 		.attr("text-anchor", "end")
 		.attr("x", width - 50)
 		.attr("y", 40)

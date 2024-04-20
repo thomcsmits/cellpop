@@ -43,6 +43,7 @@ export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions
         .attr("class", "axisleft")
         .call(d3.axisLeft(y))
         .selectAll("text")
+            .attr("class", "tickYSide")
             .style("font-size", dimensions.textSize.ind.tickYSide);
     // svg.append("g")
     //     .attr("class", "axisbottom")
@@ -51,7 +52,7 @@ export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions
     //         .style("font-size", dimensions.textSize.tick);
 
     svg.append("text")
-        .attr("class", "y label")
+        .attr("class", "labelYSide")
         .attr("text-anchor", "end")
         .attr("x", 0)
         .attr("y", -70)
