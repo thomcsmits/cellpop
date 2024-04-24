@@ -533,7 +533,7 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
         updateDimensionsWithGlobal(dimensions);
         d3.selectAll("svg").attr("width", dimensionsGlobal.width.total).attr("height", dimensionsGlobal.height.total);
         renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
-        resizeLabels(dimensions);
+        // resizeLabels(dimensions);
         updateLines(dimensionsGlobal);
     })
     drag.on("end", function() {
@@ -631,24 +631,67 @@ export function removeSizeBoundaries() {
 }
 
 function resizeLabels(dimensions: CellPopDimensions) {
-    // select text from right axis
-    const axisrightText = d3.select(".axisright").selectAll("text");
-    // calculate the maximum size of the labels
-    const axisrightTextMaxWidth = d3.max(axisrightText.nodes(), n => (n as SVGTextElement).getComputedTextLength());
 
-    // calculate possible size
-    const sizePossible = 2/3 * dimensions.heatmap.margin.right;
+    // later change this into an option
+    let autoReziseLabels = true;
+    if (!autoReziseLabels) {
+        return;
+    }
 
-    if (axisrightTextMaxWidth > sizePossible) {
-        console.log('here')
-        const scale = sizePossible / axisrightTextMaxWidth;
+    const texts = [
+        [dimensions.textSize.ind.tickY, 'tickY', 0, 2/3 * dimensions.heatmap.margin.right],
+        [dimensions.textSize.ind.labelY, 'labelY', 0, 1/3 * dimensions.heatmap.margin.right],
+        [dimensions.textSize.ind.tickX, 'tickX', 45, 2/3 * dimensions.heatmap.margin.bottom],
+        [dimensions.textSize.ind.labelX, 'labelX', 45, 1/3 * dimensions.heatmap.margin.bottom],
+    ] as [string, string, number, number][];
 
-        const sizeNow = dimensions.textSize.ind.tickY;
-        const num = parseFloat(sizeNow.substring(0, sizeNow.length - 2));
-        const letr = sizeNow.substring(sizeNow.length - 2, sizeNow.length);
-        const sizeNew = `${num * scale}${letr}`;
+
+    // // select text from right axis
+    // const axisrightText = d3.select(".axisright").selectAll("text");
+    // // calculate the maximum size of the labels
+    // const axisrightTextMaxWidth = d3.max(axisrightText.nodes(), n => (n as SVGTextElement).getComputedTextLength());
+
+    // // calculate possible size
+    // const sizePossible = 2/3 * dimensions.heatmap.margin.right;
+
+    // if (axisrightTextMaxWidth > sizePossible) {
+    //     console.log('here')
+    //     const scale = sizePossible / axisrightTextMaxWidth;
+
+    //     const sizeNow = dimensions.textSize.ind.tickY;
+    //     const num = parseFloat(sizeNow.substring(0, sizeNow.length - 2));
+    //     const letr = sizeNow.substring(sizeNow.length - 2, sizeNow.length);
+    //     const sizeNew = `${num * scale}${letr}`;
         
-        axisrightText.style("font-size", sizeNew);
+    //     axisrightText.style("font-size", sizeNew);
+    // }
+
+    for (const text of texts) {
+        const textElement = d3.select(`.${text[1]}`);
+        let textElementMaxWidth = d3.max(textElement.nodes(), n => (n as SVGTextElement).getComputedTextLength());
+        if (text[2] !== 0) {
+            if (text[2] !== 45) {
+                console.warn("Text rotation unforeseen when calculating label size.")
+            }
+            textElementMaxWidth = Math.sqrt((textElementMaxWidth ** 2) / 2);
+        }
+
+        const sizePossible = text[3];
+
+        if (textElementMaxWidth > sizePossible) {
+            console.log('here', text);
+            const scale = sizePossible / textElementMaxWidth;
+    
+            const sizeNow = text[0];
+            const num = parseFloat(sizeNow.substring(0, sizeNow.length - 2));
+            const letr = sizeNow.substring(sizeNow.length - 2, sizeNow.length);
+            const sizeNew = `${num * scale}${letr}`;
+            
+            textElement.style("font-size", sizeNew);
+            // console.log('here', sizeNew);
+            text[0] = sizeNew;
+            // console.log(text[0], dimensions.textSize.ind.labelX)
+        }
     }
 
 
