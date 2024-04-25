@@ -50,7 +50,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			.style("font-size", dimensions.textSize.ind.tickX)
 			.style("fill", themeColors.text);
 
-	svg.append("text")
+	const labelX = svg.append("text")
         .attr("class", "labelX")
         .attr("text-anchor", "end")
         .attr("x", width / 2)
@@ -59,6 +59,9 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.style("font-size", dimensions.textSize.ind.labelX)
 		.style("fill", themeColors.text);
 
+	// position label in center
+	const labelXSize = labelX.node().getComputedTextLength();
+	labelX.attr("x", width/2 + labelXSize/2);
 
 	// Add y-axis
 	let y = d3.scaleBand<string>()
@@ -75,16 +78,20 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			.style("font-size", dimensions.textSize.ind.tickY)
 			.style("fill", themeColors.text);
 
-    svg.append("text")
+    const labelY = svg.append("text")
 		.attr("class", "labelY")
 		.attr("text-anchor", "end")
 		.attr("x", -height/2)
-		.attr("y", width + 120)
+		.attr("y", width + 5/6 * dimensions.heatmap.margin.right)
 		.attr("dy", ".75em")
 		.attr("transform", "rotate(-90)")
 		.text("Sample")
 		.style("font-size", dimensions.textSize.ind.labelY)
 		.style("fill", themeColors.text);
+
+	// position label in center
+	const labelYSize = labelY.node().getComputedTextLength();
+	labelY.attr("x", -height/2 + labelYSize/2);
 
 	// add metadata scale
 	// let y_meta = d3.scaleOrdinal()
