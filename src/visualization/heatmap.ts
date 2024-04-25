@@ -54,7 +54,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
         .attr("class", "labelX")
         .attr("text-anchor", "end")
         .attr("x", width / 2)
-        .attr("y", height + dimensions.heatmap.margin.bottom - 10)
+        .attr("y", height + 5/6 * dimensions.heatmap.margin.bottom)
         .text("Cell type")
 		.style("font-size", dimensions.textSize.ind.labelX)
 		.style("fill", themeColors.text);

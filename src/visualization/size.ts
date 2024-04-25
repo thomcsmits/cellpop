@@ -533,7 +533,7 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
         updateDimensionsWithGlobal(dimensions);
         d3.selectAll("svg").attr("width", dimensionsGlobal.width.total).attr("height", dimensionsGlobal.height.total);
         renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
-        // resizeLabels(dimensions);
+        resizeLabels(dimensions);
         updateLines(dimensionsGlobal);
     })
     drag.on("end", function() {
@@ -642,7 +642,7 @@ function resizeLabels(dimensions: CellPopDimensions) {
         [dimensions.textSize.ind.tickY, 'tickY', 0, 2/3 * dimensions.heatmap.margin.right],
         [dimensions.textSize.ind.labelY, 'labelY', 0, 1/3 * dimensions.heatmap.margin.right],
         [dimensions.textSize.ind.tickX, 'tickX', 45, 2/3 * dimensions.heatmap.margin.bottom],
-        [dimensions.textSize.ind.labelX, 'labelX', 45, 1/3 * dimensions.heatmap.margin.bottom],
+        [dimensions.textSize.ind.labelX, 'labelX', 0, 1/3 * dimensions.heatmap.margin.bottom],
     ] as [string, string, number, number][];
 
 
@@ -667,19 +667,20 @@ function resizeLabels(dimensions: CellPopDimensions) {
     // }
 
     for (const text of texts) {
-        const textElement = d3.select(`.${text[1]}`);
+        const textElement = d3.selectAll(`.${text[1]}`);
+        // todo: for labels, this calculates the size of the text as horizontal, not vertical, making them smaller than necessary
         let textElementMaxWidth = d3.max(textElement.nodes(), n => (n as SVGTextElement).getComputedTextLength());
-        if (text[2] !== 0) {
-            if (text[2] !== 45) {
-                console.warn("Text rotation unforeseen when calculating label size.")
-            }
-            textElementMaxWidth = Math.sqrt((textElementMaxWidth ** 2) / 2);
-        }
+        // if (text[2] !== 0) {
+        //     if (text[2] !== 45) {
+        //         console.warn("Text rotation unforeseen when calculating label size.")
+        //     }
+        //     console.log('text width changed')
+        //     textElementMaxWidth = Math.sqrt((textElementMaxWidth ** 2) / 2);
+        // }
 
         const sizePossible = text[3];
 
-        if (textElementMaxWidth > sizePossible) {
-            console.log('here', text);
+        if (textElementMaxWidth > sizePossible + 5 || textElementMaxWidth < sizePossible - 5) {
             const scale = sizePossible / textElementMaxWidth;
     
             const sizeNow = text[0];
@@ -688,9 +689,8 @@ function resizeLabels(dimensions: CellPopDimensions) {
             const sizeNew = `${num * scale}${letr}`;
             
             textElement.style("font-size", sizeNew);
-            // console.log('here', sizeNew);
             text[0] = sizeNew;
-            // console.log(text[0], dimensions.textSize.ind.labelX)
+            dimensions.textSize.ind[text[1]] = sizeNew;
         }
     }
 
