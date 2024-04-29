@@ -12,8 +12,8 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
     d3.select(".extension").selectAll("*").remove();
 
     const svg = d3.select(".extension")
-        .attr("width", dimensions.detailBar.width)
-        .attr("height", dimensions.detailBar.height);
+        .attr("width", dimensions.global.width.total)
+        .attr("height", dimensions.global.width.total);
 
     svg.append("rect")
         .attr("class", "background")
@@ -31,18 +31,22 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
         .selectAll("text")
             .attr("transform", "translate(-10,0)rotate(-45)")
             .style("text-anchor", "end")
-            .style("font-size", dimensions.textSize.tick)
+            .style("font-size", dimensions.textSize.ind.tickX)
             .style("fill", themeColors.text);
 
     // X axis label
-    svgBar.append("text")
+    const labelX = svgBar.append("text")
         .attr("class", "x label")
         .attr("text-anchor", "end")
-        .attr("x", dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left + width / 2)
+        .attr("x", dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left + width/2)
         .attr("y", height + dimensions.heatmap.margin.bottom - 10)
         .text("Cell type")
-        .style("font-size", dimensions.textSize.label)
+        .style("font-size", dimensions.textSize.ind.labelX)
         .style("fill", themeColors.text);
+
+    // position label in center
+	const labelXSize = labelX.node().getComputedTextLength();
+	labelX.attr("x", dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left + width/2 + labelXSize/2 + 75);
 
     // Y axis label
     svgBar.append("text")
@@ -53,7 +57,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
         .attr("dy", ".75em")
         .attr("transform", "rotate(-90)")
         .text("Number of cells")
-        .style("font-size", dimensions.textSize.label)
+        .style("font-size", dimensions.textSize.ind.labelY)
         .style("fill", themeColors.text);
 
     const nBars = data.extendedChart.rowNames.length;
@@ -75,7 +79,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
             .attr("x", 30)
             .attr("y", 50)
             .text(row)
-            .style("font-size", dimensions.textSize.title)
+            .style("font-size", dimensions.textSize.ind.title)
             .style("fill", themeColors.text);
 
 
@@ -90,7 +94,7 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
             .attr("class", "axisleft")
             .call(d3.axisLeft(y))
             .selectAll("text")
-                .style("font-size", dimensions.textSize.tick)
+                .style("font-size", dimensions.textSize.ind.tickY)
                 .style("fill", themeColors.text);
 
         // add color range for bars

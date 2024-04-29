@@ -43,7 +43,8 @@ export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions
         .attr("class", "axisleft")
         .call(d3.axisLeft(y))
         .selectAll("text")
-            .style("font-size", dimensions.textSize.tick);
+            .attr("class", "tickYSide")
+            .style("font-size", dimensions.textSize.ind.tickYSide);
     // svg.append("g")
     //     .attr("class", "axisbottom")
     //     .call(d3.axisBottom(x))
@@ -51,14 +52,14 @@ export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions
     //         .style("font-size", dimensions.textSize.tick);
 
     svg.append("text")
-        .attr("class", "y label")
+        .attr("class", "labelYSide")
         .attr("text-anchor", "end")
         .attr("x", 0)
         .attr("y", -70)
         .attr("dy", ".75em")
         .attr("transform", "rotate(-90)")
         .text("Fraction of cells")
-        .style("font-size", dimensions.textSize.labelSmall)
+        .style("font-size", dimensions.textSize.ind.labelYSide)
         .style("fill", themeColors.text);
 
     function kde(kernel: any, thds: number[]) {
