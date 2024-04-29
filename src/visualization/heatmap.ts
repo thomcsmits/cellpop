@@ -45,7 +45,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.call(d3.axisBottom(x))
 		.selectAll("text")
 			.attr("class", "tickX")
-			.attr("transform", "translate(-10,0)rotate(-45)")
+			.attr("transform", "translate(0,10)rotate(-90)")
 			.style("text-anchor", "end")
 			.style("font-size", dimensions.textSize.ind.tickX)
 			.style("fill", themeColors.text);
