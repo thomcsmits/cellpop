@@ -36,7 +36,7 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
 
 	svg.append("g")
 		.call(d3.axisBottom(x))
-		.attr("transform", "translate(0," + height + ")")
+		.attr("transform", "translate(0," + (height + dimensions.barLeft.margin.bottom) + ")")
 		.selectAll("text")
 			.attr("class", "tickXSide")
 			.attr("transform", "translate(-10,0)rotate(-45)")
@@ -50,7 +50,7 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
 		.attr("x", width - 50)
 		.attr("y", 40)
 		.attr("dy", ".75em")
-		.attr("transform", "translate(0," + height + ")")
+		.attr("transform", "translate(0," + (height + dimensions.barLeft.margin.bottom) + ")")
 		.text("Fraction of cells")
 		.style("font-size", dimensions.textSize.ind.labelXSide)
 		.style("fill", themeColors.text);

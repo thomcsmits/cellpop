@@ -12,8 +12,8 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
     d3.select(".extension").selectAll("*").remove();
 
     const svg = d3.select(".extension")
-        .attr("width", dimensions.detailBar.width)
-        .attr("height", dimensions.detailBar.height);
+        .attr("width", dimensions.global.width.total)
+        .attr("height", dimensions.global.width.total);
 
     svg.append("rect")
         .attr("class", "background")
@@ -35,14 +35,18 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
             .style("fill", themeColors.text);
 
     // X axis label
-    svgBar.append("text")
+    const labelX = svgBar.append("text")
         .attr("class", "x label")
         .attr("text-anchor", "end")
-        .attr("x", dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left + width / 2)
+        .attr("x", dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left + width/2)
         .attr("y", height + dimensions.heatmap.margin.bottom - 10)
         .text("Cell type")
         .style("font-size", dimensions.textSize.ind.labelX)
         .style("fill", themeColors.text);
+
+    // position label in center
+	const labelXSize = labelX.node().getComputedTextLength();
+	labelX.attr("x", dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left + width/2 + labelXSize/2 + 75);
 
     // Y axis label
     svgBar.append("text")
