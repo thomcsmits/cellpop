@@ -69,6 +69,26 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.domain(data.rowNames)
 		.padding(0.01);
 
+	// calculate size with embedded
+	// Apply custom row heights
+	// y.bandwidth = function() {
+	// 	return function(d) {
+	// 		return findIncluded(d.row, data.extendedChart.rowNames, 10, 100);
+	// 	};
+	// };
+
+	// function findIncluded(val: string, rowsExpanded: string[], lengthCollapsed: number, lengthExpanded: number): number {
+	// 	if (rowsExpanded.includes(val)) {
+	// 		return lengthExpanded;
+	// 	} else {
+	// 		return lengthCollapsed;
+	// 	}
+	// }
+
+	// let rowHeights = data.rowNames.map(d => findIncluded(d, data.extendedChart.rowNames, 10, 100));
+	// console.log(rowHeights)
+	
+
 	svg.append("g")
 		.attr("class", "axisright")
 		.attr("transform", "translate(" + width + ",0)")
