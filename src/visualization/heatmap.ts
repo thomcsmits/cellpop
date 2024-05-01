@@ -6,7 +6,7 @@ import { resetRowNames, resetColNames } from "../dataLoading/dataWrangling";
 import { defineContextMenu, addContextMenu, removeContextMenu } from "./contextMenu";
 import { renderCellPopVisualizationLeft, renderCellPopVisualizationTop } from "./sides";
 import { getUpperBound } from "./util";
-import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, RowNamesWrapped } from "../cellpop-schema";
+import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, RowNamesWrapped, CountsTotalRowValue } from "../cellpop-schema";
 
 
 export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, fraction=false, themeColors: CellPopThemeColors, metadataField: string, reset=false): [d3.ScaleBand<string>, d3.ScaleBand<string>, d3.ScaleLinear<string,number,never>] {
@@ -467,3 +467,14 @@ function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: Cell
 //         axisbottomText.style("font-size", 5);
 //     }
 // }
+
+
+function sortRowsDescending(data: CellPopData) {
+	// Get accumulated data
+	const dataRows = [] as CountsTotalRowValue[];
+	for (const row of data.rowNames) {
+		dataRows.push({row: row, countTotal: data.countsMatrix.filter(r => r.row === row).map(r => r.value).reduce((a, b) => a + b, 0)});
+	}
+	console.log(dataRows)
+
+}
