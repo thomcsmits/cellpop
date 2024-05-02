@@ -8,6 +8,7 @@ import { renderCellPopVisualizationLeft, renderCellPopVisualizationTop } from ".
 import { getUpperBound } from "./util";
 import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, RowNamesWrapped, CountsTotalRowValue } from "../cellpop-schema";
 
+import "./style.css";
 
 export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, fraction=false, themeColors: CellPopThemeColors, metadataField: string, reset=false): [d3.ScaleBand<string>, d3.ScaleBand<string>, d3.ScaleLinear<string,number,never>] {
 	if (reset) {
