@@ -224,12 +224,8 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			}
 			addTooltip(event, d);
         }
-		if (event.shiftKey) {
-			addHighlightRow(event.target.y.animVal.value, event.target.height.animVal.value);
-        }
-		if (event.altKey) {
-			addHighlightCol(event.target.x.animVal.value, event.target.width.animVal.value);
-		}
+		addHighlightRow(event.target.y.animVal.value, event.target.height.animVal.value);
+		addHighlightCol(event.target.x.animVal.value, event.target.width.animVal.value);
     };
     const mouseleave = function(event: MouseEvent) {
 		removeTooltip();
