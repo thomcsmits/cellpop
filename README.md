@@ -1,3 +1,5 @@
+> **_NOTE:_**  This project is a work in progress.
+
 # CellPop: Cell Type Composition Explorer
 CellPop is a visualization tool for cell type compositions. It is an NPM package that exports various functions and to create a D3 visualization from various file types.
 
