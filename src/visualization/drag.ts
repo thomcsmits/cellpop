@@ -8,6 +8,8 @@ import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, Co
 
 
 /** DRAG FUNCTION FOR ROWS */
+let offsetRows, offsetCols;
+// todo: get offset on start drag and add to y and x on drag.
 
 // Drag start function
 export function dragstartedRows(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue & {y?: number}) {
