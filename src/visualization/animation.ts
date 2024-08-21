@@ -163,7 +163,7 @@ function createStackedBar(svgBase: d3.Selection<d3.BaseType, unknown, HTMLElemen
         .select("g.axisleft")
         .transition()
         .delay(5000)
-        // @ts-ignore
+        // @ts-expect-error deep d3 type mismatch
         .call(d3.axisLeft(y2));
 
     // move the rects
