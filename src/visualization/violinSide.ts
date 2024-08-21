@@ -18,7 +18,7 @@ export function renderLeftViolin(data: CellPopData, dimensions: CellPopDimension
 		.append("g")
 			.attr("transform",
 				"translate(" + dimensions.barLeft.offsetWidth + "," + dimensions.barLeft.offsetHeight + ")")
-			.attr("class", "violinleft")
+			.attr("class", "violinleft");
 
 	// Get dimensions
 	const width = dimensions.barLeft.width - dimensions.barLeft.margin.left - dimensions.barLeft.margin.right;

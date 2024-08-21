@@ -59,7 +59,7 @@ export const CellPop = (props: CellPopProps) => {
 		svg.append("rect")
 			.attr("class", "background")
 			.attr("width", props.dimensions.global.width.total)
-			.attr("height", props.dimensions.global.height.total)
+			.attr("height", props.dimensions.global.height.total);
 
 		// add svg element for extension
 		const svgExtension = app.append("svg")
@@ -76,8 +76,8 @@ export const CellPop = (props: CellPopProps) => {
 
 		// create main visualization
 		renderCellPopVisualization(props.data, dimensions, fraction, themeColors, metadataField);
-    
-	}, [theme, fraction, metadataField])
+
+	}, [theme, fraction, metadataField]);
 
 
 	// create MUI buttons with callback functions to e.g. change theme
@@ -181,9 +181,9 @@ export const CellPop = (props: CellPopProps) => {
 					<ToggleButton value="dark">Dark</ToggleButton>
 				</ToggleButtonGroup>
 
-				{boundary ? 
+				{boundary ?
 					<Button variant="outlined" onClick={removeBoundary}>Remove boundary boxes</Button>
-					: <Button variant="outlined" onClick={showBoundary}>Show boundary boxes</Button> 
+					: <Button variant="outlined" onClick={showBoundary}>Show boundary boxes</Button>
 				}
 
 				<Button variant="outlined" onClick={handleAnimantionPopup}>
@@ -207,7 +207,7 @@ export const CellPop = (props: CellPopProps) => {
 			</Box> */}
 
 			<div id="cellpopvis" ref={cellPopRef} style={{position: "absolute", padding: "100px"}}></div>
-      
+
 		</div>
 	);
 };
