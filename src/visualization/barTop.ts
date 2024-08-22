@@ -14,7 +14,7 @@ export function renderTopBar(dataFull: CellPopData, dimensions: CellPopDimension
 		.append("g")
 			.attr("transform",
 				"translate(" + dimensions.barTop.offsetWidth + "," + dimensions.barTop.offsetHeight + ")")
-			.attr("class", "bartop")
+			.attr("class", "bartop");
 
 	// Get dimensions
 	const width = dimensions.barTop.width;

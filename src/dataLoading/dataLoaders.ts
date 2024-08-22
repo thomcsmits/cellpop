@@ -1,5 +1,4 @@
-// @ts-ignore
-import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
+// import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
 import { MetaData, ObsSets } from "../cellpop-schema";
 
 export function loadData() {

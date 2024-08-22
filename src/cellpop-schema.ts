@@ -143,7 +143,7 @@ export type CellPopDimensionsGlobalInner = {
     parts: {
         lengths: number[],
         offsets: number[]
-    }, 
+    },
     margins: {
         lengths: number[],
         offsets: number[]

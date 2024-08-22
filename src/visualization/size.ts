@@ -31,23 +31,23 @@ import { CellPopData, CellPopDimensions, CellPopDimensionsGlobal, CellPopDimensi
  * @param heightMarginMiddleTop Height of the margin between the top and middle panel. Can be supplied as absolute number or as fraction of height. Default to 0.05 (fraction of height)
  * @param heightMarginMiddleBottom Height of the margin between the middle and bottom panel. Can be supplied as absolute number or as fraction of height. Default to 0.05 (fraction of height)
  * @param heightMarginBottom Height of the margin on the bottom of the bottom panel. Can be supplied as absolute number or as fraction of height. Default to 0.05 (fraction of height)
- * @param heightExtension 
- * @param heightExtensionMiddle 
- * @param heightExtensionMarginTop 
- * @param heightExtensionMarginBottom 
+ * @param heightExtension
+ * @param heightExtensionMiddle
+ * @param heightExtensionMarginTop
+ * @param heightExtensionMarginBottom
  * @returns CellPopDimension object
  */
 export function getDimensions(
-    width?: number, 
-    widthLeft?: number, 
+    width?: number,
+    widthLeft?: number,
     widhtMiddle?: number,
-    widthRight?: number, 
+    widthRight?: number,
     widthMarginLeft?: number,
     widthMarginMiddleLeft?: number,
     widthMarginMiddleRight?: number,
     widthMarginRight?: number,
-    height?: number, 
-    heightTop?: number, 
+    height?: number,
+    heightTop?: number,
     heightMiddle?: number,
     heightBottom?: number,
     heightMarginTop?: number,
@@ -62,22 +62,22 @@ export function getDimensions(
     const dimensionsGlobal = getDimensionsGlobal(width, widthLeft, widhtMiddle, widthRight, widthMarginLeft, widthMarginMiddleLeft, widthMarginMiddleRight, widthMarginRight, height, heightTop, heightMiddle, heightBottom, heightMarginTop, heightMarginMiddleTop, heightMarginMiddleBottom, heightMarginBottom, heightExtension, heightExtensionMiddle, heightExtensionMarginTop, heightExtensionMarginBottom);
 
     const dimensions = getDimensionsFromGlobal(dimensionsGlobal);
-    
+
     return dimensions;
 }
 
 
 export function getDimensionsGlobal(
-    width?: number, 
-    widthLeft?: number, 
+    width?: number,
+    widthLeft?: number,
     widhtMiddle?: number,
-    widthRight?: number, 
+    widthRight?: number,
     widthMarginLeft?: number,
     widthMarginMiddleLeft?: number,
     widthMarginMiddleRight?: number,
     widthMarginRight?: number,
-    height?: number, 
-    heightTop?: number, 
+    height?: number,
+    heightTop?: number,
     heightMiddle?: number,
     heightBottom?: number,
     heightMarginTop?: number,
@@ -130,12 +130,12 @@ export function getDimensionsGlobal(
 
 
     checkDimensionsGlobal(dimensionsGlobal);
-    
+
     return dimensionsGlobal;
 }
 
 export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal) {
-    
+
     // fill in all required dimensions
 
     // if total width is not specified, set it to default
@@ -159,7 +159,7 @@ export function checkDimensionsGlobal(dimensionsGlobal: CellPopDimensionsGlobal)
         // }
     }
 
-    // For all width and height options, check if specified. If not, set to default. 
+    // For all width and height options, check if specified. If not, set to default.
     // Check if fraction, if so, set to absolute.
     for (let i = 0; i < dimensionsGlobal.width.parts.lengths.length; i++) {
         if (!dimensionsGlobal.width.parts.lengths[i]) {
@@ -271,11 +271,11 @@ function updateOffsets(dimensionsGlobal: CellPopDimensionsGlobal) {
 function getDimensionsText() {
     // todo: add these as params on top
     const textSizeGlobal = {
-        title: '2em', 
-        label: '2em', 
-        labelSmall: '1em', 
-        tick: '1em'
-    }
+        title: "2em",
+        label: "2em",
+        labelSmall: "1em",
+        tick: "1em"
+    };
 
     const textSizeInd = {
         title: textSizeGlobal.title,
@@ -289,23 +289,23 @@ function getDimensionsText() {
         tickColor: textSizeGlobal.tick,
         tickXSide: textSizeGlobal.tick,
         tickYSide: textSizeGlobal.tick,
-    }
+    };
 
     const textSize = {
         global: textSizeGlobal,
         ind: textSizeInd
-    }
+    };
 
     return textSize;
 }
 
 /**
  * Using the dimensionsGlobal, fill in all dimensions of individual parts
- * @param dimensionsGlobal 
+ * @param dimensionsGlobal
  * @returns CellPopDimensions
  */
 export function getDimensionsFromGlobal(dimensionsGlobal: CellPopDimensionsGlobal): CellPopDimensions {
-    
+
     const dimensions = {
 		global: dimensionsGlobal,
         heatmap: getDimType(dimensionsGlobal, 1, 1),
@@ -338,7 +338,7 @@ export function updateDimensionsWithGlobal(dimensions: CellPopDimensions): CellP
 }
 
 function getDimType(dimensionsGlobal: CellPopDimensionsGlobal, widthPosition: number, heightPosition: number) {
-    let dim = {} as CellPopDimensionsValue;
+    const dim = {} as CellPopDimensionsValue;
     dim.width = dimensionsGlobal.width.parts.lengths[widthPosition];
     dim.offsetWidth = dimensionsGlobal.width.parts.offsets[widthPosition];
     dim.height = dimensionsGlobal.height.parts.lengths[heightPosition];
@@ -348,7 +348,7 @@ function getDimType(dimensionsGlobal: CellPopDimensionsGlobal, widthPosition: nu
         right: dimensionsGlobal.width.margins.lengths[widthPosition+1],
         top: dimensionsGlobal.height.margins.lengths[heightPosition],
         bottom: dimensionsGlobal.height.margins.lengths[heightPosition+1],
-    }
+    };
     return dim;
 }
 
@@ -364,10 +364,10 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
 
     const svg = d3.select("g.main")
         .append("g")
-        .attr("class", "boundary")
+        .attr("class", "boundary");
 
     // define drag behaviour
-    const drag = d3.drag()
+    const drag = d3.drag();
 
     let className = "";
 
@@ -375,10 +375,10 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
         // set as active
         className = event.sourceEvent.target.classList[0] as string;
         d3.select(`.${className}`).classed("active", true);
-    })
+    });
     drag.on("drag", function(event) {
         switch(className) {
-            case 'boundary-width0': // between side and margin 0
+            case "boundary-width0": // between side and margin 0
                 if (event.x < 0) {
                     // make svg bigger
                     dimensionsGlobal.width.total += 0 - event.x;
@@ -395,49 +395,49 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                     updateOffsets(dimensionsGlobal);
                 }
                 break;
-            case 'boundary-width1': // between margin 0 and part 0
+            case "boundary-width1": // between margin 0 and part 0
                 if (event.x > dimensionsGlobal.width.border && event.x < dimensionsGlobal.width.margins.offsets[1]) {
                     dimensionsGlobal.width.parts.offsets[0] = event.x;
                     dimensionsGlobal.width.margins.lengths[0] = event.x - dimensionsGlobal.width.border;
                     dimensionsGlobal.width.parts.lengths[0] = dimensionsGlobal.width.margins.offsets[1] - event.x;
                 }
                 break;
-            case 'boundary-width2': // between part 0 and margin 1
+            case "boundary-width2": // between part 0 and margin 1
                 if (event.x > dimensionsGlobal.width.parts.offsets[0] && event.x < dimensionsGlobal.width.parts.offsets[1]) {
                     dimensionsGlobal.width.margins.offsets[1] = event.x;
                     dimensionsGlobal.width.parts.lengths[0] = event.x - dimensionsGlobal.width.parts.offsets[0];
                     dimensionsGlobal.width.margins.lengths[1] = dimensionsGlobal.width.parts.offsets[1] - event.x;
                 }
                 break;
-            case 'boundary-width3': // between margin 1 and part 2
+            case "boundary-width3": // between margin 1 and part 2
                 if (event.x > dimensionsGlobal.width.margins.offsets[1] && event.x < dimensionsGlobal.width.margins.offsets[2]) {
                     dimensionsGlobal.width.parts.offsets[1] = event.x;
                     dimensionsGlobal.width.margins.lengths[1] = event.x - dimensionsGlobal.width.margins.offsets[1];
                     dimensionsGlobal.width.parts.lengths[1] = dimensionsGlobal.width.margins.offsets[2] - event.x;
                 }
                 break;
-            case 'boundary-width4': // between part 2 and margin 2
+            case "boundary-width4": // between part 2 and margin 2
                 if (event.x > dimensionsGlobal.width.parts.offsets[1] && event.x < dimensionsGlobal.width.parts.offsets[2]) {
                     dimensionsGlobal.width.margins.offsets[2] = event.x;
                     dimensionsGlobal.width.parts.lengths[1] = event.x - dimensionsGlobal.width.parts.offsets[1];
                     dimensionsGlobal.width.margins.lengths[2] = dimensionsGlobal.width.parts.offsets[2] - event.x;
                 }
                 break;
-            case 'boundary-width5': // between margin 2 and part 3
+            case "boundary-width5": // between margin 2 and part 3
                 if (event.x > dimensionsGlobal.width.margins.offsets[2] && event.x < dimensionsGlobal.width.margins.offsets[3]) {
                     dimensionsGlobal.width.parts.offsets[2] = event.x;
                     dimensionsGlobal.width.margins.lengths[2] = event.x - dimensionsGlobal.width.margins.offsets[2];
                     dimensionsGlobal.width.parts.lengths[2] = dimensionsGlobal.width.margins.offsets[3] - event.x;
                 }
                 break;
-            case 'boundary-width6': // between part 3 and margin 4
+            case "boundary-width6": // between part 3 and margin 4
                 if (event.x > dimensionsGlobal.width.parts.offsets[2] && event.x < dimensionsGlobal.width.total - dimensionsGlobal.width.border) {
                     dimensionsGlobal.width.margins.offsets[3] = event.x;
                     dimensionsGlobal.width.parts.lengths[2] = event.x - dimensionsGlobal.width.parts.offsets[2];
                     dimensionsGlobal.width.margins.lengths[3] = dimensionsGlobal.width.total - event.x;
                 }
                 break;
-            case 'boundary-width7': // between margin 4 and side
+            case "boundary-width7": // between margin 4 and side
                 if (event.x > dimensionsGlobal.width.margins.offsets[3] && event.x < dimensionsGlobal.width.total - dimensionsGlobal.width.border) {
                     // make svg smaller
                     dimensionsGlobal.width.total -= event.x - dimensionsGlobal.width.margins.offsets[3];
@@ -453,7 +453,7 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                     updateOffsets(dimensionsGlobal);
                 }
                 break;
-            case 'boundary-height0': // between side and margin 0
+            case "boundary-height0": // between side and margin 0
                 if (event.y < 0) {
                     // make svg bigger
                     dimensionsGlobal.height.total += 0 - event.y;
@@ -469,49 +469,49 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                     updateOffsets(dimensionsGlobal);
                 }
                 break;
-            case 'boundary-height1': // between margin 0 and part 0
+            case "boundary-height1": // between margin 0 and part 0
                 if (event.y > dimensionsGlobal.height.border && event.y < dimensionsGlobal.height.margins.offsets[1]) {
                     dimensionsGlobal.height.parts.offsets[0] = event.y;
                     dimensionsGlobal.height.margins.lengths[0] = event.y - dimensionsGlobal.height.border;
                     dimensionsGlobal.height.parts.lengths[0] = dimensionsGlobal.height.margins.offsets[1] - event.y;
                 }
                 break;
-            case 'boundary-height2': // between part 0 and margin 1
+            case "boundary-height2": // between part 0 and margin 1
                 if (event.y > dimensionsGlobal.height.parts.offsets[0] && event.y < dimensionsGlobal.height.parts.offsets[1]) {
                     dimensionsGlobal.height.margins.offsets[1] = event.y;
                     dimensionsGlobal.height.parts.lengths[0] = event.y - dimensionsGlobal.height.parts.offsets[0];
                     dimensionsGlobal.height.margins.lengths[1] = dimensionsGlobal.height.parts.offsets[1] - event.y;
                 }
                 break;
-            case 'boundary-height3': // between margin 1 and part 2
+            case "boundary-height3": // between margin 1 and part 2
                 if (event.y > dimensionsGlobal.height.margins.offsets[1] && event.y < dimensionsGlobal.height.margins.offsets[2]) {
                     dimensionsGlobal.height.parts.offsets[1] = event.y;
                     dimensionsGlobal.height.margins.lengths[1] = event.y - dimensionsGlobal.height.margins.offsets[1];
                     dimensionsGlobal.height.parts.lengths[1] = dimensionsGlobal.height.margins.offsets[2] - event.y;
                 }
                 break;
-            case 'boundary-height4': // between part 2 and margin 2
+            case "boundary-height4": // between part 2 and margin 2
                 if (event.y > dimensionsGlobal.height.parts.offsets[1] && event.y < dimensionsGlobal.height.parts.offsets[2]) {
                     dimensionsGlobal.height.margins.offsets[2] = event.y;
                     dimensionsGlobal.height.parts.lengths[1] = event.y - dimensionsGlobal.height.parts.offsets[1];
                     dimensionsGlobal.height.margins.lengths[2] = dimensionsGlobal.height.parts.offsets[2] - event.y;
                 }
                 break;
-            case 'boundary-height5': // between margin 2 and part 3
+            case "boundary-height5": // between margin 2 and part 3
                 if (event.y > dimensionsGlobal.height.margins.offsets[2] && event.y < dimensionsGlobal.height.margins.offsets[3]) {
                     dimensionsGlobal.height.parts.offsets[2] = event.y;
                     dimensionsGlobal.height.margins.lengths[2] = event.y - dimensionsGlobal.height.margins.offsets[2];
                     dimensionsGlobal.height.parts.lengths[2] = dimensionsGlobal.height.margins.offsets[3] - event.y;
                 }
                 break;
-            case 'boundary-height6': // between part 3 and margin 4
+            case "boundary-height6": // between part 3 and margin 4
                 if (event.y > dimensionsGlobal.height.parts.offsets[2] && event.y < dimensionsGlobal.height.total - dimensionsGlobal.height.border) {
                     dimensionsGlobal.height.margins.offsets[3] = event.y;
                     dimensionsGlobal.height.parts.lengths[2] = event.y - dimensionsGlobal.height.parts.offsets[2];
                     dimensionsGlobal.height.margins.lengths[3] = dimensionsGlobal.height.total - event.y;
                 }
                 break;
-            case 'boundary-height7': // between margin 4 and side
+            case "boundary-height7": // between margin 4 and side
                 if (event.y > dimensionsGlobal.height.margins.offsets[3] && event.y < dimensionsGlobal.height.total - dimensionsGlobal.height.border) {
                     // make svg smaller
                     dimensionsGlobal.height.total -= event.y - dimensionsGlobal.height.margins.offsets[3];
@@ -528,24 +528,24 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
                 }
                 break;
             default:
-                
-        } 
+
+        }
         updateDimensionsWithGlobal(dimensions);
         d3.selectAll("svg").attr("width", dimensionsGlobal.width.total).attr("height", dimensionsGlobal.height.total);
         renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
         resizeLabels(dimensions);
         updateLines(dimensionsGlobal);
-    })
+    });
     drag.on("end", function() {
         updateDimensionsWithGlobal(dimensions);
         d3.selectAll("svg").attr("width", dimensionsGlobal.width.total).attr("height", dimensionsGlobal.height.total);
         renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
         resizeLabels(dimensions);
         drawSizeBoundaries(data, dimensions, fraction, themeColors, metadataField);
-        
+
         // set as inactive
         d3.select(`.${className}`).classed("active", false);
-    })
+    });
 
     // draw gridlines
     const gridLines = getGridLines(dimensionsGlobal);
@@ -559,32 +559,32 @@ export function drawSizeBoundaries(data: CellPopData, dimensions: CellPopDimensi
 function getGridLines(dimensionsGlobal: CellPopDimensionsGlobal) {
 
     const lineSize = 5;
-    const lineSizeHalf = lineSize / 2
-    const colorLine = 'grey';
-    const colorSide = 'red';
-    const colorCorner = 'red';
+    const lineSizeHalf = lineSize / 2;
+    const colorLine = "grey";
+    const colorSide = "red";
+    const colorCorner = "red";
 
     const lineHeight = dimensionsGlobal.height.total - 2 * dimensionsGlobal.height.border;
     const lineWidth = dimensionsGlobal.width.total - 2 * dimensionsGlobal.width.border;
 
     // lines
     const lines = [
-        ['width0', { x: 0, y: dimensionsGlobal.height.border, width: dimensionsGlobal.width.border, height: dimensionsGlobal.height.total, color: colorSide }],
-        ['width1', { x: - lineSizeHalf + dimensionsGlobal.width.parts.offsets[0], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
-        ['width2', { x: - lineSizeHalf + dimensionsGlobal.width.margins.offsets[1], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
-        ['width3', { x: - lineSizeHalf + dimensionsGlobal.width.parts.offsets[1], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
-        ['width4', { x: - lineSizeHalf + dimensionsGlobal.width.margins.offsets[2], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
-        ['width5', { x: - lineSizeHalf + dimensionsGlobal.width.parts.offsets[2], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
-        ['width6', { x: - lineSizeHalf + dimensionsGlobal.width.margins.offsets[3], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
-        ['width7', { x: dimensionsGlobal.width.total - dimensionsGlobal.width.border, y: dimensionsGlobal.height.border, width: dimensionsGlobal.width.border, height: dimensionsGlobal.height.total, color: colorSide }],
-        ['height0', { x: dimensionsGlobal.width.border, y: 0, width: dimensionsGlobal.width.total, height: dimensionsGlobal.height.border, color: colorSide }],
-        ['height1', { x:  dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.parts.offsets[0], width: lineWidth, height: lineSize, color: colorLine }],
-        ['height2', { x: dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.margins.offsets[1], width: lineWidth, height: lineSize, color: colorLine }],
-        ['height3', { x: dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.parts.offsets[1], width: lineWidth, height: lineSize, color: colorLine }],
-        ['height4', { x: dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.margins.offsets[2], width: lineWidth, height: lineSize, color: colorLine }],
-        ['height5', { x: dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.parts.offsets[2], width: lineWidth, height: lineSize, color: colorLine }],
-        ['height6', { x: dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.margins.offsets[3], width: lineWidth, height: lineSize, color: colorLine }],
-        ['height7', { x: dimensionsGlobal.width.border, y: dimensionsGlobal.height.total - dimensionsGlobal.height.border, width: dimensionsGlobal.width.total, height: dimensionsGlobal.height.border, color: colorSide }]
+        ["width0", { x: 0, y: dimensionsGlobal.height.border, width: dimensionsGlobal.width.border, height: dimensionsGlobal.height.total, color: colorSide }],
+        ["width1", { x: - lineSizeHalf + dimensionsGlobal.width.parts.offsets[0], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
+        ["width2", { x: - lineSizeHalf + dimensionsGlobal.width.margins.offsets[1], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
+        ["width3", { x: - lineSizeHalf + dimensionsGlobal.width.parts.offsets[1], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
+        ["width4", { x: - lineSizeHalf + dimensionsGlobal.width.margins.offsets[2], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
+        ["width5", { x: - lineSizeHalf + dimensionsGlobal.width.parts.offsets[2], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
+        ["width6", { x: - lineSizeHalf + dimensionsGlobal.width.margins.offsets[3], y: dimensionsGlobal.height.border, width: lineSize, height: lineHeight, color: colorLine }],
+        ["width7", { x: dimensionsGlobal.width.total - dimensionsGlobal.width.border, y: dimensionsGlobal.height.border, width: dimensionsGlobal.width.border, height: dimensionsGlobal.height.total, color: colorSide }],
+        ["height0", { x: dimensionsGlobal.width.border, y: 0, width: dimensionsGlobal.width.total, height: dimensionsGlobal.height.border, color: colorSide }],
+        ["height1", { x:  dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.parts.offsets[0], width: lineWidth, height: lineSize, color: colorLine }],
+        ["height2", { x: dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.margins.offsets[1], width: lineWidth, height: lineSize, color: colorLine }],
+        ["height3", { x: dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.parts.offsets[1], width: lineWidth, height: lineSize, color: colorLine }],
+        ["height4", { x: dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.margins.offsets[2], width: lineWidth, height: lineSize, color: colorLine }],
+        ["height5", { x: dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.parts.offsets[2], width: lineWidth, height: lineSize, color: colorLine }],
+        ["height6", { x: dimensionsGlobal.width.border, y: - lineSizeHalf + dimensionsGlobal.height.margins.offsets[3], width: lineWidth, height: lineSize, color: colorLine }],
+        ["height7", { x: dimensionsGlobal.width.border, y: dimensionsGlobal.height.total - dimensionsGlobal.height.border, width: dimensionsGlobal.width.total, height: dimensionsGlobal.height.border, color: colorSide }]
     ] as [string, {x: number, y: number, width: number, height: number, color: string}][];
 
     return lines;
@@ -598,16 +598,16 @@ function createLine(svg: d3.Selection<SVGGElement, unknown, HTMLElement, any>, d
         .attr("width", width)
         .attr("height", height)
         .style("fill", color)
-        .call(drag)
+        .call(drag);
 
     line.on("mouseover", (event) => {
-        d3.select(event.target).style("opacity", 0.7)
-    })
+        d3.select(event.target).style("opacity", 0.7);
+    });
 
     line.on("mouseout", (event) => {
-        d3.select(event.target).style("opacity", 1)
-    })
-    
+        d3.select(event.target).style("opacity", 1);
+    });
+
 }
 
 function updateLines(dimensionsGlobal: CellPopDimensionsGlobal) {
@@ -617,7 +617,7 @@ function updateLines(dimensionsGlobal: CellPopDimensionsGlobal) {
     for (const line of gridLines) {
         const className = line[0];
         const sizing = line[1];
-        const element = d3.select("g.boundary").select(`.boundary-${className}`)
+        const element = d3.select("g.boundary").select(`.boundary-${className}`);
         element.attr("x", sizing.x);
         element.attr("y", sizing.y);
         element.attr("width", sizing.width);
@@ -633,16 +633,16 @@ export function removeSizeBoundaries() {
 function resizeLabels(dimensions: CellPopDimensions) {
 
     // later change this into an option
-    let autoReziseLabels = true;
+    const autoReziseLabels = true;
     if (!autoReziseLabels) {
         return;
     }
 
     const texts = [
-        [dimensions.textSize.ind.tickY, 'tickY', 0, 2/3 * dimensions.heatmap.margin.right],
-        [dimensions.textSize.ind.labelY, 'labelY', 0, 1/3 * dimensions.heatmap.margin.right],
-        [dimensions.textSize.ind.tickX, 'tickX', 45, 2/3 * dimensions.heatmap.margin.bottom],
-        [dimensions.textSize.ind.labelX, 'labelX', 0, 1/3 * dimensions.heatmap.margin.bottom],
+        [dimensions.textSize.ind.tickY, "tickY", 0, 2/3 * dimensions.heatmap.margin.right],
+        [dimensions.textSize.ind.labelY, "labelY", 0, 1/3 * dimensions.heatmap.margin.right],
+        [dimensions.textSize.ind.tickX, "tickX", 45, 2/3 * dimensions.heatmap.margin.bottom],
+        [dimensions.textSize.ind.labelX, "labelX", 0, 1/3 * dimensions.heatmap.margin.bottom],
     ] as [string, string, number, number][];
 
 
@@ -662,14 +662,14 @@ function resizeLabels(dimensions: CellPopDimensions) {
     //     const num = parseFloat(sizeNow.substring(0, sizeNow.length - 2));
     //     const letr = sizeNow.substring(sizeNow.length - 2, sizeNow.length);
     //     const sizeNew = `${num * scale}${letr}`;
-        
+
     //     axisrightText.style("font-size", sizeNew);
     // }
 
     for (const text of texts) {
         const textElement = d3.selectAll(`.${text[1]}`);
         // todo: for labels, this calculates the size of the text as horizontal, not vertical, making them smaller than necessary
-        let textElementMaxWidth = d3.max(textElement.nodes(), n => (n as SVGTextElement).getComputedTextLength());
+        const textElementMaxWidth = d3.max(textElement.nodes(), n => (n as SVGTextElement).getComputedTextLength());
         // if (text[2] !== 0) {
         //     if (text[2] !== 45) {
         //         console.warn("Text rotation unforeseen when calculating label size.")
@@ -682,12 +682,12 @@ function resizeLabels(dimensions: CellPopDimensions) {
 
         if (textElementMaxWidth > sizePossible + 5 || textElementMaxWidth < sizePossible - 5) {
             const scale = sizePossible / textElementMaxWidth;
-    
+
             const sizeNow = text[0];
             const num = parseFloat(sizeNow.substring(0, sizeNow.length - 2));
             const letr = sizeNow.substring(sizeNow.length - 2, sizeNow.length);
             const sizeNew = `${num * scale}${letr}`;
-            
+
             textElement.style("font-size", sizeNew);
             text[0] = sizeNew;
             dimensions.textSize.ind[text[1]] = sizeNew;
@@ -700,7 +700,7 @@ function resizeLabels(dimensions: CellPopDimensions) {
     //     // todo: resize properly
     //     axisrightText.style("font-size", 5);
     // }
-    
+
 
     // // select text from bottom axis
     // const axisbottomText = d3.select(".axisbottom").selectAll("text");

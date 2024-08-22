@@ -14,7 +14,7 @@ export function renderLeftBar(dataFull: CellPopData, dimensions: CellPopDimensio
 		.append("g")
 			.attr("transform",
 				"translate(" + dimensions.barLeft.offsetWidth + "," + dimensions.barLeft.offsetHeight + ")")
-			.attr("class", "barleft")
+			.attr("class", "barleft");
 
 	// Get dimensions
 	const width = dimensions.barLeft.width;

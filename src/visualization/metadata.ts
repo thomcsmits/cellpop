@@ -22,7 +22,7 @@ export function sortByMetadata(data: CellPopData, op: string) {
     const rowsMeta = data.metadata.rows;
 
     const opVals = rowsMeta.map(r => [r.row, r.metadata[op[0]]]);
-    
+
     // // Update the ordering of rowNames
     // data.rowNames = reorderArray(data.rowNames, currentIndex, newIndex);
     // data.rowNamesWrapped = reorderArray(data.rowNamesWrapped, currentIndex, newIndex);
