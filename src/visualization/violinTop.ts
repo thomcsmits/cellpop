@@ -20,7 +20,7 @@ export function renderTopViolin(data: CellPopData, dimensions: CellPopDimensions
 		.append("g")
 			.attr("transform",
 				"translate(" + dimensions.barTop.offsetWidth + "," + dimensions.barTop.offsetHeight + ")")
-			.attr("class", "violintop")
+			.attr("class", "violintop");
 
 	// Get dimensions
 	const width = dimensions.barTop.width - dimensions.barTop.margin.left - dimensions.barTop.margin.right;

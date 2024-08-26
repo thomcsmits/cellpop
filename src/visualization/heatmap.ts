@@ -27,7 +27,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.append("g")
 			.attr("transform",
 				"translate(" + dimensions.heatmap.offsetWidth + "," + dimensions.heatmap.offsetHeight + ")")
-			.attr("class", "heatmap")
+			.attr("class", "heatmap");
 
 
 	// Get dimensions
@@ -386,9 +386,9 @@ function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: Cell
 	d3.select("g.axiscolor").remove();
 	const gradient = d3.select("g.main")
 		.append("g")
-		.attr("transform", 
+		.attr("transform",
 			"translate(" + dimensions.heatmapLegend.offsetWidth + "," + dimensions.heatmapLegend.offsetHeight + ")")
-		.attr("class", "axiscolor")
+		.attr("class", "axiscolor");
 
 	const width = dimensions.heatmapLegend.width;
 	const height = 10;
@@ -406,10 +406,10 @@ function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: Cell
 			.attr("y", colorAxisSize - i * colorAxisSize / colorAxisSteps)
 			.attr("width", colorAxisWidth)
 			.attr("height", colorAxisSize / colorAxisSteps)
-			.style("fill", color)
+			.style("fill", color);
 	}
 
-	const colorAxisLabel = fraction ? 'Fraction' : 'Count'; 
+	const colorAxisLabel = fraction ? "Fraction" : "Count";
 	gradient.append("text")
 		.attr("class", "labelColor")
 		.attr("y", -10)
@@ -452,7 +452,7 @@ function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: Cell
 //         // todo: resize properly
 //         axisrightText.style("font-size", 5);
 //     }
-    
+
 
 //     // select text from bottom axis
 //     const axisbottomText = d3.select(".axisbottom").selectAll("text");
