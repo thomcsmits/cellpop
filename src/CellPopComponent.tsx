@@ -80,6 +80,10 @@ export const CellPop = (props: CellPopProps) => {
 	}, [theme, fraction, metadataField]);
 
 
+	function undo() {
+		console.warn("Not yet implemented")
+	}
+
 	// create MUI buttons with callback functions to e.g. change theme
 	function changeTheme(event: React.MouseEvent<HTMLInputElement, MouseEvent>, newTheme: CellPopTheme | null) {
 		if (newTheme !== null) {
@@ -139,9 +143,7 @@ export const CellPop = (props: CellPopProps) => {
 		<div>
 			<Stack spacing={6} direction="row">
 
-				<Button variant="outlined" onClick={resetData}>Reset data</Button>
-
-				<Button variant="outlined" onClick={resetLayeredBar}>Reset layered bar chart</Button>
+				<Button variant="outlined" onClick={undo}>Undo</Button>
 
 				<ToggleButtonGroup
 					color="primary"
@@ -152,6 +154,17 @@ export const CellPop = (props: CellPopProps) => {
 				>
 					<ToggleButton value={false}>Count</ToggleButton>
 					<ToggleButton value={true}>Fraction</ToggleButton>
+				</ToggleButtonGroup>
+
+				<ToggleButtonGroup
+					color="primary"
+					value={theme}
+					exclusive
+					onChange={changeTheme}
+					aria-label="Theme"
+				>
+					<ToggleButton value="light">Light</ToggleButton>
+					<ToggleButton value="dark">Dark</ToggleButton>
 				</ToggleButtonGroup>
 
 				<FormControl sx={{ m: 1, width: 300 }}>
@@ -170,6 +183,7 @@ export const CellPop = (props: CellPopProps) => {
 					</Select>
 				</FormControl>
 
+				{boundary ? 
 				<ToggleButtonGroup
 					color="primary"
 					value={theme}
@@ -181,10 +195,13 @@ export const CellPop = (props: CellPopProps) => {
 					<ToggleButton value="dark">Dark</ToggleButton>
 				</ToggleButtonGroup>
 
-				{boundary ?
 					<Button variant="outlined" onClick={removeBoundary}>Remove boundary boxes</Button>
 					: <Button variant="outlined" onClick={showBoundary}>Show boundary boxes</Button>
 				}
+
+				<Button variant="outlined" onClick={resetData}>Reset data</Button>
+
+				<Button variant="outlined" onClick={resetLayeredBar}>Reset layered bar chart</Button>
 
 				<Button variant="outlined" onClick={handleAnimantionPopup}>
 					Show animation
@@ -201,10 +218,6 @@ export const CellPop = (props: CellPopProps) => {
 
 				</div>
 			</Popup>
-
-			{/* <Box sx={{position: "relative"}}>
-				{animationAnchor ? <svg className="animate-svg" width={dimensions.global.width / 2} height={dimensions.global.height / 2}></svg> : null}
-			</Box> */}
 
 			<div id="cellpopvis" ref={cellPopRef} style={{position: "absolute", padding: "100px"}}></div>
 

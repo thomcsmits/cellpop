@@ -6,8 +6,9 @@ import { resetRowNames, resetColNames } from "../dataLoading/dataWrangling";
 import { defineContextMenu, addContextMenu, removeContextMenu } from "./contextMenu";
 import { renderCellPopVisualizationLeft, renderCellPopVisualizationTop } from "./sides";
 import { getUpperBound } from "./util";
-import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, RowNamesWrapped } from "../cellpop-schema";
+import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, RowNamesWrapped, CountsTotalRowValue } from "../cellpop-schema";
 
+import "./style.css";
 
 export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, fraction=false, themeColors: CellPopThemeColors, metadataField: string, reset=false): [d3.ScaleBand<string>, d3.ScaleBand<string>, d3.ScaleLinear<string,number,never>] {
 	if (reset) {
@@ -68,6 +69,26 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 		.range([ height, 0 ])
 		.domain(data.rowNames)
 		.padding(0.01);
+
+	// calculate size with embedded
+	// Apply custom row heights
+	// y.bandwidth = function() {
+	// 	return function(d) {
+	// 		return findIncluded(d.row, data.extendedChart.rowNames, 10, 100);
+	// 	};
+	// };
+
+	// function findIncluded(val: string, rowsExpanded: string[], lengthCollapsed: number, lengthExpanded: number): number {
+	// 	if (rowsExpanded.includes(val)) {
+	// 		return lengthExpanded;
+	// 	} else {
+	// 		return lengthCollapsed;
+	// 	}
+	// }
+
+	// let rowHeights = data.rowNames.map(d => findIncluded(d, data.extendedChart.rowNames, 10, 100));
+	// console.log(rowHeights)
+	
 
 	svg.append("g")
 		.attr("class", "axisright")
@@ -203,12 +224,8 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 			}
 			addTooltip(event, d);
         }
-		if (event.shiftKey) {
-			addHighlightRow(event.target.y.animVal.value, event.target.height.animVal.value);
-        }
-		if (event.altKey) {
-			addHighlightCol(event.target.x.animVal.value, event.target.width.animVal.value);
-		}
+		addHighlightRow(event.target.y.animVal.value, event.target.height.animVal.value);
+		addHighlightCol(event.target.x.animVal.value, event.target.width.animVal.value);
     };
     const mouseleave = function(event: MouseEvent) {
 		removeTooltip();
@@ -447,3 +464,14 @@ function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: Cell
 //         axisbottomText.style("font-size", 5);
 //     }
 // }
+
+
+function sortRowsDescending(data: CellPopData) {
+	// Get accumulated data
+	const dataRows = [] as CountsTotalRowValue[];
+	for (const row of data.rowNames) {
+		dataRows.push({row: row, countTotal: data.countsMatrix.filter(r => r.row === row).map(r => r.value).reduce((a, b) => a + b, 0)});
+	}
+	console.log(dataRows)
+
+}
