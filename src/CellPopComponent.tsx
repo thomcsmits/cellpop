@@ -24,9 +24,6 @@ import Background from "./visx-visualization/Background";
 
 
 export const CellPop = (props: CellPopProps) => {
-	if (!props.data) {
-		return <></>;
-	}
 
 	const cellPopRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +35,8 @@ export const CellPop = (props: CellPopProps) => {
 
 	const [animationAnchor, setAnimationAnchor] = useState<HTMLElement>(null);
 	const [boundary, setBoundary] = useState<boolean>(false);
+
+
 
 	// get metadata options
 	const metadataFields = getPossibleMetadataSelections(props.data);
@@ -81,6 +80,10 @@ export const CellPop = (props: CellPopProps) => {
 
 	}, [theme, fraction, metadataField]);
 
+
+	if (!props.data) {
+		return <></>;
+	}
 
 	function undo() {
 		console.warn("Not yet implemented");
