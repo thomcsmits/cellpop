@@ -19,6 +19,8 @@ import { resetRowNames } from "./dataLoading/dataWrangling";
 import { resetExtensionChart } from "./visualization/barExtensions";
 import { drawSizeBoundaries, removeSizeBoundaries } from "./visualization/size";
 import { CellPopProps, CellPopDimensions, CellPopTheme, CellPopData } from "./cellpop-schema";
+import VizContainer from "./visx-visualization/VizContainer";
+import Background from "./visx-visualization/Background";
 
 
 export const CellPop = (props: CellPopProps) => {
@@ -81,7 +83,7 @@ export const CellPop = (props: CellPopProps) => {
 
 
 	function undo() {
-		console.warn("Not yet implemented")
+		console.warn("Not yet implemented");
 	}
 
 	// create MUI buttons with callback functions to e.g. change theme
@@ -194,7 +196,7 @@ export const CellPop = (props: CellPopProps) => {
 						<ToggleButton value="dark">Dark</ToggleButton>
 					</ToggleButtonGroup>
 
-				{boundary ? 
+				{boundary ?
 					<Button variant="outlined" onClick={removeBoundary}>Remove boundary boxes</Button>
 					: <Button variant="outlined" onClick={showBoundary}>Show boundary boxes</Button>
 				}
@@ -219,8 +221,9 @@ export const CellPop = (props: CellPopProps) => {
 				</div>
 			</Popup>
 
-			<div id="cellpopvis" ref={cellPopRef} style={{position: "absolute", padding: "100px"}}></div>
-
+			<VizContainer width={dimensions.global.width.total} height={dimensions.global.height.total} ref={cellPopRef}>
+				<Background width={dimensions.global.width.total} height={dimensions.global.height.total} />
+			</VizContainer>
 		</div>
 	);
 };

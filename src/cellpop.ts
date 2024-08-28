@@ -111,7 +111,7 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 	mainVis.id = "cellpopvis";
 	app.appendChild(mainVis);
 
-	// append the svg object to the body of the page
+	// append the svg object to the body of the page -> `VizContainer.tsx`
 	const svg = d3.select("#cellpopvis")
 	.append("svg")
 		.attr("width", dimensions.global.width)
@@ -119,7 +119,7 @@ export function getMainVis(data: CellPopData, dimensions?: CellPopDimensions, th
 	.append("g")
 		.attr("class", "main");
 
-	// add background
+	// add background -> `Background.tsx`
 	svg.append("rect")
 		.attr("class", "background")
 		.attr("width", dimensions.global.width)
