@@ -23,67 +23,14 @@ import VizContainer from "./visx-visualization/VizContainer";
 import Background from "./visx-visualization/Background";
 
 
-export const CellPop = (props: CellPopProps) => {
-
-	const cellPopRef = useRef<HTMLDivElement>(null);
-
-	// const [data, setData] = useState(props.data);
-	const [theme, setTheme] = useState<CellPopTheme>(props.theme);
-	const [dimensions, setDimensions] = useState<CellPopDimensions>(props.dimensions);
+const useCellPopConfig = ({data, dimensions: initialDimensions, theme: initialTheme}: CellPopProps) => {
+	const [theme, setTheme] = useState<CellPopTheme>(initialTheme);
+	const [dimensions, setDimensions] = useState<CellPopDimensions>(initialDimensions);
 	const [fraction, setFraction] = useState<boolean>(false);
 	const [metadataField, setMetadataField] = useState<string>("None");
 
 	const [animationAnchor, setAnimationAnchor] = useState<HTMLElement>(null);
 	const [boundary, setBoundary] = useState<boolean>(false);
-
-
-
-	// get metadata options
-	const metadataFields = getPossibleMetadataSelections(props.data);
-
-
-	// useref for creating the svg
-	useEffect(() => {
-		const app = d3.select(cellPopRef.current);
-
-		// on the first render, we want to make sure there aren't any svg's
-		app.selectAll("svg").remove();
-
-		// add svg element for main
-		const svg = app.append("svg")
-			.attr("width", props.dimensions.global.width.total)
-			.attr("height", props.dimensions.global.height.total)
-		.append("g")
-			.attr("class", "main");
-
-		// add background
-		svg.append("rect")
-			.attr("class", "background")
-			.attr("width", props.dimensions.global.width.total)
-			.attr("height", props.dimensions.global.height.total);
-
-		// add svg element for extension
-		const svgExtension = app.append("svg")
-			.attr("class", "extension");
-	}, []);
-
-	// call renderCellPopVisualization on updates
-	useEffect(() => {
-		// get theme colors
-		const themeColors = getTheme(theme);
-
-		// change background theme
-		d3.selectAll(".background").style("fill", themeColors.background);
-
-		// create main visualization
-		renderCellPopVisualization(props.data, dimensions, fraction, themeColors, metadataField);
-
-	}, [theme, fraction, metadataField]);
-
-
-	if (!props.data) {
-		return <></>;
-	}
 
 	function undo() {
 		console.warn("Not yet implemented");
@@ -113,35 +60,124 @@ export const CellPop = (props: CellPopProps) => {
 		// get theme colors
 		const themeColors = getTheme(theme);
 
-		// // change background theme
+		// change background theme
 		d3.selectAll(".background").style("fill", themeColors.background);
 
 		resetLayeredBar();
 
-		renderCellPopVisualization(props.data, dimensions, fraction, themeColors, metadataField, true);
+		renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField, true);
 		removeBoundary();
 	}
 
 	function resetLayeredBar() {
-		resetExtensionChart(props.data);
+		resetExtensionChart(data);
 		removeBoundary();
 	}
 
 	// animation pop-up
-	const handleAnimantionPopup = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+	const handleAnimationPopup = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		setAnimationAnchor(animationAnchor ? null : event.currentTarget);
 		removeBoundary();
 	};
 
 	function showBoundary() {
 		const themeColors = getTheme(theme);
-		const smth = drawSizeBoundaries(props.data, dimensions, fraction, themeColors, metadataField);
+		const smth = drawSizeBoundaries(data, dimensions, fraction, themeColors, metadataField);
 		setBoundary(true);
 	}
 
 	function removeBoundary() {
 		removeSizeBoundaries();
 		setBoundary(false);
+	}
+
+	return {
+		theme,
+		dimensions,
+		fraction,
+		metadataField,
+		animationAnchor,
+		boundary,
+		undo,
+		changeTheme,
+		changeFraction,
+		changeMetadataField,
+		resetData,
+		resetLayeredBar,
+		handleAnimationPopup,
+		showBoundary,
+		removeBoundary
+	};
+};
+
+export const CellPop = (props: CellPopProps) => {
+
+	const cellPopRef = useRef<HTMLDivElement>(null);
+
+	const {
+		theme,
+		dimensions,
+		fraction,
+		metadataField,
+		animationAnchor,
+		boundary,
+		undo,
+		changeTheme,
+		changeFraction,
+		changeMetadataField,
+		resetData,
+		resetLayeredBar,
+		handleAnimationPopup: handleAnimationPopup,
+		showBoundary,
+		removeBoundary
+	} = useCellPopConfig(props);
+
+	const { data } = props;
+
+	// get metadata options
+	const metadataFields = getPossibleMetadataSelections(data);
+
+	// useref for creating the svg
+	useEffect(() => {
+		const app = d3.select(cellPopRef.current);
+
+		// on the first render, we want to make sure there aren't any svg's
+		app.selectAll("svg").remove();
+
+		// add svg element for main
+		const svg = app.append("svg")
+			.attr("width", dimensions.global.width.total)
+			.attr("height", dimensions.global.height.total)
+		.append("g")
+			.attr("class", "main");
+
+		// add background
+		svg.append("rect")
+			.attr("class", "background")
+			.attr("width", dimensions.global.width.total)
+			.attr("height", dimensions.global.height.total);
+
+		// add svg element for extension
+		const svgExtension = app.append("svg")
+			.attr("class", "extension");
+	}, []);
+
+	// call renderCellPopVisualization on updates
+	useEffect(() => {
+		// get theme colors
+		const themeColors = getTheme(theme);
+
+		// change background theme
+		d3.selectAll(".background").style("fill", themeColors.background);
+
+		// create main visualization
+		renderCellPopVisualization(data, dimensions, fraction, themeColors, metadataField);
+
+	}, [theme, fraction, metadataField]);
+
+
+	if (!data) {
+		return <></>;
 	}
 
 	return (
@@ -171,7 +207,6 @@ export const CellPop = (props: CellPopProps) => {
 					<ToggleButton value="light">Light</ToggleButton>
 					<ToggleButton value="dark">Dark</ToggleButton>
 				</ToggleButtonGroup>
-
 				<FormControl sx={{ m: 1, width: 300 }}>
 					<InputLabel id="sort-by-metadata">Sort by metadata</InputLabel>
 					<Select
@@ -187,7 +222,6 @@ export const CellPop = (props: CellPopProps) => {
 						})}
 					</Select>
 				</FormControl>
-
 				<ToggleButtonGroup
 						color="primary"
 						value={theme}
@@ -198,17 +232,10 @@ export const CellPop = (props: CellPopProps) => {
 						<ToggleButton value="light">Light</ToggleButton>
 						<ToggleButton value="dark">Dark</ToggleButton>
 					</ToggleButtonGroup>
-
-				{boundary ?
-					<Button variant="outlined" onClick={removeBoundary}>Remove boundary boxes</Button>
-					: <Button variant="outlined" onClick={showBoundary}>Show boundary boxes</Button>
-				}
-
+				<Button variant='outlined' onClick={boundary ? removeBoundary : showBoundary}>{boundary ? "Remove" : "Show"} boundary boxes</Button>
 				<Button variant="outlined" onClick={resetData}>Reset data</Button>
-
 				<Button variant="outlined" onClick={resetLayeredBar}>Reset layered bar chart</Button>
-
-				<Button variant="outlined" onClick={handleAnimantionPopup}>
+				<Button variant="outlined" onClick={handleAnimationPopup}>
 					Show animation
 				</Button>
 
@@ -216,7 +243,7 @@ export const CellPop = (props: CellPopProps) => {
 
 			<Popup open={animationAnchor ? true : false} anchor={animationAnchor} placement="bottom-end">
 				<div aria-label="Pop up animation" style={{border: "solid black 2px", backgroundColor: "white"}}>
-					<Button variant="outlined" onClick={() => showAnimationBox(props.data, dimensions.global.width.total / 2, dimensions.global.height.total / 2)}>Play animation</Button>
+					<Button variant="outlined" onClick={() => showAnimationBox(data, dimensions.global.width.total / 2, dimensions.global.height.total / 2)}>Play animation</Button>
 					<div>
 						<svg className="animate-svg" width={dimensions.global.width.total / 2} height={dimensions.global.height.total / 2}></svg>
 					</div>

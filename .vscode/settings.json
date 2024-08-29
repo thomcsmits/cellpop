@@ -1,0 +1,10 @@
+{
+  "eslint.format.enable": true,
+  "eslint.useFlatConfig": true,
+  "eslint.workingDirectories": [
+    "./src"
+  ],
+  "[javascript|typescript|javascriptreact|typescriptreact]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+}

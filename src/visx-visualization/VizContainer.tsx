@@ -6,7 +6,7 @@ interface VizContainerProps extends PropsWithChildren {
 }
 
 function VizContainer({width, height, children}: VizContainerProps, ref: React.Ref<HTMLDivElement>) {
-  return  <div ref={ref} id="cellpopvis"><svg width={width} height={height}>{children}</svg></div>;
+  return  <div ref={ref} id="cellpop__container"><svg width={width} height={height}>{children}</svg></div>;
 }
 
 export default React.forwardRef(VizContainer);

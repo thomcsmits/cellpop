@@ -45,9 +45,9 @@ export type CountsMatrixFractions = {
     row: CountsMatrixValue[],
 }
 
-export type MetaData = {
-    rows?: {row: string, metadata: any}[],
-    cols?: {col: string, metadata: any}[]
+export type MetaData<T extends object> = {
+    rows?: {row: string, metadata: T}[],
+    cols?: {col: string, metadata: T}[]
 }
 
 export type extendedChart = {
@@ -67,7 +67,7 @@ export type ObsSets = {
         name: string,
         children: {
             name: string,
-            set: [any, any][]
+            set: [unknown, unknown][]
         }
     }[]
 }
@@ -77,7 +77,7 @@ export type HuBMAPMetaData = {
     _index?: string,
     _score?: number,
     _type?: string,
-    _source: any
+    _source: unknown
 }
 
 /** OPTIONS */
