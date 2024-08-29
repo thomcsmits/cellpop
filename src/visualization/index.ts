@@ -1,11 +1,11 @@
-import { renderHeatmap } from "./heatmap";
-import { renderTopBar } from "./barTop";
-import { renderTopViolin } from "./violinTop";
-import { renderLeftBar } from "./barSide";
-import { renderLeftViolin } from "./violinSide";
-import { renderGraph } from "./graph";
-import { renderExtensionChart } from "./barExtensions";
 import { CellPopData, CellPopDimensions, CellPopThemeColors } from "../cellpop-schema";
+import { renderExtensionChart } from "./barExtensions";
+import { renderLeftBar } from "./barSide";
+import { renderTopBar } from "./barTop";
+import { renderGraph } from "./graph";
+import { renderHeatmap } from "./heatmap";
+import { renderLeftViolin } from "./violinSide";
+import { renderTopViolin } from "./violinTop";
 
 export function renderCellPopVisualization(data: CellPopData, dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, metadataField?: string, reset?: boolean) {
 

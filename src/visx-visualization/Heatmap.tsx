@@ -1,8 +1,8 @@
-import React, { useMemo } from "react";
-import useCellPopConfig from "./CellPopConfigContext";
-import { scaleBand, scaleLinear } from "@visx/scale";
-import { getUpperBound } from "../visualization/util";
 import { AxisBottom, AxisRight, Orientation } from "@visx/axis";
+import { scaleBand, scaleLinear } from "@visx/scale";
+import React, { useMemo } from "react";
+import { getUpperBound } from "../visualization/util";
+import useCellPopConfig from "./CellPopConfigContext";
 
 export default function Heatmap() {
   const {
@@ -62,27 +62,27 @@ export default function Heatmap() {
         tickLineProps={{
           fontSize: textSize.ind.tickX,
         }}
-        tickLabelProps={(t) => ({
-          textAnchor: "end",
-          fontSize: textSize.global.tick,
-          fontFamily: "Arial",
-          style: {
-            fontVariantNumeric: "tabular-nums",
-          },
-          fill: theme.text,
-          dy: "0.25em",
-          transform: `rotate(-90, ${x(t)}, 12)translate(0, ${x.bandwidth() / 2})`,
-        })}
+        tickLabelProps={(t) =>
+          ({
+            textAnchor: "end",
+            fontSize: "1em",
+            fontFamily: "sans-serif",
+            style: {
+              fontVariantNumeric: "tabular-nums",
+            },
+            fill: theme.text,
+            dy: "0.25em",
+            transform: `rotate(-45, ${x(t)}, 12)translate(0, ${x.bandwidth() / 2})`,
+          }) as const
+        }
         tickValues={x.domain()}
         orientation={Orientation.bottom}
         top={height}
         labelOffset={Math.max(...x.domain().map((s) => s.length)) * 16}
-        labelProps={
-          {
-            fontSize: textSize.global.labelSmall,
-            fill: theme.text,
-          }
-        }
+        labelProps={{
+          fontSize: textSize.global.labelSmall,
+          fill: theme.text,
+        }}
       />
       <AxisRight
         scale={y}
@@ -95,19 +95,18 @@ export default function Heatmap() {
           fontSize: textSize.global.tick,
           fill: theme.text,
           style: {
+            fontFamily: "sans-serif",
             fontVariantNumeric: "tabular-nums",
           },
         }}
         tickValues={y.domain()}
         orientation={Orientation.right}
         left={width}
-        labelOffset={Math.max(...y.domain().map((s) => s.length)) *  12}
-        labelProps={
-          {
-            fontSize: textSize.global.labelSmall,
-            fill: theme.text,
-          }
-        }
+        labelOffset={Math.max(...y.domain().map((s) => s.length)) * 12}
+        labelProps={{
+          fontSize: textSize.global.labelSmall,
+          fill: theme.text,
+        }}
       />
     </g>
   );

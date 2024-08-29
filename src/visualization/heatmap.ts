@@ -1,12 +1,12 @@
 import * as d3 from "d3";
 
-import { dragstartedRows, draggedRows, dragendedRows, dragstartedCols, draggedCols, dragendedCols } from "./drag";
-import { defineTooltip, addTooltip, removeTooltip } from "./tooltips";
-import { resetRowNames, resetColNames } from "../dataLoading/dataWrangling";
-import { defineContextMenu, addContextMenu, removeContextMenu } from "./contextMenu";
+import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, CountsTotalRowValue, RowNamesWrapped } from "../cellpop-schema";
+import { resetColNames, resetRowNames } from "../dataLoading/dataWrangling";
+import { addContextMenu, defineContextMenu, removeContextMenu } from "./contextMenu";
+import { dragendedCols, dragendedRows, draggedCols, draggedRows, dragstartedCols, dragstartedRows } from "./drag";
 import { renderCellPopVisualizationLeft, renderCellPopVisualizationTop } from "./sides";
+import { addTooltip, defineTooltip, removeTooltip } from "./tooltips";
 import { getUpperBound } from "./util";
-import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, RowNamesWrapped, CountsTotalRowValue } from "../cellpop-schema";
 
 import "./style.css";
 
