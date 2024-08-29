@@ -1,4 +1,4 @@
-import { getMainVis } from "../src/cellpop";
+// import { getMainVis } from "../src/cellpop";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
 
 // data
@@ -34,8 +34,8 @@ const uuids = ["ad693f99fb9006e68a53e97598da1509",
 
 
 // Load data directly as demo
-loadHuBMAPData(uuids).then((data) => {
-	getMainVis(data!);
-}).catch(error => {
-	console.error(error);
-});
+// loadHuBMAPData(uuids).then((data) => {
+	// getMainVis(data!);
+// }).catch(error => {
+// 	console.error(error);
+// });

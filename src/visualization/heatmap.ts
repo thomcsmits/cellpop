@@ -88,7 +88,7 @@ export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, 
 
 	// let rowHeights = data.rowNames.map(d => findIncluded(d, data.extendedChart.rowNames, 10, 100));
 	// console.log(rowHeights)
-	
+
 
 	svg.append("g")
 		.attr("class", "axisright")
@@ -472,6 +472,6 @@ function sortRowsDescending(data: CellPopData) {
 	for (const row of data.rowNames) {
 		dataRows.push({row: row, countTotal: data.countsMatrix.filter(r => r.row === row).map(r => r.value).reduce((a, b) => a + b, 0)});
 	}
-	console.log(dataRows)
+	console.log(dataRows);
 
 }

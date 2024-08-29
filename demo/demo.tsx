@@ -1,9 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
 import { CellPop } from "../src/CellPopComponent";
-import { CellPopData, CellPopDimensions } from "../src/cellpop-schema";
-import { getDimensions, getDimensionsGlobal } from "../src/visualization/size";
+import { CellPopData } from "../src/cellpop-schema";
+import { getDimensions } from "../src/visualization/size";
 
+
+// const dimensions = {
+// 	global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
+// 	heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 400, bottom: 100, left: 0}},
+// 	barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
+// 	violinTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
+// 	barLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
+// 	violinLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
+// 	graph: {offsetWidth: widthLeft, offsetHeight: height, width: widthRight, height: heightTop, margin: {top: 0, right: 200, bottom: 0, left: 0}},
+// 	detailBar: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: height, margin: {top: 50, right: 200, bottom: 50, left: 0}},
+// 	textSize: {title: "20px", label: "30px", labelSmall: "20px", tick: "10px"}
+// } as CellPopDimensions;
+
+const dimensions = getDimensions(1500, 200, 400, 200, 5, 5, 100, 5, 1000, 200, 400, 0, 5, 5, 100, 5, 1000, 900, 50, 50);
+
+
+const widthRatio = 0.8;
+const heightRatio = 0.8;
+
+const widthRight = 45 * 25;
+const heightBottom =  20 * 40;
+
+const width = widthRight / widthRatio;
+const height = heightBottom / heightRatio;
+
+const widthLeft = width - widthRight;
+const heightTop = height - heightBottom;
 
 function Demo() {
 
@@ -55,37 +82,11 @@ function Demo() {
 	// 	theme: "light",
 	// }
 
-	const widthRatio = 0.8;
-	const heightRatio = 0.8;
+	if (!data) {
+		return <div>Loading...</div>;
+	}
 
-	const widthRight = 45 * 25;
-	const heightBottom =  20 * 40;
-
-	const width = widthRight / widthRatio;
-	const height = heightBottom / heightRatio;
-
-	const widthLeft = width - widthRight;
-	const heightTop = height - heightBottom;
-
-	// const dimensions = {
-	// 	global: {width: width, widthSplit: [widthLeft, widthRight], height: height, heightSplit: [heightTop, heightBottom]},
-	// 	heatmap: {offsetWidth: widthLeft, offsetHeight: heightTop, width: widthRight, height: heightBottom, margin: {top: 0, right: 400, bottom: 100, left: 0}},
-	// 	barTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
-	// 	violinTop: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: heightTop, margin: {top: 50, right: 50, bottom: 0, left: 0}},
-	// 	barLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
-	// 	violinLeft: {offsetWidth: 0, offsetHeight: heightTop, width: widthLeft, height: heightBottom, margin: {top: 0, right: 0, bottom: 100, left: 50}},
-	// 	graph: {offsetWidth: widthLeft, offsetHeight: height, width: widthRight, height: heightTop, margin: {top: 0, right: 200, bottom: 0, left: 0}},
-	// 	detailBar: {offsetWidth: widthLeft, offsetHeight: 0, width: widthRight, height: height, margin: {top: 50, right: 200, bottom: 50, left: 0}},
-	// 	textSize: {title: "20px", label: "30px", labelSmall: "20px", tick: "10px"}
-	// } as CellPopDimensions;
-
-	const dimensions = getDimensions(1500, 200, 400, 200, 5, 5, 100, 5, 1000, 200, 400, 0, 5, 5, 100, 5, 1000, 900, 50, 50);
-
-	return (
-		<>
-			{data ? <CellPop data={data} theme={"light"} dimensions={dimensions}/> : <div>Loading...</div>}
-		</>
-	);
+	return <CellPop data={data} theme={"light"} dimensions={dimensions}/>;
 }
 
 export default Demo;
