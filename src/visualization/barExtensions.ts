@@ -1,120 +1,177 @@
 import * as d3 from "d3";
 
 import { getUpperBound } from "./util";
-import { CellPopData, CellPopDimensions, CellPopThemeColors } from "../cellpop-schema";
+import {
+  CellPopData,
+  CellPopDimensions,
+  CellPopThemeColors,
+} from "../cellpop-schema";
 
 // add bar chart
-export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimensions, themeColors: CellPopThemeColors, x: d3.ScaleBand<string>) {
-    const width = dimensions.detailBar.width - dimensions.detailBar.margin.left - dimensions.detailBar.margin.right;
-	const height = dimensions.detailBar.height - dimensions.detailBar.margin.top - dimensions.detailBar.margin.bottom;
+export function renderExtensionChart(
+  data: CellPopData,
+  dimensions: CellPopDimensions,
+  themeColors: CellPopThemeColors,
+  x: d3.ScaleBand<string>,
+) {
+  const width =
+    dimensions.detailBar.width -
+    dimensions.detailBar.margin.left -
+    dimensions.detailBar.margin.right;
+  const height =
+    dimensions.detailBar.height -
+    dimensions.detailBar.margin.top -
+    dimensions.detailBar.margin.bottom;
 
-    // remove anything on this svg
-    d3.select(".extension").selectAll("*").remove();
+  // remove anything on this svg
+  d3.select(".extension").selectAll("*").remove();
 
-    const svg = d3.select(".extension")
-        .attr("width", dimensions.global.width.total)
-        .attr("height", dimensions.global.width.total);
+  const svg = d3
+    .select(".extension")
+    .attr("width", dimensions.global.width.total)
+    .attr("height", dimensions.global.width.total);
 
-    svg.append("rect")
-        .attr("class", "background")
-        .attr("width", dimensions.detailBar.width)
-        .attr("height", dimensions.detailBar.height)
-        .style("fill", themeColors.background);
+  svg
+    .append("rect")
+    .attr("class", "background")
+    .attr("width", dimensions.detailBar.width)
+    .attr("height", dimensions.detailBar.height)
+    .style("fill", themeColors.background);
 
-    const svgBar = svg.append("g")
-        .attr("class", "bars");
+  const svgBar = svg.append("g").attr("class", "bars");
 
-    // X axis
-    svgBar.append("g")
-        .attr("transform", "translate(" + (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left).toString() + "," + height + ")")
-        .call(d3.axisBottom(x))
-        .selectAll("text")
-            .attr("transform", "translate(-10,0)rotate(-45)")
-            .style("text-anchor", "end")
-            .style("font-size", dimensions.textSize.ind.tickX)
-            .style("fill", themeColors.text);
+  // X axis
+  svgBar
+    .append("g")
+    .attr(
+      "transform",
+      "translate(" +
+        (
+          dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left
+        ).toString() +
+        "," +
+        height +
+        ")",
+    )
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+    .attr("transform", "translate(-10,0)rotate(-45)")
+    .style("text-anchor", "end")
+    .style("font-size", dimensions.textSize.ind.tickX)
+    .style("fill", themeColors.text);
 
-    // X axis label
-    const labelX = svgBar.append("text")
-        .attr("class", "x label")
-        .attr("text-anchor", "end")
-        .attr("x", dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left + width/2)
-        .attr("y", height + dimensions.heatmap.margin.bottom - 10)
-        .text("Cell type")
-        .style("font-size", dimensions.textSize.ind.labelX)
-        .style("fill", themeColors.text);
+  // X axis label
+  const labelX = svgBar
+    .append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "end")
+    .attr(
+      "x",
+      dimensions.detailBar.offsetWidth +
+        dimensions.detailBar.margin.left +
+        width / 2,
+    )
+    .attr("y", height + dimensions.heatmap.margin.bottom - 10)
+    .text("Cell type")
+    .style("font-size", dimensions.textSize.ind.labelX)
+    .style("fill", themeColors.text);
 
-    // position label in center
-	const labelXSize = labelX.node().getComputedTextLength();
-	labelX.attr("x", dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left + width/2 + labelXSize/2 + 75);
+  // position label in center
+  const labelXSize = labelX.node().getComputedTextLength();
+  labelX.attr(
+    "x",
+    dimensions.detailBar.offsetWidth +
+      dimensions.detailBar.margin.left +
+      width / 2 +
+      labelXSize / 2 +
+      75,
+  );
 
-    // Y axis label
-    svgBar.append("text")
-        .attr("class", "y label")
-        .attr("text-anchor", "end")
-        .attr("x", - height / 2)
-        .attr("y", (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left) / 2)
-        .attr("dy", ".75em")
-        .attr("transform", "rotate(-90)")
-        .text("Number of cells")
-        .style("font-size", dimensions.textSize.ind.labelY)
-        .style("fill", themeColors.text);
+  // Y axis label
+  svgBar
+    .append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("x", -height / 2)
+    .attr(
+      "y",
+      (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left) / 2,
+    )
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("Number of cells")
+    .style("font-size", dimensions.textSize.ind.labelY)
+    .style("fill", themeColors.text);
 
-    const nBars = data.extendedChart.rowNames.length;
-    const heightInd = height / nBars;
-    const heightMargin = heightInd / 10;
+  const nBars = data.extendedChart.rowNames.length;
+  const heightInd = height / nBars;
+  const heightMargin = heightInd / 10;
 
-    for (let i = 0; i < nBars; i++) {
-        const svgBarRow = svgBar.append("g")
-            .attr("class", `bardetailsample row-${i}`)
-            .attr("transform", "translate(" + (dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left).toString() + "," + (i*heightInd + heightMargin).toString() + ")");
+  for (let i = 0; i < nBars; i++) {
+    const svgBarRow = svgBar
+      .append("g")
+      .attr("class", `bardetailsample row-${i}`)
+      .attr(
+        "transform",
+        "translate(" +
+          (
+            dimensions.detailBar.offsetWidth + dimensions.detailBar.margin.left
+          ).toString() +
+          "," +
+          (i * heightInd + heightMargin).toString() +
+          ")",
+      );
 
-        const row = data.extendedChart.rowNames[i];
-        const dataBar = data.countsMatrix.filter((o) => o.row === row);
+    const row = data.extendedChart.rowNames[i];
+    const dataBar = data.countsMatrix.filter((o) => o.row === row);
 
-        // Add label
-        svgBarRow.append("text")
-            .attr("class", "title")
-            .attr("text-anchor", "start")
-            .attr("x", 30)
-            .attr("y", 50)
-            .text(row)
-            .style("font-size", dimensions.textSize.ind.title)
-            .style("fill", themeColors.text);
+    // Add label
+    svgBarRow
+      .append("text")
+      .attr("class", "title")
+      .attr("text-anchor", "start")
+      .attr("x", 30)
+      .attr("y", 50)
+      .text(row)
+      .style("font-size", dimensions.textSize.ind.title)
+      .style("fill", themeColors.text);
 
+    // Add Y axis
+    const upperbound = getUpperBound(dataBar.map((c) => c.value));
 
-        // Add Y axis
-        const upperbound = getUpperBound(dataBar.map(c => c.value));
+    const y = d3
+      .scaleLinear()
+      .domain([0, upperbound])
+      .range([heightInd - heightMargin, 0]);
 
-        const y = d3.scaleLinear()
-            .domain([0, upperbound])
-            .range([ heightInd - heightMargin, 0]);
+    svgBarRow
+      .append("g")
+      .attr("class", "axisleft")
+      .call(d3.axisLeft(y))
+      .selectAll("text")
+      .style("font-size", dimensions.textSize.ind.tickY)
+      .style("fill", themeColors.text);
 
-        svgBarRow.append("g")
-            .attr("class", "axisleft")
-            .call(d3.axisLeft(y))
-            .selectAll("text")
-                .style("font-size", dimensions.textSize.ind.tickY)
-                .style("fill", themeColors.text);
+    // add color range for bars
+    const colorRange = d3
+      .scaleOrdinal<string, string>()
+      .domain(data.extendedChart.colNames)
+      .range(themeColors.extensionRange)
+      .unknown(themeColors.extensionDefault);
 
-        // add color range for bars
-        const colorRange = d3.scaleOrdinal<string, string>()
-            .domain(data.extendedChart.colNames)
-            .range(themeColors.extensionRange)
-            .unknown(themeColors.extensionDefault);
-
-        // Add bars
-        svgBarRow.append("g")
-            .attr("class", "rects")
-            .selectAll()
-            .data(dataBar)
-            .join("rect")
-                .attr("x", d => x(d.col))
-                .attr("y", d => y(d.value))
-                .attr("width", x.bandwidth())
-                .attr("height", d => heightInd - heightMargin - y(d.value))
-                .attr("fill", d => colorRange(d.col));
-    }
+    // Add bars
+    svgBarRow
+      .append("g")
+      .attr("class", "rects")
+      .selectAll()
+      .data(dataBar)
+      .join("rect")
+      .attr("x", (d) => x(d.col))
+      .attr("y", (d) => y(d.value))
+      .attr("width", x.bandwidth())
+      .attr("height", (d) => heightInd - heightMargin - y(d.value))
+      .attr("fill", (d) => colorRange(d.col));
+  }
 }
 
 // export function createBarChart(dataFull: CellPopData, selectedRow: string, dimensions: CellPopDimensions, x: d3.ScaleBand<string>, themeColors: CellPopThemeColors) {
@@ -243,14 +300,12 @@ export function renderExtensionChart(data: CellPopData, dimensions: CellPopDimen
 // }
 
 export function resetExtensionChart(data: CellPopData) {
-    // remove bars
-    d3.select(".extension").selectAll("*").remove();
+  // remove bars
+  d3.select(".extension").selectAll("*").remove();
 
-    // resize svg (without deletion)
-    d3.select(".extension")
-        .attr("width", 0)
-        .attr("height", 0);
+  // resize svg (without deletion)
+  d3.select(".extension").attr("width", 0).attr("height", 0);
 
-    // reset data
-    data.extendedChart = {rowNames: [], colNames: []};
+  // reset data
+  data.extendedChart = { rowNames: [], colNames: [] };
 }

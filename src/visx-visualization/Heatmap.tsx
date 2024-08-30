@@ -1,39 +1,20 @@
 import { AxisBottom, AxisRight, Orientation } from "@visx/axis";
-import { scaleBand, scaleLinear } from "@visx/scale";
-import React, { useMemo } from "react";
-import { getUpperBound } from "../visualization/util";
-import useCellPopConfig from "./CellPopConfigContext";
+import React from "react";
+import { useData, useDimensions, useTheme } from "./ConfigContext";
+import { useColorScale, useXScale, useYScale } from "./ScaleContext";
 
 export default function Heatmap() {
+  const data = useData();
+  const { theme } = useTheme();
   const {
-    data,
     dimensions: {
       heatmap: { width, height, offsetWidth, offsetHeight },
       textSize,
     },
-    theme,
-  } = useCellPopConfig();
-  const x = useMemo(() => {
-    return scaleBand<string>({
-      range: [0, width],
-      domain: data.colNames,
-      padding: 0.01,
-    });
-  }, [width, data.colNames]);
-
-  const y = useMemo(() => {
-    return scaleBand<string>()
-      .range([height, 0])
-      .domain(data.rowNames)
-      .padding(0.01);
-  }, [height, data.rowNames]);
-
-  const colors = useMemo(() => {
-    return scaleLinear<string>({
-      range: [theme.heatmapZero, theme.heatmapMax],
-      domain: [0, getUpperBound(data.countsMatrix.map((r) => r.value))],
-    });
-  }, [data.countsMatrix, theme.heatmapZero, theme.heatmapMax]);
+  } = useDimensions();
+  const { scale: x } = useXScale();
+  const { scale: y } = useYScale();
+  const { scale: colors } = useColorScale();
 
   return (
     <g

@@ -1,445 +1,592 @@
 import * as d3 from "d3";
 
-import { CellPopData, CellPopDimensions, CellPopThemeColors, ColNamesWrapped, CountsMatrixValue, CountsTotalRowValue, RowNamesWrapped } from "../cellpop-schema";
+import {
+  CellPopData,
+  CellPopDimensions,
+  CellPopThemeColors,
+  ColNamesWrapped,
+  CountsMatrixValue,
+  CountsTotalRowValue,
+  RowNamesWrapped,
+} from "../cellpop-schema";
 import { resetColNames, resetRowNames } from "../dataLoading/dataWrangling";
-import { addContextMenu, defineContextMenu, removeContextMenu } from "./contextMenu";
-import { dragendedCols, dragendedRows, draggedCols, draggedRows, dragstartedCols, dragstartedRows } from "./drag";
-import { renderCellPopVisualizationLeft, renderCellPopVisualizationTop } from "./sides";
+import {
+  addContextMenu,
+  defineContextMenu,
+  removeContextMenu,
+} from "./contextMenu";
+import {
+  dragendedCols,
+  dragendedRows,
+  draggedCols,
+  draggedRows,
+  dragstartedCols,
+  dragstartedRows,
+} from "./drag";
+import {
+  renderCellPopVisualizationLeft,
+  renderCellPopVisualizationTop,
+} from "./sides";
 import { addTooltip, defineTooltip, removeTooltip } from "./tooltips";
 import { getUpperBound } from "./util";
 
 import "./style.css";
 
-export function renderHeatmap(data: CellPopData, dimensions: CellPopDimensions, fraction=false, themeColors: CellPopThemeColors, metadataField: string, reset=false): [d3.ScaleBand<string>, d3.ScaleBand<string>, d3.ScaleLinear<string,number,never>] {
-	if (reset) {
-		resetData(data);
-	}
+export function renderHeatmap(
+  data: CellPopData,
+  dimensions: CellPopDimensions,
+  fraction = false,
+  themeColors: CellPopThemeColors,
+  metadataField: string,
+  reset = false,
+): [
+  d3.ScaleBand<string>,
+  d3.ScaleBand<string>,
+  d3.ScaleLinear<string, number, never>,
+] {
+  if (reset) {
+    resetData(data);
+  }
 
-	let countsMatrix = data.countsMatrix;
-	if (fraction) {
-		countsMatrix = data.countsMatrixFractions.row;
-	}
-	// Remove any prior heatmaps
-	d3.select("g.heatmap").remove();
+  let countsMatrix = data.countsMatrix;
+  if (fraction) {
+    countsMatrix = data.countsMatrixFractions.row;
+  }
+  // Remove any prior heatmaps
+  d3.select("g.heatmap").remove();
 
-	// Create svg element
-	const svg = d3.select("g.main")
-		.append("g")
-			.attr("transform",
-				"translate(" + dimensions.heatmap.offsetWidth + "," + dimensions.heatmap.offsetHeight + ")")
-			.attr("class", "heatmap");
+  // Create svg element
+  const svg = d3
+    .select("g.main")
+    .append("g")
+    .attr(
+      "transform",
+      "translate(" +
+        dimensions.heatmap.offsetWidth +
+        "," +
+        dimensions.heatmap.offsetHeight +
+        ")",
+    )
+    .attr("class", "heatmap");
 
+  // Get dimensions
+  const width = dimensions.heatmap.width;
+  const height = dimensions.heatmap.height;
 
-	// Get dimensions
-	const width = dimensions.heatmap.width;
-	const height = dimensions.heatmap.height;
+  // Add x-axis
+  let x: d3.ScaleBand<string> = d3
+    .scaleBand()
+    .range([0, width])
+    .domain(data.colNames)
+    .padding(0.01);
 
-	// Add x-axis
-	let x: d3.ScaleBand<string> = d3.scaleBand()
-		.range([ 0, width ])
-		.domain(data.colNames)
-		.padding(0.01);
+  svg
+    .append("g")
+    .attr("class", "axisbottom")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+    .attr("class", "tickX")
+    .attr("transform", "translate(0,10)rotate(-90)")
+    .style("text-anchor", "end")
+    .style("font-size", dimensions.textSize.ind.tickX)
+    .style("fill", themeColors.text);
 
-	svg.append("g")
-		.attr("class", "axisbottom")
-		.attr("transform", "translate(0," + height + ")")
-		.call(d3.axisBottom(x))
-		.selectAll("text")
-			.attr("class", "tickX")
-			.attr("transform", "translate(0,10)rotate(-90)")
-			.style("text-anchor", "end")
-			.style("font-size", dimensions.textSize.ind.tickX)
-			.style("fill", themeColors.text);
+  const labelX = svg
+    .append("text")
+    .attr("class", "labelX")
+    .attr("text-anchor", "end")
+    .attr("x", width / 2)
+    .attr("y", height + (5 / 6) * dimensions.heatmap.margin.bottom)
+    .text("Cell type")
+    .style("font-size", dimensions.textSize.ind.labelX)
+    .style("fill", themeColors.text);
 
-	const labelX = svg.append("text")
-        .attr("class", "labelX")
-        .attr("text-anchor", "end")
-        .attr("x", width / 2)
-        .attr("y", height + 5/6 * dimensions.heatmap.margin.bottom)
-        .text("Cell type")
-		.style("font-size", dimensions.textSize.ind.labelX)
-		.style("fill", themeColors.text);
+  // position label in center
+  const labelXSize = labelX.node().getComputedTextLength();
+  labelX.attr("x", width / 2 + labelXSize / 2);
 
-	// position label in center
-	const labelXSize = labelX.node().getComputedTextLength();
-	labelX.attr("x", width/2 + labelXSize/2);
+  // Add y-axis
+  let y = d3
+    .scaleBand<string>()
+    .range([height, 0])
+    .domain(data.rowNames)
+    .padding(0.01);
 
-	// Add y-axis
-	let y = d3.scaleBand<string>()
-		.range([ height, 0 ])
-		.domain(data.rowNames)
-		.padding(0.01);
+  // calculate size with embedded
+  // Apply custom row heights
+  // y.bandwidth = function() {
+  // 	return function(d) {
+  // 		return findIncluded(d.row, data.extendedChart.rowNames, 10, 100);
+  // 	};
+  // };
 
-	// calculate size with embedded
-	// Apply custom row heights
-	// y.bandwidth = function() {
-	// 	return function(d) {
-	// 		return findIncluded(d.row, data.extendedChart.rowNames, 10, 100);
-	// 	};
-	// };
+  // function findIncluded(val: string, rowsExpanded: string[], lengthCollapsed: number, lengthExpanded: number): number {
+  // 	if (rowsExpanded.includes(val)) {
+  // 		return lengthExpanded;
+  // 	} else {
+  // 		return lengthCollapsed;
+  // 	}
+  // }
 
-	// function findIncluded(val: string, rowsExpanded: string[], lengthCollapsed: number, lengthExpanded: number): number {
-	// 	if (rowsExpanded.includes(val)) {
-	// 		return lengthExpanded;
-	// 	} else {
-	// 		return lengthCollapsed;
-	// 	}
-	// }
+  // let rowHeights = data.rowNames.map(d => findIncluded(d, data.extendedChart.rowNames, 10, 100));
+  // console.log(rowHeights)
 
-	// let rowHeights = data.rowNames.map(d => findIncluded(d, data.extendedChart.rowNames, 10, 100));
-	// console.log(rowHeights)
+  svg
+    .append("g")
+    .attr("class", "axisright")
+    .attr("transform", "translate(" + width + ",0)")
+    .call(d3.axisRight(y))
+    .selectAll("text")
+    .attr("class", "tickY")
+    .style("font-size", dimensions.textSize.ind.tickY)
+    .style("fill", themeColors.text);
 
+  const labelY = svg
+    .append("text")
+    .attr("class", "labelY")
+    .attr("text-anchor", "end")
+    .attr("x", -height / 2)
+    .attr("y", width + (5 / 6) * dimensions.heatmap.margin.right)
+    .attr("dy", ".75em")
+    .attr("transform", "rotate(-90)")
+    .text("Sample")
+    .style("font-size", dimensions.textSize.ind.labelY)
+    .style("fill", themeColors.text);
 
-	svg.append("g")
-		.attr("class", "axisright")
-		.attr("transform", "translate(" + width + ",0)")
-		.call(d3.axisRight(y))
-		.selectAll("text")
-			.attr("class", "tickY")
-			.style("font-size", dimensions.textSize.ind.tickY)
-			.style("fill", themeColors.text);
+  // position label in center
+  const labelYSize = labelY.node().getComputedTextLength();
+  labelY.attr("x", -height / 2 + labelYSize / 2);
 
-    const labelY = svg.append("text")
-		.attr("class", "labelY")
-		.attr("text-anchor", "end")
-		.attr("x", -height/2)
-		.attr("y", width + 5/6 * dimensions.heatmap.margin.right)
-		.attr("dy", ".75em")
-		.attr("transform", "rotate(-90)")
-		.text("Sample")
-		.style("font-size", dimensions.textSize.ind.labelY)
-		.style("fill", themeColors.text);
+  // add metadata scale
+  // let y_meta = d3.scaleOrdinal()
+  // 	.domain(["right", "left"])
+  // 	.range([0, 300, height])
 
-	// position label in center
-	const labelYSize = labelY.node().getComputedTextLength();
-	labelY.attr("x", -height/2 + labelYSize/2);
+  // svg.append("g")
+  // 	.attr("class", "axisright")
+  // 	.attr("transform", "translate(" + eval(width+100) + ",0)")
+  // 	.call(d3.axisRight(y_meta))
+  // 	.selectAll("text")
+  // 		.attr("transform", "translate(0,150)")
+  // 		.style("font-size", dimensions.textSize.tick)
+  //		.style("fill", themeColors.text);
 
-	// add metadata scale
-	// let y_meta = d3.scaleOrdinal()
-	// 	.domain(["right", "left"])
-	// 	.range([0, 300, height])
+  // svg.append("text")
+  // 	.attr("class", "y-label")
+  // 	.attr("text-anchor", "end")
+  // 	.attr("x", -height/2)
+  // 	.attr("y", width + 150)
+  // 	.attr("dy", ".75em")
+  // 	.attr("transform", "rotate(-90)")
+  // 	.text("Metadata")
+  // 	.style("font-size", dimensions.textSize.label)
+  //	.style("fill", themeColors.text);
 
-	// svg.append("g")
-	// 	.attr("class", "axisright")
-	// 	.attr("transform", "translate(" + eval(width+100) + ",0)")
-	// 	.call(d3.axisRight(y_meta))
-	// 	.selectAll("text")
-	// 		.attr("transform", "translate(0,150)")
-	// 		.style("font-size", dimensions.textSize.tick)
-	//		.style("fill", themeColors.text);
+  // Add color
+  const colorRange = d3
+    .scaleLinear<string, number>()
+    .range([themeColors.heatmapZero, themeColors.heatmapMax])
+    .domain([0, getUpperBound(countsMatrix.map((r) => r.value))]);
 
-	// svg.append("text")
-	// 	.attr("class", "y-label")
-	// 	.attr("text-anchor", "end")
-	// 	.attr("x", -height/2)
-	// 	.attr("y", width + 150)
-	// 	.attr("dy", ".75em")
-	// 	.attr("transform", "rotate(-90)")
-	// 	.text("Metadata")
-	// 	.style("font-size", dimensions.textSize.label)
-	//	.style("fill", themeColors.text);
+  renderHeatmapLegend(
+    countsMatrix,
+    dimensions,
+    fraction,
+    themeColors,
+    colorRange,
+  );
 
+  // Add rows and columns behind
+  const colsBehind = svg
+    .selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols")
+    .data(data.colNamesWrapped, function (d) {
+      return d.col;
+    })
+    .enter()
+    .append("rect")
+    .attr("class", "heatmap-cols")
+    .attr("x", (d) => x(d.col))
+    .attr("y", 0)
+    .attr("width", x.bandwidth())
+    .attr("height", height)
+    .style("fill", themeColors.heatmapGrid);
 
-	// Add color
-	const colorRange = d3.scaleLinear<string, number>()
-		.range([themeColors.heatmapZero, themeColors.heatmapMax])
-		.domain([0,getUpperBound(countsMatrix.map(r => r.value))]);
+  const rowsBehind = svg
+    .selectAll<SVGRectElement, RowNamesWrapped>(".heatmap-rows")
+    .data(data.rowNamesWrapped, function (d) {
+      return d.row;
+    })
+    .enter()
+    .append("rect")
+    .attr("class", "heatmap-rows")
+    .attr("x", 0)
+    .attr("y", (d) => y(d.row))
+    .attr("width", width)
+    .attr("height", y.bandwidth())
+    .style("fill", themeColors.heatmapGrid);
 
-	renderHeatmapLegend(countsMatrix, dimensions, fraction, themeColors, colorRange);
+  // Read the data
+  const rects = svg
+    .selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects")
+    .data(countsMatrix, function (d) {
+      return d.row + ":" + d.col;
+    })
+    .enter()
+    .append("rect")
+    .attr("class", "heatmap-rects")
+    .attr("x", (d) => x(d.col))
+    .attr("y", (d) => y(d.row))
+    .attr("width", x.bandwidth())
+    .attr("height", y.bandwidth())
+    .style("fill", function (d) {
+      return colorRange(d.value);
+    });
 
-	// Add rows and columns behind
-	const colsBehind = svg.selectAll<SVGRectElement, ColNamesWrapped>(".heatmap-cols")
-		.data(data.colNamesWrapped, function(d) {return d.col;})
-		.enter()
-		.append("rect")
-			.attr("class", "heatmap-cols")
-			.attr("x", d => x(d.col))
-			.attr("y", 0)
-			.attr("width", x.bandwidth() )
-			.attr("height", height )
-			.style("fill", themeColors.heatmapGrid);
+  // Add highlight for rows
+  svg
+    .append("rect")
+    .attr("class", "highlight-rows")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", width)
+    .attr("height", height)
+    .style("stroke", themeColors.heatmapHighlight)
+    .style("fill", "none")
+    .attr("pointer-events", "none")
+    .attr("visibility", "hidden");
 
+  // Add highlight for cols
+  svg
+    .append("rect")
+    .attr("class", "highlight-cols")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", width)
+    .attr("height", height)
+    .style("stroke", themeColors.heatmapHighlight)
+    .style("fill", "none")
+    .attr("pointer-events", "none")
+    .attr("visibility", "hidden");
 
-	const rowsBehind = svg.selectAll<SVGRectElement, RowNamesWrapped>(".heatmap-rows")
-		.data(data.rowNamesWrapped, function(d) {return d.row;})
-		.enter()
-		.append("rect")
-			.attr("class", "heatmap-rows")
-			.attr("x", 0)
-			.attr("y", d => y(d.row))
-			.attr("width", width )
-			.attr("height", y.bandwidth() )
-			.style("fill", themeColors.heatmapGrid);
+  defineTooltip();
+  defineContextMenu();
 
+  // Define mouse functions
+  const mouseover = function (event: MouseEvent, d: CountsMatrixValue) {
+    if (!event.target || !(event.target instanceof SVGRectElement)) {
+      return;
+    }
+    if (event.ctrlKey) {
+      if (event.target?.classList[0].includes("heatmap-rects")) {
+        // remove?
+      }
+      addTooltip(event, d);
+    }
+    addHighlightRow(
+      event.target.y.animVal.value,
+      event.target.height.animVal.value,
+    );
+    addHighlightCol(
+      event.target.x.animVal.value,
+      event.target.width.animVal.value,
+    );
+  };
+  const mouseleave = function (event: MouseEvent) {
+    removeTooltip();
+    removeHighlightRow(event);
+    removeHighlightCol(event);
+  };
 
-	// Read the data
-	const rects = svg.selectAll<SVGRectElement, CountsMatrixValue>(".heatmap-rects")
-		.data(countsMatrix, function(d) {return d.row+":"+d.col;})
-		.enter()
-		.append("rect")
-			.attr("class", "heatmap-rects")
-			.attr("x", d => x(d.col))
-			.attr("y", d => y(d.row))
-			.attr("width", x.bandwidth() )
-			.attr("height", y.bandwidth() )
-			.style("fill", function(d) { return colorRange(d.value);} );
+  const contextmenu = function (event: MouseEvent, d: CountsMatrixValue) {
+    event.preventDefault();
+    addContextMenu(
+      event,
+      d,
+      data,
+      dimensions,
+      fraction,
+      themeColors,
+      metadataField,
+    );
+  };
 
+  rects.on("mouseover", mouseover);
+  // rowsBehind.on("mouseover", mouseover);
+  rects.on("mouseleave", mouseleave);
+  // rowsBehind.on("mouseleave", mouseleave);
+  rects.on("contextmenu", contextmenu);
+  // rowsBehind.on("contextmenu", contextmenu);
 
-    // Add highlight for rows
-    svg.append("rect")
-		.attr("class", "highlight-rows")
-		.attr("x", 0)
-		.attr("y", 0)
-		.attr("width", width)
-		.attr("height", height)
-		.style("stroke", themeColors.heatmapHighlight)
-		.style("fill", "none")
-		.attr("pointer-events", "none")
-		.attr("visibility", "hidden");
+  // allowClick is a variable set to true at each dragstart
+  // if no row is moved, it remains true, otherwise it's set to false
+  // at dragend, if allowClick is true, a layered bar chart is created
+  let allowClickRow: boolean;
+  let allowClickCol: boolean;
 
-	// Add highlight for cols
-    svg.append("rect")
-		.attr("class", "highlight-cols")
-		.attr("x", 0)
-		.attr("y", 0)
-		.attr("width", width)
-		.attr("height", height)
-		.style("stroke", themeColors.heatmapHighlight)
-		.style("fill", "none")
-		.attr("pointer-events", "none")
-		.attr("visibility", "hidden");
-
-	defineTooltip();
-	defineContextMenu();
-
-
-	// Define mouse functions
-    const mouseover = function(event: MouseEvent, d: CountsMatrixValue) {
-		if (!(event.target) ||  !(event.target instanceof SVGRectElement)) {
-			return;
-		}
-        if (event.ctrlKey) {
-			if (event.target?.classList[0].includes("heatmap-rects")) {
-				// remove?
-			}
-			addTooltip(event, d);
+  // Define drag behavior
+  const drag = d3
+    .drag<SVGRectElement, CountsMatrixValue>()
+    .on(
+      "start",
+      function (
+        event: d3.D3DragEvent<
+          SVGRectElement,
+          CountsMatrixValue,
+          d3.SubjectPosition
+        >,
+        d: CountsMatrixValue,
+      ) {
+        // if (!(event.target) ||  !(event.target instanceof SVGRectElement)) {
+        // 	return;
+        // }
+        removeContextMenu();
+        if (event.sourceEvent.shiftKey) {
+          dragstartedRows(event, d);
+          allowClickRow = true;
         }
-		addHighlightRow(event.target.y.animVal.value, event.target.height.animVal.value);
-		addHighlightCol(event.target.x.animVal.value, event.target.width.animVal.value);
-    };
-    const mouseleave = function(event: MouseEvent) {
-		removeTooltip();
-        removeHighlightRow(event);
-		removeHighlightCol(event);
-    };
+        if (event.sourceEvent.altKey) {
+          dragstartedCols(event, d);
+          allowClickCol = true;
+        }
+      },
+    )
+    .on(
+      "drag",
+      function (
+        event: d3.D3DragEvent<
+          SVGRectElement,
+          CountsMatrixValue,
+          d3.SubjectPosition
+        >,
+        d: CountsMatrixValue,
+      ) {
+        // Rows
+        if (event.sourceEvent.shiftKey) {
+          // Update data
+          const dataAndClick = draggedRows(event, d, data, y, allowClickRow);
+          data = dataAndClick[0];
+          allowClickRow = dataAndClick[1];
 
-	const contextmenu = function(event: MouseEvent, d: CountsMatrixValue) {
-		event.preventDefault();
-		addContextMenu(event, d, data, dimensions, fraction, themeColors, metadataField);
-	};
+          // Update the y-domain
+          y = y.domain(data.rowNames);
 
-    rects.on("mouseover", mouseover);
-	// rowsBehind.on("mouseover", mouseover);
-    rects.on("mouseleave", mouseleave);
-	// rowsBehind.on("mouseleave", mouseleave);
-	rects.on("contextmenu", contextmenu);
-	// rowsBehind.on("contextmenu", contextmenu);
+          svg.select("g.axisright").remove();
 
-	// allowClick is a variable set to true at each dragstart
-	// if no row is moved, it remains true, otherwise it's set to false
-	// at dragend, if allowClick is true, a layered bar chart is created
-	let allowClickRow: boolean;
-	let allowClickCol: boolean;
+          svg
+            .append("g")
+            .attr("class", "axisright")
+            .call(d3.axisRight(y))
+            .attr("transform", "translate(" + width + ",0)")
+            .selectAll("text")
+            .style("font-size", dimensions.textSize.ind.tickY)
+            .style("fill", themeColors.text);
 
-	// Define drag behavior
-	const drag = d3.drag<SVGRectElement, CountsMatrixValue>()
-	.on("start", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) {
-		// if (!(event.target) ||  !(event.target instanceof SVGRectElement)) {
-		// 	return;
-		// }
-		removeContextMenu();
-		if (event.sourceEvent.shiftKey) {
-			dragstartedRows(event, d);
-			allowClickRow = true;
-		}
-		if (event.sourceEvent.altKey) {
-			dragstartedCols(event, d);
-			allowClickCol = true;
-		}
-	})
-    .on("drag", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) {
-		// Rows
-		if (event.sourceEvent.shiftKey) {
-			// Update data
-			const dataAndClick = draggedRows(event, d, data, y, allowClickRow);
-			data = dataAndClick[0];
-			allowClickRow = dataAndClick[1];
+          // Update left bar
+          renderCellPopVisualizationLeft(
+            data,
+            dimensions,
+            y,
+            themeColors,
+            fraction,
+          );
+        }
 
-			// Update the y-domain
-			y = y.domain(data.rowNames);
+        // Cols
+        if (event.sourceEvent.altKey) {
+          // Update data
+          const dataAndClick = draggedCols(event, d, data, x, allowClickCol);
+          data = dataAndClick[0];
+          allowClickCol = dataAndClick[1];
 
-			svg.select("g.axisright").remove();
+          // Update the y-domain
+          x = x.domain(data.colNames);
 
-			svg.append("g")
-				.attr("class", "axisright")
-				.call(d3.axisRight(y))
-				.attr("transform", "translate(" + width + ",0)")
-				.selectAll("text")
-					.style("font-size", dimensions.textSize.ind.tickY)
-					.style("fill", themeColors.text);
+          svg.select("g.axisbottom").remove();
 
-			// Update left bar
-			renderCellPopVisualizationLeft(data, dimensions, y, themeColors, fraction);
-		}
+          svg
+            .append("g")
+            .attr("class", "axisbottom")
+            .call(d3.axisBottom(x))
+            .attr("transform", "translate(0," + height + ")")
+            .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end")
+            .style("font-size", dimensions.textSize.ind.tickX)
+            .style("fill", themeColors.text);
 
-		// Cols
-		if (event.sourceEvent.altKey) {
-			// Update data
-			const dataAndClick = draggedCols(event, d, data, x, allowClickCol);
-			data = dataAndClick[0];
-			allowClickCol = dataAndClick[1];
+          // Update top bar
+          renderCellPopVisualizationTop(
+            data,
+            dimensions,
+            x,
+            themeColors,
+            fraction,
+          );
+        }
+      },
+    )
+    .on(
+      "end",
+      function (
+        event: d3.D3DragEvent<
+          SVGRectElement,
+          CountsMatrixValue,
+          d3.SubjectPosition
+        >,
+        d: CountsMatrixValue,
+      ) {
+        // todo: case when key is lifted before the click
 
-			// Update the y-domain
-			x = x.domain(data.colNames);
+        if (event.sourceEvent.shiftKey) {
+          dragendedRows(
+            event,
+            d,
+            data,
+            dimensions,
+            themeColors,
+            x,
+            y,
+            allowClickRow,
+          );
+        }
 
-			svg.select("g.axisbottom").remove();
+        if (event.sourceEvent.altKey) {
+          dragendedCols(
+            event,
+            d,
+            data,
+            dimensions,
+            themeColors,
+            x,
+            y,
+            allowClickCol,
+          );
+        }
+      },
+    );
 
-			svg.append("g")
-				.attr("class", "axisbottom")
-				.call(d3.axisBottom(x))
-				.attr("transform", "translate(0," + height + ")")
-				.selectAll("text")
-					.attr("transform", "translate(-10,0)rotate(-45)")
-					.style("text-anchor", "end")
-					.style("font-size", dimensions.textSize.ind.tickX)
-					.style("fill", themeColors.text);
+  // Apply drag behavior to rects
+  rects.call(drag);
 
-			// Update top bar
-			renderCellPopVisualizationTop(data, dimensions, x, themeColors, fraction);
-		}
-
-	})
-    .on("end", function(event: d3.D3DragEvent<SVGRectElement, CountsMatrixValue, d3.SubjectPosition>, d: CountsMatrixValue) {
-		// todo: case when key is lifted before the click
-
-		if (event.sourceEvent.shiftKey) {
-			dragendedRows(event, d, data, dimensions, themeColors, x, y, allowClickRow);
-		}
-
-		if (event.sourceEvent.altKey) {
-			dragendedCols(event, d, data, dimensions, themeColors, x, y, allowClickCol);
-		}
-	});
-
-	// Apply drag behavior to rects
-	rects.call(drag);
-
-    return [x,y,colorRange];
+  return [x, y, colorRange];
 }
-
 
 // heatmap highlight
 function addHighlightRow(y: number, currHeight: number) {
-	d3.select(".highlight-rows")
-		.attr("visibility", "shown")
-		.attr("y", y)
-		.attr("height", currHeight)
-		.raise();
+  d3.select(".highlight-rows")
+    .attr("visibility", "shown")
+    .attr("y", y)
+    .attr("height", currHeight)
+    .raise();
 }
 
 function removeHighlightRow(event: MouseEvent) {
-	// makes sure the highlight stays when dragging
-	if (event.defaultPrevented) {
-		return;
-	}
+  // makes sure the highlight stays when dragging
+  if (event.defaultPrevented) {
+    return;
+  }
 
-	d3.select(".highlight-rows")
-		.attr("visibility", "hidden");
+  d3.select(".highlight-rows").attr("visibility", "hidden");
 }
 
 // heatmap highlight
 function addHighlightCol(x: number, currWidth: number) {
-	d3.select(".highlight-cols")
-		.attr("visibility", "shown")
-		.attr("x", x)
-		.attr("width", currWidth)
-		.raise();
+  d3.select(".highlight-cols")
+    .attr("visibility", "shown")
+    .attr("x", x)
+    .attr("width", currWidth)
+    .raise();
 }
 
 function removeHighlightCol(event: MouseEvent) {
-	// makes sure the highlight stays when dragging
-	if (event.defaultPrevented) {
-		return;
-	}
+  // makes sure the highlight stays when dragging
+  if (event.defaultPrevented) {
+    return;
+  }
 
-	d3.select(".highlight-cols")
-		.attr("visibility", "hidden");
+  d3.select(".highlight-cols").attr("visibility", "hidden");
 }
 
 export function resetData(data: CellPopData) {
-	resetRowNames(data);
-	resetColNames(data);
+  resetRowNames(data);
+  resetColNames(data);
 }
 
+function renderHeatmapLegend(
+  countsMatrix: CountsMatrixValue[],
+  dimensions: CellPopDimensions,
+  fraction: boolean,
+  themeColors: CellPopThemeColors,
+  colorRange: d3.ScaleLinear<string, number>,
+) {
+  d3.select("g.axiscolor").remove();
+  const gradient = d3
+    .select("g.main")
+    .append("g")
+    .attr(
+      "transform",
+      "translate(" +
+        dimensions.heatmapLegend.offsetWidth +
+        "," +
+        dimensions.heatmapLegend.offsetHeight +
+        ")",
+    )
+    .attr("class", "axiscolor");
 
-function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: CellPopDimensions, fraction: boolean, themeColors: CellPopThemeColors, colorRange: d3.ScaleLinear<string, number>) {
-	d3.select("g.axiscolor").remove();
-	const gradient = d3.select("g.main")
-		.append("g")
-		.attr("transform",
-			"translate(" + dimensions.heatmapLegend.offsetWidth + "," + dimensions.heatmapLegend.offsetHeight + ")")
-		.attr("class", "axiscolor");
+  const width = dimensions.heatmapLegend.width;
+  const height = 10;
 
-	const width = dimensions.heatmapLegend.width;
-	const height = 10;
+  const colorAxisSize = 100;
+  const colorAxisSteps = 100;
+  const colorAxisWidth = width / 2;
+  const colorAxisOffsetWidth = width / 4;
 
-	const colorAxisSize = 100;
-	const colorAxisSteps = 100;
-	const colorAxisWidth = width / 2;
-	const colorAxisOffsetWidth = width / 4;
+  for (let i = 0; i < colorAxisSteps; i++) {
+    const color = colorRange(
+      (i * getUpperBound(countsMatrix.map((r) => r.value))) / colorAxisSteps,
+    );
+    gradient
+      .append("rect")
+      .attr("class", "colorlabelrect")
+      .attr("x", colorAxisOffsetWidth)
+      .attr("y", colorAxisSize - (i * colorAxisSize) / colorAxisSteps)
+      .attr("width", colorAxisWidth)
+      .attr("height", colorAxisSize / colorAxisSteps)
+      .style("fill", color);
+  }
 
-	for (let i = 0; i < colorAxisSteps; i++) {
-		const color = colorRange(i * getUpperBound(countsMatrix.map(r => r.value)) / colorAxisSteps);
-		gradient.append("rect")
-			.attr("class", "colorlabelrect")
-			.attr("x", colorAxisOffsetWidth)
-			.attr("y", colorAxisSize - i * colorAxisSize / colorAxisSteps)
-			.attr("width", colorAxisWidth)
-			.attr("height", colorAxisSize / colorAxisSteps)
-			.style("fill", color);
-	}
+  const colorAxisLabel = fraction ? "Fraction" : "Count";
+  gradient
+    .append("text")
+    .attr("class", "labelColor")
+    .attr("y", -10)
+    .text(colorAxisLabel)
+    .style("font-size", dimensions.textSize.ind.labelColor)
+    .style("fill", themeColors.text);
 
-	const colorAxisLabel = fraction ? "Fraction" : "Count";
-	gradient.append("text")
-		.attr("class", "labelColor")
-		.attr("y", -10)
-		.text(colorAxisLabel)
-		.style("font-size", dimensions.textSize.ind.labelColor)
-		.style("fill", themeColors.text);
+  gradient
+    .append("text")
+    .attr("class", "tickColor")
+    .attr("x", colorAxisOffsetWidth + colorAxisWidth)
+    .attr("y", colorAxisSize)
+    .text(0)
+    .style("font-size", dimensions.textSize.ind.tickColor)
+    .style("fill", themeColors.text);
 
-	gradient.append("text")
-		.attr("class", "tickColor")
-		.attr("x", colorAxisOffsetWidth + colorAxisWidth)
-		.attr("y", colorAxisSize)
-		.text(0)
-		.style("font-size", dimensions.textSize.ind.tickColor)
-		.style("fill", themeColors.text);
-
-	gradient.append("text")
-		.attr("class", "tickColor")
-		.attr("x", colorAxisOffsetWidth + colorAxisWidth)
-		.attr("y", 0)
-		.text(getUpperBound(countsMatrix.map(r => r.value)))
-		.style("font-size", dimensions.textSize.ind.tickColor)
-		.style("fill", themeColors.text);
+  gradient
+    .append("text")
+    .attr("class", "tickColor")
+    .attr("x", colorAxisOffsetWidth + colorAxisWidth)
+    .attr("y", 0)
+    .text(getUpperBound(countsMatrix.map((r) => r.value)))
+    .style("font-size", dimensions.textSize.ind.tickColor)
+    .style("fill", themeColors.text);
 }
 
 // function sizeLabels(dimensions: CellPopDimensions) {
 
-
 // }
-
-
 
 // function resizeLabels(dimensions: CellPopDimensions) {
 //     // select text from right axis
@@ -453,7 +600,6 @@ function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: Cell
 //         axisrightText.style("font-size", 5);
 //     }
 
-
 //     // select text from bottom axis
 //     const axisbottomText = d3.select(".axisbottom").selectAll("text");
 //     // calculate the maximum size of the labels
@@ -465,13 +611,17 @@ function renderHeatmapLegend(countsMatrix: CountsMatrixValue[], dimensions: Cell
 //     }
 // }
 
-
 function sortRowsDescending(data: CellPopData) {
-	// Get accumulated data
-	const dataRows = [] as CountsTotalRowValue[];
-	for (const row of data.rowNames) {
-		dataRows.push({row: row, countTotal: data.countsMatrix.filter(r => r.row === row).map(r => r.value).reduce((a, b) => a + b, 0)});
-	}
-	console.log(dataRows);
-
+  // Get accumulated data
+  const dataRows = [] as CountsTotalRowValue[];
+  for (const row of data.rowNames) {
+    dataRows.push({
+      row: row,
+      countTotal: data.countsMatrix
+        .filter((r) => r.row === row)
+        .map((r) => r.value)
+        .reduce((a, b) => a + b, 0),
+    });
+  }
+  console.log(dataRows);
 }

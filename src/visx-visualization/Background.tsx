@@ -1,5 +1,5 @@
 import React from "react";
-import useCellPopConfig from "./CellPopConfigContext";
+import { useDimensions, useTheme } from "./ConfigContext";
 
 export default function Background() {
   const {
@@ -9,7 +9,10 @@ export default function Background() {
         height: { total: height },
       },
     },
+  } = useDimensions();
+  const {
     theme: { background },
-  } = useCellPopConfig();
+  } = useTheme();
+
   return <rect width={width} height={height} fill={background} />;
 }

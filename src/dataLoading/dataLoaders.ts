@@ -2,41 +2,41 @@
 import { MetaData, ObsSets } from "../cellpop-schema";
 
 export function loadData() {
-    // create a wrapper for all data loaders?
+  // create a wrapper for all data loaders?
 }
 
-
-export function loadDataWithVitessce(obsSetsList: ObsSets[], rowNames: string[], metadata?: MetaData) {
-    // options: anndata/zarr, csv, json
-
-    // const counts = getCountsFromObsSetsList(obsSetsList, rowNames);
-    // const countsMatrix = getCountsMatrixFromCounts(counts);
-    // let data = {countsMatrix: countsMatrix};
-    // loadDataWrapper(data);
-    // data.metadata = metadata;
+export function loadDataWithVitessce(
+  obsSetsList: ObsSets[],
+  rowNames: string[],
+  metadata?: MetaData,
+) {
+  // options: anndata/zarr, csv, json
+  // const counts = getCountsFromObsSetsList(obsSetsList, rowNames);
+  // const countsMatrix = getCountsMatrixFromCounts(counts);
+  // let data = {countsMatrix: countsMatrix};
+  // loadDataWrapper(data);
+  // data.metadata = metadata;
 }
 
-
-export function getCountsFromObsSetsList(obsSetsList: ObsSets[], rowNames: string[]) {
-    const counts = new Object() as any;
-	for (let i = 0; i < rowNames.length; i++) {
-		counts[rowNames[i]] = getCountsPerType(obsSetsList[i].tree[0].children);
-	}
-    return counts;
+export function getCountsFromObsSetsList(
+  obsSetsList: ObsSets[],
+  rowNames: string[],
+) {
+  const counts = new Object() as any;
+  for (let i = 0; i < rowNames.length; i++) {
+    counts[rowNames[i]] = getCountsPerType(obsSetsList[i].tree[0].children);
+  }
+  return counts;
 }
-
 
 // get the counts per cell type
 function getCountsPerType(o: any) {
-	const dict = new Object() as any;
-	for(const t of o) {
-		dict[t.name] = t.set.length;
-	}
-	return dict;
+  const dict = new Object() as any;
+  for (const t of o) {
+    dict[t.name] = t.set.length;
+  }
+  return dict;
 }
-
-
-
 
 // // data
 // var uuids = ["ad693f99fb9006e68a53e97598da1509",
@@ -122,7 +122,6 @@ function getCountsPerType(o: any) {
 //   	return {counts: obsSetsListChildrenCounts, countsMatrix: obsSetsListChildrenCountsMatrix, colNames: allTypes, rowNames: rowNames, obsSetsList: obsSetsList};
 // }
 
-
 // // get the counts per cell type
 // function getCountsPerType(o) {
 // 	let dict = new Object();
@@ -131,7 +130,6 @@ function getCountsPerType(o: any) {
 // 	}
 // 	return dict;
 // }
-
 
 // // // Retrieve the ObsSets, then wrangle data and call the vis
 // let promiseData = retrieveObsSets(urls)
@@ -152,7 +150,6 @@ function getCountsPerType(o: any) {
 //     .catch(error => {
 //         console.error(error);
 //     });
-
 
 // // get metadata
 // function getMetadata(uuids) {
@@ -194,7 +191,6 @@ function getCountsPerType(o: any) {
 // }
 
 // let promiseMetadata = getMetadata(uuids);
-
 
 // Promise.all([promiseData, promiseMetadata]).then((values) => {
 // 	let data = values[0];

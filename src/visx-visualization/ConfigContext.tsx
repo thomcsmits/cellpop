@@ -1,4 +1,9 @@
-import React, { PropsWithChildren, useState } from "react";
+import React, {
+  Dispatch,
+  PropsWithChildren,
+  SetStateAction,
+  useState,
+} from "react";
 import {
   CellPopData,
   CellPopDimensions,
@@ -7,6 +12,9 @@ import {
 } from "../cellpop-schema";
 import { createContext, useContext } from "../utils/context";
 import { getTheme } from "../visualization/theme";
+import { ScaleProvider } from "./ScaleContext";
+
+type Setter<T> = Dispatch<SetStateAction<T>>;
 
 interface CellPopConfigProps extends PropsWithChildren {
   data: CellPopData;
@@ -19,7 +27,7 @@ export const useData = () => useContext(DataContext);
 
 interface DimensionsContextType {
   dimensions: CellPopDimensions;
-  setDimensions: (dimensions: CellPopDimensions) => void;
+  setDimensions: Setter<CellPopDimensions>;
 }
 
 const DimensionsContext = createContext<DimensionsContextType | null>(
@@ -30,7 +38,7 @@ export const useDimensions = () => useContext(DimensionsContext);
 interface ThemeContextType {
   theme: CellPopThemeColors;
   currentThemeName: CellPopTheme;
-  setTheme: (theme: CellPopTheme) => void;
+  setTheme: Setter<CellPopTheme>;
 }
 
 const ThemeContext = createContext<ThemeContextType | null>(
@@ -40,7 +48,7 @@ export const useTheme = () => useContext(ThemeContext);
 
 interface FractionContextType {
   fraction: boolean;
-  setFraction: (fraction: boolean) => void;
+  setFraction: Setter<boolean>;
 }
 const FractionContext = createContext<FractionContextType | null>("Fraction");
 export const useFraction = () => useContext(FractionContext);
@@ -56,7 +64,7 @@ export const useMetadataField = () => useContext(MetadataFieldContext);
 
 interface BoundaryContextType {
   boundary: boolean;
-  setBoundary: (boundary: boolean) => void;
+  setBoundary: Setter<boolean>;
 }
 
 const BoundaryContext = createContext<BoundaryContextType | null>("Boundary");
@@ -86,7 +94,7 @@ export function CellPopConfigProvider({
               value={{ metadataField, setMetadataField }}
             >
               <BoundaryContext.Provider value={{ boundary, setBoundary }}>
-                {children}
+                <ScaleProvider>{children}</ScaleProvider>
               </BoundaryContext.Provider>
             </MetadataFieldContext.Provider>
           </FractionContext.Provider>

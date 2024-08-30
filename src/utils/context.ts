@@ -1,4 +1,8 @@
-import React, { createContext as createContextNative, useContext as useContextNative, type Context } from "react";
+import React, {
+  createContext as createContextNative,
+  useContext as useContextNative,
+  type Context,
+} from "react";
 
 /**
  * Type-safe `useContext` hook that throws if the context is undefined.
@@ -25,10 +29,15 @@ export function useContext<T>(context: React.Context<T | undefined>): T {
  * @param displayName The display name to apply to the context
  */
 export function createContext<T>(displayName: string): Context<T | undefined>;
-export function createContext<T>(displayName: string, defaultValue: T): Context<T>;
+export function createContext<T>(
+  displayName: string,
+  defaultValue: T,
+): Context<T>;
 export function createContext<T>(displayName: string, defaultValue?: T) {
   const context =
-    defaultValue !== undefined ? createContextNative<T>(defaultValue) : createContextNative<T | undefined>(undefined);
+    defaultValue !== undefined
+      ? createContextNative<T>(defaultValue)
+      : createContextNative<T | undefined>(undefined);
   context.displayName = displayName;
   return context;
 }

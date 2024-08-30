@@ -1,11 +1,11 @@
 import React, { PropsWithChildren, useId } from "react";
-import useCellPopConfig from "./CellPopConfigContext";
+import { useDimensions } from "./ConfigContext";
 
 interface VizContainerProps extends PropsWithChildren {}
 
 function VizContainer(
   { children }: VizContainerProps,
-  ref: React.Ref<HTMLDivElement>
+  ref: React.Ref<HTMLDivElement>,
 ) {
   const {
     dimensions: {
@@ -14,7 +14,7 @@ function VizContainer(
         height: { total: height },
       },
     },
-  } = useCellPopConfig();
+  } = useDimensions();
 
   const id = useId();
 
