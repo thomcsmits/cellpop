@@ -1,5 +1,6 @@
 import { ScaleBand, ScaleLinear } from "d3";
 import React from "react";
+import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 
 interface BarsProps {
   orientation: "horizontal" | "vertical";
@@ -18,6 +19,7 @@ export function Bars({
 }: BarsProps) {
   const entries = Object.entries(data);
   const barWidth = categoricalScale.bandwidth();
+  const { theme } = useCellPopTheme();
   return (
     <>
       {entries.map(([key, value]) => (
@@ -43,7 +45,7 @@ export function Bars({
               ? domainLimit - numericalScale(value)
               : barWidth
           }
-          fill="steelblue"
+          fill={theme.sideCharts}
         />
       ))}
     </>

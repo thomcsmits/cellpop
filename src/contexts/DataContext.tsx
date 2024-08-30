@@ -10,6 +10,9 @@ interface DataContextType {
   data: CellPopData;
   columnCounts: Record<string, number>;
   rowCounts: Record<string, number>;
+  maxRow: number;
+  maxCol: number;
+  upperBound: number;
 }
 
 const DataContext = createContext<DataContextType | null>("CellPopData");
@@ -18,24 +21,29 @@ export const useData = () => useContext(DataContext);
 export function calculateRowAndColumnCounts(data: CellPopData) {
   const columnCounts: Record<string, number> = {};
   const rowCounts: Record<string, number> = {};
+  let upperBound = 0;
   data.countsMatrix.forEach(({ col, row, value }) => {
     columnCounts[col] = (columnCounts[col] || 0) + value;
     rowCounts[row] = (rowCounts[row] || 0) + value;
+    if (value > upperBound) {
+      upperBound = value;
+    }
   });
-  return { columnCounts, rowCounts };
-}
-
-export function calculateRowAndColumnFractions(/*data: CellPopData*/) {
-  // TODO: Implement function for calculating violin plot data
+  const maxRow = Math.max(...Object.values(rowCounts));
+  const maxCol = Math.max(...Object.values(columnCounts));
+  return { columnCounts, rowCounts, maxRow, maxCol, upperBound };
 }
 
 export function DataProvider({ children, data }: DataContextProps) {
-  const { columnCounts, rowCounts } = useMemo(() => {
-    return calculateRowAndColumnCounts(data);
-  }, [data]);
+  const { columnCounts, rowCounts, maxRow, maxCol, upperBound } =
+    useMemo(() => {
+      return calculateRowAndColumnCounts(data);
+    }, [data]);
 
   return (
-    <DataContext.Provider value={{ data, columnCounts, rowCounts }}>
+    <DataContext.Provider
+      value={{ data, columnCounts, rowCounts, maxRow, maxCol, upperBound }}
+    >
       {children}
     </DataContext.Provider>
   );

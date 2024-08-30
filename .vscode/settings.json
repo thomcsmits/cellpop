@@ -8,5 +8,8 @@
   "editor.codeActionsOnSave": {
     "source.sortImports": "always",
     "source.fixAll": "always"
-  }
+  },
+  "cSpell.words": [
+    "epanechnikov"
+  ]
 }

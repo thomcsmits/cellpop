@@ -1,16 +1,16 @@
 import * as d3 from "d3";
 
-import { getUpperBound } from "./util";
-import {
-  defineTooltipBarTop,
-  addTooltipBarTop,
-  removeTooltipBarTop,
-} from "./tooltips";
 import {
   CellPopData,
   CellPopDimensions,
   CellPopThemeColors,
 } from "../cellpop-schema";
+import {
+  addTooltipBarTop,
+  defineTooltipBarTop,
+  removeTooltipBarTop,
+} from "./tooltips";
+import { getUpperBound } from "./util";
 
 export function renderTopViolin(
   data: CellPopData,
