@@ -4,43 +4,32 @@ import { useData } from "../contexts/DataContext";
 import { useDimensions } from "../contexts/DimensionsContext";
 import { useFraction } from "../contexts/FractionContext";
 import { useYScale } from "../contexts/ScaleContext";
+import { Bars } from "./Bars";
 import { useCountsScale } from "./hooks";
 
-function useLeftGraphXScale() {
+function LeftBar() {
   const {
     dimensions: {
       barLeft: { width },
     },
   } = useDimensions();
   const { rowCounts } = useData();
-  return useCountsScale([0, max(Object.values(rowCounts)) || 0], [0, width]);
-}
-
-function LeftBar() {
-  const {
-    dimensions: {
-      barLeft: { width, height },
-    },
-  } = useDimensions();
-  const { rowCounts } = useData();
   // Use same y scale as the heatmap
   const { scale: yScale } = useYScale();
-  const xScale = useLeftGraphXScale();
+  const xScale = useCountsScale(
+    [0, max(Object.values(rowCounts)) || 0],
+    [0, width],
+  );
 
   return (
     <g className="barleft">
-      {Object.entries(rowCounts).map(([row, count]) => {
-        return (
-          <rect
-            key={row}
-            x={xScale(count)}
-            y={yScale(row)}
-            width={width - xScale(count)}
-            height={yScale.bandwidth()}
-            fill="steelblue"
-          />
-        );
-      })}
+      <Bars
+        orientation="horizontal"
+        categoricalScale={yScale}
+        numericalScale={xScale}
+        data={rowCounts}
+        domainLimit={width}
+      />
     </g>
   );
 }
