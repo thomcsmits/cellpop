@@ -1,11 +1,13 @@
 import React, { useRef } from "react";
 
-import { Skeleton } from "@mui/material";
+import Skeleton from "@mui/material/Skeleton";
 import { CellPopProps } from "./cellpop-schema";
 import CellPopConfig from "./CellPopConfig";
+import { Providers } from "./contexts/Providers";
 import Background from "./visx-visualization/Background";
-import { CellPopConfigProvider } from "./visx-visualization/ConfigContext";
 import Heatmap from "./visx-visualization/Heatmap";
+import LeftGraph from "./visx-visualization/LeftGraph";
+import TopGraph from "./visx-visualization/TopGraph";
 import VizContainer from "./visx-visualization/VizContainer";
 
 export const CellPop = ({ theme, dimensions, data }: CellPopProps) => {
@@ -17,13 +19,15 @@ export const CellPop = ({ theme, dimensions, data }: CellPopProps) => {
 
   return (
     <div>
-      <CellPopConfigProvider data={data} dimensions={dimensions} theme={theme}>
+      <Providers data={data} dimensions={dimensions} theme={theme}>
         <CellPopConfig />
         <VizContainer ref={cellPopRef}>
           <Background />
           <Heatmap />
+          <TopGraph />
+          <LeftGraph />
         </VizContainer>
-      </CellPopConfigProvider>
+      </Providers>
     </div>
   );
 };

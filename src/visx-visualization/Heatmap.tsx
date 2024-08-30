@@ -1,11 +1,13 @@
 import { AxisBottom, AxisRight, Orientation } from "@visx/axis";
 import React from "react";
-import { useData, useDimensions, useTheme } from "./ConfigContext";
-import { useColorScale, useXScale, useYScale } from "./ScaleContext";
+import { useCellPopTheme } from "../contexts/CellPopThemeContext";
+import { useData } from "../contexts/DataContext";
+import { useDimensions } from "../contexts/DimensionsContext";
+import { useColorScale, useXScale, useYScale } from "../contexts/ScaleContext";
 
 export default function Heatmap() {
-  const data = useData();
-  const { theme } = useTheme();
+  const { data } = useData();
+  const { theme } = useCellPopTheme();
   const {
     dimensions: {
       heatmap: { width, height, offsetWidth, offsetHeight },

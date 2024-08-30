@@ -1,5 +1,6 @@
 import React from "react";
-import { useDimensions, useTheme } from "./ConfigContext";
+import { useCellPopTheme } from "../contexts/CellPopThemeContext";
+import { useDimensions } from "../contexts/DimensionsContext";
 
 export default function Background() {
   const {
@@ -12,7 +13,7 @@ export default function Background() {
   } = useDimensions();
   const {
     theme: { background },
-  } = useTheme();
+  } = useCellPopTheme();
 
   return <rect width={width} height={height} fill={background} />;
 }

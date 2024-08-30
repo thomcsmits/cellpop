@@ -8,7 +8,9 @@ import React, {
 import { getUpperBound } from "../visualization/util";
 
 import { createContext, useContext } from "../utils/context";
-import { useData, useDimensions, useTheme } from "./ConfigContext";
+import { useCellPopTheme } from "./CellPopThemeContext";
+import { useData } from "./DataContext";
+import { useDimensions } from "./DimensionsContext";
 
 const SCALES = ["X", "Y", "Color"] as const;
 type ScaleType = (typeof SCALES)[number];
@@ -75,7 +77,7 @@ export function useToggleSet<T>(initialValues: T[] = []) {
 }
 
 export function ScaleProvider({ children }: PropsWithChildren) {
-  const data = useData();
+  const { data } = useData();
   const {
     dimensions: {
       heatmap: { width, height },
@@ -83,7 +85,7 @@ export function ScaleProvider({ children }: PropsWithChildren) {
   } = useDimensions();
   const {
     theme: { heatmapZero, heatmapMax },
-  } = useTheme();
+  } = useCellPopTheme();
 
   const x = useMemo(() => {
     return scaleBand<string>({

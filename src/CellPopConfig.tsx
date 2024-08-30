@@ -8,18 +8,17 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useEventCallback } from "@mui/material/utils";
 import React, { ChangeEvent } from "react";
+import { useData } from "./contexts/DataContext";
+
+import { useBoundary } from "./contexts/BoundaryContext";
+import { useCellPopTheme } from "./contexts/CellPopThemeContext";
+import { useFraction } from "./contexts/FractionContext";
+import { useMetadataField } from "./contexts/MetadataFieldContext";
 import { getPossibleMetadataSelections } from "./visualization/metadata";
-import {
-  useBoundary,
-  useData,
-  useFraction,
-  useMetadataField,
-  useTheme,
-} from "./visx-visualization/ConfigContext";
 
 export default function CellPopConfig() {
-  const data = useData();
-  const { currentThemeName: theme, setTheme } = useTheme();
+  const { data } = useData();
+  const { currentThemeName: theme, setTheme } = useCellPopTheme();
   const { fraction, setFraction } = useFraction();
   const { metadataField, setMetadataField } = useMetadataField();
   const { boundary, setBoundary } = useBoundary();

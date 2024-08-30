@@ -1,10 +1,10 @@
 import React, { PropsWithChildren, useId } from "react";
-import { useDimensions } from "./ConfigContext";
+import { useDimensions } from "../contexts/DimensionsContext";
 
-interface VizContainerProps extends PropsWithChildren {}
+// interface VizContainerProps extends PropsWithChildren {}
 
 function VizContainer(
-  { children }: VizContainerProps,
+  { children }: PropsWithChildren,
   ref: React.Ref<HTMLDivElement>,
 ) {
   const {
