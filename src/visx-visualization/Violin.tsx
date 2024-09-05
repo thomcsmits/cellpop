@@ -1,75 +1,140 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useMemo } from "react";
 
+import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
-import { max, rollup, ScaleBand, ScaleLinear } from "d3";
+import { area } from "@visx/shape";
+import { count, curveBumpY, extent, max, rollup } from "d3";
 import { CountsMatrixValue } from "../cellpop-schema";
+import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useData } from "../contexts/DataContext";
-import { epanechnikov, kde } from "../utils/violin";
+import { useDimensions } from "../contexts/DimensionsContext";
+import { useXScale, useYScale } from "../contexts/ScaleContext";
+import { epanechnikov, kde, useDensityFunction } from "../utils/violin";
 
-function useDensityFunction(
-  scale: ScaleLinear<number, number>,
-  bandwidth: number,
-) {
-  return useMemo(
-    () => kde(epanechnikov(bandwidth), scale.ticks(100)),
-    [bandwidth, scale],
-  );
+type Side = "top" | "left";
+
+interface ViolinsProps {
+  side?: Side;
 }
 
-interface ViolinProps {
-  categoricalScale: ScaleBand<string>;
-  bandwidth: number;
-  orientation: "horizontal" | "vertical";
-  rangeLimit: number;
+function useCategoricalScale(side: Side) {
+  const { scale: heatmapXScale } = useXScale();
+  const { scale: heatmapYScale } = useYScale();
+  if (side === "top") {
+    return heatmapXScale;
+  }
+  return heatmapYScale;
 }
 
-function useViolins({
-  categoricalScale,
-  bandwidth = 0.1,
-  orientation,
-  rangeLimit,
-}: ViolinProps) {
+export default function Violins({ side = "top" }: ViolinsProps) {
+  const horizontal = side === "top";
   const {
-    data: { countsMatrix },
+    data: { countsMatrix, rowNames, colNames, ...data },
     upperBound,
   } = useData();
-  const densityScale = scaleLinear<number>({
-    range: [rangeLimit, 0],
+
+  const {
+    dimensions: { barTop, barLeft },
+  } = useDimensions();
+  const dimensions = horizontal ? barTop : barLeft;
+  const width =
+    dimensions.width - dimensions.margin.left - dimensions.margin.right;
+  const height =
+    dimensions.height - dimensions.margin.top - dimensions.margin.bottom;
+  // X scale is used for the top graph, Y scale is used for the left graph
+  const categoricalScale = useCategoricalScale(side);
+  const groups = horizontal ? colNames : rowNames;
+
+  const violinScale = scaleLinear({
+    range: [horizontal ? height : width, 0],
     domain: [0, upperBound],
   });
-  const paddedScale = categoricalScale.copy().paddingInner(0.25);
-  const density = useDensityFunction(densityScale, bandwidth);
-  const key = orientation === "horizontal" ? "row" : "col";
-  const violins = useMemo(
-    () =>
-      rollup(
-        countsMatrix,
-        (v) => density(v.map((g: CountsMatrixValue) => g.value)),
-        (d: CountsMatrixValue) => d[key],
-      ),
-    [countsMatrix, density, key],
-  );
 
-  const violinScale = useMemo(() => {
-    const allNumbers = [...violins.values()].reduce(
-      (acc: number[], d) => acc.concat(d.map((d) => d[1])),
-      [],
+  console.log(upperBound);
+
+  // A map of group name to violin data
+  const violins = useMemo(() => {
+    const bandwidth = 0.1;
+    const thresholds = violinScale.ticks(100);
+    const density = kde(epanechnikov(bandwidth), thresholds);
+    return rollup<CountsMatrixValue, [number, number][], string[]>(
+      countsMatrix,
+      (v) => {
+        const d = density(v.map((g) => g.value));
+        console.log("rollup", { v, density: d });
+        return density(v.map((g) => g.value));
+      },
+      (d) => (horizontal ? d.col : d.row),
     );
-    const xMax = max(allNumbers) || 0;
-    return scaleLinear<number>({
-      domain: [-xMax, xMax],
-      range: [0, paddedScale.bandwidth()],
+  }, [countsMatrix, horizontal, violinScale]);
+
+  const allNums = useMemo(() => {
+    const violinValues = [...violins.values()];
+    const allNum = violinValues.reduce((allNum, d) => {
+      allNum.push(...d.map((d) => d[1]));
+      return allNum;
+    }, [] as number[]);
+    return allNum;
+  }, [violins]);
+
+  const categoricalScaleRescaled = categoricalScale.copy().paddingInner(0.25);
+
+  const maxNum = max(allNums) || 0;
+  const densityScale = scaleLinear({
+    domain: [-maxNum, maxNum],
+    range: [0, categoricalScaleRescaled.bandwidth()],
+  });
+
+  const violinAreaGenerator = useMemo(() => {
+    return area<[number, number]>({
+      ...(horizontal
+        ? ({
+            // top
+            x0: (d) => densityScale(-d[1]),
+            x1: (d) => densityScale(d[1]),
+            y: (d) => violinScale(d[0]),
+          } as const)
+        : ({
+            // left
+            y0: (d) => densityScale(-d[1]),
+            y1: (d) => densityScale(d[1]),
+            x: (d) => violinScale(d[0]),
+          } as const)),
+      curve: curveBumpY,
     });
-  }, [paddedScale, violins]);
+  }, [densityScale, violinScale, horizontal]);
 
-  return { violins, violinScale };
-}
+  const { theme } = useCellPopTheme();
 
-function Violin({ orientation, categoricalScale }: ViolinProps) {
   return (
-    <g>
-      <area />
-      <path />
-    </g>
+    <>
+      {groups.map((group) => {
+        const violinData = violins.get(group);
+        console.log({ violinData });
+        if (!violinData) {
+          return null;
+        }
+        // Position of violin corresponds to its row/column;
+        // bandwidth is used to center its position
+        const transformCoordinate =
+          categoricalScaleRescaled(group) - categoricalScale.bandwidth() / 2;
+        const transform = horizontal
+          ? `translate(${transformCoordinate}, 0)`
+          : `translate(0, ${transformCoordinate})`;
+        return (
+          <Group key={group} transform={transform}>
+            <path
+              key={group}
+              d={violinAreaGenerator(violinData)}
+              opacity={1}
+              stroke={theme.sideCharts}
+              fill={theme.sideCharts}
+              fillOpacity={0.6}
+              strokeWidth={1}
+            />
+          </Group>
+        );
+      })}
+    </>
   );
 }

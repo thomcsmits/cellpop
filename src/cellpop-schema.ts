@@ -44,7 +44,7 @@ export type CountsMatrixFractions = {
   row: CountsMatrixValue[];
 };
 
-export type MetaData<T extends object> = {
+export type MetaData<T extends object = object> = {
   rows?: { row: string; metadata: T }[];
   cols?: { col: string; metadata: T }[];
 };

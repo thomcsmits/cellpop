@@ -1,16 +1,16 @@
 import * as d3 from "d3";
 
-import { getUpperBound } from "./util";
-import {
-  defineTooltipBarSide,
-  addTooltipBarSide,
-  removeTooltipBarSide,
-} from "./tooltips";
 import {
   CellPopData,
   CellPopDimensions,
   CellPopThemeColors,
 } from "../cellpop-schema";
+import {
+  addTooltipBarSide,
+  defineTooltipBarSide,
+  removeTooltipBarSide,
+} from "./tooltips";
+import { getUpperBound } from "./util";
 
 export function renderLeftViolin(
   data: CellPopData,

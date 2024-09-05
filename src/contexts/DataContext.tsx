@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, useMemo } from "react";
 import { CellPopData } from "../cellpop-schema";
 import { createContext, useContext } from "../utils/context";
+import { getUpperBound } from "../visualization/util";
 
 interface DataContextProps extends PropsWithChildren {
   data: CellPopData;
@@ -21,14 +22,11 @@ export const useData = () => useContext(DataContext);
 export function calculateRowAndColumnCounts(data: CellPopData) {
   const columnCounts: Record<string, number> = {};
   const rowCounts: Record<string, number> = {};
-  let upperBound = 0;
   data.countsMatrix.forEach(({ col, row, value }) => {
     columnCounts[col] = (columnCounts[col] || 0) + value;
     rowCounts[row] = (rowCounts[row] || 0) + value;
-    if (value > upperBound) {
-      upperBound = value;
-    }
   });
+  const upperBound = getUpperBound(data.countsMatrix.map((r) => r.value));
   const maxRow = Math.max(...Object.values(rowCounts));
   const maxCol = Math.max(...Object.values(columnCounts));
   return { columnCounts, rowCounts, maxRow, maxCol, upperBound };

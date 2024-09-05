@@ -6,11 +6,12 @@ import { useFraction } from "../contexts/FractionContext";
 import { useYScale } from "../contexts/ScaleContext";
 import { Bars } from "./Bars";
 import { useCountsScale } from "./hooks";
+import Violins from "./Violin";
 
 function LeftBar() {
   const {
     dimensions: {
-      barLeft: { width },
+      barLeft: { width, margin },
     },
   } = useDimensions();
   const { rowCounts } = useData();
@@ -22,7 +23,10 @@ function LeftBar() {
   );
 
   return (
-    <g className="barleft">
+    <g
+      className="barleft"
+      transform={`translate(${-margin.left},${-margin.top})`}
+    >
       <Bars
         orientation="horizontal"
         categoricalScale={yScale}
@@ -34,15 +38,14 @@ function LeftBar() {
   );
 }
 
-// Placeholder
 function LeftViolin() {
-  return <rect />;
+  return <Violins side="left" />;
 }
 
 export default function LeftGraph() {
   const {
     dimensions: {
-      barLeft: { offsetHeight, offsetWidth, height, width },
+      barLeft: { offsetHeight, offsetWidth, height, width, margin },
     },
   } = useDimensions();
 
@@ -51,7 +54,7 @@ export default function LeftGraph() {
   return (
     <g
       className="left-graph-container"
-      transform={`translate(${offsetWidth}, ${offsetHeight})`}
+      transform={`translate(${offsetWidth + margin.left}, ${offsetHeight + margin.top})`}
       height={height}
       width={width}
     >

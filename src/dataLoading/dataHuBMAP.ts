@@ -95,7 +95,6 @@ function getPromiseMetadata(
       return response.json();
     })
     .then((queryBody) => {
-      console.log({ queryBody });
       const listAll = queryBody.hits.hits;
       const metadata = listAll.map((l: HuBMAPMetaData) => {
         const ls = l._source;

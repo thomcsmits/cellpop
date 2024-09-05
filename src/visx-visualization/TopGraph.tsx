@@ -7,11 +7,12 @@ import { useFraction } from "../contexts/FractionContext";
 import { useXScale } from "../contexts/ScaleContext";
 import { Bars } from "./Bars";
 import { useCountsScale } from "./hooks";
+import Violins from "./Violin";
 
 function TopBar() {
   const {
     dimensions: {
-      barTop: { height },
+      barTop: { height, margin },
     },
   } = useDimensions();
   const { columnCounts } = useData();
@@ -23,7 +24,10 @@ function TopBar() {
   );
 
   return (
-    <g className="bartop">
+    <g
+      className="bartop"
+      transform={`translate(${-margin.left},${-margin.top})`}
+    >
       <Bars
         orientation="vertical"
         categoricalScale={xScale}
@@ -36,13 +40,13 @@ function TopBar() {
 }
 
 function TopViolin() {
-  return <rect />;
+  return <Violins side="top" />;
 }
 
 export default function TopGraph() {
   const {
     dimensions: {
-      barTop: { offsetHeight, offsetWidth, height, width },
+      barTop: { offsetHeight, offsetWidth, height, width, margin },
     },
   } = useDimensions();
 
@@ -50,7 +54,7 @@ export default function TopGraph() {
   return (
     <g
       className="top-graph-container"
-      transform={`translate(${offsetWidth}, ${offsetHeight})`}
+      transform={`translate(${offsetWidth + margin.left}, ${offsetHeight + margin.top})`}
       height={height}
       width={width}
     >
