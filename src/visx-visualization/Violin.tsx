@@ -29,9 +29,13 @@ function useCategoricalScale(side: Side) {
 export default function Violins({ side = "top" }: ViolinsProps) {
   const horizontal = side === "top";
   const {
-    data: { countsMatrix, rowNames, colNames, ...data },
+    data: { rowNames, colNames, countsMatrixFractions },
     upperBound,
   } = useData();
+
+  const countsMatrix = horizontal
+    ? countsMatrixFractions.col
+    : countsMatrixFractions.row;
 
   const {
     dimensions: { barTop, barLeft },
