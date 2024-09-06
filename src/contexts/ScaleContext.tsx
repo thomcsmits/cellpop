@@ -2,11 +2,14 @@ import { scaleBand, scaleLinear } from "@visx/scale";
 import React, {
   PropsWithChildren,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from "react";
 import { getUpperBound } from "../visualization/util";
 
+import { useOrderedArrayState } from "../hooks/useOrderedArray";
+import { useSet } from "../hooks/useSet";
 import { createContext, useContext } from "../utils/context";
 import { useCellPopTheme } from "./CellPopThemeContext";
 import { useData } from "./DataContext";
@@ -37,45 +40,6 @@ export const useXScale = () => useContext(XScaleContext);
 export const useYScale = () => useContext(YScaleContext);
 export const useColorScale = () => useContext(ColorScaleContext);
 
-export function useToggleSet<T>(initialValues: T[] = []) {
-  const [set, update] = useState<Set<T>>(new Set([...initialValues]));
-  const add = useCallback(
-    (value: T) => {
-      update((prev) => {
-        const next = new Set(prev);
-        next.add(value);
-        return next;
-      });
-    },
-    [update],
-  );
-  const remove = useCallback(
-    (value: T) => {
-      update((prev) => {
-        const next = new Set(prev);
-        next.delete(value);
-        return next;
-      });
-    },
-    [update],
-  );
-  const toggle = useCallback(
-    (value: T) => {
-      update((prev) => {
-        const next = new Set(prev);
-        if (next.has(value)) {
-          next.delete(value);
-        } else {
-          next.add(value);
-        }
-        return next;
-      });
-    },
-    [update],
-  );
-  return { set, add, remove, update: update, toggle };
-}
-
 export function ScaleProvider({ children }: PropsWithChildren) {
   const { data } = useData();
   const {
@@ -87,20 +51,22 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     theme: { heatmapZero, heatmapMax },
   } = useCellPopTheme();
 
+  const [columns, columnsActions] = useOrderedArrayState(data.colNames);
+  const [rows, rowsActions] = useOrderedArrayState(data.rowNames);
+
+  const selectedDimension = useState<"X" | "Y">("X");
+
   const x = useMemo(() => {
     return scaleBand<string>({
       range: [0, width],
-      domain: data.colNames,
+      domain: columns,
       padding: 0.01,
     });
-  }, [width, data.colNames]);
+  }, [width, columns]);
 
   const y = useMemo(() => {
-    return scaleBand<string>()
-      .range([height, 0])
-      .domain(data.rowNames)
-      .padding(0.01);
-  }, [height, data.rowNames]);
+    return scaleBand<string>().range([height, 0]).domain(rows).padding(0.01);
+  }, [height, rows]);
 
   const colors = useMemo(() => {
     return scaleLinear<string>({
@@ -109,8 +75,8 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     });
   }, [data.countsMatrix, heatmapZero, heatmapMax]);
 
-  const { set: selectedX, toggle: toggleX } = useToggleSet<string>();
-  const { set: selectedY, toggle: toggleY } = useToggleSet<string>();
+  const { set: selectedX, toggle: toggleX } = useSet<string>();
+  const { set: selectedY, toggle: toggleY } = useSet<string>();
 
   const xScaleContext = useMemo(
     () => ({ scale: x, selectedValues: selectedX, toggleSelection: toggleX }),
@@ -126,7 +92,9 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     <XScaleContext.Provider value={xScaleContext}>
       <YScaleContext.Provider value={yScaleContext}>
         <ColorScaleContext.Provider value={colorScaleContext}>
-          {children}
+          <SelectedDimensionContext.Provider value={selectedDimension}>
+            {children}
+          </SelectedDimensionContext.Provider>
         </ColorScaleContext.Provider>
       </YScaleContext.Provider>
     </XScaleContext.Provider>

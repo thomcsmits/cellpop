@@ -6,6 +6,7 @@ export function useCountsScale(domain: number[], range: number[]) {
     return scaleLinear<number>({
       domain,
       range,
+      nice: true,
     });
   }, [domain, range]);
 }

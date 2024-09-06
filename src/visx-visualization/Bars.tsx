@@ -30,29 +30,22 @@ export function Bars({
   return (
     <>
       {entries.map(([key, value]) => {
+        const scaledKey = categoricalScale(key);
+        const scaledValue = numericalScale(value);
         const x =
-          orientation === "vertical"
-            ? categoricalScale(key)
-            : numericalScale(value);
+          orientation === "vertical" ? scaledKey : domainLimit - scaledValue;
         const y =
-          orientation === "vertical"
-            ? numericalScale(value)
-            : categoricalScale(key);
+          orientation === "vertical" ? domainLimit - scaledValue : scaledKey;
+        const barHeight = scaledValue;
+        const height = orientation === "vertical" ? barHeight : barWidth;
+        const width = orientation === "vertical" ? barWidth : barHeight;
         return (
           <rect
             key={key}
             x={x}
             y={y}
-            width={
-              orientation === "vertical"
-                ? barWidth
-                : domainLimit - numericalScale(value)
-            }
-            height={
-              orientation === "vertical"
-                ? domainLimit - numericalScale(value)
-                : barWidth
-            }
+            width={width}
+            height={height}
             fill={theme.sideCharts}
             onMouseOver={() => {
               openTooltip(

@@ -28,21 +28,20 @@ export default function Heatmap() {
       className="heatmap"
       transform={`translate(${offsetWidth}, ${offsetHeight})`}
     >
-      {data.countsMatrix.map((cell, i) => {
+      {data.countsMatrix.map((cell) => {
         return (
           <rect
-            key={i}
+            key={`${cell.row}-${cell.col}`}
             x={x(cell.col) || 0}
             y={y(cell.row) || 0}
             width={x.bandwidth()}
             height={y.bandwidth()}
             fill={colors(cell.value)}
             onMouseOver={() => {
-              console.log("Mouse over", cell);
               openTooltip(
                 {
                   title: `${cell.row} - ${cell.col}`,
-                  data: { "Cell count": cell.value },
+                  data: { "Cell Count": cell.value },
                 },
                 x(cell.col) + offsetWidth,
                 y(cell.row) + offsetHeight,

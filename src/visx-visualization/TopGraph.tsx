@@ -19,7 +19,7 @@ function TopBar() {
   // Use same x scale as the heatmap
   const { scale: xScale } = useXScale();
   const yScale = useCountsScale(
-    [0, max(Object.values(columnCounts)) || 0],
+    [max(Object.values(columnCounts)) || 0, 0],
     [height, 0],
   );
 
