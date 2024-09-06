@@ -10,6 +10,7 @@ import { useData } from "../contexts/DataContext";
 import { useDimensions } from "../contexts/DimensionsContext";
 import { useXScale, useYScale } from "../contexts/ScaleContext";
 import { epanechnikov, kde, useDensityFunction } from "../utils/violin";
+import { getUpperBound } from "../visualization/util";
 
 type Side = "top" | "left";
 
@@ -30,12 +31,13 @@ export default function Violins({ side = "top" }: ViolinsProps) {
   const horizontal = side === "top";
   const {
     data: { rowNames, colNames, countsMatrixFractions },
-    upperBound,
   } = useData();
 
   const countsMatrix = horizontal
     ? countsMatrixFractions.col
     : countsMatrixFractions.row;
+
+  const upperBound = getUpperBound(countsMatrix.map((d) => d.value));
 
   const {
     dimensions: { barTop, barLeft },
