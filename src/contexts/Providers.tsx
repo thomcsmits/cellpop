@@ -11,6 +11,7 @@ import { DimensionsProvider } from "./DimensionsContext";
 import { FractionProvider } from "./FractionContext";
 import { MetadataFieldProvider } from "./MetadataFieldContext";
 import { ScaleProvider } from "./ScaleContext";
+import { TooltipDataProvider } from "./TooltipDataContext";
 
 interface CellPopConfigProps extends PropsWithChildren {
   data: CellPopData;
@@ -26,17 +27,19 @@ export function Providers({
 }: CellPopConfigProps) {
   return (
     <DataProvider data={data}>
-      <CellPopThemeProvider theme={theme}>
-        <DimensionsProvider dimensions={dimensions}>
-          <FractionProvider>
-            <MetadataFieldProvider>
-              <BoundaryProvider>
-                <ScaleProvider>{children}</ScaleProvider>
-              </BoundaryProvider>
-            </MetadataFieldProvider>
-          </FractionProvider>
-        </DimensionsProvider>
-      </CellPopThemeProvider>
+      <TooltipDataProvider>
+        <CellPopThemeProvider theme={theme}>
+          <DimensionsProvider dimensions={dimensions}>
+            <FractionProvider>
+              <MetadataFieldProvider>
+                <BoundaryProvider>
+                  <ScaleProvider>{children}</ScaleProvider>
+                </BoundaryProvider>
+              </MetadataFieldProvider>
+            </FractionProvider>
+          </DimensionsProvider>
+        </CellPopThemeProvider>
+      </TooltipDataProvider>
     </DataProvider>
   );
 }

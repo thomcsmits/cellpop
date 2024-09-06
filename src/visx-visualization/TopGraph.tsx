@@ -12,7 +12,7 @@ import Violins from "./Violin";
 function TopBar() {
   const {
     dimensions: {
-      barTop: { height, margin },
+      barTop: { height, margin, offsetHeight, offsetWidth },
     },
   } = useDimensions();
   const { columnCounts } = useData();
@@ -34,6 +34,8 @@ function TopBar() {
         numericalScale={yScale}
         data={columnCounts}
         domainLimit={height}
+        xOffset={margin.left + offsetWidth}
+        yOffset={margin.top + offsetHeight}
       />
     </g>
   );

@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, useId } from "react";
 import { useDimensions } from "../contexts/DimensionsContext";
+import Tooltip from "./Tooltip";
 
 // interface VizContainerProps extends PropsWithChildren {}
 
@@ -23,6 +24,7 @@ function VizContainer(
       <svg width={width} height={height}>
         {children}
       </svg>
+      <Tooltip />
     </div>
   );
 }

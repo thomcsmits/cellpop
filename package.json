@@ -45,6 +45,7 @@
     "@visx/scale": "^3.5.0",
     "@visx/shape": "^3.5.0",
     "@visx/stats": "^3.5.0",
+    "@visx/tooltip": "^3.3.0",
     "@vitessce/zarr": "^3.4.9",
     "d3": "^6.7.0",
     "react": "^18.3.1",

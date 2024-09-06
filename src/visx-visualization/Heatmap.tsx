@@ -4,9 +4,10 @@ import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useData } from "../contexts/DataContext";
 import { useDimensions } from "../contexts/DimensionsContext";
 import { useColorScale, useXScale, useYScale } from "../contexts/ScaleContext";
+import { useSetTooltipData } from "../contexts/TooltipDataContext";
 
 export default function Heatmap() {
-  const { data } = useData();
+  const { data, rowCounts, columnCounts } = useData();
   const { theme } = useCellPopTheme();
   const {
     dimensions: {
@@ -17,6 +18,8 @@ export default function Heatmap() {
   const { scale: x } = useXScale();
   const { scale: y } = useYScale();
   const { scale: colors } = useColorScale();
+
+  const { openTooltip, closeTooltip } = useSetTooltipData();
 
   return (
     <g
@@ -34,6 +37,20 @@ export default function Heatmap() {
             width={x.bandwidth()}
             height={y.bandwidth()}
             fill={colors(cell.value)}
+            onMouseOver={() => {
+              console.log("Mouse over", cell);
+              openTooltip(
+                {
+                  title: `${cell.row} - ${cell.col}`,
+                  data: { "Cell count": cell.value },
+                },
+                x(cell.col) + offsetWidth,
+                y(cell.row) + offsetHeight,
+              );
+            }}
+            onMouseOut={() => {
+              closeTooltip();
+            }}
           />
         );
       })}
@@ -56,6 +73,20 @@ export default function Heatmap() {
             fill: theme.text,
             dy: "0.25em",
             transform: `rotate(-45, ${x(t)}, 12)translate(0, ${x.bandwidth() / 2})`,
+            onMouseOver: (e) => {
+              const totalCounts = columnCounts[t];
+              openTooltip(
+                {
+                  title: t,
+                  data: {
+                    "Cell Count": totalCounts,
+                  },
+                },
+                e.clientX,
+                e.clientY,
+              );
+            },
+            onMouseOut: closeTooltip,
           }) as const
         }
         tickValues={x.domain()}
@@ -81,6 +112,22 @@ export default function Heatmap() {
             fontFamily: "sans-serif",
             fontVariantNumeric: "tabular-nums",
           },
+          onMouseOver: (e) => {
+            const target = e.target as SVGTextElement;
+            const title = target.textContent;
+            const totalCounts = rowCounts[title];
+            openTooltip(
+              {
+                title,
+                data: {
+                  "Cell Count": totalCounts,
+                },
+              },
+              e.clientX,
+              e.clientY,
+            );
+          },
+          onMouseOut: closeTooltip,
         }}
         tickValues={y.domain()}
         orientation={Orientation.right}

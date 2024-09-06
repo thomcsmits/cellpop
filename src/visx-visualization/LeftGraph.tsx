@@ -11,7 +11,7 @@ import Violins from "./Violin";
 function LeftBar() {
   const {
     dimensions: {
-      barLeft: { width, margin },
+      barLeft: { width, margin, offsetHeight, offsetWidth },
     },
   } = useDimensions();
   const { rowCounts } = useData();
@@ -33,6 +33,8 @@ function LeftBar() {
         numericalScale={xScale}
         data={rowCounts}
         domainLimit={width}
+        xOffset={margin.left + offsetWidth}
+        yOffset={margin.top + offsetHeight}
       />
     </g>
   );
