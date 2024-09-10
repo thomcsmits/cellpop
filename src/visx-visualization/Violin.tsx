@@ -5,6 +5,7 @@ import { scaleLinear } from "@visx/scale";
 import { area } from "@visx/shape";
 import { count, curveBumpY, extent, max, rollup } from "d3";
 import { CountsMatrixValue } from "../cellpop-schema";
+import { useColumns, useRows } from "../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useData } from "../contexts/DataContext";
 import { useDimensions } from "../contexts/DimensionsContext";
@@ -29,9 +30,12 @@ function useCategoricalScale(side: Side) {
 export default function Violins({ side = "top" }: ViolinsProps) {
   const horizontal = side === "top";
   const {
-    data: { rowNames, colNames, countsMatrixFractions },
+    data: { countsMatrixFractions },
     upperBound,
   } = useData();
+
+  const [rows] = useRows();
+  const [columns] = useColumns();
 
   const countsMatrix = horizontal
     ? countsMatrixFractions.col
@@ -47,14 +51,12 @@ export default function Violins({ side = "top" }: ViolinsProps) {
     dimensions.height - dimensions.margin.top - dimensions.margin.bottom;
   // X scale is used for the top graph, Y scale is used for the left graph
   const categoricalScale = useCategoricalScale(side);
-  const groups = horizontal ? colNames : rowNames;
+  const groups = horizontal ? columns : rows;
 
   const violinScale = scaleLinear({
     range: [horizontal ? height : width, 0],
     domain: [0, upperBound],
   });
-
-  console.log(upperBound);
 
   // A map of group name to violin data
   const violins = useMemo(() => {

@@ -15,14 +15,14 @@ export default function Tooltip() {
       key={Math.random()}
       top={tooltipTop}
       left={tooltipLeft}
-      style={defaultStyles}
+      style={{ ...defaultStyles, pointerEvents: "none" }}
     >
       <div>
-        <div>{tooltipData.title}</div>
+        <strong>{tooltipData.title}</strong>
         <div>
           {Object.entries(tooltipData.data).map(([key, value]) => (
             <div key={key}>
-              <span>{key}: </span>
+              <span style={{ textTransform: "capitalize" }}>{key}: </span>
               <span>{String(value)}</span>
             </div>
           ))}

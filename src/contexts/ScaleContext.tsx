@@ -1,22 +1,16 @@
 import { scaleBand, scaleLinear } from "@visx/scale";
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { PropsWithChildren, useMemo } from "react";
 import { getUpperBound } from "../visualization/util";
 
-import { useOrderedArrayState } from "../hooks/useOrderedArray";
 import { useSet } from "../hooks/useSet";
 import { createContext, useContext } from "../utils/context";
+import { useColumns, useRows } from "./AxisOrderContext";
 import { useCellPopTheme } from "./CellPopThemeContext";
 import { useData } from "./DataContext";
 import { useDimensions } from "./DimensionsContext";
+import { SelectedDimensionProvider } from "./SelectedDimensionContext";
 
 const SCALES = ["X", "Y", "Color"] as const;
-type ScaleType = (typeof SCALES)[number];
 
 type ScaleLinear<T> = ReturnType<typeof scaleLinear<T>>;
 type ScaleBand<T> = ReturnType<typeof scaleBand<T>>;
@@ -26,18 +20,17 @@ interface DimensionScaleContext {
   selectedValues: Set<string>;
   toggleSelection: (value: string) => void;
 }
+const [XScaleContext, YScaleContext] = SCALES.map((dimension: string) => {
+  return createContext<DimensionScaleContext>(`${dimension}ScaleContext`);
+});
+export const useXScale = () => useContext(XScaleContext);
+export const useYScale = () => useContext(YScaleContext);
 
+// Color context does not have selection
 interface ColorScaleContext {
   scale: ScaleLinear<string>;
 }
-
-const [XScaleContext, YScaleContext] = SCALES.map((dimension: ScaleType) => {
-  return createContext<DimensionScaleContext>(`${dimension}ScaleContext`);
-});
 const ColorScaleContext = createContext<ColorScaleContext>("ColorScaleContext");
-
-export const useXScale = () => useContext(XScaleContext);
-export const useYScale = () => useContext(YScaleContext);
 export const useColorScale = () => useContext(ColorScaleContext);
 
 export function ScaleProvider({ children }: PropsWithChildren) {
@@ -51,10 +44,8 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     theme: { heatmapZero, heatmapMax },
   } = useCellPopTheme();
 
-  const [columns, columnsActions] = useOrderedArrayState(data.colNames);
-  const [rows, rowsActions] = useOrderedArrayState(data.rowNames);
-
-  const selectedDimension = useState<"X" | "Y">("X");
+  const [columns] = useColumns();
+  const [rows] = useRows();
 
   const x = useMemo(() => {
     return scaleBand<string>({
@@ -92,9 +83,7 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     <XScaleContext.Provider value={xScaleContext}>
       <YScaleContext.Provider value={yScaleContext}>
         <ColorScaleContext.Provider value={colorScaleContext}>
-          <SelectedDimensionContext.Provider value={selectedDimension}>
-            {children}
-          </SelectedDimensionContext.Provider>
+          <SelectedDimensionProvider>{children}</SelectedDimensionProvider>
         </ColorScaleContext.Provider>
       </YScaleContext.Provider>
     </XScaleContext.Provider>

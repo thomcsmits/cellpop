@@ -1,10 +1,12 @@
 import { AxisBottom, AxisRight, Orientation } from "@visx/axis";
 import React from "react";
+import { useColumns, useRows } from "../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useData } from "../contexts/DataContext";
 import { useDimensions } from "../contexts/DimensionsContext";
 import { useColorScale, useXScale, useYScale } from "../contexts/ScaleContext";
 import { useSetTooltipData } from "../contexts/TooltipDataContext";
+import DragOverlay from "./DragOverlay";
 
 export default function Heatmap() {
   const { data, rowCounts, columnCounts } = useData();
@@ -20,6 +22,9 @@ export default function Heatmap() {
   const { scale: colors } = useColorScale();
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
+
+  const [columns] = useColumns();
+  const [rows] = useRows();
 
   return (
     <g
@@ -41,15 +46,20 @@ export default function Heatmap() {
               openTooltip(
                 {
                   title: `${cell.row} - ${cell.col}`,
-                  data: { "Cell Count": cell.value },
+                  data: {
+                    "cell count": cell.value,
+                    row: cell.row,
+                    column: cell.col,
+                  },
                 },
                 x(cell.col) + offsetWidth,
                 y(cell.row) + offsetHeight,
               );
             }}
-            onMouseOut={() => {
-              closeTooltip();
-            }}
+            // onMouseOut={() => {
+            //   // TODO: Prevent flickering when moving between cells
+            //   closeTooltip();
+            // }}
           />
         );
       })}
@@ -71,7 +81,7 @@ export default function Heatmap() {
             },
             fill: theme.text,
             dy: "0.25em",
-            transform: `rotate(-45, ${x(t)}, 12)translate(0, ${x.bandwidth() / 2})`,
+            transform: `rotate(-60, ${x(t)}, 12)translate(0, ${x.bandwidth() / 2})`,
             onMouseOver: (e) => {
               const totalCounts = columnCounts[t];
               openTooltip(
@@ -79,6 +89,7 @@ export default function Heatmap() {
                   title: t,
                   data: {
                     "Cell Count": totalCounts,
+                    column: t,
                   },
                 },
                 e.clientX,
@@ -88,7 +99,7 @@ export default function Heatmap() {
             onMouseOut: closeTooltip,
           }) as const
         }
-        tickValues={x.domain()}
+        tickValues={columns}
         orientation={Orientation.bottom}
         top={height}
         labelOffset={Math.max(...x.domain().map((s) => s.length)) * 16}
@@ -120,6 +131,7 @@ export default function Heatmap() {
                 title,
                 data: {
                   "Cell Count": totalCounts,
+                  row: title,
                 },
               },
               e.clientX,
@@ -128,7 +140,7 @@ export default function Heatmap() {
           },
           onMouseOut: closeTooltip,
         }}
-        tickValues={y.domain()}
+        tickValues={rows}
         orientation={Orientation.right}
         left={width}
         labelOffset={Math.max(...y.domain().map((s) => s.length)) * 12}
@@ -137,6 +149,7 @@ export default function Heatmap() {
           fill: theme.text,
         }}
       />
+      <DragOverlay />
     </g>
   );
 }

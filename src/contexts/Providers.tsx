@@ -4,6 +4,7 @@ import {
   CellPopDimensions,
   CellPopTheme,
 } from "../cellpop-schema";
+import { ColumnProvider, RowProvider } from "./AxisOrderContext";
 import { BoundaryProvider } from "./BoundaryContext";
 import { CellPopThemeProvider } from "./CellPopThemeContext";
 import { DataProvider } from "./DataContext";
@@ -27,19 +28,23 @@ export function Providers({
 }: CellPopConfigProps) {
   return (
     <DataProvider data={data}>
-      <TooltipDataProvider>
-        <CellPopThemeProvider theme={theme}>
-          <DimensionsProvider dimensions={dimensions}>
-            <FractionProvider>
-              <MetadataFieldProvider>
-                <BoundaryProvider>
-                  <ScaleProvider>{children}</ScaleProvider>
-                </BoundaryProvider>
-              </MetadataFieldProvider>
-            </FractionProvider>
-          </DimensionsProvider>
-        </CellPopThemeProvider>
-      </TooltipDataProvider>
+      <RowProvider>
+        <ColumnProvider>
+          <TooltipDataProvider>
+            <CellPopThemeProvider theme={theme}>
+              <DimensionsProvider dimensions={dimensions}>
+                <FractionProvider>
+                  <MetadataFieldProvider>
+                    <BoundaryProvider>
+                      <ScaleProvider>{children}</ScaleProvider>
+                    </BoundaryProvider>
+                  </MetadataFieldProvider>
+                </FractionProvider>
+              </DimensionsProvider>
+            </CellPopThemeProvider>
+          </TooltipDataProvider>
+        </ColumnProvider>
+      </RowProvider>
     </DataProvider>
   );
 }

@@ -4,18 +4,13 @@ export function useOrderedArrayState<T>(
   values: T[] = [],
   sortOrder?: (a: T, b: T) => number,
 ) {
-  const [order, setOrder] = useState<number[]>(values.map((_, i) => i));
+  const [orderedValues, setOrderedValues] = useState<T[]>(values);
 
   // TODO: Implement sorting
   // const sorting = Boolean(sortOrder);
 
-  // Reset order if input values array changes length
-  useEffect(() => {
-    setOrder(values.map((_, i) => i));
-  }, [values.length]);
-
   const move = useCallback((from: number, to: number) => {
-    setOrder((prev) => {
+    setOrderedValues((prev) => {
       const next = [...prev];
       const [removed] = next.splice(from, 1);
       next.splice(to, 0, removed);
@@ -39,9 +34,5 @@ export function useOrderedArrayState<T>(
     [move],
   );
 
-  const orderedValues = useMemo(() => {
-    return order.map((i) => values[i]);
-  }, [order, values]);
-
-  return [orderedValues, { moveUp, moveDown, move }] as const;
+  return [orderedValues, { moveUp, moveDown, move, setOrderedValues }] as const;
 }

@@ -51,7 +51,10 @@ export function Bars({
               openTooltip(
                 {
                   title: key,
-                  data: { "Cell count": value },
+                  data: {
+                    "Cell Count": value,
+                    [orientation === "vertical" ? "column" : "row"]: key,
+                  },
                 },
                 x + xOffset,
                 y + yOffset,

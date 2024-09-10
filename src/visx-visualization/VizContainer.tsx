@@ -2,8 +2,6 @@ import React, { PropsWithChildren, useId } from "react";
 import { useDimensions } from "../contexts/DimensionsContext";
 import Tooltip from "./Tooltip";
 
-// interface VizContainerProps extends PropsWithChildren {}
-
 function VizContainer(
   { children }: PropsWithChildren,
   ref: React.Ref<HTMLDivElement>,

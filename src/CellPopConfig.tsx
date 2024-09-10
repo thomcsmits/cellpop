@@ -14,6 +14,7 @@ import { useBoundary } from "./contexts/BoundaryContext";
 import { useCellPopTheme } from "./contexts/CellPopThemeContext";
 import { useFraction } from "./contexts/FractionContext";
 import { useMetadataField } from "./contexts/MetadataFieldContext";
+import { useSelectedDimension } from "./contexts/SelectedDimensionContext";
 import { getPossibleMetadataSelections } from "./visualization/metadata";
 
 export default function CellPopConfig() {
@@ -22,6 +23,7 @@ export default function CellPopConfig() {
   const { fraction, setFraction } = useFraction();
   const { metadataField, setMetadataField } = useMetadataField();
   const { boundary, setBoundary } = useBoundary();
+  const { selectedDimension, setSelectedDimension } = useSelectedDimension();
   const metadataFields = getPossibleMetadataSelections(data);
 
   const undo = useEventCallback(() => {
@@ -98,6 +100,16 @@ export default function CellPopConfig() {
       <Button variant="outlined" onClick={toggleBoundary}>
         {boundary ? "Remove" : "Show"} boundary boxes
       </Button>
+      <ToggleButtonGroup
+        color="primary"
+        value={selectedDimension}
+        exclusive
+        onChange={(e) => setSelectedDimension(e.target.value)}
+        aria-label="Axis"
+      >
+        <ToggleButton value="X">X</ToggleButton>
+        <ToggleButton value="Y">Y</ToggleButton>
+      </ToggleButtonGroup>
       {/* <Button variant="outlined" onClick={resetData}>
         Reset data
       </Button>
