@@ -1,3 +1,4 @@
+import { AxisBottom } from "@visx/axis";
 import { max } from "d3";
 import React from "react";
 import { useData } from "../contexts/DataContext";
@@ -11,7 +12,7 @@ import Violins from "./Violin";
 function LeftBar() {
   const {
     dimensions: {
-      barLeft: { width, margin, offsetHeight, offsetWidth },
+      barLeft: { width, height, margin, offsetHeight, offsetWidth },
     },
   } = useDimensions();
   const { rowCounts } = useData();
@@ -21,6 +22,8 @@ function LeftBar() {
     [0, max(Object.values(rowCounts)) || 0],
     [0, width],
   );
+
+  const axisScale = xScale.copy().range([width, 0]);
 
   return (
     <g
@@ -35,6 +38,12 @@ function LeftBar() {
         domainLimit={width}
         xOffset={margin.left + offsetWidth}
         yOffset={margin.top + offsetHeight}
+      />
+      <AxisBottom
+        scale={axisScale}
+        top={height}
+        left={0}
+        orientation="bottom"
       />
     </g>
   );

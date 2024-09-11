@@ -1,6 +1,5 @@
-import React, { PropsWithChildren, Ref } from "react";
+import React, { PropsWithChildren } from "react";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
-import { useData } from "../contexts/DataContext";
 import { useDimensions } from "../contexts/DimensionsContext";
 import { useXScale, useYScale } from "../contexts/ScaleContext";
 import { useSelectedDimension } from "../contexts/SelectedDimensionContext";
@@ -142,7 +141,7 @@ function Draggable() {
     return null;
   }
 
-  console.log(CSS.Transform.toString(transform));
+  const outline = `1px solid ${theme.text}`;
 
   if (selectedDimension === "X") {
     return (
@@ -156,7 +155,7 @@ function Draggable() {
           left: x(positionKey),
           width: x.bandwidth(),
           height,
-          outline: "1px solid black",
+          outline,
           pointerEvents: "all",
           transform: CSS.Transform.toString(transform),
           transition,
@@ -175,7 +174,7 @@ function Draggable() {
           top: y(positionKey),
           height: y.bandwidth(),
           width,
-          outline: "1px solid black",
+          outline,
           pointerEvents: "all",
           transform: CSS.Transform.toString(transform),
           transition,

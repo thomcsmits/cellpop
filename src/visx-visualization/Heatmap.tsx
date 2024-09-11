@@ -6,7 +6,6 @@ import { useData } from "../contexts/DataContext";
 import { useDimensions } from "../contexts/DimensionsContext";
 import { useColorScale, useXScale, useYScale } from "../contexts/ScaleContext";
 import { useSetTooltipData } from "../contexts/TooltipDataContext";
-import DragOverlay from "./DragOverlay";
 
 export default function Heatmap() {
   const { data, rowCounts, columnCounts } = useData();
@@ -56,10 +55,6 @@ export default function Heatmap() {
                 y(cell.row) + offsetHeight,
               );
             }}
-            // onMouseOut={() => {
-            //   // TODO: Prevent flickering when moving between cells
-            //   closeTooltip();
-            // }}
           />
         );
       })}

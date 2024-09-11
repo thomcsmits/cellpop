@@ -1,5 +1,6 @@
 import React from "react";
 
+import { AxisRight } from "@visx/axis";
 import { max } from "d3";
 import { useData } from "../contexts/DataContext";
 import { useDimensions } from "../contexts/DimensionsContext";
@@ -12,7 +13,7 @@ import Violins from "./Violin";
 function TopBar() {
   const {
     dimensions: {
-      barTop: { height, margin, offsetHeight, offsetWidth },
+      barTop: { height, margin, offsetHeight, offsetWidth, width },
     },
   } = useDimensions();
   const { columnCounts } = useData();
@@ -22,6 +23,7 @@ function TopBar() {
     [max(Object.values(columnCounts)) || 0, 0],
     [height, 0],
   );
+  const axisScale = yScale.copy().range([0, height]);
 
   return (
     <g
@@ -37,6 +39,7 @@ function TopBar() {
         xOffset={margin.left + offsetWidth}
         yOffset={margin.top + offsetHeight}
       />
+      <AxisRight scale={axisScale} top={0} left={width} orientation="right" />
     </g>
   );
 }
