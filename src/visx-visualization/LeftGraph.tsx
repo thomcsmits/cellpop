@@ -1,5 +1,5 @@
 import { AxisBottom } from "@visx/axis";
-import { max } from "d3";
+import { formatPrefix, max } from "d3";
 import React from "react";
 import { useData } from "../contexts/DataContext";
 import { useDimensions } from "../contexts/DimensionsContext";
@@ -44,6 +44,7 @@ function LeftBar() {
         top={height}
         left={0}
         orientation="bottom"
+        tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
       />
     </g>
   );

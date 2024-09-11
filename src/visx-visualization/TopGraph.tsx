@@ -1,7 +1,7 @@
 import React from "react";
 
 import { AxisRight } from "@visx/axis";
-import { max } from "d3";
+import { formatPrefix, max } from "d3";
 import { useData } from "../contexts/DataContext";
 import { useDimensions } from "../contexts/DimensionsContext";
 import { useFraction } from "../contexts/FractionContext";
@@ -39,7 +39,13 @@ function TopBar() {
         xOffset={margin.left + offsetWidth}
         yOffset={margin.top + offsetHeight}
       />
-      <AxisRight scale={axisScale} top={0} left={width} orientation="right" />
+      <AxisRight
+        scale={axisScale}
+        top={0}
+        left={width}
+        orientation="right"
+        tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
+      />
     </g>
   );
 }
