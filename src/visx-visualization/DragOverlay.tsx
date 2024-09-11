@@ -16,7 +16,10 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import { createSnapModifier } from "@dnd-kit/modifiers";
+import {
+  createSnapModifier,
+  restrictToParentElement,
+} from "@dnd-kit/modifiers";
 import {
   arrayMove,
   horizontalListSortingStrategy,
@@ -32,7 +35,7 @@ import { useColumns, useRows } from "../contexts/AxisOrderContext";
 function DragOverlayContainer({ children }: PropsWithChildren) {
   const {
     dimensions: {
-      heatmap: { offsetHeight, offsetWidth },
+      heatmap: { height, width, offsetHeight, offsetWidth },
     },
   } = useDimensions();
 
@@ -63,7 +66,9 @@ function DragOverlayContainer({ children }: PropsWithChildren) {
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
-    console.log(event, active, over);
+    if (!over) {
+      return;
+    }
 
     if (active.id !== over.id) {
       setItems((items) => {
@@ -79,11 +84,23 @@ function DragOverlayContainer({ children }: PropsWithChildren) {
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-      modifiers={[createSnapModifier(gridSize)]}
+      onDragMove={handleDragEnd}
+      modifiers={[createSnapModifier(gridSize), restrictToParentElement]}
     >
       <SortableContext items={items} strategy={strategy}>
-        {children}
+        <div
+          className="drag-overlay"
+          style={{
+            height,
+            width,
+            top: offsetHeight,
+            left: offsetWidth,
+            position: "absolute",
+            pointerEvents: "none",
+          }}
+        >
+          {children}
+        </div>
       </SortableContext>
       <DragOverlay />
     </DndContext>
@@ -115,25 +132,32 @@ function Draggable() {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({
       id: positionKey,
+      strategy:
+        selectedDimension === "X"
+          ? horizontalListSortingStrategy
+          : verticalListSortingStrategy,
     });
 
   if (!positionKey) {
     return null;
   }
 
+  console.log(CSS.Transform.toString(transform));
+
   if (selectedDimension === "X") {
     return (
-      <rect
-        ref={setNodeRef as unknown as Ref<SVGRectElement>}
-        x={x(positionKey)}
-        y={0}
-        width={x.bandwidth()}
-        height={height}
-        fill={"transparent"}
-        stroke={"black"}
+      <div
+        ref={setNodeRef}
         {...attributes}
         {...listeners}
         style={{
+          position: "absolute",
+          top: 0,
+          left: x(positionKey),
+          width: x.bandwidth(),
+          height,
+          outline: "1px solid black",
+          pointerEvents: "all",
           transform: CSS.Transform.toString(transform),
           transition,
         }}
@@ -141,17 +165,18 @@ function Draggable() {
     );
   } else {
     return (
-      <rect
-        ref={setNodeRef as unknown as Ref<SVGRectElement>}
-        x={0}
-        y={y(positionKey)}
-        width={width}
-        height={y.bandwidth()}
-        fill={"transparent"}
-        stroke={"black"}
+      <div
+        ref={setNodeRef}
         {...attributes}
         {...listeners}
         style={{
+          position: "absolute",
+          left: 0,
+          top: y(positionKey),
+          height: y.bandwidth(),
+          width,
+          outline: "1px solid black",
+          pointerEvents: "all",
           transform: CSS.Transform.toString(transform),
           transition,
         }}

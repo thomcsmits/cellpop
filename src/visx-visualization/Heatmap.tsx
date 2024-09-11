@@ -149,7 +149,6 @@ export default function Heatmap() {
           fill: theme.text,
         }}
       />
-      <DragOverlay />
     </g>
   );
 }

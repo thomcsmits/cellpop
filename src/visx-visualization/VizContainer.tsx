@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, useId } from "react";
 import { useDimensions } from "../contexts/DimensionsContext";
+import DragOverlay from "./DragOverlay";
 import Tooltip from "./Tooltip";
 
 function VizContainer(
@@ -18,10 +19,16 @@ function VizContainer(
   const id = useId();
 
   return (
-    <div ref={ref} className="cellpop__container" id={id}>
+    <div
+      ref={ref}
+      className="cellpop__container"
+      id={id}
+      style={{ position: "relative" }}
+    >
       <svg width={width} height={height}>
         {children}
       </svg>
+      <DragOverlay />
       <Tooltip />
     </div>
   );
