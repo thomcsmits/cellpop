@@ -7,6 +7,7 @@ import { Providers } from "./contexts/Providers";
 import Background from "./visx-visualization/Background";
 import Heatmap from "./visx-visualization/Heatmap";
 import LeftGraph from "./visx-visualization/LeftGraph";
+import { Legend } from "./visx-visualization/Legend";
 import TopGraph from "./visx-visualization/TopGraph";
 import VizContainer from "./visx-visualization/VizContainer";
 
@@ -23,6 +24,7 @@ export const CellPop = ({ theme, dimensions, data }: CellPopProps) => {
         <CellPopConfig />
         <VizContainer ref={cellPopRef}>
           <Background />
+          <Legend />
           <Heatmap />
           <TopGraph />
           <LeftGraph />

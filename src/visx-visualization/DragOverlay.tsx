@@ -149,6 +149,7 @@ function Draggable() {
         ref={setNodeRef}
         {...attributes}
         {...listeners}
+        tabIndex={0}
         style={{
           position: "absolute",
           top: 0,
@@ -168,6 +169,7 @@ function Draggable() {
         ref={setNodeRef}
         {...attributes}
         {...listeners}
+        tabIndex={0}
         style={{
           position: "absolute",
           left: 0,
