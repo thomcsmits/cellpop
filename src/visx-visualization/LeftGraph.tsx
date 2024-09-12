@@ -2,7 +2,7 @@ import { AxisBottom } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import React from "react";
 import { useData } from "../contexts/DataContext";
-import { useDimensions } from "../contexts/DimensionsContext";
+import { usePanelDimensions } from "../contexts/DimensionsContext";
 import { useFraction } from "../contexts/FractionContext";
 import { useYScale } from "../contexts/ScaleContext";
 import { Bars } from "./Bars";
@@ -10,11 +10,7 @@ import { useCountsScale } from "./hooks";
 import Violins from "./Violin";
 
 function LeftBar() {
-  const {
-    dimensions: {
-      barLeft: { width, height, margin, offsetHeight, offsetWidth },
-    },
-  } = useDimensions();
+  const { width } = usePanelDimensions("left_middle");
   const { rowCounts } = useData();
   // Use same y scale as the heatmap
   const { scale: yScale } = useYScale();
@@ -23,30 +19,40 @@ function LeftBar() {
     [0, width],
   );
 
-  const axisScale = xScale.copy().range([width, 0]);
-
   return (
-    <g
-      className="barleft"
-      transform={`translate(${-margin.left},${-margin.top})`}
-    >
+    <g className="barleft">
       <Bars
         orientation="horizontal"
         categoricalScale={yScale}
         numericalScale={xScale}
         data={rowCounts}
         domainLimit={width}
-        xOffset={margin.left + offsetWidth}
-        yOffset={margin.top + offsetHeight}
+        xOffset={0}
+        yOffset={0}
       />
+    </g>
+  );
+}
+
+export function LeftGraphScale() {
+  const { width } = usePanelDimensions("left_bottom");
+  const { rowCounts } = useData();
+  const xScale = useCountsScale(
+    [0, max(Object.values(rowCounts)) || 0],
+    [0, width],
+  );
+
+  const axisScale = xScale.copy().range([width, 0]);
+  return (
+    <svg>
       <AxisBottom
         scale={axisScale}
-        top={height}
+        top={0}
         left={0}
         orientation="bottom"
         tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
       />
-    </g>
+    </svg>
   );
 }
 
@@ -55,22 +61,13 @@ function LeftViolin() {
 }
 
 export default function LeftGraph() {
-  const {
-    dimensions: {
-      barLeft: { offsetHeight, offsetWidth, height, width, margin },
-    },
-  } = useDimensions();
+  const { width, height } = usePanelDimensions("left_middle");
 
   const { fraction } = useFraction();
 
   return (
-    <g
-      className="left-graph-container"
-      transform={`translate(${offsetWidth + margin.left}, ${offsetHeight + margin.top})`}
-      height={height}
-      width={width}
-    >
+    <svg className="left-graph-container" height={height} width={width}>
       {fraction ? <LeftViolin /> : <LeftBar />}
-    </g>
+    </svg>
   );
 }

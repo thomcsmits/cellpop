@@ -1,20 +1,16 @@
 import { rgbToHex } from "@mui/material";
 import React from "react";
 import { useData } from "../contexts/DataContext";
-import { useDimensions } from "../contexts/DimensionsContext";
+import { usePanelDimensions } from "../contexts/DimensionsContext";
 import { useColorScale } from "../contexts/ScaleContext";
 
 export function Legend() {
   const { scale: colors } = useColorScale();
-  const {
-    dimensions: {
-      barLeft: { width },
-    },
-  } = useDimensions();
+  const { width } = usePanelDimensions("left_top");
   const { maxCount } = useData();
   const domain = colors.domain();
   return (
-    <g>
+    <svg width={width}>
       <defs>
         <linearGradient id="legendGradient" gradientTransform="rotate(0)">
           <stop offset="5%" stopColor={rgbToHex(colors(domain[0]))} />
@@ -28,6 +24,6 @@ export function Legend() {
       <text y={36} x={width - 40}>
         {maxCount}
       </text>
-    </g>
+    </svg>
   );
 }

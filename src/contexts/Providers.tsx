@@ -1,14 +1,10 @@
 import React, { PropsWithChildren } from "react";
-import {
-  CellPopData,
-  CellPopDimensions,
-  CellPopTheme,
-} from "../cellpop-schema";
+import { CellPopData, CellPopTheme } from "../cellpop-schema";
 import { ColumnProvider, RowProvider } from "./AxisOrderContext";
 import { BoundaryProvider } from "./BoundaryContext";
 import { CellPopThemeProvider } from "./CellPopThemeContext";
 import { DataProvider } from "./DataContext";
-import { DimensionsProvider } from "./DimensionsContext";
+import { Dimensions, DimensionsProvider } from "./DimensionsContext";
 import { FractionProvider } from "./FractionContext";
 import { MetadataFieldProvider } from "./MetadataFieldContext";
 import { ScaleProvider } from "./ScaleContext";
@@ -16,7 +12,7 @@ import { TooltipDataProvider } from "./TooltipDataContext";
 
 interface CellPopConfigProps extends PropsWithChildren {
   data: CellPopData;
-  dimensions: CellPopDimensions;
+  dimensions: Dimensions;
   theme: CellPopTheme;
 }
 

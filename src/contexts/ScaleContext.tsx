@@ -7,7 +7,7 @@ import { createContext, useContext } from "../utils/context";
 import { useColumns, useRows } from "./AxisOrderContext";
 import { useCellPopTheme } from "./CellPopThemeContext";
 import { useData } from "./DataContext";
-import { useDimensions } from "./DimensionsContext";
+import { useHeatmapDimensions } from "./DimensionsContext";
 import { SelectedDimensionProvider } from "./SelectedDimensionContext";
 
 const SCALES = ["X", "Y", "Color"] as const;
@@ -35,11 +35,7 @@ export const useColorScale = () => useContext(ColorScaleContext);
 
 export function ScaleProvider({ children }: PropsWithChildren) {
   const { data } = useData();
-  const {
-    dimensions: {
-      heatmap: { width, height },
-    },
-  } = useDimensions();
+  const { width, height } = useHeatmapDimensions();
   const {
     theme: { heatmapZero, heatmapMax },
   } = useCellPopTheme();

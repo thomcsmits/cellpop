@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from "react";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
-import { useDimensions } from "../contexts/DimensionsContext";
+import { useHeatmapDimensions } from "../contexts/DimensionsContext";
 import { useXScale, useYScale } from "../contexts/ScaleContext";
 import { useSelectedDimension } from "../contexts/SelectedDimensionContext";
 import { useTooltipData } from "../contexts/TooltipDataContext";
@@ -32,11 +32,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { useColumns, useRows } from "../contexts/AxisOrderContext";
 
 function DragOverlayContainer({ children }: PropsWithChildren) {
-  const {
-    dimensions: {
-      heatmap: { height, width, offsetHeight, offsetWidth },
-    },
-  } = useDimensions();
+  const { width, height } = useHeatmapDimensions();
 
   const [columns, { setOrderedValues: setColumns }] = useColumns();
   const [rows, { setOrderedValues: setRows }] = useRows();
@@ -92,8 +88,8 @@ function DragOverlayContainer({ children }: PropsWithChildren) {
           style={{
             height,
             width,
-            top: offsetHeight,
-            left: offsetWidth,
+            top: 0,
+            left: 0,
             position: "absolute",
             pointerEvents: "none",
           }}
@@ -110,11 +106,7 @@ function Draggable() {
   const { selectedDimension } = useSelectedDimension();
   const { tooltipData } = useTooltipData();
 
-  const {
-    dimensions: {
-      heatmap: { height, width },
-    },
-  } = useDimensions();
+  const { width, height } = useHeatmapDimensions();
   const { theme } = useCellPopTheme();
 
   const { scale: x } = useXScale();

@@ -110,7 +110,13 @@ function Demo() {
     return <div>Loading...</div>;
   }
 
-  return <CellPop data={data} theme={"light"} dimensions={dimensions} />;
+  return (
+    <CellPop
+      data={data}
+      theme={"light"}
+      dimensions={{ width: 1500, height: 1000 }}
+    />
+  );
 }
 
 export default Demo;

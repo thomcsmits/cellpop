@@ -3,7 +3,7 @@ import React from "react";
 import { AxisRight } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import { useData } from "../contexts/DataContext";
-import { useDimensions } from "../contexts/DimensionsContext";
+import { usePanelDimensions } from "../contexts/DimensionsContext";
 import { useFraction } from "../contexts/FractionContext";
 import { useXScale } from "../contexts/ScaleContext";
 import { Bars } from "./Bars";
@@ -11,11 +11,7 @@ import { useCountsScale } from "./hooks";
 import Violins from "./Violin";
 
 function TopBar() {
-  const {
-    dimensions: {
-      barTop: { height, margin, offsetHeight, offsetWidth, width },
-    },
-  } = useDimensions();
+  const { width, height } = usePanelDimensions("center_top");
   const { columnCounts } = useData();
   // Use same x scale as the heatmap
   const { scale: xScale } = useXScale();
@@ -26,18 +22,15 @@ function TopBar() {
   const axisScale = yScale.copy().range([0, height]);
 
   return (
-    <g
-      className="bartop"
-      transform={`translate(${-margin.left},${-margin.top})`}
-    >
+    <g className="bartop">
       <Bars
         orientation="vertical"
         categoricalScale={xScale}
         numericalScale={yScale}
         data={columnCounts}
         domainLimit={height}
-        xOffset={margin.left + offsetWidth}
-        yOffset={margin.top + offsetHeight}
+        xOffset={0}
+        yOffset={0}
       />
       <AxisRight
         scale={axisScale}
@@ -55,21 +48,12 @@ function TopViolin() {
 }
 
 export default function TopGraph() {
-  const {
-    dimensions: {
-      barTop: { offsetHeight, offsetWidth, height, width, margin },
-    },
-  } = useDimensions();
+  const { width, height } = usePanelDimensions("center_top");
 
   const { fraction } = useFraction();
   return (
-    <g
-      className="top-graph-container"
-      transform={`translate(${offsetWidth + margin.left}, ${offsetHeight + margin.top})`}
-      height={height}
-      width={width}
-    >
+    <svg className="top-graph-container" height={height} width={width}>
       {fraction ? <TopViolin /> : <TopBar />}
-    </g>
+    </svg>
   );
 }
