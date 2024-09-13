@@ -6,12 +6,12 @@ import { useSelectedDimension } from "../contexts/SelectedDimensionContext";
 import { useTooltipData } from "../contexts/TooltipDataContext";
 
 import {
-  closestCenter,
   DndContext,
   DragEndEvent,
   DragOverlay,
   KeyboardSensor,
   PointerSensor,
+  pointerWithin,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -78,8 +78,9 @@ function DragOverlayContainer({ children }: PropsWithChildren) {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={pointerWithin}
       onDragMove={handleDragEnd}
+      onDragEnd={handleDragEnd}
       modifiers={[createSnapModifier(gridSize), restrictToParentElement]}
     >
       <SortableContext items={items} strategy={strategy}>
