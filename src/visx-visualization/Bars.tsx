@@ -9,8 +9,6 @@ interface BarsProps {
   numericalScale: ScaleLinear<number, number>;
   data: Record<string, number>;
   domainLimit: number;
-  xOffset: number;
-  yOffset: number;
 }
 
 export function Bars({
@@ -19,14 +17,25 @@ export function Bars({
   numericalScale,
   data,
   domainLimit,
-  xOffset,
-  yOffset,
 }: BarsProps) {
   const entries = Object.entries(data);
   const barWidth = categoricalScale.bandwidth();
   const { theme } = useCellPopTheme();
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
+  const onMouse = (key: string) => (e: React.MouseEvent<SVGRectElement>) => {
+    openTooltip(
+      {
+        title: key,
+        data: {
+          "Cell Count": data[key],
+          [orientation === "vertical" ? "column" : "row"]: key,
+        },
+      },
+      e.clientX,
+      e.clientY,
+    );
+  };
   return (
     <>
       {entries.map(([key, value]) => {
@@ -47,19 +56,8 @@ export function Bars({
             width={width}
             height={height}
             fill={theme.sideCharts}
-            onMouseOver={() => {
-              openTooltip(
-                {
-                  title: key,
-                  data: {
-                    "Cell Count": value,
-                    [orientation === "vertical" ? "column" : "row"]: key,
-                  },
-                },
-                x + xOffset,
-                y + yOffset,
-              );
-            }}
+            onMouseOver={onMouse(key)}
+            onMouseMove={onMouse(key)}
             onMouseOut={closeTooltip}
           />
         );

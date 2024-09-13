@@ -29,8 +29,6 @@ function TopBar() {
         numericalScale={yScale}
         data={columnCounts}
         domainLimit={height}
-        xOffset={0}
-        yOffset={0}
       />
       <AxisRight
         scale={axisScale}

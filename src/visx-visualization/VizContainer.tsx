@@ -27,6 +27,7 @@ import HeatmapXAxis from "./HeatmapXAxis";
 import HeatmapYAxis from "./HeatmapYAxis";
 import LeftGraph from "./LeftGraph";
 import { Legend } from "./Legend";
+import Tooltip from "./Tooltip";
 import TopGraph from "./TopGraph";
 
 interface VerticalPanelGroupProps extends PropsWithChildren {
@@ -37,8 +38,9 @@ interface VerticalPanelGroupProps extends PropsWithChildren {
   side: "left" | "center" | "right";
 }
 
+// Placeholder in case we need to style the resize handle
 function StyledPanelHandle(props: PanelResizeHandleProps) {
-  return <PanelResizeHandle {...props} style={{ background: "black" }} />;
+  return <PanelResizeHandle {...props} />;
 }
 
 function getPanelSize(id: string) {
@@ -183,6 +185,7 @@ export default function VizContainer() {
           <HeatmapYAxis />
         </VerticalPanelGroup>
       </Panel>
+      <Tooltip />
     </PanelGroup>
   );
 }

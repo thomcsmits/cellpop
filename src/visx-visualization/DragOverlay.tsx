@@ -3,7 +3,10 @@ import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useHeatmapDimensions } from "../contexts/DimensionsContext";
 import { useXScale, useYScale } from "../contexts/ScaleContext";
 import { useSelectedDimension } from "../contexts/SelectedDimensionContext";
-import { useTooltipData } from "../contexts/TooltipDataContext";
+import {
+  useSetTooltipData,
+  useTooltipData,
+} from "../contexts/TooltipDataContext";
 
 import {
   DndContext,
@@ -30,6 +33,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 import { useColumns, useRows } from "../contexts/AxisOrderContext";
+import { useData } from "../contexts/DataContext";
 
 function DragOverlayContainer({ children }: PropsWithChildren) {
   const { width, height } = useHeatmapDimensions();

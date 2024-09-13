@@ -27,8 +27,6 @@ function LeftBar() {
         numericalScale={xScale}
         data={rowCounts}
         domainLimit={width}
-        xOffset={0}
-        yOffset={0}
       />
     </g>
   );
