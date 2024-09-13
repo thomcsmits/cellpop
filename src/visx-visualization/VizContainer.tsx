@@ -82,7 +82,7 @@ const VerticalPanelGroup = forwardRef(function VerticalPanelGroup(
       <StyledPanelHandle id={`${id}-resize-tm`} />
       <Panel id={middlePanelId}>{children}</Panel>
       <StyledPanelHandle id={`${id}-resize-mb`} />
-      <Panel id={bottomPanelId} minSize={10}>
+      <Panel id={bottomPanelId} minSize={15}>
         {bottom}
       </Panel>
     </PanelGroup>
@@ -147,7 +147,7 @@ export default function VizContainer() {
       defaultValue={["25%", "50%", "25%"]}
       onLayout={onHorizontalLayout}
     >
-      <Panel id={leftPanelId}>
+      <Panel id={leftPanelId} minSize={10}>
         <VerticalPanelGroup
           ref={leftPanelGroupRef}
           id={`${id}-left`}
@@ -159,7 +159,7 @@ export default function VizContainer() {
         </VerticalPanelGroup>
       </Panel>
       <StyledPanelHandle id={`${id}-resize-left`} />
-      <Panel id={centerPanelId}>
+      <Panel id={centerPanelId} minSize={25}>
         <VerticalPanelGroup
           ref={centerPanelGroupRef}
           id={`${id}-center`}
@@ -168,14 +168,11 @@ export default function VizContainer() {
           bottom={<HeatmapXAxis />}
           side="center"
         >
-          <div style={{ position: "relative", width: "100%", height: "100%" }}>
-            <Heatmap />
-            <DragOverlay />
-          </div>
+          <Heatmap />
         </VerticalPanelGroup>
       </Panel>
       <StyledPanelHandle id={`${id}-resize-right`} />
-      <Panel id={rightPanelId}>
+      <Panel id={rightPanelId} minSize={15}>
         <VerticalPanelGroup
           ref={rightPanelGroupRef}
           id={`${id}-right`}

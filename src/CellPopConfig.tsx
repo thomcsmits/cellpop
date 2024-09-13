@@ -51,6 +51,14 @@ export default function CellPopConfig() {
     setBoundary((prev) => !prev);
   });
 
+  const changeSelectedDimension = useEventCallback(
+    (event: React.MouseEvent<HTMLElement>) => {
+      setSelectedDimension(
+        (event.target as HTMLInputElement).value as "X" | "Y",
+      );
+    },
+  );
+
   return (
     <Stack spacing={6} direction="row">
       <Button variant="outlined" onClick={undo}>
@@ -104,21 +112,12 @@ export default function CellPopConfig() {
         color="primary"
         value={selectedDimension}
         exclusive
-        onChange={(e) => setSelectedDimension(e.target.value)}
+        onChange={changeSelectedDimension}
         aria-label="Axis"
       >
         <ToggleButton value="X">X</ToggleButton>
         <ToggleButton value="Y">Y</ToggleButton>
       </ToggleButtonGroup>
-      {/* <Button variant="outlined" onClick={resetData}>
-        Reset data
-      </Button>
-      <Button variant="outlined" onClick={resetLayeredBar}>
-        Reset layered bar chart
-      </Button>
-      <Button variant="outlined" onClick={handleAnimationPopup}>
-        Show animation
-      </Button> */}
     </Stack>
   );
 }
