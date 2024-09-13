@@ -96,9 +96,9 @@ function DragOverlayContainer({ children }: PropsWithChildren) {
           }}
         >
           {children}
+          <DragOverlay />
         </div>
       </SortableContext>
-      <DragOverlay />
     </DndContext>
   );
 }
@@ -136,47 +136,31 @@ function Draggable() {
 
   const outline = `1px solid ${theme.text}`;
 
-  if (selectedDimension === "X") {
-    return (
-      <div
-        ref={setNodeRef}
-        {...attributes}
-        {...listeners}
-        tabIndex={0}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: x(positionKey),
-          width: x.bandwidth(),
-          height,
-          outline,
-          pointerEvents: "all",
-          transform: CSS.Transform.toString(transform),
-          transition,
-        }}
-      />
-    );
-  } else {
-    return (
-      <div
-        ref={setNodeRef}
-        {...attributes}
-        {...listeners}
-        tabIndex={0}
-        style={{
-          position: "absolute",
-          left: 0,
-          top: y(positionKey),
-          height: y.bandwidth(),
-          width,
-          outline,
-          pointerEvents: "all",
-          transform: CSS.Transform.toString(transform),
-          transition,
-        }}
-      />
-    );
-  }
+  const left = selectedDimension === "X" ? x(positionKey) : 0;
+  const top = selectedDimension === "X" ? 0 : y(positionKey);
+  const widthValue = selectedDimension === "X" ? x.bandwidth() : width;
+  const heightValue = selectedDimension === "X" ? height : y.bandwidth();
+
+  return (
+    <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
+      tabIndex={0}
+      style={{
+        cursor: "pointer",
+        position: "absolute",
+        top,
+        left,
+        width: widthValue,
+        height: heightValue,
+        outline,
+        pointerEvents: "all",
+        transform: CSS.Transform.toString(transform),
+        transition,
+      }}
+    />
+  );
 }
 
 export default function DragOverlayDisplay() {
