@@ -3,7 +3,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import React, { Ref, RefObject } from "react";
+import React, { Ref, useMemo } from "react";
 import { useColumns, useRows } from "../contexts/AxisOrderContext";
 import { useData } from "../contexts/DataContext";
 import { useHeatmapDimensions } from "../contexts/DimensionsContext";
@@ -27,21 +27,20 @@ function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
   const [columns] = useColumns();
   const { openTooltip } = useSetTooltipData();
 
-  const otherAxisItems = selectedDimension === "X" ? rows : columns;
+  const items = selectedDimension === "X" ? rows : columns;
 
   const widthScale = selectedDimension === "X" ? xScale : yScale;
-  const rowWidth = widthScale.bandwidth();
-  const rowHeight = selectedDimension === "X" ? height : width;
+  const rowWidth = selectedDimension === "X" ? widthScale.bandwidth() : width;
+  const rowHeight = selectedDimension === "X" ? height : widthScale.bandwidth();
 
   const strategy =
     selectedDimension === "X"
       ? verticalListSortingStrategy
       : horizontalListSortingStrategy;
-  const { attributes, listeners, setNodeRef, isDragging, setActivatorNodeRef } =
-    useSortable({
-      id: dataKey,
-      strategy,
-    });
+  const { attributes, listeners, setNodeRef, isDragging } = useSortable({
+    id: dataKey,
+    strategy,
+  });
 
   const cellWidth = xScale.bandwidth();
   const cellHeight = yScale.bandwidth();
@@ -57,7 +56,7 @@ function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
       {...attributes}
       {...listeners}
     >
-      {otherAxisItems.map((itemKey) => {
+      {items.map((itemKey) => {
         const row = selectedDimension === "X" ? itemKey : dataKey;
         const column = selectedDimension === "X" ? dataKey : itemKey;
         const counts = dataMap.get(`${row}-${column}`);
@@ -106,14 +105,24 @@ function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
 export default function Heatmap() {
   const { width, height } = useHeatmapDimensions();
   const { selectedDimension } = useSelectedDimension();
-  const [rows] = useRows();
-  const [columns] = useColumns();
+  const [rows, { setOrderedValues: setRows, setSortOrder: setRowOrder }] =
+    useRows();
+  const [
+    columns,
+    { setOrderedValues: setColumns, setSortOrder: setColumnOrder },
+  ] = useColumns();
 
-  const items = selectedDimension === "X" ? columns : rows;
+  // Dynamically determine which dimension to use based on the selected dimension
+  const { items, setItems, setSort } = useMemo(() => {
+    const items = selectedDimension === "X" ? columns : rows;
+    const setItems = selectedDimension === "X" ? setColumns : setRows;
+    const setSort = selectedDimension === "X" ? setColumnOrder : setRowOrder;
+    return { items, setItems, setSort };
+  }, [selectedDimension]);
 
   return (
     <svg width={width} height={height} className="heatmap">
-      <DragOverlayContainer>
+      <DragOverlayContainer items={items} setItems={setItems} setSort={setSort}>
         {items.map((key) => (
           <HeatmapArray
             key={key}

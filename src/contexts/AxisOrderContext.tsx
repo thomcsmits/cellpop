@@ -12,22 +12,18 @@ const [RowContext, ColumnContext] = ["Row", "Column"].map((dimension: string) =>
 export const useRows = () => useContext(RowContext);
 export const useColumns = () => useContext(ColumnContext);
 
-interface AxisProviderProps extends PropsWithChildren {
-  sortOrder?: (a: string, b: string) => number;
-}
+export const RowProvider = ({ children }: PropsWithChildren) => {
+  const { data, rowCounts } = useData();
 
-export const RowProvider = ({ children, sortOrder }: AxisProviderProps) => {
-  const { data } = useData();
-
-  const value = useOrderedArrayState(data.rowNames, sortOrder);
+  const value = useOrderedArrayState(data.rowNames, rowCounts);
 
   return <RowContext.Provider value={value}>{children}</RowContext.Provider>;
 };
 
-export const ColumnProvider = ({ children, sortOrder }: AxisProviderProps) => {
-  const { data } = useData();
+export const ColumnProvider = ({ children }: PropsWithChildren) => {
+  const { data, columnCounts } = useData();
 
-  const value = useOrderedArrayState(data.colNames, sortOrder);
+  const value = useOrderedArrayState(data.colNames, columnCounts);
 
   return (
     <ColumnContext.Provider value={value}>{children}</ColumnContext.Provider>

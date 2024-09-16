@@ -6,6 +6,7 @@ import { useData } from "../contexts/DataContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
 import { useYScale } from "../contexts/ScaleContext";
 import { useSetTooltipData } from "../contexts/TooltipDataContext";
+import { AxisButtons } from "./AxisButtons";
 import { textSize } from "./constants";
 
 export default function HeatmapYAxis() {
@@ -16,50 +17,53 @@ export default function HeatmapYAxis() {
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const [rows] = useRows();
+  const [rows, { setSortOrder }] = useRows();
 
   return (
-    <svg width={width} height={height} className="cellpop__heatmap_axis_y">
-      <AxisRight
-        scale={y}
-        label="Sample"
-        numTicks={y.domain().length}
-        tickLineProps={{
-          fontSize: textSize,
-        }}
-        tickLabelProps={{
-          fontSize: textSize,
-          fill: theme.text,
-          style: {
-            fontFamily: "sans-serif",
-            fontVariantNumeric: "tabular-nums",
-          },
-          onMouseOver: (e) => {
-            const target = e.target as SVGTextElement;
-            const title = target.textContent;
-            const totalCounts = rowCounts[title];
-            openTooltip(
-              {
-                title,
-                data: {
-                  "Cell Count": totalCounts,
-                  row: title,
+    <div className="cellpop__heatmap_axis_y" style={{ position: "relative" }}>
+      <svg width={width} height={height} className="cellpop__heatmap_axis_y">
+        <AxisRight
+          scale={y}
+          label="Sample"
+          numTicks={y.domain().length}
+          tickLineProps={{
+            fontSize: textSize,
+          }}
+          tickLabelProps={{
+            fontSize: textSize,
+            fill: theme.text,
+            style: {
+              fontFamily: "sans-serif",
+              fontVariantNumeric: "tabular-nums",
+            },
+            onMouseOver: (e) => {
+              const target = e.target as SVGTextElement;
+              const title = target.textContent;
+              const totalCounts = rowCounts[title];
+              openTooltip(
+                {
+                  title,
+                  data: {
+                    "Cell Count": totalCounts,
+                    row: title,
+                  },
                 },
-              },
-              e.clientX,
-              e.clientY,
-            );
-          },
-          onMouseOut: closeTooltip,
-        }}
-        tickValues={rows}
-        orientation={Orientation.right}
-        labelOffset={Math.max(...y.domain().map((s) => s.length)) * 10}
-        labelProps={{
-          fontSize: textSize,
-          fill: theme.text,
-        }}
-      />
-    </svg>
+                e.clientX,
+                e.clientY,
+              );
+            },
+            onMouseOut: closeTooltip,
+          }}
+          tickValues={rows}
+          orientation={Orientation.right}
+          labelOffset={Math.max(...y.domain().map((s) => s.length)) * 10}
+          labelProps={{
+            fontSize: textSize,
+            fill: theme.text,
+          }}
+        />
+      </svg>
+      <AxisButtons axis="Y" setSortOrder={setSortOrder} />
+    </div>
   );
 }

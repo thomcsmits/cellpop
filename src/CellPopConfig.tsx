@@ -10,7 +10,6 @@ import { useEventCallback } from "@mui/material/utils";
 import React, { ChangeEvent } from "react";
 import { useData } from "./contexts/DataContext";
 
-import { useBoundary } from "./contexts/BoundaryContext";
 import { useCellPopTheme } from "./contexts/CellPopThemeContext";
 import { useFraction } from "./contexts/FractionContext";
 import { useMetadataField } from "./contexts/MetadataFieldContext";
@@ -22,7 +21,6 @@ export default function CellPopConfig() {
   const { currentThemeName: theme, setTheme } = useCellPopTheme();
   const { fraction, setFraction } = useFraction();
   const { metadataField, setMetadataField } = useMetadataField();
-  const { boundary, setBoundary } = useBoundary();
   const { selectedDimension, setSelectedDimension } = useSelectedDimension();
   const metadataFields = getPossibleMetadataSelections(data);
 
@@ -46,10 +44,6 @@ export default function CellPopConfig() {
       setMetadataField(event.target.value);
     },
   );
-
-  const toggleBoundary = useEventCallback(() => {
-    setBoundary((prev) => !prev);
-  });
 
   const changeSelectedDimension = useEventCallback(
     (event: React.MouseEvent<HTMLElement>) => {
@@ -105,9 +99,6 @@ export default function CellPopConfig() {
         <ToggleButton value="light">Light</ToggleButton>
         <ToggleButton value="dark">Dark</ToggleButton>
       </ToggleButtonGroup>
-      <Button variant="outlined" onClick={toggleBoundary}>
-        {boundary ? "Remove" : "Show"} boundary boxes
-      </Button>
       <ToggleButtonGroup
         color="primary"
         value={selectedDimension}

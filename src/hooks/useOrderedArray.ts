@@ -1,38 +1,51 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export function useOrderedArrayState<T>(
+export type SortOrder =
+  | "Alphabetical Ascending"
+  | "Alphabetical Descending"
+  | "Counts Ascending"
+  | "Counts Descending"
+  | "Custom";
+
+export const SORT_ORDERS: SortOrder[] = [
+  "Custom",
+  "Alphabetical Ascending",
+  "Alphabetical Descending",
+  "Counts Ascending",
+  "Counts Descending",
+];
+
+export function useOrderedArrayState<T extends string | number>(
   values: T[] = [],
-  sortOrder?: (a: T, b: T) => number,
+  counts?: Record<T, number>,
 ) {
   const [orderedValues, setOrderedValues] = useState<T[]>(values);
+  const [sortOrder, setSortOrder] = useState<SortOrder>("Custom");
 
-  // TODO: Implement sorting
-  // const sorting = Boolean(sortOrder);
+  const previousSortOrder = useRef<SortOrder>("Custom");
 
-  const move = useCallback((from: number, to: number) => {
-    setOrderedValues((prev) => {
-      const next = [...prev];
-      const [removed] = next.splice(from, 1);
-      next.splice(to, 0, removed);
-      return next;
-    });
-  }, []);
+  useEffect(() => {
+    if (sortOrder !== previousSortOrder.current) {
+      previousSortOrder.current = sortOrder;
+      switch (sortOrder) {
+        case "Alphabetical Ascending":
+          setOrderedValues([...values].sort());
+          break;
+        case "Alphabetical Descending":
+          setOrderedValues([...values].sort().reverse());
+          break;
+        case "Counts Ascending":
+          setOrderedValues([...values].sort((a, b) => counts[a] - counts[b]));
+          break;
+        case "Counts Descending":
+          setOrderedValues([...values].sort((a, b) => counts[b] - counts[a]));
+          break;
+      }
+    }
+  }, [values, counts, sortOrder]);
 
-  const moveUp = useCallback(
-    (index: number) => {
-      if (index === 0) return;
-      move(index, index - 1);
-    },
-    [move],
-  );
-
-  const moveDown = useCallback(
-    (index: number) => {
-      if (index === values.length - 1) return;
-      move(index, index + 1);
-    },
-    [move],
-  );
-
-  return [orderedValues, { moveUp, moveDown, move, setOrderedValues }] as const;
+  return [
+    orderedValues,
+    { setOrderedValues, sortOrder, setSortOrder },
+  ] as const;
 }

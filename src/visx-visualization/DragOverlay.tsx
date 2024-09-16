@@ -23,12 +23,21 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { SortOrder } from "../hooks/useOrderedArray";
+import { Setter } from "../utils/types";
 
-import { useColumns, useRows } from "../contexts/AxisOrderContext";
+interface DragOverlayContainerProps extends PropsWithChildren {
+  items: string[];
+  setItems: Setter<string[]>;
+  setSort: Setter<SortOrder>;
+}
 
-function DragOverlayContainer({ children }: PropsWithChildren) {
-  const [columns, { setOrderedValues: setColumns }] = useColumns();
-  const [rows, { setOrderedValues: setRows }] = useRows();
+function DragOverlayContainer({
+  children,
+  items,
+  setItems,
+  setSort,
+}: DragOverlayContainerProps) {
   const { selectedDimension } = useSelectedDimension();
 
   const { scale: x } = useXScale();
@@ -48,9 +57,6 @@ function DragOverlayContainer({ children }: PropsWithChildren) {
     }),
   );
 
-  const [items, setItems] =
-    selectedDimension === "X" ? [columns, setColumns] : [rows, setRows];
-
   function handleDrag(event: DragEndEvent) {
     const { active, over } = event;
 
@@ -59,6 +65,7 @@ function DragOverlayContainer({ children }: PropsWithChildren) {
     }
 
     if (active.id !== over.id) {
+      setSort("Custom");
       setItems((items) => {
         const oldIndex = items.indexOf(active.id as string);
         const newIndex = items.indexOf(over.id as string);

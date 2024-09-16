@@ -1,7 +1,6 @@
 import React, { PropsWithChildren } from "react";
 import { CellPopData, CellPopTheme } from "../cellpop-schema";
 import { ColumnProvider, RowProvider } from "./AxisOrderContext";
-import { BoundaryProvider } from "./BoundaryContext";
 import { CellPopThemeProvider } from "./CellPopThemeContext";
 import { DataProvider } from "./DataContext";
 import { Dimensions, DimensionsProvider } from "./DimensionsContext";
@@ -31,9 +30,7 @@ export function Providers({
               <DimensionsProvider dimensions={dimensions}>
                 <FractionProvider>
                   <MetadataFieldProvider>
-                    <BoundaryProvider>
-                      <ScaleProvider>{children}</ScaleProvider>
-                    </BoundaryProvider>
+                    <ScaleProvider>{children}</ScaleProvider>
                   </MetadataFieldProvider>
                 </FractionProvider>
               </DimensionsProvider>

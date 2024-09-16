@@ -21,7 +21,6 @@ import {
 import { useEventCallback } from "@mui/material";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useDimensions } from "../contexts/DimensionsContext";
-import DragOverlay from "./DragOverlay";
 import Heatmap from "./Heatmap";
 import HeatmapXAxis from "./HeatmapXAxis";
 import HeatmapYAxis from "./HeatmapYAxis";
@@ -82,7 +81,11 @@ const VerticalPanelGroup = forwardRef(function VerticalPanelGroup(
       <StyledPanelHandle id={`${id}-resize-tm`} />
       <Panel id={middlePanelId}>{children}</Panel>
       <StyledPanelHandle id={`${id}-resize-mb`} />
-      <Panel id={bottomPanelId} minSize={15}>
+      <Panel
+        id={bottomPanelId}
+        minSize={15}
+        style={{ position: "relative", width: "100%" }}
+      >
         {bottom}
       </Panel>
     </PanelGroup>

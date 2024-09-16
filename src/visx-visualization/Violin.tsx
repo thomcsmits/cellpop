@@ -8,9 +8,9 @@ import { CountsMatrixValue } from "../cellpop-schema";
 import { useColumns, useRows } from "../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useData } from "../contexts/DataContext";
-import { useDimensions } from "../contexts/DimensionsContext";
+import { usePanelDimensions } from "../contexts/DimensionsContext";
 import { useXScale, useYScale } from "../contexts/ScaleContext";
-import { epanechnikov, kde, useDensityFunction } from "../utils/violin";
+import { epanechnikov, kde } from "../utils/violin";
 
 type Side = "top" | "left";
 
@@ -41,14 +41,10 @@ export default function Violins({ side = "top" }: ViolinsProps) {
     ? countsMatrixFractions.col
     : countsMatrixFractions.row;
 
-  const {
-    dimensions: { barTop, barLeft },
-  } = useDimensions();
-  const dimensions = horizontal ? barTop : barLeft;
-  const width =
-    dimensions.width - dimensions.margin.left - dimensions.margin.right;
-  const height =
-    dimensions.height - dimensions.margin.top - dimensions.margin.bottom;
+  const dimensions = usePanelDimensions(
+    side === "top" ? "center_top" : "left_middle",
+  );
+  const { width, height } = dimensions;
   // X scale is used for the top graph, Y scale is used for the left graph
   const categoricalScale = useCategoricalScale(side);
   const groups = horizontal ? columns : rows;
