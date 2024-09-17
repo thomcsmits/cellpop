@@ -27,6 +27,9 @@ const TooltipActionsContext =
 export const useTooltipData = () => useContext(TooltipDataContext);
 export const useSetTooltipData = () => useContext(TooltipActionsContext);
 
+/**
+ * Provider which manages the tooltip data and actions for displaying tooltips.
+ */
 export function TooltipDataProvider({ children }: PropsWithChildren) {
   const {
     showTooltip,

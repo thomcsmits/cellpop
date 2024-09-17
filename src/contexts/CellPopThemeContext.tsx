@@ -17,6 +17,10 @@ const ThemeContext = createContext<ThemeContextType | null>(
 );
 export const useCellPopTheme = () => useContext(ThemeContext);
 
+/**
+ * Provider which manages the theme to use for the visualization.
+ * @param props.theme - The initial theme to use.
+ */
 export function CellPopThemeProvider({
   children,
   theme: initialTheme,

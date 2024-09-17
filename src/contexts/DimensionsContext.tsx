@@ -64,10 +64,14 @@ const initialPanelDimensions = Object.fromEntries(
   }),
 ) as Record<MappedPanelSection, Dimensions>;
 
+/**
+ * Main provider for visualization dimensions
+ * @param props.dimensions Initial dimensions for the visualization
+ */
 export function DimensionsProvider({
   children,
   dimensions: initialDimensions,
-}: PropsWithChildren<{ dimensions: Dimensions }>) {
+}: PropsWithChildren<{ dimensions: Dimensions & Partial<GlobalDimensions> }>) {
   const [dimensions, setDimensions] = useState<GlobalDimensions>({
     ...initialDimensions,
     ...initialPanelDimensions,

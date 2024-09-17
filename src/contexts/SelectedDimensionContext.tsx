@@ -11,6 +11,9 @@ const SelectedDimensionContext = createContext<SelectedScaleContext>(
 
 export const useSelectedDimension = () => useContext(SelectedDimensionContext);
 
+/**
+ * Provider which manages the selected dimension for reordering axis values.
+ */
 export const SelectedDimensionProvider = ({ children }: PropsWithChildren) => {
   const [selectedDimension, setSelectedDimension] = useState<"X" | "Y">("X");
   return (

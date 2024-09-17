@@ -11,6 +11,9 @@ const MetadataFieldContext = createContext<MetadataFieldContextType | null>(
 );
 export const useMetadataField = () => useContext(MetadataFieldContext);
 
+/**
+ * Context for managing which metadata field to sort by.
+ */
 export function MetadataFieldProvider({ children }: PropsWithChildren) {
   const [metadataField, setMetadataField] = useState<string>("None");
 

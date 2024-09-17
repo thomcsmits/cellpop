@@ -33,6 +33,9 @@ interface ColorScaleContext {
 const ColorScaleContext = createContext<ColorScaleContext>("ColorScaleContext");
 export const useColorScale = () => useContext(ColorScaleContext);
 
+/**
+ * Provider which instantiates and manages the scales used for the heatmap.
+ */
 export function ScaleProvider({ children }: PropsWithChildren) {
   const { data } = useData();
   const { width, height } = useHeatmapDimensions();
