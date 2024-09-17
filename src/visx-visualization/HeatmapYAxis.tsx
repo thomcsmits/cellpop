@@ -23,7 +23,7 @@ export default function HeatmapYAxis() {
   const [rows, { setSortOrder }] = useRows();
 
   return (
-    <div className="cellpop__heatmap_axis_y" style={{ position: "relative" }}>
+    <div style={{ width: "100%" }}>
       <svg width={width} height={height} className="cellpop__heatmap_axis_y">
         <AxisRight
           scale={y}

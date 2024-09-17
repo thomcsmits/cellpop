@@ -4,7 +4,7 @@ import { useData } from "../contexts/DataContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
 import { useColorScale } from "../contexts/ScaleContext";
 
-export function Legend() {
+export default function Legend() {
   const { scale: colors } = useColorScale();
   const { width } = usePanelDimensions("left_top");
   const { maxCount } = useData();

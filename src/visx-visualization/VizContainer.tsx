@@ -1,212 +1,185 @@
 import React, {
-  forwardRef,
+  MouseEventHandler,
   PropsWithChildren,
-  Ref,
-  useEffect,
-  useId,
+  useCallback,
   useRef,
-  useState,
 } from "react";
 
-import {
-  getPanelElement,
-  ImperativePanelGroupHandle,
-  Panel,
-  PanelGroup,
-  PanelGroupOnLayout,
-  PanelResizeHandle,
-  PanelResizeHandleProps,
-} from "react-resizable-panels";
-
-import { useEventCallback } from "@mui/material";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useDimensions } from "../contexts/DimensionsContext";
+import { createContext, useContext } from "../utils/context";
 import Heatmap from "./Heatmap";
 import HeatmapXAxis from "./HeatmapXAxis";
 import HeatmapYAxis from "./HeatmapYAxis";
 import LeftGraph, { LeftGraphScale } from "./LeftGraph";
-import { Legend } from "./Legend";
+import Legend from "./Legend";
 import Tooltip from "./Tooltip";
 import TopGraph, { TopGraphScale } from "./TopGraph";
 
-interface VerticalPanelGroupProps extends PropsWithChildren {
-  id: string;
-  top?: React.ReactNode;
-  bottom?: React.ReactNode;
-  onLayout: PanelGroupOnLayout;
-  side: "left" | "center" | "right";
+interface VisualizationPanelResizerProps {
+  index: number;
+  resize: (newSize: number, index: number) => void;
+  orientation: "X" | "Y";
 }
 
-// Placeholder in case we need to style the resize handle
-function StyledPanelHandle(props: PanelResizeHandleProps) {
-  return <PanelResizeHandle {...props} />;
-}
+function VisualizationPanelResizer({
+  index,
+  resize,
+  orientation,
+}: VisualizationPanelResizerProps) {
+  const parentRef = useParentRef();
+  const { rowSizes, columnSizes } = useDimensions();
+  const ref = useRef<HTMLDivElement>(null);
+  const positionKey = orientation === "X" ? "left" : "top";
+  const positionValues = orientation === "X" ? columnSizes : rowSizes;
+  const position = positionValues
+    .slice(0, index + 1)
+    .reduce((acc, size) => acc + size, 0);
 
-function getPanelSize(id: string) {
-  const panel = getPanelElement(id);
-  return panel.getBoundingClientRect();
-}
-
-/**
- * Represents a group of panels arranged vertically.
- * @param props.top The content of the top panel.
- * @param props.bottom The content of the bottom panel.
- * @param props.children The content of the middle panel.
- * @param props.id The id of the panel group.
- * @param props.onLayout Callback for when the layout changes.
- * @param props.side The side of the visualization the panel group is on.
- */
-const VerticalPanelGroup = forwardRef(function VerticalPanelGroup(
-  { top, bottom, children, id, onLayout, side }: VerticalPanelGroupProps,
-  ref: Ref<ImperativePanelGroupHandle>,
-) {
-  const topPanelId = `${id}-panel-top`;
-  const middlePanelId = `${id}-panel-middle`;
-  const bottomPanelId = `${id}-panel-bottom`;
-  const {
-    setDimension,
-    dimensions: { height },
-  } = useDimensions();
-
-  const onLayoutWithUpdates: PanelGroupOnLayout = useEventCallback(
-    (newLayout: number[]) => {
-      setDimension(`${side}_top`, getPanelSize(topPanelId));
-      setDimension(`${side}_middle`, getPanelSize(middlePanelId));
-      setDimension(`${side}_bottom`, getPanelSize(bottomPanelId));
-      onLayout(newLayout);
+  const onMouseDown: MouseEventHandler = useCallback(
+    (e) => {
+      e.preventDefault();
+      const onMouseMove = (e: MouseEvent) => {
+        const visualizationBounds = parentRef.current?.getBoundingClientRect();
+        if (!visualizationBounds) {
+          return;
+        }
+        const newSize =
+          orientation === "X"
+            ? e.clientX - visualizationBounds.left
+            : e.clientY - visualizationBounds.top;
+        resize(newSize, index);
+      };
+      const onMouseUp = () => {
+        window.removeEventListener("mousemove", onMouseMove);
+        window.removeEventListener("mouseup", onMouseUp);
+      };
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
     },
+    [orientation],
   );
 
   return (
-    <PanelGroup
-      direction="vertical"
-      onLayout={onLayoutWithUpdates}
+    <div
       ref={ref}
-      style={{ height }}
-    >
-      <Panel id={topPanelId} minSize={10}>
-        {top}
-      </Panel>
-      <StyledPanelHandle id={`${id}-resize-tm`} />
-      <Panel id={middlePanelId} minSize={25}>
-        {children}
-      </Panel>
-      <StyledPanelHandle id={`${id}-resize-mb`} />
-      <Panel
-        id={bottomPanelId}
-        minSize={15}
-        style={{ position: "relative", width: "100%" }}
-      >
-        {bottom}
-      </Panel>
-    </PanelGroup>
+      className="resize-handle"
+      data-orientation={orientation}
+      onMouseDown={onMouseDown}
+      style={{
+        position: "absolute",
+        pointerEvents: "auto",
+        cursor: orientation === "X" ? "ew-resize" : "ns-resize",
+        zIndex: 100,
+        height: orientation === "X" ? "100%" : "5px",
+        width: orientation === "X" ? "5px" : "100%",
+        [positionKey]: position,
+      }}
+    />
   );
-});
+}
 
-/**
- * Main container for the visualization.
- * Contains a grid of nine panels arranged in a 3x3 grid.
- */
-export default function VizContainer() {
-  const { theme } = useCellPopTheme();
+interface VisualizationPanelProps extends PropsWithChildren {
+  id: string;
+}
+function VisualizationPanel({ children, id }: VisualizationPanelProps) {
+  return (
+    <div
+      id={id}
+      style={{ position: "relative", width: "100%", height: "100%" }}
+    >
+      {children}
+    </div>
+  );
+}
+
+const ParentRefContext = createContext<React.RefObject<HTMLDivElement> | null>(
+  "Visualization Container Context",
+);
+
+export function useParentRef() {
+  return useContext(ParentRefContext);
+}
+
+export default function VizContainerGrid() {
   const {
     dimensions: { width, height },
-    setSideWidth,
+    rowSizes,
+    columnSizes,
+    resizeColumn,
+    resizeRow,
   } = useDimensions();
 
-  const id = useId();
-  const topLevelRef = useRef<ImperativePanelGroupHandle>(null);
-  const leftPanelId = `${id}-left-container`;
-  const centerPanelId = `${id}-center-container`;
-  const rightPanelId = `${id}-right-container`;
-  const leftPanelGroupRef = useRef<ImperativePanelGroupHandle>(null);
-  const centerPanelGroupRef = useRef<ImperativePanelGroupHandle>(null);
-  const rightPanelGroupRef = useRef<ImperativePanelGroupHandle>(null);
+  const {
+    theme: { background },
+  } = useCellPopTheme();
 
-  const [verticalLayout, setVerticalLayout] = useState<number[]>([30, 40, 30]);
+  const parentRef = useRef<HTMLDivElement>(null);
 
-  // Keep layout in sync between the three vertical groups
-  const onLayout: PanelGroupOnLayout = useEventCallback(
-    (newLayout: number[]) => {
-      setVerticalLayout(newLayout);
-    },
-  );
-  const onHorizontalLayout: PanelGroupOnLayout = useEventCallback(
-    (newLayout: number[]) => {
-      topLevelRef.current?.setLayout(newLayout);
-      const leftWidth = getPanelSize(leftPanelId).width;
-      const centerWidth = getPanelSize(centerPanelId).width;
-      const rightWidth = getPanelSize(rightPanelId).width;
-      setSideWidth("left", leftWidth);
-      setSideWidth("center", centerWidth);
-      setSideWidth("right", rightWidth);
-    },
-  );
-
-  /**
-   * Update the layout of the vertical panel groups when the layout changes.
-   */
-  useEffect(() => {
-    for (const ref of [
-      leftPanelGroupRef,
-      centerPanelGroupRef,
-      rightPanelGroupRef,
-    ]) {
-      const panelGroup = ref.current;
-      if (panelGroup) {
-        panelGroup.setLayout(verticalLayout);
-      }
-    }
-  }, [verticalLayout]);
+  const gridTemplateColumns = columnSizes.map((size) => `${size}px`).join(" ");
+  const gridTemplateRows = rowSizes.map((size) => `${size}px`).join(" ");
 
   return (
-    <PanelGroup
-      direction="horizontal"
-      className="cellpop"
-      id={id}
-      ref={topLevelRef}
-      style={{ background: theme.background, width, height }}
-      defaultValue={["25%", "50%", "25%"]}
-      onLayout={onHorizontalLayout}
-    >
-      <Panel id={leftPanelId} minSize={10}>
-        <VerticalPanelGroup
-          ref={leftPanelGroupRef}
-          id={`${id}-left`}
-          onLayout={onLayout}
-          top={<Legend />}
-          bottom={<LeftGraphScale />}
-          side="left"
+    <ParentRefContext.Provider value={parentRef}>
+      <div style={{ position: "relative" }} ref={parentRef}>
+        <div
+          style={{
+            width,
+            height,
+            display: "grid",
+            gridTemplateColumns,
+            gridTemplateRows,
+            background,
+          }}
         >
-          <LeftGraph />
-        </VerticalPanelGroup>
-      </Panel>
-      <StyledPanelHandle id={`${id}-resize-left`} />
-      <Panel id={centerPanelId} minSize={25}>
-        <VerticalPanelGroup
-          ref={centerPanelGroupRef}
-          id={`${id}-center`}
-          onLayout={onLayout}
-          top={<TopGraph />}
-          bottom={<HeatmapXAxis />}
-          side="center"
-        >
-          <Heatmap />
-        </VerticalPanelGroup>
-      </Panel>
-      <StyledPanelHandle id={`${id}-resize-right`} />
-      <Panel id={rightPanelId} minSize={15}>
-        <VerticalPanelGroup
-          ref={rightPanelGroupRef}
-          id={`${id}-right`}
-          onLayout={onLayout}
-          side="right"
-          top={<TopGraphScale />}
-        >
-          <HeatmapYAxis />
-        </VerticalPanelGroup>
-      </Panel>
-      <Tooltip />
-    </PanelGroup>
+          <VisualizationPanel id="top-left">
+            <Legend />
+          </VisualizationPanel>
+          <VisualizationPanel id="top-center">
+            <TopGraph />
+          </VisualizationPanel>
+          <VisualizationPanel id="top-right">
+            <TopGraphScale />
+          </VisualizationPanel>
+          <VisualizationPanel id="middle-left">
+            <LeftGraph />
+          </VisualizationPanel>
+          <VisualizationPanel id="middle-center">
+            <Heatmap />
+          </VisualizationPanel>
+          <VisualizationPanel id="middle-right">
+            <HeatmapYAxis />
+          </VisualizationPanel>
+          <VisualizationPanel id="bottom-left">
+            <LeftGraphScale />
+          </VisualizationPanel>
+          <VisualizationPanel id="bottom-center">
+            <HeatmapXAxis />
+          </VisualizationPanel>
+          <VisualizationPanel id="bottom-right"></VisualizationPanel>
+        </div>
+        <VisualizationPanelResizer
+          index={0}
+          resize={resizeColumn}
+          orientation="X"
+        />
+        <VisualizationPanelResizer
+          index={1}
+          resize={resizeColumn}
+          orientation="X"
+        />
+        <VisualizationPanelResizer
+          index={0}
+          resize={resizeRow}
+          orientation="Y"
+        />
+        <VisualizationPanelResizer
+          index={1}
+          resize={resizeRow}
+          orientation="Y"
+        />
+        <Tooltip />
+      </div>
+    </ParentRefContext.Provider>
   );
 }

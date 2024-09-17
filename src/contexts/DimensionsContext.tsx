@@ -1,4 +1,9 @@
-import React, { PropsWithChildren, useCallback, useState } from "react";
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import { createContext, useContext } from "../utils/context";
 import { Setter } from "../utils/types";
 
@@ -8,22 +13,8 @@ export interface Dimensions {
 }
 
 type VerticalPanelSection = "top" | "middle" | "bottom";
-const verticalPanelSections: VerticalPanelSection[] = [
-  "top",
-  "middle",
-  "bottom",
-];
 type HorizontalPanelSection = "left" | "center" | "right";
-const horizontalPanelSections: HorizontalPanelSection[] = [
-  "left",
-  "center",
-  "right",
-];
 type MappedPanelSection = `${HorizontalPanelSection}_${VerticalPanelSection}`;
-const mappedPanelSections: MappedPanelSection[] =
-  horizontalPanelSections.flatMap((h) => {
-    return verticalPanelSections.map((v) => `${h}_${v}` as MappedPanelSection);
-  });
 
 /**
  * Type holding the global width/height and width/height for each panel section.
@@ -47,22 +38,22 @@ interface GlobalDimensions
 
 interface DimensionsContextType {
   dimensions: GlobalDimensions;
-  setDimensions: Setter<GlobalDimensions>;
-  setDimension: (section: MappedPanelSection, value: Dimensions) => void;
-  setSideWidth: (side: HorizontalPanelSection, width: number) => void;
+  columnSizes: GridSizeTuple;
+  rowSizes: GridSizeTuple;
+  resizeColumn: (newSize: number, index: number) => void;
+  resizeRow: (newSize: number, index: number) => void;
 }
 
 const DimensionsContext = createContext<DimensionsContextType | null>(
   "CellPopDimensions",
 );
 
-const initialWidthHeight = { width: 0, height: 0 };
+type GridSizeTuple = [number, number, number];
 
-const initialPanelDimensions = Object.fromEntries(
-  mappedPanelSections.map((section) => {
-    return [section, initialWidthHeight] as const;
-  }),
-) as Record<MappedPanelSection, Dimensions>;
+// Helper function to get the initial size of the panels
+function getInitialSize(total: number) {
+  return [0.3 * total, 0.4 * total, 0.3 * total] as GridSizeTuple;
+}
 
 /**
  * Main provider for visualization dimensions
@@ -70,45 +61,65 @@ const initialPanelDimensions = Object.fromEntries(
  */
 export function DimensionsProvider({
   children,
-  dimensions: initialDimensions,
+  dimensions: { width, height },
 }: PropsWithChildren<{ dimensions: Dimensions & Partial<GlobalDimensions> }>) {
-  const [dimensions, setDimensions] = useState<GlobalDimensions>({
-    ...initialDimensions,
-    ...initialPanelDimensions,
-  });
-
-  const setDimension = useCallback(
-    (section: MappedPanelSection, value: Dimensions) => {
-      setDimensions((prev) => {
-        return { ...prev, [section]: value };
-      });
-    },
-    [setDimensions],
+  const [columnSizes, setColumnSizes] = useState<GridSizeTuple>(
+    getInitialSize(width),
+  );
+  const [rowSizes, setRowSizes] = useState<GridSizeTuple>(
+    getInitialSize(height),
   );
 
-  const setSideWidth = useCallback(
-    (side: HorizontalPanelSection, value: number) => {
-      const sections = verticalPanelSections.map(
-        (v) => `${side}_${v}` as MappedPanelSection,
-      );
-      setDimensions((prev) => {
-        const next = { ...prev };
-        sections.forEach((section) => {
-          next[section].width = value;
-        });
-        return next;
+  const resize = useCallback(
+    (setter: Setter<GridSizeTuple>) => (newSize: number, index: number) => {
+      setter((prev) => {
+        const newSizes = [...prev];
+        const oldSize = newSizes[index];
+        const totalSize = newSizes.reduce((acc, size) => acc + size, 0);
+        switch (index) {
+          case 0:
+            newSizes[0] = newSize;
+            newSizes[1] = newSizes[1] + oldSize - newSize;
+            break;
+          case 1:
+            newSizes[1] = newSize - newSizes[0];
+            newSizes[2] = totalSize - newSize;
+            break;
+        }
+        console.log({ previousSizes: prev, newSizes });
+        return newSizes as [number, number, number];
       });
     },
-    [setDimensions],
+    [],
   );
+
+  const resizeColumn = useCallback(resize(setColumnSizes), [resize]);
+  const resizeRow = useCallback(resize(setRowSizes), [resize]);
+
+  const dimensions = useMemo(() => {
+    return {
+      width,
+      height,
+      left_top: { width: columnSizes[0], height: rowSizes[0] },
+      left_middle: { width: columnSizes[0], height: rowSizes[1] },
+      left_bottom: { width: columnSizes[0], height: rowSizes[2] },
+      center_top: { width: columnSizes[1], height: rowSizes[0] },
+      center_middle: { width: columnSizes[1], height: rowSizes[1] },
+      center_bottom: { width: columnSizes[1], height: rowSizes[2] },
+      right_top: { width: columnSizes[2], height: rowSizes[0] },
+      right_middle: { width: columnSizes[2], height: rowSizes[1] },
+      right_bottom: { width: columnSizes[2], height: rowSizes[2] },
+    };
+  }, [width, height, columnSizes, rowSizes]);
 
   return (
     <DimensionsContext.Provider
       value={{
         dimensions,
-        setDimensions,
-        setDimension,
-        setSideWidth,
+        columnSizes,
+        rowSizes,
+        resizeColumn,
+        resizeRow,
       }}
     >
       {children}
