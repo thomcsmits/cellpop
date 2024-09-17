@@ -9,6 +9,9 @@ import { useSetTooltipData } from "../contexts/TooltipDataContext";
 import { AxisButtons } from "./AxisButtons";
 import { textSize } from "./constants";
 
+/**
+ * Component which renders the y-axis of the heatmap.
+ */
 export default function HeatmapYAxis() {
   const { rowCounts } = useData();
   const { theme } = useCellPopTheme();

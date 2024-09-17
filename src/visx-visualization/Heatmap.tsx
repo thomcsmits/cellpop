@@ -17,6 +17,12 @@ interface HeatmapArrayProps {
   selectedDimension: "X" | "Y";
 }
 
+/**
+ * Component which renders one row or column of the heatmap.
+ * @param props.dataKey The key of the row or column to render.
+ * @param props.selectedDimension The dimension to render (either X or Y).
+ * @returns
+ */
 function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
   const { dataMap } = useData();
   const { scale: xScale } = useXScale();

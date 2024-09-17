@@ -19,6 +19,12 @@ const positionProps: Record<"X" | "Y", CSSProperties> = {
   },
 };
 
+/**
+ * Axis-specific controls for setting sorts in the ScaleContext.
+ * @param props.setSortOrder Setter for the sort order.
+ * @param props.axis The axis to sort.
+ * @returns The AxisButtons component.
+ */
 export function AxisButtons({ setSortOrder, axis }: AxisButtonsProps) {
   return (
     <div

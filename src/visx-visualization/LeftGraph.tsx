@@ -33,7 +33,7 @@ function LeftBar() {
 }
 
 export function LeftGraphScale() {
-  const { width } = usePanelDimensions("left_bottom");
+  const { width, height } = usePanelDimensions("left_bottom");
   const { rowCounts } = useData();
   const xScale = useCountsScale(
     [0, max(Object.values(rowCounts)) || 0],
@@ -42,7 +42,7 @@ export function LeftGraphScale() {
 
   const axisScale = xScale.copy().range([width, 0]);
   return (
-    <svg>
+    <svg width={width} height={height}>
       <AxisBottom
         scale={axisScale}
         top={0}
@@ -58,6 +58,9 @@ function LeftViolin() {
   return <Violins side="left" />;
 }
 
+/**
+ * Container component for the left graph.
+ */
 export default function LeftGraph() {
   const { width, height } = usePanelDimensions("left_middle");
 

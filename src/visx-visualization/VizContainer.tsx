@@ -24,10 +24,10 @@ import { useDimensions } from "../contexts/DimensionsContext";
 import Heatmap from "./Heatmap";
 import HeatmapXAxis from "./HeatmapXAxis";
 import HeatmapYAxis from "./HeatmapYAxis";
-import LeftGraph from "./LeftGraph";
+import LeftGraph, { LeftGraphScale } from "./LeftGraph";
 import { Legend } from "./Legend";
 import Tooltip from "./Tooltip";
-import TopGraph from "./TopGraph";
+import TopGraph, { TopGraphScale } from "./TopGraph";
 
 interface VerticalPanelGroupProps extends PropsWithChildren {
   id: string;
@@ -47,6 +47,15 @@ function getPanelSize(id: string) {
   return panel.getBoundingClientRect();
 }
 
+/**
+ * Represents a group of panels arranged vertically.
+ * @param props.top The content of the top panel.
+ * @param props.bottom The content of the bottom panel.
+ * @param props.children The content of the middle panel.
+ * @param props.id The id of the panel group.
+ * @param props.onLayout Callback for when the layout changes.
+ * @param props.side The side of the visualization the panel group is on.
+ */
 const VerticalPanelGroup = forwardRef(function VerticalPanelGroup(
   { top, bottom, children, id, onLayout, side }: VerticalPanelGroupProps,
   ref: Ref<ImperativePanelGroupHandle>,
@@ -79,7 +88,9 @@ const VerticalPanelGroup = forwardRef(function VerticalPanelGroup(
         {top}
       </Panel>
       <StyledPanelHandle id={`${id}-resize-tm`} />
-      <Panel id={middlePanelId}>{children}</Panel>
+      <Panel id={middlePanelId} minSize={25}>
+        {children}
+      </Panel>
       <StyledPanelHandle id={`${id}-resize-mb`} />
       <Panel
         id={bottomPanelId}
@@ -92,6 +103,10 @@ const VerticalPanelGroup = forwardRef(function VerticalPanelGroup(
   );
 });
 
+/**
+ * Main container for the visualization.
+ * Contains a grid of nine panels arranged in a 3x3 grid.
+ */
 export default function VizContainer() {
   const { theme } = useCellPopTheme();
   const {
@@ -127,6 +142,10 @@ export default function VizContainer() {
       setSideWidth("right", rightWidth);
     },
   );
+
+  /**
+   * Update the layout of the vertical panel groups when the layout changes.
+   */
   useEffect(() => {
     for (const ref of [
       leftPanelGroupRef,
@@ -156,6 +175,7 @@ export default function VizContainer() {
           id={`${id}-left`}
           onLayout={onLayout}
           top={<Legend />}
+          bottom={<LeftGraphScale />}
           side="left"
         >
           <LeftGraph />
@@ -181,6 +201,7 @@ export default function VizContainer() {
           id={`${id}-right`}
           onLayout={onLayout}
           side="right"
+          top={<TopGraphScale />}
         >
           <HeatmapYAxis />
         </VerticalPanelGroup>

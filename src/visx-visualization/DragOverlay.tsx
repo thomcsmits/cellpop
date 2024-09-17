@@ -32,6 +32,13 @@ interface DragOverlayContainerProps extends PropsWithChildren {
   setSort: Setter<SortOrder>;
 }
 
+/**
+ * Wrapper for the heatmap which allows for dragging and dropping of rows or columns.
+ * @param props.items The items to be sorted.
+ * @param props.setItems Setter for the items.
+ * @param props.setSort Setter for the sort order. Used to reset the sort order when custom sorting is applied.
+ * @returns
+ */
 function DragOverlayContainer({
   children,
   items,

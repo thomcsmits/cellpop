@@ -11,7 +11,7 @@ export function Legend() {
   const domain = colors.domain();
   const id = useId() + "-legend";
   return (
-    <>
+    <div>
       <label htmlFor={id}>Counts</label>
       <svg width={width} id={id}>
         <defs>
@@ -28,6 +28,6 @@ export function Legend() {
           {maxCount}
         </text>
       </svg>
-    </>
+    </div>
   );
 }

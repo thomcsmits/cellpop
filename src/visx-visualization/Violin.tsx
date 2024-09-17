@@ -3,7 +3,7 @@ import React, { useMemo } from "react";
 import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
 import { area } from "@visx/shape";
-import { count, curveBumpY, extent, max, rollup } from "d3";
+import { curveBumpY, max, rollup } from "d3";
 import { CountsMatrixValue } from "../cellpop-schema";
 import { useColumns, useRows } from "../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
@@ -18,6 +18,7 @@ interface ViolinsProps {
   side?: Side;
 }
 
+// X scale is categorical for the top graph, Y scale is categorical for the left graph
 function useCategoricalScale(side: Side) {
   const { scale: heatmapXScale } = useXScale();
   const { scale: heatmapYScale } = useYScale();
@@ -27,6 +28,11 @@ function useCategoricalScale(side: Side) {
   return heatmapYScale;
 }
 
+/**
+ * Component used to render the violin plots on the left or top of the heatmap.
+ * @param props.side The side to render the violin plots on.
+ * @returns
+ */
 export default function Violins({ side = "top" }: ViolinsProps) {
   const horizontal = side === "top";
   const {
@@ -45,16 +51,18 @@ export default function Violins({ side = "top" }: ViolinsProps) {
     side === "top" ? "center_top" : "left_middle",
   );
   const { width, height } = dimensions;
-  // X scale is used for the top graph, Y scale is used for the left graph
   const categoricalScale = useCategoricalScale(side);
   const groups = horizontal ? columns : rows;
 
+  /**
+   * Scale used to generate the density of the violin plots.
+   */
   const violinScale = scaleLinear({
     range: [horizontal ? height : width, 0],
     domain: [0, upperBound],
   });
 
-  // A map of group name to violin data
+  // Creates a map of group name to violin data
   const violins = useMemo(() => {
     const bandwidth = 0.1;
     const thresholds = violinScale.ticks(100);
@@ -62,8 +70,6 @@ export default function Violins({ side = "top" }: ViolinsProps) {
     return rollup<CountsMatrixValue, [number, number][], string[]>(
       countsMatrix,
       (v) => {
-        const d = density(v.map((g) => g.value));
-        console.log("rollup", { v, density: d });
         return density(v.map((g) => g.value));
       },
       (d) => (horizontal ? d.col : d.row),
@@ -73,6 +79,7 @@ export default function Violins({ side = "top" }: ViolinsProps) {
   const allNums = useMemo(() => {
     const violinValues = [...violins.values()];
     const allNum = violinValues.reduce((allNum, d) => {
+      /* @ts-expect-error The d3 type annotations for `rollup` don't seem to be correct */
       allNum.push(...d.map((d) => d[1]));
       return allNum;
     }, [] as number[]);
@@ -111,8 +118,8 @@ export default function Violins({ side = "top" }: ViolinsProps) {
   return (
     <>
       {groups.map((group) => {
+        // @ts-expect-error The d3 type annotations for `rollup` don't seem to be correct
         const violinData = violins.get(group);
-        console.log({ violinData });
         if (!violinData) {
           return null;
         }

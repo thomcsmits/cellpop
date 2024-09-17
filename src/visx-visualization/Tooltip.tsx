@@ -2,6 +2,10 @@ import { defaultStyles, TooltipWithBounds } from "@visx/tooltip";
 import React from "react";
 import { useTooltipData } from "../contexts/TooltipDataContext";
 
+/**
+ * Component which renders a basic tooltip with the data set in the tooltip data context.
+ * @returns
+ */
 export default function Tooltip() {
   const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
     useTooltipData();
@@ -12,7 +16,6 @@ export default function Tooltip() {
 
   return (
     <TooltipWithBounds
-      key={Math.random()}
       top={tooltipTop}
       left={tooltipLeft}
       style={{ ...defaultStyles, pointerEvents: "none" }}

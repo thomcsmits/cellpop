@@ -41,10 +41,36 @@ function TopBar() {
   );
 }
 
+export function TopGraphScale() {
+  const { width, height } = usePanelDimensions("right_top");
+  const { columnCounts } = useData();
+  // Use same x scale as the heatmap
+  const yScale = useCountsScale(
+    [max(Object.values(columnCounts)) || 0, 0],
+    [height, 0],
+  );
+
+  const axisScale = yScale.copy().range([0, height]);
+  return (
+    <svg width={width} height={height}>
+      <AxisRight
+        scale={axisScale}
+        top={0}
+        left={0}
+        orientation="right"
+        tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
+      />
+    </svg>
+  );
+}
+
 function TopViolin() {
   return <Violins side="top" />;
 }
 
+/**
+ * Container component for the top graph.
+ */
 export default function TopGraph() {
   const { width, height } = usePanelDimensions("center_top");
 
