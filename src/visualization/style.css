@@ -5,17 +5,30 @@
 .resize-handle {
   display: block;
   position: absolute;
-  cursor: col-resize;
-  width: 8px;
-  right: 0;
+  left: 0;
+  z-index: 5;
+  pointer-events: auto;;
   top: 0;
-  border-right: 2px solid transparent;
+  background-color: 'transparent';
+  transition: 'background-color 0.3s';
+}
+
+.resize-handle.resize-x {
+  cursor: ew-resize;
+  height: 100%;
+  width: 5px;
+}
+
+.resize-handle.resize-y {
+  cursor: ns-resize;
+  width: 100%;
+  height: 5px;
 }
 
 .resize-handle:hover {
-  border-color: #ccc;
+  background-color: #ccc;
 }
 
 .resize-handle.active {
-  border-color: #517ea5;
+  background-color: #517ea5;
 }

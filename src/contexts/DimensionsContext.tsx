@@ -1,9 +1,4 @@
-import React, {
-  PropsWithChildren,
-  useCallback,
-  useMemo,
-  useState,
-} from "react";
+import React, { PropsWithChildren, useCallback, useState } from "react";
 import { createContext, useContext } from "../utils/context";
 import { Setter } from "../utils/types";
 
@@ -16,28 +11,7 @@ type VerticalPanelSection = "top" | "middle" | "bottom";
 type HorizontalPanelSection = "left" | "center" | "right";
 type MappedPanelSection = `${HorizontalPanelSection}_${VerticalPanelSection}`;
 
-/**
- * Type holding the global width/height and width/height for each panel section.
- * @example {
- *  width: 1000,
- *  height: 800,
- *  left_top: { width: 300, height: 200 },
- *  left_middle: { width: 300, height: 400 },
- *  left_bottom: { width: 300, height: 200 },
- *  center_top: { width: 400, height: 200 },
- *  center_middle: { width: 400, height: 400 },
- *  center_bottom: { width: 400, height: 200 },
- *  right_top: { width: 300, height: 200 },
- *  right_middle: { width: 300, height: 400 },
- *  right_bottom: { width: 300, height: 200 },
- * }
- */
-interface GlobalDimensions
-  extends Dimensions,
-    Record<MappedPanelSection, Dimensions> {}
-
-interface DimensionsContextType {
-  dimensions: GlobalDimensions;
+interface DimensionsContextType extends Dimensions {
   columnSizes: GridSizeTuple;
   rowSizes: GridSizeTuple;
   resizeColumn: (newSize: number, index: number) => void;
@@ -86,7 +60,6 @@ export function DimensionsProvider({
             newSizes[2] = totalSize - newSize;
             break;
         }
-        console.log({ previousSizes: prev, newSizes });
         return newSizes as [number, number, number];
       });
     },
@@ -96,26 +69,11 @@ export function DimensionsProvider({
   const resizeColumn = useCallback(resize(setColumnSizes), [resize]);
   const resizeRow = useCallback(resize(setRowSizes), [resize]);
 
-  const dimensions = useMemo(() => {
-    return {
-      width,
-      height,
-      left_top: { width: columnSizes[0], height: rowSizes[0] },
-      left_middle: { width: columnSizes[0], height: rowSizes[1] },
-      left_bottom: { width: columnSizes[0], height: rowSizes[2] },
-      center_top: { width: columnSizes[1], height: rowSizes[0] },
-      center_middle: { width: columnSizes[1], height: rowSizes[1] },
-      center_bottom: { width: columnSizes[1], height: rowSizes[2] },
-      right_top: { width: columnSizes[2], height: rowSizes[0] },
-      right_middle: { width: columnSizes[2], height: rowSizes[1] },
-      right_bottom: { width: columnSizes[2], height: rowSizes[2] },
-    };
-  }, [width, height, columnSizes, rowSizes]);
-
   return (
     <DimensionsContext.Provider
       value={{
-        dimensions,
+        width,
+        height,
         columnSizes,
         rowSizes,
         resizeColumn,
@@ -129,9 +87,15 @@ export function DimensionsProvider({
 
 export const useDimensions = () => useContext(DimensionsContext);
 
-export const useHeatmapDimensions = () =>
-  useDimensions().dimensions.center_middle;
-
 export const usePanelDimensions = (section: MappedPanelSection) => {
-  return useDimensions().dimensions[section];
+  const { columnSizes, rowSizes } = useDimensions();
+  const [horizontal, vertical] = section.split("_") as [
+    HorizontalPanelSection,
+    VerticalPanelSection,
+  ];
+  const column = columnSizes[["left", "center", "right"].indexOf(horizontal)];
+  const row = rowSizes[["top", "middle", "bottom"].indexOf(vertical)];
+  return { width: column, height: row };
 };
+
+export const useHeatmapDimensions = () => usePanelDimensions("center_middle");

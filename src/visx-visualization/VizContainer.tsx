@@ -53,9 +53,11 @@ function VisualizationPanelResizer({
       const onMouseUp = () => {
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("mouseup", onMouseUp);
+        ref.current?.classList.remove("active");
       };
       window.addEventListener("mousemove", onMouseMove);
       window.addEventListener("mouseup", onMouseUp);
+      ref.current?.classList.add("active");
     },
     [orientation],
   );
@@ -63,17 +65,12 @@ function VisualizationPanelResizer({
   return (
     <div
       ref={ref}
-      className="resize-handle"
+      className={`resize-handle resize-${orientation.toLowerCase()}`}
       data-orientation={orientation}
       onMouseDown={onMouseDown}
       style={{
-        position: "absolute",
-        pointerEvents: "auto",
-        cursor: orientation === "X" ? "ew-resize" : "ns-resize",
-        zIndex: 100,
-        height: orientation === "X" ? "100%" : "5px",
-        width: orientation === "X" ? "5px" : "100%",
-        [positionKey]: position,
+        // Offset by 5px to align the handle with the edge of the panel
+        [positionKey]: `calc(${position - 5}px)`,
       }}
     />
   );
@@ -102,13 +99,8 @@ export function useParentRef() {
 }
 
 export default function VizContainerGrid() {
-  const {
-    dimensions: { width, height },
-    rowSizes,
-    columnSizes,
-    resizeColumn,
-    resizeRow,
-  } = useDimensions();
+  const { width, height, rowSizes, columnSizes, resizeColumn, resizeRow } =
+    useDimensions();
 
   const {
     theme: { background },
