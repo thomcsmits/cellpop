@@ -10,6 +10,8 @@ import { Bars } from "./Bars";
 import { useCountsScale } from "./hooks";
 import Violins from "./Violin";
 
+const LEFT_MARGIN = 16;
+
 function LeftBar() {
   const { width } = usePanelDimensions("left_middle");
   const { rowCounts } = useData();
@@ -17,7 +19,7 @@ function LeftBar() {
   const { scale: yScale } = useYScale();
   const xScale = useCountsScale(
     [0, max(Object.values(rowCounts)) || 0],
-    [0, width],
+    [0, width - LEFT_MARGIN],
   );
 
   return (
@@ -38,10 +40,10 @@ export function LeftGraphScale() {
   const { rowCounts } = useData();
   const xScale = useCountsScale(
     [0, max(Object.values(rowCounts)) || 0],
-    [0, width],
+    [0, width - LEFT_MARGIN],
   );
 
-  const axisScale = xScale.copy().range([width, 0]);
+  const axisScale = xScale.copy().range([width - LEFT_MARGIN, 0]);
   const { theme } = useCellPopTheme();
   return (
     <svg width={width} height={height}>
@@ -49,7 +51,7 @@ export function LeftGraphScale() {
         scale={axisScale}
         hideZero
         top={0}
-        left={0}
+        left={LEFT_MARGIN}
         orientation="bottom"
         stroke={theme.text}
         tickLabelProps={{ fill: theme.text }}

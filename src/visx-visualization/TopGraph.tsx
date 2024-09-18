@@ -11,6 +11,8 @@ import { Bars } from "./Bars";
 import { useCountsScale } from "./hooks";
 import Violins from "./Violin";
 
+const TOP_MARGIN = 16;
+
 function TopBar() {
   const { height } = usePanelDimensions("center_top");
   const { columnCounts } = useData();
@@ -18,7 +20,7 @@ function TopBar() {
   const { scale: xScale } = useXScale();
   const yScale = useCountsScale(
     [max(Object.values(columnCounts)) || 0, 0],
-    [height, 0],
+    [height - TOP_MARGIN, 0],
   );
 
   return (
@@ -40,17 +42,17 @@ export function TopGraphScale() {
   // Use same x scale as the heatmap
   const yScale = useCountsScale(
     [max(Object.values(columnCounts)) || 0, 0],
-    [height, 0],
+    [height - TOP_MARGIN, 0],
   );
 
-  const axisScale = yScale.copy().range([0, height]);
+  const axisScale = yScale.copy().range([0, height - TOP_MARGIN]);
   const { theme } = useCellPopTheme();
 
   return (
     <svg width={width} height={height}>
       <AxisRight
         scale={axisScale}
-        top={0}
+        top={16}
         left={0}
         orientation="right"
         hideZero
