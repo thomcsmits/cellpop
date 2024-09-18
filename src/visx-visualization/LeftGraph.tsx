@@ -1,6 +1,7 @@
 import { AxisBottom } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import React from "react";
+import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useData } from "../contexts/DataContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
 import { useFraction } from "../contexts/FractionContext";
@@ -41,13 +42,18 @@ export function LeftGraphScale() {
   );
 
   const axisScale = xScale.copy().range([width, 0]);
+  const { theme } = useCellPopTheme();
   return (
     <svg width={width} height={height}>
       <AxisBottom
         scale={axisScale}
+        hideZero
         top={0}
         left={0}
         orientation="bottom"
+        stroke={theme.text}
+        tickLabelProps={{ fill: theme.text }}
+        tickStroke={theme.text}
         tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
       />
     </svg>

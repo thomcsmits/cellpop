@@ -32,6 +32,8 @@ export default function HeatmapYAxis() {
           tickLineProps={{
             fontSize: textSize,
           }}
+          stroke={theme.text}
+          tickStroke={theme.text}
           tickLabelProps={{
             fontSize: textSize,
             fill: theme.text,

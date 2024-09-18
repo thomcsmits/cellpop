@@ -5,6 +5,7 @@ import {
 } from "@dnd-kit/sortable";
 import React, { Ref, useMemo } from "react";
 import { useColumns, useRows } from "../contexts/AxisOrderContext";
+import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useData } from "../contexts/DataContext";
 import { useHeatmapDimensions } from "../contexts/DimensionsContext";
 import { useColorScale, useXScale, useYScale } from "../contexts/ScaleContext";
@@ -50,6 +51,7 @@ function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
 
   const cellWidth = xScale.bandwidth();
   const cellHeight = yScale.bandwidth();
+  const { theme } = useCellPopTheme();
 
   return (
     <g
@@ -99,7 +101,7 @@ function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
         height={rowHeight}
         fill="transparent"
         style={{
-          outline: isDragging ? "1px solid black" : "none",
+          outline: isDragging ? `1px solid ${theme.text}` : "none",
           outlineOffset: isDragging ? "-1px" : "none",
           pointerEvents: "none",
         }}

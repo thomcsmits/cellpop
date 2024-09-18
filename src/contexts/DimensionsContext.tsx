@@ -46,10 +46,16 @@ export function DimensionsProvider({
 
   const resize = useCallback(
     (setter: Setter<GridSizeTuple>) => (newSize: number, index: number) => {
+      if (newSize < 0) {
+        return;
+      }
       setter((prev) => {
         const newSizes = [...prev];
         const oldSize = newSizes[index];
         const totalSize = newSizes.reduce((acc, size) => acc + size, 0);
+        if (newSize > totalSize) {
+          return prev;
+        }
         switch (index) {
           case 0:
             newSizes[0] = newSize;

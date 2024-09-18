@@ -45,6 +45,7 @@ export function Bars({
       e.clientY,
     );
   };
+  // Outer `g` wrapper is used to show the tooltip on hover for accessibility
   return (
     <>
       {entries.map(([key, value]) => {
@@ -58,17 +59,28 @@ export function Bars({
         const height = orientation === "vertical" ? barHeight : barWidth;
         const width = orientation === "vertical" ? barWidth : barHeight;
         return (
-          <rect
+          <g
             key={key}
-            x={x}
-            y={y}
-            width={width}
-            height={height}
-            fill={theme.sideCharts}
             onMouseOver={onMouse(key)}
             onMouseMove={onMouse(key)}
             onMouseOut={closeTooltip}
-          />
+            pointerEvents={"all"}
+          >
+            <rect
+              x={orientation === "vertical" ? x : 0}
+              y={orientation === "vertical" ? 0 : y}
+              height={orientation === "vertical" ? "100%" : barWidth}
+              width={orientation === "vertical" ? barWidth : "100%"}
+              fill={theme.background}
+            />
+            <rect
+              x={x}
+              y={y}
+              width={width}
+              height={height}
+              fill={theme.sideCharts}
+            />
+          </g>
         );
       })}
     </>

@@ -33,6 +33,8 @@ export default function HeatmapXAxis() {
           tickLineProps={{
             fontSize: textSize,
           }}
+          stroke={theme.text}
+          tickStroke={theme.text}
           tickLabelProps={(t) =>
             ({
               textAnchor: "end",
