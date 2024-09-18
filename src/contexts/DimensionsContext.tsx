@@ -36,7 +36,7 @@ function getInitialSize(total: number) {
 export function DimensionsProvider({
   children,
   dimensions: { width, height },
-}: PropsWithChildren<{ dimensions: Dimensions & Partial<GlobalDimensions> }>) {
+}: PropsWithChildren<{ dimensions: Dimensions }>) {
   const [columnSizes, setColumnSizes] = useState<GridSizeTuple>(
     getInitialSize(width),
   );
