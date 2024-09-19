@@ -11,16 +11,30 @@ export interface CellPopProps {
   data: CellPopData;
   theme: CellPopTheme;
   dimensions: Dimensions;
+  createRowHref?: (row: string) => string;
+  createColHref?: (col: string) => string;
 }
 
-export const CellPop = ({ theme, dimensions, data }: CellPopProps) => {
+export const CellPop = ({
+  theme,
+  dimensions,
+  data,
+  createColHref,
+  createRowHref,
+}: CellPopProps) => {
   if (!data) {
     return <Skeleton />;
   }
 
   return (
     <div>
-      <Providers data={data} dimensions={dimensions} theme={theme}>
+      <Providers
+        data={data}
+        dimensions={dimensions}
+        theme={theme}
+        createColHref={createColHref}
+        createRowHref={createRowHref}
+      >
         <CellPopConfig />
         <VizContainer />
       </Providers>
