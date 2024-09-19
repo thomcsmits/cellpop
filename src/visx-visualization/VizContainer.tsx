@@ -16,6 +16,8 @@ import Legend from "./Legend";
 import Tooltip from "./Tooltip";
 import TopGraph, { TopGraphScale } from "./TopGraph";
 
+import "../visualization/style.css";
+
 interface VisualizationPanelResizerProps {
   index: number;
   resize: (newSize: number, index: number) => void;
@@ -70,7 +72,7 @@ function VisualizationPanelResizer({
       onMouseDown={onMouseDown}
       style={{
         // Offset by 5px to align the handle with the edge of the panel
-        [positionKey]: `calc(${position - 5}px)`,
+        [positionKey]: `${position - 5}px`,
       }}
     />
   );

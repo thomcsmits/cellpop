@@ -4,6 +4,7 @@ import { useRows } from "../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useData } from "../contexts/DataContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
+import { useRowLinkCreator } from "../contexts/LabelLinkContext";
 import { useYScale } from "../contexts/ScaleContext";
 import { useSetTooltipData } from "../contexts/TooltipDataContext";
 import { AxisButtons } from "./AxisButtons";
@@ -17,48 +18,59 @@ export default function HeatmapYAxis() {
   const { theme } = useCellPopTheme();
   const { scale: y } = useYScale();
   const { width, height } = usePanelDimensions("right_middle");
+  const createRowLink = useRowLinkCreator();
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
   const [rows, { setSortOrder }] = useRows();
 
+  const openInNewTab = (tick: string) => {
+    const href = createRowLink?.(tick);
+    if (href) {
+      window.open(href, "_blank");
+    }
+  };
+
+  const size = y.bandwidth() > textSize ? textSize : y.bandwidth();
+
   return (
-    <div style={{ width: "100%" }}>
+    <>
       <svg width={width} height={height} className="cellpop__heatmap_axis_y">
         <AxisRight
           scale={y}
           label="Sample"
           numTicks={y.domain().length}
-          tickLineProps={{
-            fontSize: textSize,
-          }}
           stroke={theme.text}
           tickStroke={theme.text}
-          tickLabelProps={{
-            fontSize: textSize,
-            fill: theme.text,
-            style: {
-              fontFamily: "sans-serif",
-              fontVariantNumeric: "tabular-nums",
-            },
-            onMouseOver: (e) => {
-              const target = e.target as SVGTextElement;
-              const title = target.textContent;
-              const totalCounts = rowCounts[title];
-              openTooltip(
-                {
-                  title,
-                  data: {
-                    "Cell Count": totalCounts,
-                    row: title,
+          tickLabelProps={(t) =>
+            ({
+              fontSize: size,
+              fill: theme.text,
+              style: {
+                fontFamily: "sans-serif",
+                fontVariantNumeric: "tabular-nums",
+                cursor: createRowLink ? "pointer" : "default",
+              },
+              transform: `translate(0, ${size / 2})`,
+              onMouseOver: (e) => {
+                openTooltip(
+                  {
+                    title: createRowLink
+                      ? `${t} (Click to view in new tab)`
+                      : t,
+                    data: {
+                      "Cell Count": rowCounts[t],
+                      column: t,
+                    },
                   },
-                },
-                e.clientX,
-                e.clientY,
-              );
-            },
-            onMouseOut: closeTooltip,
-          }}
+                  e.clientX,
+                  e.clientY,
+                );
+              },
+              onMouseOut: closeTooltip,
+              onClick: () => openInNewTab(t),
+            }) as const
+          }
           tickValues={rows}
           orientation={Orientation.right}
           labelOffset={Math.max(...y.domain().map((s) => s.length)) * 10}
@@ -69,6 +81,6 @@ export default function HeatmapYAxis() {
         />
       </svg>
       <AxisButtons axis="Y" setSortOrder={setSortOrder} />
-    </div>
+    </>
   );
 }

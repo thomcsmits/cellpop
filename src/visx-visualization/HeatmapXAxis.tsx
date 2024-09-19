@@ -4,6 +4,7 @@ import { useColumns } from "../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useData } from "../contexts/DataContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
+import { useColLinkCreator } from "../contexts/LabelLinkContext";
 import { useXScale } from "../contexts/ScaleContext";
 import { useSetTooltipData } from "../contexts/TooltipDataContext";
 import { AxisButtons } from "./AxisButtons";
@@ -18,10 +19,19 @@ export default function HeatmapXAxis() {
   const { theme } = useCellPopTheme();
   const { scale: x } = useXScale();
   const { width, height } = usePanelDimensions("center_bottom");
+  const createColHref = useColLinkCreator();
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
   const [columns, { setSortOrder }] = useColumns();
+
+  const openInNewTab = (tick: string) => {
+    const href = createColHref?.(tick);
+    if (href) {
+      window.open(href, "_blank");
+    }
+  };
+  const size = x.bandwidth() > textSize ? textSize : x.bandwidth();
 
   return (
     <>
@@ -30,29 +40,29 @@ export default function HeatmapXAxis() {
           scale={x}
           label="Cell Type"
           numTicks={x.domain().length}
-          tickLineProps={{
-            fontSize: textSize,
-          }}
           stroke={theme.text}
           tickStroke={theme.text}
           tickLabelProps={(t) =>
             ({
               textAnchor: "end",
-              fontSize: "12px",
+              fontSize: size,
               fontFamily: "sans-serif",
               style: {
+                fontFamily: "sans-serif",
                 fontVariantNumeric: "tabular-nums",
+                cursor: createColHref ? "pointer" : "default",
               },
               fill: theme.text,
               dy: "0.25em",
-              transform: `rotate(-90, ${x(t)}, 12)translate(0, ${x.bandwidth() / 2})`,
+              transform: `rotate(-90, ${x(t)}, ${size})translate(0, ${size / 2})`,
               onMouseOver: (e) => {
-                const totalCounts = columnCounts[t];
                 openTooltip(
                   {
-                    title: t,
+                    title: createColHref
+                      ? `${t} (Click to view in new tab)`
+                      : t,
                     data: {
-                      "Cell Count": totalCounts,
+                      "Cell Count": columnCounts[t],
                       column: t,
                     },
                   },
@@ -61,15 +71,12 @@ export default function HeatmapXAxis() {
                 );
               },
               onMouseOut: closeTooltip,
+              onClick: () => openInNewTab(t),
             }) as const
           }
           tickValues={columns}
           orientation={Orientation.bottom}
           labelOffset={Math.max(...x.domain().map((s) => s.length)) * 8}
-          labelProps={{
-            fontSize: textSize,
-            fill: theme.text,
-          }}
         />
       </svg>
       <AxisButtons axis="X" setSortOrder={setSortOrder} />

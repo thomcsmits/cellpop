@@ -68,7 +68,7 @@ function Demo() {
       theme={"light"}
       dimensions={{ width: 1500, height: 1000 }}
       createRowHref={(row) =>
-        `https://www.portal.hubmapconsortium.org/browse/datasets/${row}`
+        `https://portal.hubmapconsortium.org//browse/${row}`
       }
       createColHref={(col) =>
         `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`
