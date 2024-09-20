@@ -9,7 +9,7 @@ import { ColumnProvider, RowProvider } from "./AxisOrderContext";
 import { CellPopThemeProvider } from "./CellPopThemeContext";
 import { DataProvider } from "./DataContext";
 import { Dimensions, DimensionsProvider } from "./DimensionsContext";
-import { FractionProvider } from "./FractionContext"; 
+import { FractionProvider } from "./FractionContext";
 import { MetadataFieldProvider } from "./MetadataFieldContext";
 import { ScaleProvider } from "./ScaleContext";
 import { TooltipDataProvider } from "./TooltipDataContext";
