@@ -55,7 +55,7 @@ export default function HeatmapXAxis() {
             },
             fill: theme.text,
             dy: "0.25em",
-            transform: `rotate(-90, ${x(t)}, ${size})`,
+            transform: `rotate(-90, ${x(t)}, ${size})translate(${size / 2}, 0)`,
             onMouseOver: (e) => {
               openTooltip(
                 {

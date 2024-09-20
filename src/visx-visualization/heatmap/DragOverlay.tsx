@@ -1,6 +1,6 @@
 import React, { PropsWithChildren } from "react";
-import { useXScale, useYScale } from "../contexts/ScaleContext";
-import { useSelectedDimension } from "../contexts/SelectedDimensionContext";
+import { useXScale, useYScale } from "../../contexts/ScaleContext";
+import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
 
 import {
   DndContext,
@@ -23,8 +23,8 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { SortOrder } from "../hooks/useOrderedArray";
-import { Setter } from "../utils/types";
+import { SortOrder } from "../../hooks/useOrderedArray";
+import { Setter } from "../../utils/types";
 
 interface DragOverlayContainerProps extends PropsWithChildren {
   items: string[];
