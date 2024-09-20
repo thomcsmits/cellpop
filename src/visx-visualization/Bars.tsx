@@ -79,6 +79,7 @@ export function Bars({
               width={width}
               height={height}
               fill={theme.sideCharts}
+              stroke={theme.background}
             />
           </g>
         );
