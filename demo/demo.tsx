@@ -67,12 +67,16 @@ function Demo() {
       data={data}
       theme={"light"}
       dimensions={{ width: 1500, height: 1000 }}
-      createRowHref={(row) =>
-        `https://portal.hubmapconsortium.org//browse/${row}`
-      }
-      createColHref={(col) =>
-        `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`
-      }
+      yAxisConfig={{
+        label: "Samples",
+        createHref: (row) =>
+          `https://portal.hubmapconsortium.org/browse/${row}`,
+      }}
+      xAxisConfig={{
+        label: "Cell Types",
+        createHref: (col) =>
+          `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`,
+      }}
     />
   );
 }

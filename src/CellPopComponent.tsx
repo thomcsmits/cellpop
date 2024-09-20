@@ -3,6 +3,7 @@ import React from "react";
 import Skeleton from "@mui/material/Skeleton";
 import { CellPopData, CellPopTheme } from "./cellpop-schema";
 import CellPopConfig from "./CellPopConfig";
+import { AxisConfig } from "./contexts/AxisConfigContext";
 import { Dimensions } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
 import VizContainer from "./visx-visualization/VizContainer";
@@ -11,16 +12,16 @@ export interface CellPopProps {
   data: CellPopData;
   theme: CellPopTheme;
   dimensions: Dimensions;
-  createRowHref?: (row: string) => string;
-  createColHref?: (col: string) => string;
+  xAxisConfig: AxisConfig;
+  yAxisConfig: AxisConfig;
 }
 
 export const CellPop = ({
   theme,
   dimensions,
   data,
-  createColHref,
-  createRowHref,
+  xAxisConfig,
+  yAxisConfig,
 }: CellPopProps) => {
   if (!data) {
     return <Skeleton />;
@@ -32,8 +33,8 @@ export const CellPop = ({
         data={data}
         dimensions={dimensions}
         theme={theme}
-        createColHref={createColHref}
-        createRowHref={createRowHref}
+        xAxisConfig={xAxisConfig}
+        yAxisConfig={yAxisConfig}
       >
         <CellPopConfig />
         <VizContainer />

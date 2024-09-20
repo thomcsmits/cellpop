@@ -1,10 +1,10 @@
 import { AxisBottom, Orientation } from "@visx/axis";
 import React from "react";
+import { useColumnConfig } from "../contexts/AxisConfigContext";
 import { useColumns } from "../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { useData } from "../contexts/DataContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
-import { useColLinkCreator } from "../contexts/LabelLinkContext";
 import { useXScale } from "../contexts/ScaleContext";
 import { useSetTooltipData } from "../contexts/TooltipDataContext";
 import { AxisButtons } from "./AxisButtons";
@@ -19,14 +19,14 @@ export default function HeatmapXAxis() {
   const { theme } = useCellPopTheme();
   const { scale: x } = useXScale();
   const { width, height } = usePanelDimensions("center_bottom");
-  const createColHref = useColLinkCreator();
+  const { label, createHref } = useColumnConfig();
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
   const [columns, { setSortOrder }] = useColumns();
 
   const openInNewTab = (tick: string) => {
-    const href = createColHref?.(tick);
+    const href = createHref?.(tick);
     if (href) {
       window.open(href, "_blank");
     }
@@ -38,7 +38,7 @@ export default function HeatmapXAxis() {
       <svg width={width} height={height} className="cellpop__heatmap_axis_x">
         <AxisBottom
           scale={x}
-          label="Cell Type"
+          label={label}
           numTicks={x.domain().length}
           stroke={theme.text}
           tickStroke={theme.text}
@@ -50,7 +50,7 @@ export default function HeatmapXAxis() {
               style: {
                 fontFamily: "sans-serif",
                 fontVariantNumeric: "tabular-nums",
-                cursor: createColHref ? "pointer" : "default",
+                cursor: createHref ? "pointer" : "default",
               },
               fill: theme.text,
               dy: "0.25em",
@@ -58,9 +58,7 @@ export default function HeatmapXAxis() {
               onMouseOver: (e) => {
                 openTooltip(
                   {
-                    title: createColHref
-                      ? `${t} (Click to view in new tab)`
-                      : t,
+                    title: createHref ? `${t} (Click to view in new tab)` : t,
                     data: {
                       "Cell Count": columnCounts[t],
                       column: t,
@@ -76,6 +74,10 @@ export default function HeatmapXAxis() {
           }
           tickValues={columns}
           orientation={Orientation.bottom}
+          labelProps={{
+            fontSize: textSize * 1.5,
+            fill: theme.text,
+          }}
           labelOffset={Math.max(...x.domain().map((s) => s.length)) * 8}
         />
       </svg>
