@@ -6,7 +6,7 @@ import CellPopConfig from "./CellPopConfig";
 import { AxisConfig } from "./contexts/AxisConfigContext";
 import { Dimensions } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
-import VizContainer from "./visx-visualization/VizContainer";
+import VizContainer from "./visx-visualization/layout";
 
 export interface CellPopProps {
   data: CellPopData;
