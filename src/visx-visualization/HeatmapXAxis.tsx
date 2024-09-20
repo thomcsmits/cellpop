@@ -7,7 +7,6 @@ import { useData } from "../contexts/DataContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
 import { useXScale } from "../contexts/ScaleContext";
 import { useSetTooltipData } from "../contexts/TooltipDataContext";
-import { AxisButtons } from "./AxisButtons";
 import { textSize } from "./constants";
 
 /**
@@ -23,7 +22,7 @@ export default function HeatmapXAxis() {
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const [columns, { setSortOrder }] = useColumns();
+  const [columns] = useColumns();
 
   const openInNewTab = (tick: string) => {
     const href = createHref?.(tick);
@@ -34,54 +33,51 @@ export default function HeatmapXAxis() {
   const size = x.bandwidth() > textSize ? textSize : x.bandwidth();
 
   return (
-    <>
-      <svg width={width} height={height} className="cellpop__heatmap_axis_x">
-        <AxisBottom
-          scale={x}
-          label={label}
-          numTicks={x.domain().length}
-          stroke={theme.text}
-          tickStroke={theme.text}
-          tickLabelProps={(t) =>
-            ({
-              textAnchor: "end",
-              fontSize: size,
+    <svg width={width} height={height} className="cellpop__heatmap_axis_x">
+      <AxisBottom
+        scale={x}
+        label={label}
+        numTicks={x.domain().length}
+        stroke={theme.text}
+        tickStroke={theme.text}
+        tickLabelProps={(t) =>
+          ({
+            textAnchor: "end",
+            fontSize: size,
+            fontFamily: "sans-serif",
+            style: {
               fontFamily: "sans-serif",
-              style: {
-                fontFamily: "sans-serif",
-                fontVariantNumeric: "tabular-nums",
-                cursor: createHref ? "pointer" : "default",
-              },
-              fill: theme.text,
-              dy: "0.25em",
-              transform: `rotate(-90, ${x(t)}, ${size})translate(0, ${size / 2})`,
-              onMouseOver: (e) => {
-                openTooltip(
-                  {
-                    title: createHref ? `${t} (Click to view in new tab)` : t,
-                    data: {
-                      "Cell Count": columnCounts[t],
-                      column: t,
-                    },
-                  },
-                  e.clientX,
-                  e.clientY,
-                );
-              },
-              onMouseOut: closeTooltip,
-              onClick: () => openInNewTab(t),
-            }) as const
-          }
-          tickValues={columns}
-          orientation={Orientation.bottom}
-          labelProps={{
-            fontSize: textSize * 1.5,
+              fontVariantNumeric: "tabular-nums",
+              cursor: createHref ? "pointer" : "default",
+            },
             fill: theme.text,
-          }}
-          labelOffset={Math.max(...x.domain().map((s) => s.length)) * 8}
-        />
-      </svg>
-      <AxisButtons axis="X" setSortOrder={setSortOrder} />
-    </>
+            dy: "0.25em",
+            transform: `rotate(-90, ${x(t)}, ${size})translate(0, ${size / 2})`,
+            onMouseOver: (e) => {
+              openTooltip(
+                {
+                  title: createHref ? `${t} (Click to view in new tab)` : t,
+                  data: {
+                    "Cell Count": columnCounts[t],
+                    column: t,
+                  },
+                },
+                e.clientX,
+                e.clientY,
+              );
+            },
+            onMouseOut: closeTooltip,
+            onClick: () => openInNewTab(t),
+          }) as const
+        }
+        tickValues={columns}
+        orientation={Orientation.bottom}
+        labelProps={{
+          fontSize: textSize * 1.5,
+          fill: theme.text,
+        }}
+        labelOffset={Math.max(...x.domain().map((s) => s.length)) * 8}
+      />
+    </svg>
   );
 }

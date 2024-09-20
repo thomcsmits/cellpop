@@ -7,7 +7,6 @@ import { useData } from "../contexts/DataContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
 import { useYScale } from "../contexts/ScaleContext";
 import { useSetTooltipData } from "../contexts/TooltipDataContext";
-import { AxisButtons } from "./AxisButtons";
 import { textSize } from "./constants";
 
 /**
@@ -22,7 +21,7 @@ export default function HeatmapYAxis() {
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const [rows, { setSortOrder }] = useRows();
+  const [rows] = useRows();
 
   const openInNewTab = (tick: string) => {
     const href = createHref?.(tick);
@@ -34,51 +33,48 @@ export default function HeatmapYAxis() {
   const size = y.bandwidth() > textSize ? textSize : y.bandwidth();
 
   return (
-    <>
-      <svg width={width} height={height} className="cellpop__heatmap_axis_y">
-        <AxisRight
-          scale={y}
-          label={label}
-          numTicks={y.domain().length}
-          stroke={theme.text}
-          tickStroke={theme.text}
-          tickLabelProps={(t) =>
-            ({
-              fontSize: size,
-              fill: theme.text,
-              style: {
-                fontFamily: "sans-serif",
-                fontVariantNumeric: "tabular-nums",
-                cursor: createHref ? "pointer" : "default",
-              },
-              transform: `translate(0, ${size / 2})`,
-              onMouseOver: (e) => {
-                openTooltip(
-                  {
-                    title: createHref ? `${t} (Click to view in new tab)` : t,
-                    data: {
-                      "Cell Count": rowCounts[t],
-                      column: t,
-                    },
-                  },
-                  e.clientX,
-                  e.clientY,
-                );
-              },
-              onMouseOut: closeTooltip,
-              onClick: () => openInNewTab(t),
-            }) as const
-          }
-          tickValues={rows}
-          orientation={Orientation.right}
-          labelOffset={Math.max(...y.domain().map((s) => s.length)) * 10}
-          labelProps={{
-            fontSize: textSize * 1.5,
+    <svg width={width} height={height} className="cellpop__heatmap_axis_y">
+      <AxisRight
+        scale={y}
+        label={label}
+        numTicks={y.domain().length}
+        stroke={theme.text}
+        tickStroke={theme.text}
+        tickLabelProps={(t) =>
+          ({
+            fontSize: size,
             fill: theme.text,
-          }}
-        />
-      </svg>
-      <AxisButtons axis="Y" setSortOrder={setSortOrder} />
-    </>
+            style: {
+              fontFamily: "sans-serif",
+              fontVariantNumeric: "tabular-nums",
+              cursor: createHref ? "pointer" : "default",
+            },
+            transform: `translate(0, ${size / 2})`,
+            onMouseOver: (e) => {
+              openTooltip(
+                {
+                  title: createHref ? `${t} (Click to view in new tab)` : t,
+                  data: {
+                    "Cell Count": rowCounts[t],
+                    column: t,
+                  },
+                },
+                e.clientX,
+                e.clientY,
+              );
+            },
+            onMouseOut: closeTooltip,
+            onClick: () => openInNewTab(t),
+          }) as const
+        }
+        tickValues={rows}
+        orientation={Orientation.right}
+        labelOffset={Math.max(...y.domain().map((s) => s.length)) * 10}
+        labelProps={{
+          fontSize: textSize * 1.5,
+          fill: theme.text,
+        }}
+      />
+    </svg>
   );
 }
