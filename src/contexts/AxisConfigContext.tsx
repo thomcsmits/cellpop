@@ -3,7 +3,7 @@ import { createContext, useContext } from "../utils/context";
 export interface AxisConfig {
   label: string;
   createHref?: (tick: string) => string;
-  invertPosition?: boolean;
+  flipAxisPosition?: boolean;
 }
 
 const [RowConfigContext, ColumnConfigContext] = ["Row", "Column"].map(

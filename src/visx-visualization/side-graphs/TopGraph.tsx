@@ -2,16 +2,17 @@ import React from "react";
 
 import { AxisRight } from "@visx/axis";
 import { formatPrefix, max } from "d3";
-import { useCellPopTheme } from "../contexts/CellPopThemeContext";
-import { useData } from "../contexts/DataContext";
-import { usePanelDimensions } from "../contexts/DimensionsContext";
-import { useFraction } from "../contexts/FractionContext";
-import { useXScale } from "../contexts/ScaleContext";
-import { Bars } from "./Bars";
-import { useCountsScale } from "./hooks";
+import { useColumnConfig } from "../../contexts/AxisConfigContext";
+import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
+import { useData } from "../../contexts/DataContext";
+import { usePanelDimensions } from "../../contexts/DimensionsContext";
+import { useFraction } from "../../contexts/FractionContext";
+import { useXScale } from "../../contexts/ScaleContext";
+import HeatmapXAxis from "../heatmap/HeatmapXAxis";
+import Bars from "./Bars";
 import Violins from "./Violin";
-
-const TOP_MARGIN = 16;
+import { TOP_MARGIN } from "./constants";
+import { useCountsScale } from "./hooks";
 
 function TopBar() {
   const { height } = usePanelDimensions("center_top");
@@ -75,10 +76,13 @@ function TopViolin() {
 export default function TopGraph() {
   const { width, height } = usePanelDimensions("center_top");
 
+  const { flipAxisPosition } = useColumnConfig();
+
   const { fraction } = useFraction();
   return (
     <svg className="top-graph-container" height={height} width={width}>
       {fraction ? <TopViolin /> : <TopBar />}
+      {flipAxisPosition && <HeatmapXAxis />}
     </svg>
   );
 }

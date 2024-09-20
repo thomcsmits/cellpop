@@ -71,6 +71,7 @@ function Demo() {
         label: "Samples",
         createHref: (row) =>
           `https://portal.hubmapconsortium.org/browse/${row}`,
+        flipAxisPosition: true,
       }}
       xAxisConfig={{
         label: "Cell Types",

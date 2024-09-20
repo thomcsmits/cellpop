@@ -4,13 +4,17 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import React, { Ref, useMemo } from "react";
-import { useColumns, useRows } from "../contexts/AxisOrderContext";
-import { useCellPopTheme } from "../contexts/CellPopThemeContext";
-import { useData } from "../contexts/DataContext";
-import { useHeatmapDimensions } from "../contexts/DimensionsContext";
-import { useColorScale, useXScale, useYScale } from "../contexts/ScaleContext";
-import { useSelectedDimension } from "../contexts/SelectedDimensionContext";
-import { useSetTooltipData } from "../contexts/TooltipDataContext";
+import { useColumns, useRows } from "../../contexts/AxisOrderContext";
+import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
+import { useData } from "../../contexts/DataContext";
+import { useHeatmapDimensions } from "../../contexts/DimensionsContext";
+import {
+  useColorScale,
+  useXScale,
+  useYScale,
+} from "../../contexts/ScaleContext";
+import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
+import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import DragOverlayContainer from "./DragOverlay";
 
 interface HeatmapArrayProps {
@@ -128,8 +132,15 @@ export default function Heatmap() {
     return { items, setItems, setSort };
   }, [selectedDimension]);
 
+  const { theme } = useCellPopTheme();
+
   return (
-    <svg width={width} height={height} className="heatmap">
+    <svg
+      width={width}
+      height={height}
+      className="heatmap"
+      style={{ outline: `1px solid ${theme.text}` }}
+    >
       <DragOverlayContainer items={items} setItems={setItems} setSort={setSort}>
         {items.map((key) => (
           <HeatmapArray

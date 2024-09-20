@@ -1,7 +1,7 @@
 import { ScaleBand, ScaleLinear } from "d3";
 import React from "react";
-import { useCellPopTheme } from "../contexts/CellPopThemeContext";
-import { useSetTooltipData } from "../contexts/TooltipDataContext";
+import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
+import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 
 interface BarsProps {
   orientation: "horizontal" | "vertical";
@@ -20,7 +20,7 @@ interface BarsProps {
  * @param props.domainLimit The limit of the domain (i.e. the maximum height of a bar on the chart).
  * @returns
  */
-export function Bars({
+export default function Bars({
   orientation,
   categoricalScale,
   numericalScale,

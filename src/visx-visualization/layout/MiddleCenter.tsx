@@ -1,6 +1,6 @@
 import React from "react";
 
-import Heatmap from "../Heatmap";
+import Heatmap from "../heatmap/Heatmap";
 import VisualizationPanel, { VisualizationPanelProps } from "./Panel";
 
 export default function MiddleCenterPanel({ id }: VisualizationPanelProps) {

@@ -1,16 +1,17 @@
 import { AxisBottom } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import React from "react";
-import { useCellPopTheme } from "../contexts/CellPopThemeContext";
-import { useData } from "../contexts/DataContext";
-import { usePanelDimensions } from "../contexts/DimensionsContext";
-import { useFraction } from "../contexts/FractionContext";
-import { useYScale } from "../contexts/ScaleContext";
-import { Bars } from "./Bars";
-import { useCountsScale } from "./hooks";
+import { useRowConfig } from "../../contexts/AxisConfigContext";
+import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
+import { useData } from "../../contexts/DataContext";
+import { usePanelDimensions } from "../../contexts/DimensionsContext";
+import { useFraction } from "../../contexts/FractionContext";
+import { useYScale } from "../../contexts/ScaleContext";
+import HeatmapYAxis from "../heatmap/HeatmapYAxis";
+import Bars from "./Bars";
 import Violins from "./Violin";
-
-const LEFT_MARGIN = 16;
+import { LEFT_MARGIN } from "./constants";
+import { useCountsScale } from "./hooks";
 
 function LeftBar() {
   const { width } = usePanelDimensions("left_middle");
@@ -73,10 +74,11 @@ export default function LeftGraph() {
   const { width, height } = usePanelDimensions("left_middle");
 
   const { fraction } = useFraction();
-
+  const { flipAxisPosition } = useRowConfig();
   return (
     <svg className="left-graph-container" height={height} width={width}>
       {fraction ? <LeftViolin /> : <LeftBar />}
+      {flipAxisPosition && <HeatmapYAxis />}
     </svg>
   );
 }

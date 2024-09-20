@@ -4,13 +4,13 @@ import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
 import { area } from "@visx/shape";
 import { curveBumpY, max, rollup } from "d3";
-import { CountsMatrixValue } from "../cellpop-schema";
-import { useColumns, useRows } from "../contexts/AxisOrderContext";
-import { useCellPopTheme } from "../contexts/CellPopThemeContext";
-import { useData } from "../contexts/DataContext";
-import { usePanelDimensions } from "../contexts/DimensionsContext";
-import { useXScale, useYScale } from "../contexts/ScaleContext";
-import { epanechnikov, kde } from "../utils/violin";
+import { CountsMatrixValue } from "../../cellpop-schema";
+import { useColumns, useRows } from "../../contexts/AxisOrderContext";
+import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
+import { useData } from "../../contexts/DataContext";
+import { usePanelDimensions } from "../../contexts/DimensionsContext";
+import { useXScale, useYScale } from "../../contexts/ScaleContext";
+import { epanechnikov, kde } from "../../utils/violin";
 
 type Side = "top" | "left";
 

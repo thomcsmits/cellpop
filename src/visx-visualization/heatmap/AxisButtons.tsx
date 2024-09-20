@@ -1,6 +1,6 @@
 import React, { CSSProperties } from "react";
-import { SORT_ORDERS, SortOrder } from "../hooks/useOrderedArray";
-import { Setter } from "../utils/types";
+import { SORT_ORDERS, SortOrder } from "../../hooks/useOrderedArray";
+import { Setter } from "../../utils/types";
 
 interface AxisButtonsProps {
   axis: "X" | "Y";

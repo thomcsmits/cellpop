@@ -1,13 +1,13 @@
 import { AxisBottom, Orientation } from "@visx/axis";
-import React from "react";
-import { useColumnConfig } from "../contexts/AxisConfigContext";
-import { useColumns } from "../contexts/AxisOrderContext";
-import { useCellPopTheme } from "../contexts/CellPopThemeContext";
-import { useData } from "../contexts/DataContext";
-import { usePanelDimensions } from "../contexts/DimensionsContext";
-import { useXScale } from "../contexts/ScaleContext";
-import { useSetTooltipData } from "../contexts/TooltipDataContext";
-import { textSize } from "./constants";
+import React, { useId } from "react";
+import { useColumnConfig } from "../../contexts/AxisConfigContext";
+import { useColumns } from "../../contexts/AxisOrderContext";
+import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
+import { useData } from "../../contexts/DataContext";
+import { useXScale } from "../../contexts/ScaleContext";
+import { useSetTooltipData } from "../../contexts/TooltipDataContext";
+import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
+import { TICK_TEXT_SIZE } from "./constants";
 
 /**
  * Component which renders the x-axis of the heatmap.
@@ -17,8 +17,7 @@ export default function HeatmapXAxis() {
   const { columnCounts } = useData();
   const { theme } = useCellPopTheme();
   const { scale: x } = useXScale();
-  const { width, height } = usePanelDimensions("center_bottom");
-  const { label, createHref } = useColumnConfig();
+  const { label, createHref, flipAxisPosition } = useColumnConfig();
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
@@ -30,10 +29,13 @@ export default function HeatmapXAxis() {
       window.open(href, "_blank");
     }
   };
-  const size = x.bandwidth() > textSize ? textSize : x.bandwidth();
+  const size = x.bandwidth() > TICK_TEXT_SIZE ? TICK_TEXT_SIZE : x.bandwidth();
+
+  const filterId = useId();
 
   return (
-    <svg width={width} height={height} className="cellpop__heatmap_axis_x">
+    <>
+      <SVGBackgroundColorFilter color={theme.background} id={filterId} />
       <AxisBottom
         scale={x}
         label={label}
@@ -49,10 +51,11 @@ export default function HeatmapXAxis() {
               fontFamily: "sans-serif",
               fontVariantNumeric: "tabular-nums",
               cursor: createHref ? "pointer" : "default",
+              filter: flipAxisPosition ? `url(#${filterId})` : "none",
             },
             fill: theme.text,
             dy: "0.25em",
-            transform: `rotate(-90, ${x(t)}, ${size})translate(0, ${size / 2})`,
+            transform: `rotate(-90, ${x(t)}, ${size})`,
             onMouseOver: (e) => {
               openTooltip(
                 {
@@ -73,11 +76,11 @@ export default function HeatmapXAxis() {
         tickValues={columns}
         orientation={Orientation.bottom}
         labelProps={{
-          fontSize: textSize * 1.5,
+          fontSize: TICK_TEXT_SIZE * 1.5,
           fill: theme.text,
         }}
         labelOffset={Math.max(...x.domain().map((s) => s.length)) * 8}
       />
-    </svg>
+    </>
   );
 }
