@@ -8,6 +8,7 @@ import { useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
 import { TICK_TEXT_SIZE } from "./constants";
+import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
 
 /**
  * Component which renders the y-axis of the heatmap.
@@ -15,22 +16,22 @@ import { TICK_TEXT_SIZE } from "./constants";
 export default function HeatmapYAxis() {
   const { rowCounts } = useData();
   const { theme } = useCellPopTheme();
-  const { scale: y } = useYScale();
-  const { label, createHref, flipAxisPosition } = useRowConfig();
-
+  const { scale: y, tickLabelSize, setTickLabelSize } = useYScale();
+  const axisConfig = useRowConfig();
+  const { label, flipAxisPosition } = axisConfig;
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
   const [rows] = useRows();
 
-  const openInNewTab = (tick: string) => {
-    const href = createHref?.(tick);
-    if (href) {
-      window.open(href, "_blank");
-    }
-  };
   const filterId = useId();
+  const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(
+    axisConfig,
+    filterId,
+  );
 
   const size = y.bandwidth() > TICK_TEXT_SIZE ? TICK_TEXT_SIZE : y.bandwidth();
+
+  useSetTickLabelSize(flipAxisPosition, setTickLabelSize, "y", size);
 
   return (
     <>
@@ -45,17 +46,13 @@ export default function HeatmapYAxis() {
           ({
             fontSize: size,
             fill: theme.text,
-            style: {
-              fontFamily: "sans-serif",
-              fontVariantNumeric: "tabular-nums",
-              cursor: createHref ? "pointer" : "default",
-              filter: flipAxisPosition ? `url(#${filterId})` : "none",
-            },
-            transform: `translate(0, ${size / 2})`,
+            className: "y-axis-tick-label",
+            style: tickLabelStyle,
+            transform: `translate(0, ${size / 4})`,
             onMouseOver: (e) => {
               openTooltip(
                 {
-                  title: createHref ? `${t} (Click to view in new tab)` : t,
+                  title: tickTitle(t),
                   data: {
                     "Cell Count": rowCounts[t],
                     column: t,
@@ -71,7 +68,9 @@ export default function HeatmapYAxis() {
         }
         tickValues={rows}
         orientation={Orientation.right}
-        labelOffset={Math.max(...y.domain().map((s) => s.length)) * 10}
+        labelOffset={
+          tickLabelSize || Math.max(...y.domain().map((s) => s.length)) * 8
+        }
         labelProps={{
           fontSize: TICK_TEXT_SIZE * 1.5,
           fill: theme.text,

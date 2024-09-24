@@ -77,6 +77,7 @@ function Demo() {
         label: "Cell Types",
         createHref: (col) =>
           `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`,
+        flipAxisPosition: true,
       }}
     />
   );

@@ -14,15 +14,23 @@ import Violins from "./Violin";
 import { TOP_MARGIN } from "./constants";
 import { useCountsScale } from "./hooks";
 
+const useYAxisCountsScale = () => {
+  const { height } = usePanelDimensions("center_top");
+  const { columnCounts } = useData();
+  const { tickLabelSize } = useXScale();
+  console.log({ height, TOP_MARGIN, tickLabelSize });
+  return useCountsScale(
+    [max(Object.values(columnCounts)) || 0, 0],
+    [height - TOP_MARGIN - tickLabelSize, 0],
+  );
+};
+
 function TopBar() {
   const { height } = usePanelDimensions("center_top");
   const { columnCounts } = useData();
   // Use same x scale as the heatmap
   const { scale: xScale } = useXScale();
-  const yScale = useCountsScale(
-    [max(Object.values(columnCounts)) || 0, 0],
-    [height - TOP_MARGIN, 0],
-  );
+  const yScale = useYAxisCountsScale();
 
   return (
     <g className="bartop">
@@ -39,24 +47,26 @@ function TopBar() {
 
 export function TopGraphScale() {
   const { width, height } = usePanelDimensions("right_top");
-  const { columnCounts } = useData();
   // Use same x scale as the heatmap
-  const yScale = useCountsScale(
-    [max(Object.values(columnCounts)) || 0, 0],
-    [height - TOP_MARGIN, 0],
-  );
+  const yScale = useYAxisCountsScale();
+  const { tickLabelSize } = useXScale();
 
-  const axisScale = yScale.copy().range([0, height - TOP_MARGIN]);
+  const axisScale = yScale.copy().range([tickLabelSize, height - TOP_MARGIN]);
   const { theme } = useCellPopTheme();
 
   return (
-    <svg width={width} height={height}>
+    <svg
+      width={width}
+      height={height}
+      style={{ borderLeft: `1px solid ${theme.sideCharts}` }}
+    >
       <AxisRight
         scale={axisScale}
         top={16}
         left={0}
         orientation="right"
         hideZero
+        hideAxisLine
         stroke={theme.text}
         tickLabelProps={{ fill: theme.text }}
         tickStroke={theme.text}
