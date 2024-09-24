@@ -21,6 +21,9 @@ interface DimensionScaleContext {
   toggleSelection: (value: string) => void;
   tickLabelSize: number;
   setTickLabelSize: (size: number) => void;
+  removedValues: Set<string>;
+  removeValue: (value: string) => void;
+  resetRemovedValues: () => void;
 }
 const [XScaleContext, YScaleContext] = SCALES.map((dimension: string) => {
   return createContext<DimensionScaleContext>(`${dimension}ScaleContext`);
@@ -69,6 +72,16 @@ export function ScaleProvider({ children }: PropsWithChildren) {
 
   const { set: selectedX, toggle: toggleX } = useSet<string>();
   const { set: selectedY, toggle: toggleY } = useSet<string>();
+  const {
+    set: removedValuesX,
+    add: removeX,
+    reset: resetRemovedValuesX,
+  } = useSet<string>();
+  const {
+    set: removedValuesY,
+    add: removeY,
+    reset: resetRemovedValuesY,
+  } = useSet<string>();
 
   const [xTickLabelSize, setXTickLabelSize] = React.useState(0);
   const [yTickLabelSize, setYTickLabelSize] = React.useState(0);
@@ -80,8 +93,11 @@ export function ScaleProvider({ children }: PropsWithChildren) {
       toggleSelection: toggleX,
       tickLabelSize: xTickLabelSize,
       setTickLabelSize: setXTickLabelSize,
+      removedValues: removedValuesX,
+      removeValue: removeX,
+      resetRemovedValues: resetRemovedValuesX,
     }),
-    [x, selectedX, toggleX, xTickLabelSize],
+    [x, selectedX, toggleX, xTickLabelSize, removedValuesX],
   );
   const yScaleContext = useMemo(
     () => ({
@@ -90,8 +106,11 @@ export function ScaleProvider({ children }: PropsWithChildren) {
       toggleSelection: toggleY,
       tickLabelSize: yTickLabelSize,
       setTickLabelSize: setYTickLabelSize,
+      removedValues: removedValuesY,
+      removeValue: removeY,
+      resetRemovedValues: resetRemovedValuesY,
     }),
-    [y, selectedY, toggleY, yTickLabelSize],
+    [y, selectedY, toggleY, yTickLabelSize, removedValuesY],
   );
   const colorScaleContext = useMemo(() => ({ scale: colors }), [colors]);
 

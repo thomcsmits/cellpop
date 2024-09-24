@@ -27,5 +27,8 @@ export function useSet<T>(initialValues: T[] = []) {
       return next;
     });
   }, []);
-  return { set, add, remove, update, toggle };
+  const reset = useCallback(() => {
+    update(new Set());
+  }, []);
+  return { set, add, remove, update, toggle, reset };
 }

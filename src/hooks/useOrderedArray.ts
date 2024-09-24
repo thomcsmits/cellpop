@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useSet } from "./useSet";
 
 export type SortOrder =
   | "Alphabetical Ascending"
@@ -21,6 +22,12 @@ export function useOrderedArrayState<T extends string | number>(
 ) {
   const [orderedValues, setOrderedValues] = useState<T[]>(values);
   const [sortOrder, setSortOrder] = useState<SortOrder>("Custom");
+
+  const {
+    set: removedValues,
+    add: removeValue,
+    reset: resetRemovedValues,
+  } = useSet<T>();
 
   const previousSortOrder = useRef<SortOrder>("Custom");
 

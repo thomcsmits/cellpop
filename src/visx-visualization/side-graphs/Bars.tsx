@@ -1,5 +1,9 @@
 import { ScaleBand, ScaleLinear } from "d3";
 import React from "react";
+import {
+  useColumnConfig,
+  useRowConfig,
+} from "../../contexts/AxisConfigContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 
@@ -31,6 +35,9 @@ export default function Bars({
   const barWidth = categoricalScale.bandwidth();
   const { theme } = useCellPopTheme();
 
+  const { label: columnLabel } = useColumnConfig();
+  const { label: rowLabel } = useRowConfig();
+
   const { openTooltip, closeTooltip } = useSetTooltipData();
   const onMouse = (key: string) => (e: React.MouseEvent<SVGRectElement>) => {
     openTooltip(
@@ -38,7 +45,7 @@ export default function Bars({
         title: key,
         data: {
           "Cell Count": data[key],
-          [orientation === "vertical" ? "column" : "row"]: key,
+          [orientation === "vertical" ? columnLabel : rowLabel]: key,
         },
       },
       e.clientX,

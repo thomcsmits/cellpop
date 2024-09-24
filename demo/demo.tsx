@@ -68,13 +68,13 @@ function Demo() {
       theme={"light"}
       dimensions={{ width: 1500, height: 1000 }}
       yAxisConfig={{
-        label: "Samples",
+        label: "Sample",
         createHref: (row) =>
           `https://portal.hubmapconsortium.org/browse/${row}`,
         flipAxisPosition: true,
       }}
       xAxisConfig={{
-        label: "Cell Types",
+        label: "Cell Type",
         createHref: (col) =>
           `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`,
         flipAxisPosition: true,
