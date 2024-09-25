@@ -3,7 +3,6 @@ import React, { useId } from "react";
 import { useRowConfig } from "../../contexts/AxisConfigContext";
 import { useRows } from "../../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
-import { useData } from "../../contexts/DataContext";
 import { useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
@@ -14,14 +13,13 @@ import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
  * Component which renders the y-axis of the heatmap.
  */
 export default function HeatmapYAxis() {
-  const { rowCounts } = useData();
   const { theme } = useCellPopTheme();
   const { scale: y, tickLabelSize, setTickLabelSize } = useYScale();
   const axisConfig = useRowConfig();
   const { label, flipAxisPosition } = axisConfig;
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const [rows] = useRows();
+  const [rows, { filteredCounts }] = useRows();
 
   const filterId = useId();
   const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(
@@ -54,8 +52,8 @@ export default function HeatmapYAxis() {
                 {
                   title: tickTitle(t),
                   data: {
-                    "Cell Count": rowCounts[t],
-                    column: t,
+                    "Cell Count": filteredCounts[t],
+                    [label]: t,
                   },
                 },
                 e.clientX,

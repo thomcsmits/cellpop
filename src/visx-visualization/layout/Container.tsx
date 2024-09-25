@@ -6,7 +6,10 @@ import Tooltip from "../Tooltip";
 
 import { ParentRefProvider } from "../../contexts/ContainerRefContext";
 
+import { Root as ContextMenuRoot, Trigger } from "@radix-ui/react-context-menu";
+import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import "../../visualization/style.css";
+import ContextMenuComponent from "../heatmap/ContextMenu";
 import BottomCenterPanel from "./BottomCenter";
 import BottomLeftPanel from "./BottomLeft";
 import BottomRightPanel from "./BottomRight";
@@ -33,55 +36,64 @@ export default function VizContainerGrid() {
 
   const id = useId();
 
+  const { openContextMenu, closeContextMenu } = useSetTooltipData();
+
   return (
     <ParentRefProvider value={parentRef}>
-      <div
-        style={{ position: "relative" }}
-        ref={parentRef}
-        id={`${id}-main-container`}
+      <ContextMenuRoot
+        onOpenChange={(open) => (open ? openContextMenu() : closeContextMenu())}
       >
-        <div
-          style={{
-            width,
-            height,
-            display: "grid",
-            gridTemplateColumns,
-            gridTemplateRows,
-            background,
-          }}
-        >
-          <TopLeftPanel id={`${id}-top-left`} />
-          <TopCenterPanel id={`${id}-top-center`} />
-          <TopRightPanel id={`${id}-top-right`} />
-          <MiddleLeftPanel id={`${id}-middle-left`} />
-          <MiddleCenterPanel id={`${id}-middle-center`} />
-          <MiddleRightPanel id={`${id}-middle-right`} />
-          <BottomLeftPanel id={`${id}-bottom-left`} />
-          <BottomCenterPanel id={`${id}-bottom-center`} />
-          <BottomRightPanel id={`${id}-bottom-right`} />
-        </div>
-        <VisualizationPanelResizer
-          index={0}
-          resize={resizeColumn}
-          orientation="X"
-        />
-        <VisualizationPanelResizer
-          index={1}
-          resize={resizeColumn}
-          orientation="X"
-        />
-        <VisualizationPanelResizer
-          index={0}
-          resize={resizeRow}
-          orientation="Y"
-        />
-        <VisualizationPanelResizer
-          index={1}
-          resize={resizeRow}
-          orientation="Y"
-        />
-        <Tooltip />
-      </div>
+        <Trigger>
+          <div
+            style={{ position: "relative" }}
+            ref={parentRef}
+            id={`${id}-main-container`}
+          >
+            <div
+              style={{
+                width,
+                height,
+                display: "grid",
+                gridTemplateColumns,
+                gridTemplateRows,
+                background,
+              }}
+            >
+              <TopLeftPanel id={`${id}-top-left`} />
+              <TopCenterPanel id={`${id}-top-center`} />
+              <TopRightPanel id={`${id}-top-right`} />
+              <MiddleLeftPanel id={`${id}-middle-left`} />
+              <MiddleCenterPanel id={`${id}-middle-center`} />
+              <MiddleRightPanel id={`${id}-middle-right`} />
+              <BottomLeftPanel id={`${id}-bottom-left`} />
+              <BottomCenterPanel id={`${id}-bottom-center`} />
+              <BottomRightPanel id={`${id}-bottom-right`} />
+            </div>
+            <VisualizationPanelResizer
+              index={0}
+              resize={resizeColumn}
+              orientation="X"
+            />
+            <VisualizationPanelResizer
+              index={1}
+              resize={resizeColumn}
+              orientation="X"
+            />
+            <VisualizationPanelResizer
+              index={0}
+              resize={resizeRow}
+              orientation="Y"
+            />
+            <VisualizationPanelResizer
+              index={1}
+              resize={resizeRow}
+              orientation="Y"
+            />
+            <Tooltip />
+          </div>
+        </Trigger>
+        <ContextMenuComponent />
+      </ContextMenuRoot>
     </ParentRefProvider>
   );
 }

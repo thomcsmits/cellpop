@@ -58,7 +58,7 @@ export default function HeatmapXAxis() {
                   title: tickTitle(t),
                   data: {
                     "Cell Count": columnCounts[t],
-                    column: t,
+                    [label]: t,
                   },
                 },
                 e.clientX,

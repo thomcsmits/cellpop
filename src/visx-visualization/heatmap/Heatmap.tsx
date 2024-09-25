@@ -4,6 +4,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import React, { Ref, useMemo } from "react";
+import {
+  useColumnConfig,
+  useRowConfig,
+} from "../../contexts/AxisConfigContext";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
@@ -29,6 +33,8 @@ interface HeatmapArrayProps {
  * @returns
  */
 function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
+  // If selectedDimension is X, dataKey is a column key
+  // If selectedDimension is Y, dataKey is a row key
   const { dataMap } = useData();
   const { scale: xScale } = useXScale();
   const { scale: yScale } = useYScale();
@@ -36,10 +42,11 @@ function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
   const { width, height } = useHeatmapDimensions();
   const [rows] = useRows();
   const [columns] = useColumns();
+  const { label: rowLabel } = useRowConfig();
+  const { label: columnLabel } = useColumnConfig();
   const { openTooltip } = useSetTooltipData();
 
   const items = selectedDimension === "X" ? rows : columns;
-
   const widthScale = selectedDimension === "X" ? xScale : yScale;
   const rowWidth = selectedDimension === "X" ? widthScale.bandwidth() : width;
   const rowHeight = selectedDimension === "X" ? height : widthScale.bandwidth();
@@ -71,7 +78,7 @@ function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
       {items.map((itemKey) => {
         const row = selectedDimension === "X" ? itemKey : dataKey;
         const column = selectedDimension === "X" ? dataKey : itemKey;
-        const counts = dataMap.get(`${row}-${column}`);
+        const counts = dataMap[`${row}-${column}`];
         return (
           <rect
             key={`${row}-${column}`}
@@ -82,13 +89,22 @@ function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
             fill={colors(counts)}
             tabIndex={100}
             onMouseOver={(e) => {
+              console.log({
+                row,
+                column,
+                counts,
+                rowLabel,
+                [rowLabel]: row,
+                columnLabel,
+                [columnLabel]: column,
+              });
               openTooltip(
                 {
                   title: `${row} - ${column}`,
                   data: {
                     "cell count": counts,
-                    row,
-                    column,
+                    [rowLabel]: row,
+                    [columnLabel]: column,
                   },
                 },
                 e.clientX,
@@ -124,13 +140,15 @@ export default function Heatmap() {
     { setOrderedValues: setColumns, setSortOrder: setColumnOrder },
   ] = useColumns();
 
+  const { closeTooltip } = useSetTooltipData();
+
   // Dynamically determine which dimension to use based on the selected dimension
   const { items, setItems, setSort } = useMemo(() => {
     const items = selectedDimension === "X" ? columns : rows;
     const setItems = selectedDimension === "X" ? setColumns : setRows;
     const setSort = selectedDimension === "X" ? setColumnOrder : setRowOrder;
     return { items, setItems, setSort };
-  }, [selectedDimension]);
+  }, [selectedDimension, columns, rows]);
 
   const { theme } = useCellPopTheme();
 
@@ -140,6 +158,7 @@ export default function Heatmap() {
       height={height}
       className="heatmap"
       style={{ outline: `1px solid ${theme.text}` }}
+      onMouseOut={closeTooltip}
     >
       <DragOverlayContainer items={items} setItems={setItems} setSort={setSort}>
         {items.map((key) => (

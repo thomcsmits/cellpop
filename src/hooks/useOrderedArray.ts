@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSet } from "./useSet";
 
 export type SortOrder =
@@ -51,8 +51,28 @@ export function useOrderedArrayState<T extends string | number>(
     }
   }, [values, counts, sortOrder]);
 
+  const filteredValues = useMemo(() => {
+    return orderedValues.filter((v) => !removedValues.has(v));
+  }, [orderedValues, removedValues]);
+
+  const filteredCounts = useMemo(() => {
+    return Object.fromEntries(
+      Object.entries(counts ?? {}).filter(
+        ([key]) => !removedValues.has(key as T),
+      ),
+    ) as Record<T, number>;
+  }, [counts, removedValues]);
+
   return [
-    orderedValues,
-    { setOrderedValues, sortOrder, setSortOrder },
+    filteredValues,
+    {
+      filteredCounts,
+      setOrderedValues,
+      sortOrder,
+      setSortOrder,
+      removedValues,
+      removeValue,
+      resetRemovedValues,
+    },
   ] as const;
 }

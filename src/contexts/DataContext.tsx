@@ -16,7 +16,7 @@ type DataMapKey = `${RowKey}-${ColumnKey}`;
 
 interface DataContextType {
   data: CellPopData;
-  dataMap: Map<DataMapKey, number>;
+  dataMap: Record<DataMapKey, number>;
   columnCounts: Record<string, number>;
   rowCounts: Record<string, number>;
   maxRow: number;
@@ -38,12 +38,12 @@ export function calculateRowAndColumnCounts(data: CellPopData) {
   const columnCounts: Record<string, number> = {};
   const rowCounts: Record<string, number> = {};
   let maxCount: number = 0;
-  const dataMap = new Map<DataMapKey, number>();
+  const dataMap: Record<DataMapKey, number> = {} as Record<DataMapKey, number>;
   data.countsMatrix.forEach(({ col, row, value }) => {
     columnCounts[col] = (columnCounts[col] || 0) + value;
     rowCounts[row] = (rowCounts[row] || 0) + value;
     maxCount = Math.max(maxCount, value);
-    dataMap.set(`${row}-${col}`, value);
+    dataMap[`${row}-${col}`] = value;
   });
 
   const upperBound = getUpperBound(data.countsMatrix.map((r) => r.value));

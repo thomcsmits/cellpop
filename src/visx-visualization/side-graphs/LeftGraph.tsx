@@ -2,8 +2,8 @@ import { AxisBottom } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import React from "react";
 import { useRowConfig } from "../../contexts/AxisConfigContext";
+import { useRows } from "../../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
-import { useData } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useFraction } from "../../contexts/FractionContext";
 import { useYScale } from "../../contexts/ScaleContext";
@@ -15,20 +15,24 @@ import { useCountsScale } from "./hooks";
 
 const useXAxisCountsScale = () => {
   const { width } = usePanelDimensions("left_middle");
-  const { rowCounts } = useData();
+  const [, { filteredCounts }] = useRows();
   const { tickLabelSize } = useYScale();
   return useCountsScale(
-    [0, max(Object.values(rowCounts)) || 0],
+    [0, max(Object.values(filteredCounts)) || 0],
     [0, width - LEFT_MARGIN - tickLabelSize],
   );
 };
 
 function LeftBar() {
   const { width } = usePanelDimensions("left_middle");
-  const { rowCounts } = useData();
+  const [, { filteredCounts }] = useRows();
+  const { tickLabelSize } = useYScale();
+  const xScale = useCountsScale(
+    [0, max(Object.values(filteredCounts)) || 0],
+    [0, width - LEFT_MARGIN - tickLabelSize],
+  );
   // Use same y scale as the heatmap
   const { scale: yScale } = useYScale();
-  const xScale = useXAxisCountsScale();
 
   return (
     <g className="barleft">
@@ -36,7 +40,7 @@ function LeftBar() {
         orientation="horizontal"
         categoricalScale={yScale}
         numericalScale={xScale}
-        data={rowCounts}
+        data={filteredCounts}
         domainLimit={width}
       />
     </g>

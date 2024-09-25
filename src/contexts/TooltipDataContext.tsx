@@ -1,5 +1,5 @@
 import { useTooltip } from "@visx/tooltip";
-import React, { PropsWithChildren, useMemo } from "react";
+import React, { PropsWithChildren, useMemo, useState } from "react";
 import { createContext, useContext } from "../utils/context";
 
 interface TooltipData {
@@ -12,6 +12,7 @@ interface TooltipDataContextType {
   tooltipOpen: boolean;
   tooltipLeft: number;
   tooltipTop: number;
+  contextMenuOpen: boolean;
 }
 
 const TooltipDataContext = createContext<TooltipDataContextType>("TooltipData");
@@ -19,6 +20,8 @@ const TooltipDataContext = createContext<TooltipDataContextType>("TooltipData");
 interface TooltipActionsContextType {
   openTooltip: (data: TooltipData, left: number, top: number) => void;
   closeTooltip: () => void;
+  openContextMenu: () => void;
+  closeContextMenu: () => void;
 }
 
 const TooltipActionsContext =
@@ -34,6 +37,7 @@ export function TooltipDataProvider({ children }: PropsWithChildren) {
   const {
     showTooltip,
     hideTooltip,
+    updateTooltip,
     tooltipOpen,
     tooltipData,
     tooltipLeft = 0,
@@ -43,25 +47,40 @@ export function TooltipDataProvider({ children }: PropsWithChildren) {
     tooltipData: null,
   });
 
+  const [contextMenuOpen, setContextMenuOpen] = useState(false);
+
   const tooltipDataContext = useMemo(
     () => ({
       tooltipData,
-      tooltipOpen,
+      tooltipOpen: tooltipOpen && !contextMenuOpen,
+      contextMenuOpen,
       tooltipLeft,
       tooltipTop,
     }),
-    [tooltipData, tooltipOpen, tooltipLeft, tooltipTop],
+    [tooltipData, tooltipOpen, tooltipLeft, tooltipTop, contextMenuOpen],
   );
 
   const tooltipActionsContext = useMemo(() => {
     const openTooltip = (data: TooltipData, left: number, top: number) => {
+      if (contextMenuOpen) {
+        return;
+      }
       showTooltip({ tooltipData: data, tooltipLeft: left, tooltipTop: top });
     };
     const closeTooltip = () => {
+      if (contextMenuOpen) {
+        return;
+      }
       hideTooltip();
     };
-    return { openTooltip, closeTooltip };
-  }, [showTooltip]);
+    const openContextMenu = () => {
+      setContextMenuOpen(true);
+    };
+    const closeContextMenu = () => {
+      setContextMenuOpen(false);
+    };
+    return { openTooltip, closeTooltip, openContextMenu, closeContextMenu };
+  }, [updateTooltip, contextMenuOpen]);
 
   return (
     <TooltipDataContext.Provider value={tooltipDataContext}>
