@@ -1,14 +1,12 @@
 import { rgbToHex } from "@mui/material";
 import React, { useId } from "react";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
-import { useData } from "../contexts/DataContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
 import { useColorScale } from "../contexts/ScaleContext";
 
 export default function Legend() {
-  const { scale: colors } = useColorScale();
+  const { scale: colors, maxValue } = useColorScale();
   const { width } = usePanelDimensions("left_top");
-  const { maxCount } = useData();
   const { theme } = useCellPopTheme();
   const domain = colors.domain();
   const id = useId() + "-legend";
@@ -48,7 +46,7 @@ export default function Legend() {
           0
         </text>
         <text y={36} x={adjustedWidth - 8} textAnchor="end" fill={theme.text}>
-          {maxCount}
+          {maxValue}
         </text>
       </svg>
     </div>

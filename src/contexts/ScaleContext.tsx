@@ -1,6 +1,5 @@
 import { scaleBand, scaleLinear } from "@visx/scale";
 import React, { PropsWithChildren, useMemo } from "react";
-import { getUpperBound } from "../visualization/util";
 
 import { useSet } from "../hooks/useSet";
 import { createContext, useContext } from "../utils/context";
@@ -21,9 +20,6 @@ interface DimensionScaleContext {
   toggleSelection: (value: string) => void;
   tickLabelSize: number;
   setTickLabelSize: (size: number) => void;
-  removedValues: Set<string>;
-  removeValue: (value: string) => void;
-  resetRemovedValues: () => void;
 }
 const [XScaleContext, YScaleContext] = SCALES.map((dimension: string) => {
   return createContext<DimensionScaleContext>(`${dimension}ScaleContext`);
@@ -34,6 +30,21 @@ export const useYScale = () => useContext(YScaleContext);
 // Color context does not have selection
 interface ColorScaleContext {
   scale: ScaleLinear<string>;
+  maxValue: number;
+}
+function useFilteredMaxCount() {
+  const {
+    data: { countsMatrix },
+  } = useData();
+  const [, { removedValues: filteredRows }] = useRows();
+  const [, { removedValues: filteredColumns }] = useColumns();
+  return Math.max(
+    ...countsMatrix
+      .filter(
+        ({ col, row }) => !filteredColumns.has(col) && !filteredRows.has(row),
+      )
+      .map(({ value }) => value),
+  );
 }
 const ColorScaleContext = createContext<ColorScaleContext>("ColorScaleContext");
 export const useColorScale = () => useContext(ColorScaleContext);
@@ -63,25 +74,8 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     return scaleBand<string>().range([height, 0]).domain(rows).padding(0.01);
   }, [height, rows]);
 
-  const colors = useMemo(() => {
-    return scaleLinear<string>({
-      range: [heatmapZero, heatmapMax],
-      domain: [0, getUpperBound(data.countsMatrix.map((r) => r.value))],
-    });
-  }, [data.countsMatrix, heatmapZero, heatmapMax]);
-
   const { set: selectedX, toggle: toggleX } = useSet<string>();
   const { set: selectedY, toggle: toggleY } = useSet<string>();
-  const {
-    set: removedValuesX,
-    add: removeX,
-    reset: resetRemovedValuesX,
-  } = useSet<string>();
-  const {
-    set: removedValuesY,
-    add: removeY,
-    reset: resetRemovedValuesY,
-  } = useSet<string>();
 
   const [xTickLabelSize, setXTickLabelSize] = React.useState(0);
   const [yTickLabelSize, setYTickLabelSize] = React.useState(0);
@@ -93,11 +87,8 @@ export function ScaleProvider({ children }: PropsWithChildren) {
       toggleSelection: toggleX,
       tickLabelSize: xTickLabelSize,
       setTickLabelSize: setXTickLabelSize,
-      removedValues: removedValuesX,
-      removeValue: removeX,
-      resetRemovedValues: resetRemovedValuesX,
     }),
-    [x, selectedX, toggleX, xTickLabelSize, removedValuesX],
+    [x, selectedX, toggleX, xTickLabelSize],
   );
   const yScaleContext = useMemo(
     () => ({
@@ -106,13 +97,20 @@ export function ScaleProvider({ children }: PropsWithChildren) {
       toggleSelection: toggleY,
       tickLabelSize: yTickLabelSize,
       setTickLabelSize: setYTickLabelSize,
-      removedValues: removedValuesY,
-      removeValue: removeY,
-      resetRemovedValues: resetRemovedValuesY,
     }),
-    [y, selectedY, toggleY, yTickLabelSize, removedValuesY],
+    [y, selectedY, toggleY, yTickLabelSize],
   );
-  const colorScaleContext = useMemo(() => ({ scale: colors }), [colors]);
+  const maxValue = useFilteredMaxCount();
+  const colors = useMemo(() => {
+    return scaleLinear<string>({
+      range: [heatmapZero, heatmapMax],
+      domain: [0, maxValue],
+    });
+  }, [data.countsMatrix, heatmapZero, heatmapMax]);
+  const colorScaleContext = useMemo(
+    () => ({ scale: colors, maxValue }),
+    [colors, maxValue],
+  );
 
   return (
     <XScaleContext.Provider value={xScaleContext}>
