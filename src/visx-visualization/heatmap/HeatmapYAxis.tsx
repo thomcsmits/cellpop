@@ -21,7 +21,7 @@ export default function HeatmapYAxis() {
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
   const [rows] = useRows();
-  const { columnCounts } = useData();
+  const { rowCounts } = useData();
 
   const filterId = useId();
   const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(
@@ -54,7 +54,7 @@ export default function HeatmapYAxis() {
                 {
                   title: tickTitle(t),
                   data: {
-                    "Cell Count": columnCounts[t],
+                    "Cell Count": rowCounts[t],
                     [label]: t,
                   },
                 },
