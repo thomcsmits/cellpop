@@ -155,7 +155,7 @@ const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
   return (
     <ContextMenu.Sub>
       <ContextMenu.SubTrigger className="ContextMenuSubTrigger">
-        Sort {label}s <div className="RightSlot">➤</div>
+        Sort {label}s <div className="RightSlot">&rsaquo;</div>
       </ContextMenu.SubTrigger>
       <ContextMenu.Portal>
         <ContextMenu.SubContent
