@@ -87,7 +87,6 @@ function HeatmapArray({ dataKey, selectedDimension }: HeatmapArrayProps) {
             width={cellWidth}
             height={cellHeight}
             fill={colors(counts)}
-            tabIndex={100}
             onMouseOver={(e) => {
               openTooltip(
                 {

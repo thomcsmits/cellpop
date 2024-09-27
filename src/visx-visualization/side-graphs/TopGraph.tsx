@@ -1,9 +1,8 @@
-import React, { useMemo } from "react";
+import React from "react";
 
 import { AxisRight } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
-import { useColumns } from "../../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
@@ -17,17 +16,17 @@ import { useCountsScale } from "./hooks";
 
 const useYAxisCountsScale = () => {
   const { height } = usePanelDimensions("center_top");
-  const [, { filteredCounts }] = useColumns();
+  const { columnCounts } = useData();
   const { tickLabelSize } = useXScale();
   return useCountsScale(
-    [max(Object.values(filteredCounts)) || 0, 0],
+    [max(Object.values(columnCounts)) || 0, 0],
     [height - TOP_MARGIN - tickLabelSize, 0],
   );
 };
 
 function TopBar() {
   const { height } = usePanelDimensions("center_top");
-  const [, { filteredCounts }] = useColumns();
+  const { columnCounts } = useData();
   // Use same x scale as the heatmap
   const { scale: xScale } = useXScale();
   const yScale = useYAxisCountsScale();
@@ -38,7 +37,7 @@ function TopBar() {
         orientation="vertical"
         categoricalScale={xScale}
         numericalScale={yScale}
-        data={filteredCounts}
+        data={columnCounts}
         domainLimit={height}
       />
     </g>

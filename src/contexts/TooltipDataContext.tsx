@@ -2,7 +2,7 @@ import { useTooltip } from "@visx/tooltip";
 import React, { PropsWithChildren, useMemo, useState } from "react";
 import { createContext, useContext } from "../utils/context";
 
-interface TooltipData {
+export interface TooltipData {
   title: string;
   data: Record<string, unknown>;
 }
@@ -78,6 +78,7 @@ export function TooltipDataProvider({ children }: PropsWithChildren) {
     };
     const closeContextMenu = () => {
       setContextMenuOpen(false);
+      hideTooltip();
     };
     return { openTooltip, closeTooltip, openContextMenu, closeContextMenu };
   }, [updateTooltip, contextMenuOpen]);

@@ -3,6 +3,7 @@ import React, { useId } from "react";
 import { useRowConfig } from "../../contexts/AxisConfigContext";
 import { useRows } from "../../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
+import { useData } from "../../contexts/DataContext";
 import { useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
@@ -19,7 +20,8 @@ export default function HeatmapYAxis() {
   const { label, flipAxisPosition } = axisConfig;
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const [rows, { filteredCounts }] = useRows();
+  const [rows] = useRows();
+  const { columnCounts } = useData();
 
   const filterId = useId();
   const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(
@@ -52,7 +54,7 @@ export default function HeatmapYAxis() {
                 {
                   title: tickTitle(t),
                   data: {
-                    "Cell Count": filteredCounts[t],
+                    "Cell Count": columnCounts[t],
                     [label]: t,
                   },
                 },

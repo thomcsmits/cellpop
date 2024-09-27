@@ -5,13 +5,15 @@ import {
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
+import { useData } from "../../contexts/DataContext";
 import { useTooltipData } from "../../contexts/TooltipDataContext";
+import { SORT_ORDERS } from "../../hooks/useOrderedArray";
 import "./ContextMenu.css";
 
 const HideRow = () => {
   const { tooltipData } = useTooltipData();
   const { label: rowLabel } = useRowConfig();
-  const [, { removeValue }] = useRows();
+  const { removeRow } = useData();
 
   if (!tooltipData?.data) {
     return null;
@@ -22,7 +24,7 @@ const HideRow = () => {
     return (
       <ContextMenu.Item
         className="ContextMenuItem"
-        onClick={() => removeValue(rowValue)}
+        onClick={() => removeRow(rowValue)}
       >
         Hide {rowLabel} ({rowValue})
       </ContextMenu.Item>
@@ -33,7 +35,7 @@ const HideRow = () => {
 const HideColumn = () => {
   const { tooltipData } = useTooltipData();
   const { label: columnLabel } = useColumnConfig();
-  const [, { removeValue }] = useColumns();
+  const { removeColumn } = useData();
 
   if (!tooltipData?.data) {
     return null;
@@ -44,7 +46,7 @@ const HideColumn = () => {
     return (
       <ContextMenu.Item
         className="ContextMenuItem"
-        onClick={() => removeValue(columnValue)}
+        onClick={() => removeColumn(columnValue)}
       >
         Hide {columnLabel} ({columnValue})
       </ContextMenu.Item>
@@ -53,77 +55,163 @@ const HideColumn = () => {
 };
 
 const RestoreHiddenRows = () => {
-  const [, { removedValues, resetRemovedValues }] = useRows();
+  const { removedRows, resetRemovedRows } = useData();
   const { label: rowLabel } = useRowConfig();
 
-  if (!removedValues.size) {
+  if (!removedRows.size) {
     return null;
   }
 
   return (
-    <ContextMenu.Item className="ContextMenuItem" onClick={resetRemovedValues}>
+    <ContextMenu.Item className="ContextMenuItem" onClick={resetRemovedRows}>
       Restore Hidden {rowLabel}s
     </ContextMenu.Item>
   );
 };
 
 const RestoreHiddenColumns = () => {
-  const [, { removedValues, resetRemovedValues }] = useColumns();
+  const { removedColumns, resetRemovedColumns } = useData();
   const { label: columnLabel } = useColumnConfig();
 
-  if (!removedValues.size) {
+  if (!removedColumns.size) {
     return null;
   }
 
   return (
-    <ContextMenu.Item className="ContextMenuItem" onClick={resetRemovedValues}>
+    <ContextMenu.Item className="ContextMenuItem" onClick={resetRemovedColumns}>
       Restore Hidden {columnLabel}s
     </ContextMenu.Item>
   );
 };
 
+const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
+  // The visual "start" of the rows and columns is at the top and left, respectively.
+  const [, { moveToEnd: moveRowToStart }] = useRows();
+  const [, { moveToStart: moveColumnToStart }] = useColumns();
+  const {
+    tooltipData: { data },
+  } = useTooltipData();
+  const { label: rowLabel } = useRowConfig();
+
+  const { label: columnLabel } = useColumnConfig();
+
+  const move = dimension === "row" ? moveRowToStart : moveColumnToStart;
+  const label = dimension === "row" ? rowLabel : columnLabel;
+  const moveLabel = dimension === "row" ? "Top" : "Left";
+
+  if (!data[label]) {
+    return null;
+  }
+
+  return (
+    <ContextMenu.Item
+      className="ContextMenuItem"
+      onClick={() => move(data[label] as string)}
+    >
+      Move to {moveLabel}
+    </ContextMenu.Item>
+  );
+};
+
+const MoveToEnd = ({ dimension }: { dimension: "row" | "column" }) => {
+  const [, { moveToStart: moveRowToEnd }] = useRows();
+  const [, { moveToEnd: moveColumnToEnd }] = useColumns();
+  const {
+    tooltipData: { data },
+  } = useTooltipData();
+  const { label: rowLabel } = useRowConfig();
+
+  const { label: columnLabel } = useColumnConfig();
+
+  const move = dimension === "row" ? moveRowToEnd : moveColumnToEnd;
+  const label = dimension === "row" ? rowLabel : columnLabel;
+  const moveLabel = dimension === "row" ? "Bottom" : "Right";
+
+  if (!data[label]) {
+    return null;
+  }
+
+  return (
+    <ContextMenu.Item
+      className="ContextMenuItem"
+      onClick={() => move(data[label] as string)}
+    >
+      Move to {moveLabel}
+    </ContextMenu.Item>
+  );
+};
+
+const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
+  const [, { setSortOrder: sortColumns, sortOrder: colSortOrder }] =
+    useColumns();
+  const [, { setSortOrder: sortRows, sortOrder: rowSortOrder }] = useRows();
+
+  const sort = dimension === "row" ? sortRows : sortColumns;
+  const { label: rowLabel } = useRowConfig();
+  const { label: columnLabel } = useColumnConfig();
+  const label = dimension === "row" ? rowLabel : columnLabel;
+  const currentSortOrder = dimension === "row" ? rowSortOrder : colSortOrder;
+
+  return (
+    <ContextMenu.Sub>
+      <ContextMenu.SubTrigger className="ContextMenuSubTrigger">
+        Sort {label}s <div className="RightSlot">➤</div>
+      </ContextMenu.SubTrigger>
+      <ContextMenu.Portal>
+        <ContextMenu.SubContent
+          className="ContextMenuSubContent"
+          sideOffset={2}
+          alignOffset={-5}
+        >
+          {SORT_ORDERS.filter((order) => order !== "Custom").map((order) => (
+            <ContextMenu.Item
+              key={order}
+              className="ContextMenuItem"
+              onClick={() => sort(order)}
+            >
+              {order}
+              {currentSortOrder === order ? (
+                <div className="RightSlot">✓</div>
+              ) : (
+                ""
+              )}
+            </ContextMenu.Item>
+          ))}
+        </ContextMenu.SubContent>
+      </ContextMenu.Portal>
+    </ContextMenu.Sub>
+  );
+};
+
 const ContextMenuComponent = () => {
+  const { label: rowLabel } = useRowConfig();
+  const { label: columnLabel } = useColumnConfig();
+
+  const { tooltipData } = useTooltipData();
+  if (!tooltipData) {
+    return null;
+  }
+
   return (
     <ContextMenu.Portal>
       <ContextMenu.Content className="ContextMenuContent">
+        <ContextMenu.ContextMenuLabel className="ContextMenuLabel">
+          Rows ({rowLabel}s)
+        </ContextMenu.ContextMenuLabel>
         <HideRow />
-        <HideColumn />
         <RestoreHiddenRows />
-        <RestoreHiddenColumns />
-        <ContextMenu.Item className="ContextMenuItem">
-          Reload <div className="RightSlot">⌘+R</div>
-        </ContextMenu.Item>
-        <ContextMenu.Sub>
-          <ContextMenu.SubTrigger className="ContextMenuSubTrigger">
-            Sort Row
-            <div className="RightSlot">{/* <ChevronRightIcon /> */}</div>
-          </ContextMenu.SubTrigger>
-          <ContextMenu.Portal>
-            <ContextMenu.SubContent
-              className="ContextMenuSubContent"
-              sideOffset={2}
-              alignOffset={-5}
-            >
-              <ContextMenu.Item className="ContextMenuItem">
-                Save Page As… <div className="RightSlot">⌘+S</div>
-              </ContextMenu.Item>
-              <ContextMenu.Item className="ContextMenuItem">
-                Create Shortcut…
-              </ContextMenu.Item>
-              <ContextMenu.Item className="ContextMenuItem">
-                Name Window…
-              </ContextMenu.Item>
-              <ContextMenu.Separator className="ContextMenuSeparator" />
-              <ContextMenu.Item className="ContextMenuItem">
-                Developer Tools
-              </ContextMenu.Item>
-            </ContextMenu.SubContent>
-          </ContextMenu.Portal>
-        </ContextMenu.Sub>
+        <SortDimension dimension="row" />
+        <MoveToStart dimension="row" />
+        <MoveToEnd dimension="row" />
         <ContextMenu.Separator className="ContextMenuSeparator" />
-        <ContextMenu.Label className="ContextMenuLabel">
-          People
-        </ContextMenu.Label>
+        <ContextMenu.ContextMenuLabel className="ContextMenuLabel">
+          Columns ({columnLabel}s)
+        </ContextMenu.ContextMenuLabel>
+        <HideColumn />
+        <RestoreHiddenColumns />
+        <SortDimension dimension="column" />
+        <MoveToStart dimension="column" />
+        <MoveToEnd dimension="column" />
       </ContextMenu.Content>
     </ContextMenu.Portal>
   );

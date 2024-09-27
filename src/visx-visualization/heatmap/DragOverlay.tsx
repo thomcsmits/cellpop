@@ -1,4 +1,10 @@
-import React, { PropsWithChildren } from "react";
+import React, {
+  PropsWithChildren,
+  startTransition,
+  useCallback,
+  useMemo,
+  useRef,
+} from "react";
 import { useXScale, useYScale } from "../../contexts/ScaleContext";
 import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
 
@@ -55,7 +61,10 @@ function DragOverlayContainer({
       ? verticalListSortingStrategy
       : horizontalListSortingStrategy;
 
-  const gridSize = selectedDimension === "X" ? x.bandwidth() : y.bandwidth();
+  const snapModifier = useMemo(() => {
+    const gridSize = selectedDimension === "X" ? x.bandwidth() : y.bandwidth();
+    return createSnapModifier(gridSize);
+  }, [selectedDimension, x, y]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -64,30 +73,50 @@ function DragOverlayContainer({
     }),
   );
 
-  function handleDrag(event: DragEndEvent) {
-    const { active, over } = event;
+  const initialItemOrder = useRef<string[]>(items);
+  const lastOver = useRef<string | number | null>(null);
 
-    if (!over) {
-      return;
-    }
+  const startDrag = useCallback(() => {
+    initialItemOrder.current = items;
+    lastOver.current = null;
+  }, [items]);
 
-    if (active.id !== over.id) {
-      setSort("Custom");
-      setItems((items) => {
-        const oldIndex = items.indexOf(active.id as string);
-        const newIndex = items.indexOf(over.id as string);
+  const cancelDrag = useCallback(() => {
+    startTransition(() => {
+      setItems(initialItemOrder.current);
+    });
+  }, [setItems]);
 
-        return arrayMove(items, oldIndex, newIndex);
+  const handleDrag = useCallback(
+    ({ active, over }: DragEndEvent) => {
+      if (!over || active.id === over.id || lastOver.current === over.id) {
+        return;
+      }
+
+      lastOver.current = over.id;
+
+      startTransition(() => {
+        setSort("Custom");
+        setItems((items) => {
+          const oldIndex = items.indexOf(active.id as string);
+          const newIndex = items.indexOf(over.id as string);
+
+          return arrayMove(items, oldIndex, newIndex);
+        });
       });
-    }
-  }
+    },
+    [setItems, setSort],
+  );
 
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={pointerWithin}
+      onDragStart={startDrag}
+      onDragCancel={cancelDrag}
       onDragMove={handleDrag}
-      modifiers={[createSnapModifier(gridSize), restrictToParentElement]}
+      onDragEnd={startDrag}
+      modifiers={[snapModifier, restrictToParentElement]}
     >
       <SortableContext items={items} strategy={strategy}>
         {children}

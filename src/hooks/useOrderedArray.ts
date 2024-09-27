@@ -1,5 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useSet } from "./useSet";
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 export type SortOrder =
   | "Alphabetical Ascending"
@@ -19,60 +24,72 @@ export const SORT_ORDERS: SortOrder[] = [
 export function useOrderedArrayState<T extends string | number>(
   values: T[] = [],
   counts?: Record<T, number>,
+  filteredValues?: Set<T>,
 ) {
   const [orderedValues, setOrderedValues] = useState<T[]>(values);
   const [sortOrder, setSortOrder] = useState<SortOrder>("Custom");
 
-  const {
-    set: removedValues,
-    add: removeValue,
-    reset: resetRemovedValues,
-  } = useSet<T>();
-
+  useEffect(() => {
+    if (filteredValues) {
+      setOrderedValues((ordered) =>
+        ordered.filter((value) => !filteredValues.has(value)),
+      );
+    } else {
+      setOrderedValues(values);
+    }
+  }, [filteredValues, values]);
   const previousSortOrder = useRef<SortOrder>("Custom");
 
   useEffect(() => {
     if (sortOrder !== previousSortOrder.current) {
-      previousSortOrder.current = sortOrder;
-      switch (sortOrder) {
-        case "Alphabetical Ascending":
-          setOrderedValues([...values].sort());
-          break;
-        case "Alphabetical Descending":
-          setOrderedValues([...values].sort().reverse());
-          break;
-        case "Counts Ascending":
-          setOrderedValues([...values].sort((a, b) => counts[a] - counts[b]));
-          break;
-        case "Counts Descending":
-          setOrderedValues([...values].sort((a, b) => counts[b] - counts[a]));
-          break;
-      }
+      startTransition(() => {
+        previousSortOrder.current = sortOrder;
+        switch (sortOrder) {
+          case "Alphabetical Ascending":
+            setOrderedValues([...values].sort());
+            break;
+          case "Alphabetical Descending":
+            setOrderedValues([...values].sort().reverse());
+            break;
+          case "Counts Ascending":
+            setOrderedValues([...values].sort((a, b) => counts[a] - counts[b]));
+            break;
+          case "Counts Descending":
+            setOrderedValues([...values].sort((a, b) => counts[b] - counts[a]));
+            break;
+        }
+      });
     }
   }, [values, counts, sortOrder]);
 
-  const filteredValues = useMemo(() => {
-    return orderedValues.filter((v) => !removedValues.has(v));
-  }, [orderedValues, removedValues]);
+  const moveToStart = useCallback((value: T) => {
+    setOrderedValues((ordered) => {
+      const index = ordered.indexOf(value);
+      if (index === -1) {
+        return ordered;
+      }
+      return [value, ...ordered.slice(0, index), ...ordered.slice(index + 1)];
+    });
+  }, []);
 
-  const filteredCounts = useMemo(() => {
-    return Object.fromEntries(
-      Object.entries(counts ?? {}).filter(
-        ([key]) => !removedValues.has(key as T),
-      ),
-    ) as Record<T, number>;
-  }, [counts, removedValues]);
+  const moveToEnd = useCallback((value: T) => {
+    setOrderedValues((ordered) => {
+      const index = ordered.indexOf(value);
+      if (index === -1) {
+        return ordered;
+      }
+      return [...ordered.slice(0, index), ...ordered.slice(index + 1), value];
+    });
+  }, []);
 
   return [
-    filteredValues,
+    orderedValues,
     {
-      filteredCounts,
       setOrderedValues,
       sortOrder,
       setSortOrder,
-      removedValues,
-      removeValue,
-      resetRemovedValues,
+      moveToStart,
+      moveToEnd,
     },
   ] as const;
 }

@@ -1,5 +1,6 @@
 import React, { PropsWithChildren, useMemo } from "react";
 import { CellPopData } from "../cellpop-schema";
+import { useSet } from "../hooks/useSet";
 import { createContext, useContext } from "../utils/context";
 import { getUpperBound } from "../visualization/util";
 
@@ -19,36 +20,20 @@ interface DataContextType {
   dataMap: Record<DataMapKey, number>;
   columnCounts: Record<string, number>;
   rowCounts: Record<string, number>;
+  removedRows: Set<string>;
+  removedColumns: Set<string>;
+  resetRemovedRows: () => void;
+  resetRemovedColumns: () => void;
+  removeRow: (row: string) => void;
+  removeColumn: (column: string) => void;
   upperBound: number;
+  maxCount: number;
+  rowNames: string[];
+  colNames: string[];
 }
 
 const DataContext = createContext<DataContextType | null>("CellPopData");
 export const useData = () => useContext(DataContext);
-
-/**
- * Function for calculating various static counts for the data.
- * @param data The data to calculate counts for.
- * @todo It would be nice if we could generalize this further so it handles everything that the `dataLoading` helpers do.
- *       This would enable greater flexibility for downstream users, e.g. providing an array of [row, column, value] tuples instead of a `CellPopData` object.
- */
-export function calculateRowAndColumnCounts(data: CellPopData) {
-  const columnCounts: Record<string, number> = {};
-  const rowCounts: Record<string, number> = {};
-  const dataMap: Record<DataMapKey, number> = {} as Record<DataMapKey, number>;
-  data.countsMatrix.forEach(({ col, row, value }) => {
-    columnCounts[col] = (columnCounts[col] || 0) + value;
-    rowCounts[row] = (rowCounts[row] || 0) + value;
-    dataMap[`${row}-${col}`] = value;
-  });
-
-  const upperBound = getUpperBound(data.countsMatrix.map((r) => r.value));
-  return {
-    columnCounts,
-    rowCounts,
-    upperBound,
-    dataMap,
-  };
-}
 
 /**
  * Context provider for the data passed to the rest of the visualization.
@@ -56,9 +41,74 @@ export function calculateRowAndColumnCounts(data: CellPopData) {
  * @param param0 props.data The data to be visualized
  */
 export function DataProvider({ children, data }: DataContextProps) {
-  const { columnCounts, rowCounts, upperBound, dataMap } = useMemo(() => {
-    return calculateRowAndColumnCounts(data);
+  const dataMap = useMemo(() => {
+    return data.countsMatrix.reduce(
+      (acc, { col, row, value }) => {
+        acc[`${row}-${col}`] = value;
+        return acc;
+      },
+      {} as Record<DataMapKey, number>,
+    );
   }, [data]);
+
+  const {
+    set: removedRows,
+    add: removeRow,
+    reset: resetRemovedRows,
+  } = useSet<string>();
+
+  const {
+    set: removedColumns,
+    add: removeColumn,
+    reset: resetRemovedColumns,
+  } = useSet<string>();
+
+  const columnCounts = useMemo(() => {
+    const columnCounts: Record<string, number> = {};
+    data.countsMatrix.forEach(({ col, value }) => {
+      if (removedColumns.has(col)) {
+        return;
+      }
+      columnCounts[col] = (columnCounts[col] || 0) + value;
+    });
+    return columnCounts;
+  }, [data, removedColumns]);
+
+  const rowCounts = useMemo(() => {
+    const rowCounts: Record<string, number> = {};
+    data.countsMatrix.forEach(({ row, value }) => {
+      if (removedRows.has(row)) {
+        return;
+      }
+      rowCounts[row] = (rowCounts[row] || 0) + value;
+    });
+    return rowCounts;
+  }, [data, removedRows]);
+
+  const upperBound = useMemo(
+    () => getUpperBound(data.countsMatrix.map((r) => r.value)),
+    [data],
+  );
+
+  const maxCount = useMemo(() => {
+    return Math.max(
+      ...data.countsMatrix
+        .filter(
+          ({ col, row }) => !(removedRows.has(row) || removedColumns.has(col)),
+        )
+        .map((r) => r.value),
+    );
+  }, [data, removedRows, removedColumns]);
+
+  const rowNames = useMemo(
+    () => data.rowNames.filter((r) => !removedRows.has(r)),
+    [data, removedRows],
+  );
+
+  const colNames = useMemo(
+    () => data.colNames.filter((c) => !removedColumns.has(c)),
+    [data, removedColumns],
+  );
 
   return (
     <DataContext.Provider
@@ -67,7 +117,16 @@ export function DataProvider({ children, data }: DataContextProps) {
         columnCounts,
         rowCounts,
         upperBound,
+        maxCount,
         dataMap,
+        removedRows,
+        removedColumns,
+        resetRemovedRows,
+        resetRemovedColumns,
+        removeRow,
+        removeColumn,
+        rowNames,
+        colNames,
       }}
     >
       {children}

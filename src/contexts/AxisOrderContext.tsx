@@ -23,9 +23,9 @@ export const useColumns = () => useContext(ColumnContext);
  * Context for managing heatmap row order.
  */
 export const RowProvider = ({ children }: PropsWithChildren) => {
-  const { data, rowCounts } = useData();
+  const { rowNames, rowCounts, removedRows } = useData();
 
-  const value = useOrderedArrayState(data.rowNames, rowCounts);
+  const value = useOrderedArrayState(rowNames, rowCounts, removedRows);
 
   return <RowContext.Provider value={value}>{children}</RowContext.Provider>;
 };
@@ -34,9 +34,9 @@ export const RowProvider = ({ children }: PropsWithChildren) => {
  * Context for managing heatmap column order.
  */
 export const ColumnProvider = ({ children }: PropsWithChildren) => {
-  const { data, columnCounts } = useData();
+  const { colNames, columnCounts, removedColumns } = useData();
 
-  const value = useOrderedArrayState(data.colNames, columnCounts);
+  const value = useOrderedArrayState(colNames, columnCounts, removedColumns);
 
   return (
     <ColumnContext.Provider value={value}>{children}</ColumnContext.Provider>

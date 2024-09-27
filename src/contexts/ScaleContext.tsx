@@ -32,20 +32,6 @@ interface ColorScaleContext {
   scale: ScaleLinear<string>;
   maxValue: number;
 }
-function useFilteredMaxCount() {
-  const {
-    data: { countsMatrix },
-  } = useData();
-  const [, { removedValues: filteredRows }] = useRows();
-  const [, { removedValues: filteredColumns }] = useColumns();
-  return Math.max(
-    ...countsMatrix
-      .filter(
-        ({ col, row }) => !filteredColumns.has(col) && !filteredRows.has(row),
-      )
-      .map(({ value }) => value),
-  );
-}
 const ColorScaleContext = createContext<ColorScaleContext>("ColorScaleContext");
 export const useColorScale = () => useContext(ColorScaleContext);
 
@@ -53,7 +39,7 @@ export const useColorScale = () => useContext(ColorScaleContext);
  * Provider which instantiates and manages the scales used for the heatmap.
  */
 export function ScaleProvider({ children }: PropsWithChildren) {
-  const { data } = useData();
+  const { maxCount } = useData();
   const { width, height } = useHeatmapDimensions();
   const {
     theme: { heatmapZero, heatmapMax },
@@ -100,17 +86,16 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     }),
     [y, selectedY, toggleY, yTickLabelSize],
   );
-  const maxValue = useFilteredMaxCount();
-  const colors = useMemo(() => {
-    return scaleLinear<string>({
+  const colorScaleContext = useMemo(() => {
+    const scale = scaleLinear<string>({
       range: [heatmapZero, heatmapMax],
-      domain: [0, maxValue],
+      domain: [0, maxCount],
     });
-  }, [data.countsMatrix, heatmapZero, heatmapMax]);
-  const colorScaleContext = useMemo(
-    () => ({ scale: colors, maxValue }),
-    [colors, maxValue],
-  );
+    return {
+      scale,
+      maxValue: maxCount,
+    };
+  }, [heatmapZero, heatmapMax, maxCount]);
 
   return (
     <XScaleContext.Provider value={xScaleContext}>
