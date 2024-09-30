@@ -75,10 +75,9 @@ export default function HeatmapXAxis() {
           fontSize: TICK_TEXT_SIZE * 1.5,
           fill: theme.text,
           className: "x-axis-label",
+          pointerEvents: "none",
         }}
-        labelOffset={
-          tickLabelSize || Math.max(...x.domain().map((s) => s.length)) * 8
-        }
+        labelOffset={tickLabelSize - TICK_TEXT_SIZE * 2}
       />
     </>
   );

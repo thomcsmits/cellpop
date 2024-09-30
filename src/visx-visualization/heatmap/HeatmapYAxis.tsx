@@ -74,6 +74,7 @@ export default function HeatmapYAxis() {
         labelProps={{
           fontSize: TICK_TEXT_SIZE * 1.5,
           fill: theme.text,
+          pointerEvents: "none",
         }}
       />
     </>

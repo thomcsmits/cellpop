@@ -18,7 +18,7 @@ export default function Tooltip() {
     <TooltipWithBounds
       top={tooltipTop}
       left={tooltipLeft}
-      style={{ ...defaultStyles, pointerEvents: "none" }}
+      style={{ ...defaultStyles, pointerEvents: "none", zIndex: 1000 }}
     >
       <div>
         <strong>{tooltipData.title}</strong>
