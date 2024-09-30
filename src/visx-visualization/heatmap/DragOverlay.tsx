@@ -173,6 +173,8 @@ function DragIndicator({ item }: { item: string }) {
   const { width, height } = useHeatmapDimensions();
   const { scale: x } = useXScale();
   const { scale: y } = useYScale();
+  const xStep = x.bandwidth();
+  const yStep = y.bandwidth();
 
   const { columnSizes, rowSizes } = useDimensions();
   const { dataMap } = useData();
@@ -196,14 +198,7 @@ function DragIndicator({ item }: { item: string }) {
     selectedDimension === "X"
       ? verticalListSortingStrategy
       : horizontalListSortingStrategy;
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    isDragging,
-    transform,
-    transition,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, isDragging } = useSortable({
     id: item,
     strategy,
   });
@@ -218,8 +213,6 @@ function DragIndicator({ item }: { item: string }) {
       }
       const xValue = e.clientX - xOffset - visualizationBounds.left;
       const yValue = e.clientY - yOffset - visualizationBounds.top;
-      const xStep = x.bandwidth();
-      const yStep = y.bandwidth();
       const yIndex = Math.floor(xValue / xStep);
       const xIndex = Math.floor(yValue / yStep);
 
@@ -238,7 +231,7 @@ function DragIndicator({ item }: { item: string }) {
         e.clientY,
       );
     },
-    [x, y, xOffset, yOffset, dataMap, rowLabel, columnLabel],
+    [xStep, yStep, xOffset, yOffset, dataMap, rowLabel, columnLabel],
   );
   return (
     <div
@@ -251,8 +244,6 @@ function DragIndicator({ item }: { item: string }) {
         left,
         top,
         outline: isDragging ? `1px solid ${theme.text}` : "none",
-        // transform: CSS.Transform.toString(transform),
-        // transition,
       }}
       ref={setNodeRef}
       {...attributes}

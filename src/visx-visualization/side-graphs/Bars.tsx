@@ -33,12 +33,11 @@ export default function Bars({
 }: BarsProps) {
   const entries = Object.entries(data);
   const barWidth = categoricalScale.bandwidth();
-  const { theme } = useCellPopTheme();
 
   const { label: columnLabel } = useColumnConfig();
   const { label: rowLabel } = useRowConfig();
 
-  const { openTooltip, closeTooltip } = useSetTooltipData();
+  const { openTooltip } = useSetTooltipData();
   const onMouse = (key: string) => (e: React.MouseEvent<SVGRectElement>) => {
     openTooltip(
       {
@@ -52,7 +51,6 @@ export default function Bars({
       e.clientY,
     );
   };
-  // Outer `g` wrapper is used to show the tooltip on hover for accessibility
   return (
     <>
       {entries.map(([key, value]) => {
@@ -66,31 +64,65 @@ export default function Bars({
         const height = orientation === "vertical" ? barHeight : barWidth;
         const width = orientation === "vertical" ? barWidth : barHeight;
         return (
-          <g
+          <Bar
             key={key}
-            onMouseOver={onMouse(key)}
-            onMouseMove={onMouse(key)}
-            onMouseOut={closeTooltip}
-            pointerEvents={"all"}
-          >
-            <rect
-              x={orientation === "vertical" ? x : 0}
-              y={orientation === "vertical" ? 0 : y}
-              height={orientation === "vertical" ? "100%" : barWidth}
-              width={orientation === "vertical" ? barWidth : "100%"}
-              fill={theme.background}
-            />
-            <rect
-              x={x}
-              y={y}
-              width={width}
-              height={height}
-              fill={theme.sideCharts}
-              stroke={theme.background}
-            />
-          </g>
+            onMouse={onMouse(key)}
+            orientation={orientation}
+            x={x}
+            y={y}
+            barWidth={barWidth}
+            width={width}
+            height={height}
+          />
         );
       })}
     </>
+  );
+}
+
+interface BarProps {
+  onMouse: (e: React.MouseEvent<SVGRectElement>) => void;
+  orientation: "horizontal" | "vertical";
+  x: number;
+  y: number;
+  barWidth: number;
+  width: number;
+  height: number;
+}
+
+function Bar({
+  onMouse,
+  orientation,
+  x,
+  y,
+  barWidth,
+  width,
+  height,
+}: BarProps) {
+  const { closeTooltip } = useSetTooltipData();
+  const { theme } = useCellPopTheme();
+  return (
+    <g
+      onMouseOver={onMouse}
+      onMouseMove={onMouse}
+      onMouseOut={closeTooltip}
+      pointerEvents={"all"}
+    >
+      <rect
+        x={orientation === "vertical" ? x : 0}
+        y={orientation === "vertical" ? 0 : y}
+        height={orientation === "vertical" ? "100%" : barWidth}
+        width={orientation === "vertical" ? barWidth : "100%"}
+        fill={theme.background}
+      />
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={theme.sideCharts}
+        stroke={theme.background}
+      />
+    </g>
   );
 }

@@ -26,6 +26,11 @@ function HeatmapCell({
   const { scale: colors } = useColorScale();
   const cellWidth = xScale.bandwidth();
   const cellHeight = yScale.bandwidth();
+  const { removedRows, removedColumns } = useData();
+
+  if (removedRows.has(row) || removedColumns.has(col)) {
+    return null;
+  }
 
   return (
     <rect
