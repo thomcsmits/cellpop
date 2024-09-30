@@ -55,12 +55,14 @@ function getPromiseData(urls: string[]) {
     const config = {
       url,
       fileType: "obsSets.anndata.zarr",
-      options: [
-        {
-          name: "Cell Ontology Annotation",
-          path: "obs/predicted_CLID", //"obs/predicted_label"
-        },
-      ],
+      options: {
+        obsSets: [
+          {
+            name: "Cell Ontology Annotation",
+            path: "obs/predicted_CLID", //"obs/predicted_label"
+          },
+        ],
+      },
       type: "obsSets",
     } as const;
     const loader = new ObsSetsAnndataLoader(source, config);

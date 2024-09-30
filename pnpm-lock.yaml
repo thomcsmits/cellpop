@@ -84,8 +84,8 @@ importers:
         specifier: ^3.3.0
         version: 3.3.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@vitessce/zarr':
-        specifier: 3.4.9
-        version: 3.4.9(vzif22isvp2jpjjnqpjozzxawq)
+        specifier: 3.4.11
+        version: 3.4.11(vzif22isvp2jpjjnqpjozzxawq)
       d3:
         specifier: ^6.7.0
         version: 6.7.0
@@ -2225,49 +2225,49 @@ packages:
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0
 
-  '@vitessce/config@3.4.9':
-    resolution: {integrity: sha512-EQ8MOQw4mhSbXq3kl2qVd5W3NVCW3Hmey4fsZD+iA1zH4mBU8DmZgptMsKsfjYaLdIKCTMHYrc5z56F/pUwEdw==}
+  '@vitessce/config@3.4.11':
+    resolution: {integrity: sha512-rA3uX3pBrjk4MWaeRvMzcYDFsAPxrs1cTqTvXYqVA+rO0D7x99g48po8x5kQq6epYZvbBMpuADEQqqbm0Eu9Mg==}
 
-  '@vitessce/constants-internal@3.4.9':
-    resolution: {integrity: sha512-NHXRo2piNPPjuoj6DYAgWOfSmAXQLups50HYUszon1wQDNnKWaDyY44Yf0J4vgiVT1FZGE+QnFwX+OvhbUl5GA==}
+  '@vitessce/constants-internal@3.4.11':
+    resolution: {integrity: sha512-xKkx0Qb4OT3ZtnL9RuNYn63cTvnn+dKNhAHeyPumjbDTlp8kpAU6703iwqL+z8s85KMipCwNmjvJvU9luBXeSw==}
 
-  '@vitessce/constants@3.4.9':
-    resolution: {integrity: sha512-emWF1rKOTbeJvbcL17I1mt9m7mhKHmPex13ULbLm0Vz1KAFXDZDM/7LKwfRAiPvXGr3IrljC1xYFYz3ywgmvKw==}
+  '@vitessce/constants@3.4.11':
+    resolution: {integrity: sha512-1c3zemxhtavXNTgc/WfyNXaPAwTxlYCpWkWjLfEVtsr68hhG7OTVAOclCezkDHwJpefiTG9Jz0wb7uIUln26Zw==}
 
-  '@vitessce/gl@3.4.9':
-    resolution: {integrity: sha512-p/hH2LC3fatVBQgWBoDo8ZYS3AwJx48UELSuyRdCiOl6a0IQq0eESbj/+rIcDGLgnBsmvcnf/EZZxJtATR9XaA==}
+  '@vitessce/gl@3.4.11':
+    resolution: {integrity: sha512-hNQFzW8bn5bWMKTmIu4B0CBV8iIPJdmpjVNrXHuqoWz6XjCYxrj1NUUmJWaYz66n5NlI6NntLrbT1JTyBkx0VA==}
 
-  '@vitessce/image-utils@3.4.9':
-    resolution: {integrity: sha512-F/Eg2ePPL1ikh1Bc0kjS9XUtEmMXiC8us3BpixVOWANivkGPMmrhWlVRaX2HatSShh34KfQwJ8TFFjnTFOQv4A==}
+  '@vitessce/image-utils@3.4.11':
+    resolution: {integrity: sha512-7Qm49cbolPYPOU69sdFq45vdcc7Pl5MooC/ngDsn7TOcnZExQ932yLVlYw45Pff0xYS5Zb7EwFpaFqZnkZcamQ==}
 
-  '@vitessce/plugins@3.4.9':
-    resolution: {integrity: sha512-lTKrbaApot7o0z+Z0K0Y444mjlzT89FErNHkvPg33pOWiIGPuv8BkjyZMbaHjoKpLCyNrXNorE+fKK4kN8q1EA==}
+  '@vitessce/plugins@3.4.11':
+    resolution: {integrity: sha512-BrdV0VI8u1AglwkKoOxNu7qD30aos/lU2sDBMB1In5ZUkDvztDux0GuONurKZQIIU0HoinpG64RJ6LkTSk004A==}
 
-  '@vitessce/schemas@3.4.9':
-    resolution: {integrity: sha512-0+3352WsQrZW5Sx4IT6rGJ9xZEQl4wa3yXBidYXCePf7eFTnDAZBRJzuaGWsZX8wa6sjqU0scLqpUi0ZOiwQtQ==}
+  '@vitessce/schemas@3.4.11':
+    resolution: {integrity: sha512-wyhMp6xwykZuSr6fxRFBql1RKFXpWVh+0nLJdYWUyw50BtDLRLa2SOedAfq45hyfupmR5ieCEx8AtS0dPhhNCQ==}
 
-  '@vitessce/sets-utils@3.4.9':
-    resolution: {integrity: sha512-XeA+D8GoqOJwPJ4/56vY7rfTEyEh7Qa4b05I9h+sM8YWRD5xFwk1xxWpfpSh+Em0qMQqUvl5Qe1R6YveSSC6bA==}
+  '@vitessce/sets-utils@3.4.11':
+    resolution: {integrity: sha512-/p2jrAA7P4ZepYJYu9aQO8y2lXYThwvYbCDe1gFxQ+lBKby/mgCGDiKaEwzG9+JS7ca87+AmNQoEYyy/Q/rpfw==}
 
-  '@vitessce/spatial-utils@3.4.9':
-    resolution: {integrity: sha512-1j9Bc+xADpUhE6E0yIJRAFGkTZFr9fpcASOjMLxUArs4wNpvYimCtRZpAiijSbaFy14tjlw+7yHzaY3egFy1mw==}
+  '@vitessce/spatial-utils@3.4.11':
+    resolution: {integrity: sha512-vWnslLV1hQy+t75Cqey02wOwRAJxSEKFwMPRdCcKZzpe64KcUENrf4gGreWRtdTz1DwDcND1CAyQ8QRMWmv3GQ==}
 
-  '@vitessce/types@3.4.9':
-    resolution: {integrity: sha512-Y8G+AwHCrChFW6g6bFay3Sxd1r8S2PSeOZ6SrVjR26Vzkn67uFotKEw9faZ/PPXfoYypjt8yFn9n5HyjC0+Lxg==}
+  '@vitessce/types@3.4.11':
+    resolution: {integrity: sha512-FkwBe0kMCqyOnjmlzdYx9SrXCXrI5lDVhDk5VnwlBcQollh7JI8+v2QcAQLJ7cYr+nkeOJCUa7bzEeErow8xfQ==}
 
-  '@vitessce/utils@3.4.9':
-    resolution: {integrity: sha512-JztOl8mqskAwiOHu9/wfAMha285AhC89cQrJmeAZHNXas6Tc5mHuTVqpC+ZTFzrZ52Z1sjucVs1K2K+U8TVQjg==}
+  '@vitessce/utils@3.4.11':
+    resolution: {integrity: sha512-Sqdl65FYSzERtjmruVVyqQ/gjCa4UzXkdPHJkGuHVWdb/a1QYDZRneqhSbxSFfbSEKMXPPJwwD7aE4GUvIA4Gg==}
 
-  '@vitessce/vit-s@3.4.9':
-    resolution: {integrity: sha512-61E+cQdCBBuB4alRQ96pSCRTEibTuTdgwBVsSR4d/hNBhyOlHpqWd9MLb/00B6pl4NhQPzBNIewu2RtOv9OijA==}
+  '@vitessce/vit-s@3.4.11':
+    resolution: {integrity: sha512-x492aMGQ+dra38yhoT6D2Eku9kEVZHKbE/yoR6riHDlRli0JWkkShmuHWc8H1auadcm+qBR6B9i0r7UnxWCqfw==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
 
-  '@vitessce/zarr-utils@3.4.9':
-    resolution: {integrity: sha512-lGyCJt672jt72nqMPT9L2qdPxqMdDERmzHv+gvxnnhc+D/EY4s+Cl/1TVefduG8TibmZrrCfoE/qFXuTbBaqAg==}
+  '@vitessce/zarr-utils@3.4.11':
+    resolution: {integrity: sha512-wr9naaB9nNUqkJ+Q+lRNdxW+IC04HX/mhuznEbs+QDVG1+fl4QDu22fJbSseQdiCauXU9SO3xj6h81gk0SQcjA==}
 
-  '@vitessce/zarr@3.4.9':
-    resolution: {integrity: sha512-eWTZeC2Y1f2fcTauubKxDzv6ncsN18iCvtE5FW1x67/i8ap9G88WYqUauFr6L/iZr2qG4N2EONn4nJ1oIWANWw==}
+  '@vitessce/zarr@3.4.11':
+    resolution: {integrity: sha512-GAPuj1BEnv/4aZH1zBokNi78on9UKz9JDNWrK/L7WbL4rg2Ia3vnUbTpti0lJ/QDt5CQwngeMwooapP1cGUHUA==}
 
   '@vivjs/constants@0.16.1':
     resolution: {integrity: sha512-TpO/vSwRdFIKTd02p/IWuV72F08SEuSBNXZSdGVRUIOXH0oSF2R51P795hoY5YOPuLGJWY8RxN+u263erOcnjA==}
@@ -2309,17 +2309,8 @@ packages:
   '@zarrita/core@0.1.0-next.14':
     resolution: {integrity: sha512-tsCZhqGU4S1YlNfPMAvw3nJodPxLgXqRSrpYF5Mf4gsi2fxDymNmJA2oSxuA4lLqTDCcvPBCubYykyF9ADxArw==}
 
-  '@zarrita/core@0.1.0-next.8':
-    resolution: {integrity: sha512-WdpTxX4JLVfpP1LAt4aAoQsC/dkgpZzhFTHKykPOGSQ7tkLRfn3ON4T7dxYVcD9uQkRE+ZTTBjhkAFnVQkNasQ==}
-
-  '@zarrita/indexing@0.1.0-next.10':
-    resolution: {integrity: sha512-WOquXdNUNBf22Kl3qkdJmWnzMDLKxpyrgdC87HNR8Y8imQMTdRjejFiI7FvOrY/7HqViDgrckYsyxRrkbLUHjg==}
-
   '@zarrita/indexing@0.1.0-next.16':
     resolution: {integrity: sha512-cNHwpcudHz3R3mOkLe14UgTBf4Jq+gFNG4Dv+AtX93WSTLCg42YSSX6gnLBnrRIoB7KB0FUwpglDDi2R4jIZKw==}
-
-  '@zarrita/storage@0.1.0-next.4':
-    resolution: {integrity: sha512-+Gqaw/dA3VD53gLdXfQs3UKZmchE5CL0N35A1mXrT/QS9dxGQrcp9q7Tcdx9VlqU1eirh8cPVM0z+xPFLiYYyw==}
 
   '@zarrita/storage@0.1.0-next.6':
     resolution: {integrity: sha512-7e1rxCCGA6aaulYiMAZOdMJ+GxVrD01QRvIjCCc1RMKo0otYUAarX2wnoatpSy+m3e+TFjB70M+GQce0XMhNwA==}
@@ -4345,8 +4336,8 @@ packages:
     resolution: {integrity: sha512-v7g3i/NfLEHtGtCEX8zl9b/LMY+8BY7fIYvbNX3nskAhliMCY5mA12jlc8Rbe91hSwL/4Nh2d3fUcVmnthXQkQ==}
     engines: {node: '>=12'}
 
-  zarrita@0.4.0-next.10:
-    resolution: {integrity: sha512-S9SODuy40xuv4jSYP0AtfdItWOetKTyEGGRCO0uv7NQ+JY66Q/k4kvGxuM040sxVIIboKkjuA7V+pT3uyPtgLA==}
+  zarrita@0.4.0-next.16:
+    resolution: {integrity: sha512-nCkhzMopRwDFUFDmK5RGvgvVTTf9vlElBZsrsZF97sEM3oAfv95D9VYDY7Xp489IjE6XGB8nYwsSzRO0EsUiUw==}
 
   zod@3.23.8:
     resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
@@ -7377,18 +7368,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitessce/config@3.4.9':
+  '@vitessce/config@3.4.11':
     dependencies:
-      '@vitessce/constants-internal': 3.4.9
-      '@vitessce/utils': 3.4.9
+      '@vitessce/constants-internal': 3.4.11
+      '@vitessce/utils': 3.4.11
 
-  '@vitessce/constants-internal@3.4.9': {}
+  '@vitessce/constants-internal@3.4.11': {}
 
-  '@vitessce/constants@3.4.9':
+  '@vitessce/constants@3.4.11':
     dependencies:
-      '@vitessce/constants-internal': 3.4.9
+      '@vitessce/constants-internal': 3.4.11
 
-  '@vitessce/gl@3.4.9(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@vitessce/gl@3.4.11(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@deck.gl/aggregation-layers': 8.8.27(@deck.gl/core@8.8.27)(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@luma.gl/core@8.5.21)
       '@deck.gl/core': 8.8.27
@@ -7419,7 +7410,7 @@ snapshots:
       '@turf/boolean-within': 6.5.0
       '@turf/centroid': 6.5.0
       '@turf/helpers': 6.5.0
-      '@vitessce/utils': 3.4.9
+      '@vitessce/utils': 3.4.11
       d3-array: 2.12.1
       deck.gl: 8.8.27(@loaders.gl/core@3.4.15)(@loaders.gl/gltf@3.4.15)(@loaders.gl/images@3.4.15)(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/shadertools@8.5.21)(@luma.gl/webgl@8.5.21)(@math.gl/core@3.6.3)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       glslify: 7.1.1
@@ -7434,12 +7425,12 @@ snapshots:
       - react
       - react-dom
 
-  '@vitessce/image-utils@3.4.9(vzif22isvp2jpjjnqpjozzxawq)':
+  '@vitessce/image-utils@3.4.11(vzif22isvp2jpjjnqpjozzxawq)':
     dependencies:
       '@hms-dbmi/viv': 0.16.1(@deck.gl/core@8.8.27)(@deck.gl/geo-layers@8.8.27(@deck.gl/core@8.8.27)(@deck.gl/extensions@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(gl-matrix@3.4.3))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/mesh-layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21))(@loaders.gl/core@3.4.15)(@loaders.gl/gltf@3.4.15)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/shadertools@8.5.21)(@luma.gl/webgl@8.5.21))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/react@8.8.27(@deck.gl/core@8.8.27)(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/webgl@8.5.21)(react@18.3.1)
-      '@vitessce/spatial-utils': 3.4.9(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@vitessce/types': 3.4.9(@deck.gl/core@8.8.27)(@deck.gl/geo-layers@8.8.27(@deck.gl/core@8.8.27)(@deck.gl/extensions@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(gl-matrix@3.4.3))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/mesh-layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21))(@loaders.gl/core@3.4.15)(@loaders.gl/gltf@3.4.15)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/shadertools@8.5.21)(@luma.gl/webgl@8.5.21))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/react@8.8.27(@deck.gl/core@8.8.27)(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/webgl@8.5.21)(react@18.3.1)
-      '@vitessce/utils': 3.4.9
+      '@vitessce/spatial-utils': 3.4.11(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@vitessce/types': 3.4.11(@deck.gl/core@8.8.27)(@deck.gl/geo-layers@8.8.27(@deck.gl/core@8.8.27)(@deck.gl/extensions@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(gl-matrix@3.4.3))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/mesh-layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21))(@loaders.gl/core@3.4.15)(@loaders.gl/gltf@3.4.15)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/shadertools@8.5.21)(@luma.gl/webgl@8.5.21))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/react@8.8.27(@deck.gl/core@8.8.27)(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/webgl@8.5.21)(react@18.3.1)
+      '@vitessce/utils': 3.4.11
     transitivePeerDependencies:
       - '@deck.gl/core'
       - '@deck.gl/geo-layers'
@@ -7455,30 +7446,30 @@ snapshots:
       - react
       - react-dom
 
-  '@vitessce/plugins@3.4.9':
+  '@vitessce/plugins@3.4.11':
     dependencies:
       zod: 3.23.8
 
-  '@vitessce/schemas@3.4.9':
+  '@vitessce/schemas@3.4.11':
     dependencies:
       '@types/lodash-es': 4.17.12
       '@types/semver': 7.5.8
       '@types/uuid': 9.0.8
-      '@vitessce/constants': 3.4.9
-      '@vitessce/constants-internal': 3.4.9
-      '@vitessce/plugins': 3.4.9
-      '@vitessce/utils': 3.4.9
+      '@vitessce/constants': 3.4.11
+      '@vitessce/constants-internal': 3.4.11
+      '@vitessce/plugins': 3.4.11
+      '@vitessce/utils': 3.4.11
       lodash-es: 4.17.21
       semver: 7.6.3
       uuid: 9.0.1
       zod: 3.23.8
 
-  '@vitessce/sets-utils@3.4.9':
+  '@vitessce/sets-utils@3.4.11':
     dependencies:
       '@turf/centroid': 6.5.0
       '@turf/helpers': 6.5.0
-      '@vitessce/schemas': 3.4.9
-      '@vitessce/utils': 3.4.9
+      '@vitessce/schemas': 3.4.11
+      '@vitessce/utils': 3.4.11
       concaveman: 1.2.1
       d3-dsv: 1.2.0
       internmap: 2.0.3
@@ -7487,15 +7478,15 @@ snapshots:
       tinycolor2: 1.6.0
       uuid: 9.0.1
 
-  '@vitessce/spatial-utils@3.4.9(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@vitessce/spatial-utils@3.4.11(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@vitessce/gl': 3.4.9(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@vitessce/utils': 3.4.9
-      '@vitessce/zarr-utils': 3.4.9
+      '@vitessce/gl': 3.4.11(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@vitessce/utils': 3.4.11
+      '@vitessce/zarr-utils': 3.4.11
       lodash-es: 4.17.21
       math.gl: 3.6.3
       mathjs: 9.5.2
-      zarrita: 0.4.0-next.10
+      zarrita: 0.4.0-next.16
     transitivePeerDependencies:
       - '@loaders.gl/gltf'
       - '@types/react'
@@ -7503,10 +7494,10 @@ snapshots:
       - react
       - react-dom
 
-  '@vitessce/types@3.4.9(@deck.gl/core@8.8.27)(@deck.gl/geo-layers@8.8.27(@deck.gl/core@8.8.27)(@deck.gl/extensions@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(gl-matrix@3.4.3))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/mesh-layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21))(@loaders.gl/core@3.4.15)(@loaders.gl/gltf@3.4.15)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/shadertools@8.5.21)(@luma.gl/webgl@8.5.21))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/react@8.8.27(@deck.gl/core@8.8.27)(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/webgl@8.5.21)(react@18.3.1)':
+  '@vitessce/types@3.4.11(@deck.gl/core@8.8.27)(@deck.gl/geo-layers@8.8.27(@deck.gl/core@8.8.27)(@deck.gl/extensions@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(gl-matrix@3.4.3))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/mesh-layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21))(@loaders.gl/core@3.4.15)(@loaders.gl/gltf@3.4.15)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/shadertools@8.5.21)(@luma.gl/webgl@8.5.21))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/react@8.8.27(@deck.gl/core@8.8.27)(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/webgl@8.5.21)(react@18.3.1)':
     dependencies:
       '@hms-dbmi/viv': 0.16.1(@deck.gl/core@8.8.27)(@deck.gl/geo-layers@8.8.27(@deck.gl/core@8.8.27)(@deck.gl/extensions@8.8.27(@deck.gl/core@8.8.27)(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(gl-matrix@3.4.3))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/mesh-layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/webgl@8.5.21))(@loaders.gl/core@3.4.15)(@loaders.gl/gltf@3.4.15)(@loaders.gl/images@3.4.15)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/gltools@8.5.21)(@luma.gl/shadertools@8.5.21)(@luma.gl/webgl@8.5.21))(@deck.gl/layers@8.8.27(@deck.gl/core@8.8.27)(@loaders.gl/core@3.4.15)(@luma.gl/core@8.5.21))(@deck.gl/react@8.8.27(@deck.gl/core@8.8.27)(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@luma.gl/constants@8.5.21)(@luma.gl/core@8.5.21)(@luma.gl/engine@8.5.21)(@luma.gl/webgl@8.5.21)(react@18.3.1)
-      '@zarrita/storage': 0.1.0-next.4
+      '@zarrita/storage': 0.1.0-next.6
     transitivePeerDependencies:
       - '@deck.gl/core'
       - '@deck.gl/geo-layers'
@@ -7518,24 +7509,24 @@ snapshots:
       - '@luma.gl/webgl'
       - react
 
-  '@vitessce/utils@3.4.9':
+  '@vitessce/utils@3.4.11':
     dependencies:
       bowser: 2.11.0
       lodash-es: 4.17.21
       lz-string: 1.5.0
       pluralize: 8.0.0
 
-  '@vitessce/vit-s@3.4.9(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@vitessce/vit-s@3.4.11(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@material-ui/core': 4.12.4(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@material-ui/icons': 4.11.3(@material-ui/core@4.12.4(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query': 4.36.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@vitessce/config': 3.4.9
-      '@vitessce/constants-internal': 3.4.9
-      '@vitessce/plugins': 3.4.9
-      '@vitessce/schemas': 3.4.9
-      '@vitessce/sets-utils': 3.4.9
-      '@vitessce/utils': 3.4.9
+      '@vitessce/config': 3.4.11
+      '@vitessce/constants-internal': 3.4.11
+      '@vitessce/plugins': 3.4.11
+      '@vitessce/schemas': 3.4.11
+      '@vitessce/sets-utils': 3.4.11
+      '@vitessce/utils': 3.4.11
       clsx: 1.2.1
       d3-array: 2.12.1
       fast-deep-equal: 3.1.3
@@ -7552,27 +7543,27 @@ snapshots:
       - react-dom
       - react-native
 
-  '@vitessce/zarr-utils@3.4.9':
+  '@vitessce/zarr-utils@3.4.11':
     dependencies:
-      '@zarrita/core': 0.1.0-next.8
-      '@zarrita/indexing': 0.1.0-next.10
-      '@zarrita/storage': 0.1.0-next.4
-      zarrita: 0.4.0-next.10
+      '@zarrita/core': 0.1.0-next.14
+      '@zarrita/indexing': 0.1.0-next.16
+      '@zarrita/storage': 0.1.0-next.6
+      zarrita: 0.4.0-next.16
 
-  '@vitessce/zarr@3.4.9(vzif22isvp2jpjjnqpjozzxawq)':
+  '@vitessce/zarr@3.4.11(vzif22isvp2jpjjnqpjozzxawq)':
     dependencies:
-      '@vitessce/config': 3.4.9
-      '@vitessce/constants-internal': 3.4.9
-      '@vitessce/gl': 3.4.9(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@vitessce/image-utils': 3.4.9(vzif22isvp2jpjjnqpjozzxawq)
-      '@vitessce/sets-utils': 3.4.9
-      '@vitessce/spatial-utils': 3.4.9(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@vitessce/utils': 3.4.9
-      '@vitessce/vit-s': 3.4.9(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@vitessce/zarr-utils': 3.4.9
+      '@vitessce/config': 3.4.11
+      '@vitessce/constants-internal': 3.4.11
+      '@vitessce/gl': 3.4.11(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@vitessce/image-utils': 3.4.11(vzif22isvp2jpjjnqpjozzxawq)
+      '@vitessce/sets-utils': 3.4.11
+      '@vitessce/spatial-utils': 3.4.11(@loaders.gl/gltf@3.4.15)(@types/react@18.3.10)(gl-matrix@3.4.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@vitessce/utils': 3.4.11
+      '@vitessce/vit-s': 3.4.11(@types/react@18.3.10)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@vitessce/zarr-utils': 3.4.11
       d3-array: 2.12.1
       lodash-es: 4.17.21
-      zarrita: 0.4.0-next.10
+      zarrita: 0.4.0-next.16
     transitivePeerDependencies:
       - '@deck.gl/core'
       - '@deck.gl/geo-layers'
@@ -7666,28 +7657,11 @@ snapshots:
       '@zarrita/typedarray': 0.1.0-next.3
       numcodecs: 0.3.2
 
-  '@zarrita/core@0.1.0-next.8':
-    dependencies:
-      '@zarrita/storage': 0.1.0-next.6
-      '@zarrita/typedarray': 0.1.0-next.3
-      numcodecs: 0.3.2
-
-  '@zarrita/indexing@0.1.0-next.10':
-    dependencies:
-      '@zarrita/core': 0.1.0-next.14
-      '@zarrita/storage': 0.1.0-next.6
-      '@zarrita/typedarray': 0.1.0-next.3
-
   '@zarrita/indexing@0.1.0-next.16':
     dependencies:
       '@zarrita/core': 0.1.0-next.14
       '@zarrita/storage': 0.1.0-next.6
       '@zarrita/typedarray': 0.1.0-next.3
-
-  '@zarrita/storage@0.1.0-next.4':
-    dependencies:
-      reference-spec-reader: 0.2.0
-      unzipit: 1.4.3
 
   '@zarrita/storage@0.1.0-next.6':
     dependencies:
@@ -8031,7 +8005,7 @@ snapshots:
 
   d3-geo@3.1.0:
     dependencies:
-      d3-array: 3.2.1
+      d3-array: 3.2.4
 
   d3-hexbin@0.2.2: {}
 
@@ -8072,7 +8046,7 @@ snapshots:
 
   d3-scale@4.0.2:
     dependencies:
-      d3-array: 3.2.1
+      d3-array: 3.2.4
       d3-format: 3.1.0
       d3-interpolate: 3.0.1
       d3-time: 3.1.0
@@ -8102,7 +8076,7 @@ snapshots:
 
   d3-time@3.1.0:
     dependencies:
-      d3-array: 3.2.1
+      d3-array: 3.2.4
 
   d3-timer@2.0.0: {}
 
@@ -10064,7 +10038,7 @@ snapshots:
       numcodecs: 0.2.2
       p-queue: 7.4.1
 
-  zarrita@0.4.0-next.10:
+  zarrita@0.4.0-next.16:
     dependencies:
       '@zarrita/core': 0.1.0-next.14
       '@zarrita/indexing': 0.1.0-next.16
