@@ -1,5 +1,6 @@
 import { defaultStyles, TooltipWithBounds } from "@visx/tooltip";
 import React from "react";
+import { useParentRef } from "../contexts/ContainerRefContext";
 import { useTooltipData } from "../contexts/TooltipDataContext";
 
 /**
@@ -10,14 +11,17 @@ export default function Tooltip() {
   const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
     useTooltipData();
 
+  const parentRef = useParentRef();
+  const visualizationBounds = parentRef.current?.getBoundingClientRect();
+
   if (!tooltipOpen || !tooltipData) {
     return null;
   }
 
   return (
     <TooltipWithBounds
-      top={tooltipTop}
-      left={tooltipLeft}
+      top={tooltipTop - visualizationBounds?.top}
+      left={tooltipLeft - visualizationBounds?.left}
       style={{ ...defaultStyles, pointerEvents: "none", zIndex: 1000 }}
     >
       <div>

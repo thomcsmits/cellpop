@@ -30,7 +30,7 @@ export function useOrderedArrayState<T extends string | number>(
   const [sortOrder, setSortOrder] = useState<SortOrder>("Custom");
 
   useEffect(() => {
-    if (filteredValues) {
+    if (filteredValues?.size > 0) {
       setOrderedValues((ordered) =>
         ordered.filter((value) => !filteredValues.has(value)),
       );

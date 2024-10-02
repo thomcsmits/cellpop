@@ -86,6 +86,7 @@ function DragOverlayContainer({
 
   const { scale: x } = useXScale();
   const { scale: y } = useYScale();
+  const { width, height } = useHeatmapDimensions();
 
   const { snapModifier, strategy } = useMemo(() => {
     const scale = selectedDimension === "X" ? x : y;
@@ -143,6 +144,21 @@ function DragOverlayContainer({
     [setItems, setSort],
   );
 
+  const indicatorProps = {
+    X: {
+      width: x.bandwidth(),
+      height,
+      left: (item: string) => x(item),
+      top: () => 0,
+    },
+    Y: {
+      width,
+      height: y.bandwidth(),
+      left: () => 0,
+      top: (item: string) => y(item),
+    },
+  };
+
   return (
     <DndContext
       sensors={sensors}
@@ -160,7 +176,11 @@ function DragOverlayContainer({
     >
       <SortableContext items={items} strategy={strategy}>
         {items.map((item) => (
-          <DragIndicator key={item} item={item} />
+          <DragIndicator
+            key={item}
+            item={item}
+            {...indicatorProps[selectedDimension]}
+          />
         ))}
         {children}
       </SortableContext>
@@ -168,13 +188,22 @@ function DragOverlayContainer({
   );
 }
 
-function DragIndicator({ item }: { item: string }) {
+function DragIndicator({
+  item,
+  width: itemWidth,
+  height: itemHeight,
+  left,
+  top,
+}: {
+  item: string;
+  width: number;
+  height: number;
+  left: (item: string) => number;
+  top: (item: string) => number;
+}) {
   const { selectedDimension } = useSelectedDimension();
-  const { width, height } = useHeatmapDimensions();
   const { scale: x } = useXScale();
   const { scale: y } = useYScale();
-  const xStep = x.bandwidth();
-  const yStep = y.bandwidth();
 
   const { columnSizes, rowSizes } = useDimensions();
   const { dataMap } = useData();
@@ -182,17 +211,10 @@ function DragIndicator({ item }: { item: string }) {
   const xOffset = columnSizes[0];
   const yOffset = rowSizes[0];
 
-  const { itemHeight, itemWidth, left, top } = useMemo(() => {
-    const itemHeight = selectedDimension === "X" ? height : x.bandwidth();
-    const itemWidth = selectedDimension === "X" ? y.bandwidth() : width;
-    const left = selectedDimension === "X" ? x(item) : 0;
-    const top = selectedDimension === "X" ? 0 : y(item);
-    return { itemHeight, itemWidth, left, top };
-  }, [selectedDimension, x, y, width, height]);
-
   const { theme } = useCellPopTheme();
   const { label: rowLabel } = useRowConfig();
   const { label: columnLabel } = useColumnConfig();
+  const { width, height } = useHeatmapDimensions();
 
   const strategy =
     selectedDimension === "X"
@@ -203,7 +225,7 @@ function DragIndicator({ item }: { item: string }) {
     strategy,
   });
   const parentRef = useParentRef();
-  const { openTooltip } = useSetTooltipData();
+  const { openTooltip, closeTooltip } = useSetTooltipData();
 
   const onMouseMove = useCallback(
     (e: React.MouseEvent) => {
@@ -211,13 +233,41 @@ function DragIndicator({ item }: { item: string }) {
       if (!visualizationBounds) {
         return;
       }
+      const xStep = x.bandwidth();
+      const yStep = y.bandwidth();
       const xValue = e.clientX - xOffset - visualizationBounds.left;
-      const yValue = e.clientY - yOffset - visualizationBounds.top;
-      const yIndex = Math.floor(xValue / xStep);
-      const xIndex = Math.floor(yValue / yStep);
 
-      const rowKey = y.domain()[xIndex];
-      const columnKey = x.domain()[yIndex];
+      const visualizationTotalHeight =
+        yOffset + height + visualizationBounds.top;
+      const yMousePosition = e.clientY;
+      const yValue = visualizationTotalHeight - yMousePosition;
+
+      const columnCount = x.domain().length - 1;
+      const rowCount = y.domain().length - 1;
+
+      // Clamp indices to prevent out of bounds errors
+      const columnIndex = Math.min(
+        Math.max(Math.floor(xValue / xStep), 0),
+        columnCount,
+      );
+      const rowIndex = Math.min(
+        Math.max(Math.floor(yValue / yStep), 0),
+        rowCount,
+      );
+
+      const rowKey = y.domain()[rowIndex];
+      const columnKey = x.domain()[columnIndex];
+
+      console.log({
+        yValue,
+        yStep,
+        visualizationTotalHeight,
+        yMousePosition,
+        rowIndex,
+        width,
+        height,
+      });
+
       openTooltip(
         {
           title: `${rowKey} - ${columnKey}`,
@@ -231,7 +281,7 @@ function DragIndicator({ item }: { item: string }) {
         e.clientY,
       );
     },
-    [xStep, yStep, xOffset, yOffset, dataMap, rowLabel, columnLabel],
+    [x, y, xOffset, yOffset, dataMap, rowLabel, columnLabel, width, height],
   );
   return (
     <div
@@ -241,14 +291,15 @@ function DragIndicator({ item }: { item: string }) {
         height: itemHeight,
         position: "absolute",
         zIndex: 1,
-        left,
-        top,
+        left: left(item),
+        top: top(item),
         outline: isDragging ? `1px solid ${theme.text}` : "none",
       }}
       ref={setNodeRef}
       {...attributes}
       {...listeners}
       onMouseMove={onMouseMove}
+      onMouseOut={closeTooltip}
     ></div>
   );
 }

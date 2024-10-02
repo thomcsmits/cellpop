@@ -54,6 +54,8 @@ export default function Heatmap() {
     { setOrderedValues: setColumns, setSortOrder: setColumnOrder },
   ] = useColumns();
 
+  console.log({ rows, columns });
+
   const { closeTooltip } = useSetTooltipData();
 
   // Dynamically determine which dimension to use based on the selected dimension
