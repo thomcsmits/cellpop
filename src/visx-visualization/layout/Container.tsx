@@ -43,7 +43,7 @@ export default function VizContainerGrid() {
       <ContextMenuRoot
         onOpenChange={(open) => (open ? openContextMenu() : closeContextMenu())}
       >
-        <Trigger>
+        <Trigger asChild>
           <div
             style={{ position: "relative" }}
             ref={parentRef}

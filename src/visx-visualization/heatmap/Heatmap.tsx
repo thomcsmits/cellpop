@@ -22,14 +22,29 @@ function HeatmapCell({
   value: number;
 }) {
   const { scale: xScale } = useXScale();
-  const { scale: yScale } = useYScale();
+  const { scale: yScale, selectedValues } = useYScale();
   const { scale: colors } = useColorScale();
   const cellWidth = xScale.bandwidth();
-  const cellHeight = yScale.bandwidth();
+  // @ts-expect-error - custom y scale provides the appropriate band width for the given row
+  // and providing an arg to a regular scale's bandwidth function doesn't throw, so this is fine
+  const cellHeight = yScale.bandwidth(row);
   const { removedRows, removedColumns } = useData();
 
   if (removedRows.has(row) || removedColumns.has(col)) {
     return null;
+  }
+
+  if (selectedValues.has(row)) {
+    return (
+      <rect
+        x={xScale(col)}
+        y={yScale(row)}
+        width={cellWidth}
+        height={cellHeight}
+        fill={colors(value)}
+        stroke="black"
+      />
+    );
   }
 
   return (
@@ -47,6 +62,7 @@ export default function Heatmap() {
   const { width, height } = useHeatmapDimensions();
   const { selectedDimension } = useSelectedDimension();
   const { data } = useData();
+  const { selectedValues } = useYScale();
   const [rows, { setOrderedValues: setRows, setSortOrder: setRowOrder }] =
     useRows();
   const [
@@ -54,17 +70,18 @@ export default function Heatmap() {
     { setOrderedValues: setColumns, setSortOrder: setColumnOrder },
   ] = useColumns();
 
-  console.log({ rows, columns });
-
   const { closeTooltip } = useSetTooltipData();
 
   // Dynamically determine which dimension to use based on the selected dimension
   const { items, setItems, setSort } = useMemo(() => {
+    if (selectedValues.size > 0) {
+      return { items: [], setItems: () => {}, setSort: () => {} };
+    }
     const items = selectedDimension === "X" ? columns : rows;
     const setItems = selectedDimension === "X" ? setColumns : setRows;
     const setSort = selectedDimension === "X" ? setColumnOrder : setRowOrder;
     return { items, setItems, setSort };
-  }, [selectedDimension, columns, rows]);
+  }, [selectedDimension, columns, rows, selectedValues]);
 
   const { theme } = useCellPopTheme();
 

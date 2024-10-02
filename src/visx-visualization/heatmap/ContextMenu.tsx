@@ -1,12 +1,16 @@
 import * as ContextMenu from "@radix-ui/react-context-menu";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   useColumnConfig,
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
 import { useData } from "../../contexts/DataContext";
-import { useTooltipData } from "../../contexts/TooltipDataContext";
+import { useYScale } from "../../contexts/ScaleContext";
+import {
+  useSetTooltipData,
+  useTooltipData,
+} from "../../contexts/TooltipDataContext";
 import { SORT_ORDERS } from "../../hooks/useOrderedArray";
 import "./ContextMenu.css";
 
@@ -80,6 +84,43 @@ const RestoreHiddenColumns = () => {
   return (
     <ContextMenu.Item className="ContextMenuItem" onClick={resetRemovedColumns}>
       Restore Hidden {columnLabel}s
+    </ContextMenu.Item>
+  );
+};
+
+const ExpandRow = () => {
+  const {
+    tooltipData: { data },
+  } = useTooltipData();
+  const { label } = useRowConfig();
+  const { toggleSelection, selectedValues } = useYScale();
+  const { closeContextMenu } = useSetTooltipData();
+
+  if (!data[label] || selectedValues.has(data[label] as string)) {
+    return null;
+  }
+
+  return (
+    <ContextMenu.Item
+      className="ContextMenuItem"
+      onClick={() => {
+        toggleSelection(data[label] as string);
+        closeContextMenu();
+      }}
+    >
+      Expand {label}
+    </ContextMenu.Item>
+  );
+};
+
+const CollapseRows = () => {
+  const { selectedValues, reset } = useYScale();
+  if (selectedValues.size === 0) {
+    return null;
+  }
+  return (
+    <ContextMenu.Item className="ContextMenuItem" onClick={reset}>
+      Clear Selection
     </ContextMenu.Item>
   );
 };
@@ -203,6 +244,8 @@ const ContextMenuComponent = () => {
         <SortDimension dimension="row" />
         <MoveToStart dimension="row" />
         <MoveToEnd dimension="row" />
+        <ExpandRow />
+        <CollapseRows />
         <ContextMenu.Separator className="ContextMenuSeparator" />
         <ContextMenu.ContextMenuLabel className="ContextMenuLabel">
           Columns ({columnLabel}s)

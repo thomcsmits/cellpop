@@ -9,11 +9,9 @@ import { useXScale, useYScale } from "../../contexts/ScaleContext";
 import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
 
 import {
-  closestCenter,
-  closestCorners,
+  CollisionDetection,
   DndContext,
   DragEndEvent,
-  DragOverlay,
   KeyboardSensor,
   MeasuringStrategy,
   PointerSensor,
@@ -34,7 +32,7 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { ScaleBand } from "d3";
 import {
   useColumnConfig,
   useRowConfig,
@@ -55,8 +53,7 @@ interface DragOverlayContainerProps extends PropsWithChildren {
   setItems: Setter<string[]>;
   setSort: Setter<SortOrder>;
 }
-
-function customCollisionDetectionAlgorithm(args) {
+const customCollisionDetectionAlgorithm: CollisionDetection = (args) => {
   // First, let's see if there are any collisions with the pointer
   const pointerCollisions = pointerWithin(args);
 
@@ -67,7 +64,27 @@ function customCollisionDetectionAlgorithm(args) {
 
   // If there are no collisions with the pointer, return rectangle intersections
   return rectIntersection(args);
-}
+};
+
+const indicatorProps = (
+  x: ScaleBand<string>,
+  y: ScaleBand<string>,
+  width: number,
+  height: number,
+) => ({
+  X: {
+    width: x.bandwidth(),
+    height,
+    left: (item: string) => x(item),
+    top: () => 0,
+  },
+  Y: {
+    width,
+    height: y.bandwidth(),
+    left: () => 0,
+    top: (item: string) => y(item),
+  },
+});
 
 /**
  * Wrapper for the heatmap which allows for dragging and dropping of rows or columns.
@@ -144,20 +161,9 @@ function DragOverlayContainer({
     [setItems, setSort],
   );
 
-  const indicatorProps = {
-    X: {
-      width: x.bandwidth(),
-      height,
-      left: (item: string) => x(item),
-      top: () => 0,
-    },
-    Y: {
-      width,
-      height: y.bandwidth(),
-      left: () => 0,
-      top: (item: string) => y(item),
-    },
-  };
+  if (items.length === 0) {
+    return children;
+  }
 
   return (
     <DndContext
@@ -179,7 +185,7 @@ function DragOverlayContainer({
           <DragIndicator
             key={item}
             item={item}
-            {...indicatorProps[selectedDimension]}
+            {...indicatorProps(x, y, width, height)[selectedDimension]}
           />
         ))}
         {children}
@@ -202,7 +208,7 @@ function DragIndicator({
   top: (item: string) => number;
 }) {
   const { selectedDimension } = useSelectedDimension();
-  const { scale: x } = useXScale();
+  const { scale: x, selectedValues } = useXScale();
   const { scale: y } = useYScale();
 
   const { columnSizes, rowSizes } = useDimensions();
@@ -258,16 +264,6 @@ function DragIndicator({
       const rowKey = y.domain()[rowIndex];
       const columnKey = x.domain()[columnIndex];
 
-      console.log({
-        yValue,
-        yStep,
-        visualizationTotalHeight,
-        yMousePosition,
-        rowIndex,
-        width,
-        height,
-      });
-
       openTooltip(
         {
           title: `${rowKey} - ${columnKey}`,
@@ -283,6 +279,11 @@ function DragIndicator({
     },
     [x, y, xOffset, yOffset, dataMap, rowLabel, columnLabel, width, height],
   );
+
+  if (selectedValues.size > 0) {
+    return null;
+  }
+
   return (
     <div
       key={item}

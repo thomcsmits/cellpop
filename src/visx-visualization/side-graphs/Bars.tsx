@@ -32,6 +32,11 @@ export default function Bars({
   domainLimit,
 }: BarsProps) {
   const entries = Object.entries(data);
+
+  // Hide bars if there is an expanded row
+  if (!("bandwidth" in categoricalScale)) {
+    return null;
+  }
   const barWidth = categoricalScale.bandwidth();
 
   const { label: columnLabel } = useColumnConfig();

@@ -12,6 +12,7 @@
 
 .ContextMenuContent,
 .ContextMenuSubContent {
+  z-index: 1000;
   min-width: 220px;
   background-color: white;
   border-radius: 6px;

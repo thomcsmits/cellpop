@@ -52,7 +52,7 @@ export function TooltipDataProvider({ children }: PropsWithChildren) {
   const tooltipDataContext = useMemo(
     () => ({
       tooltipData,
-      tooltipOpen: tooltipOpen && !contextMenuOpen,
+      tooltipOpen,
       contextMenuOpen,
       tooltipLeft,
       tooltipTop,
