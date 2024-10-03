@@ -7,7 +7,7 @@ import {
 import { scaleLinear } from "@visx/scale";
 import { Text } from "@visx/text";
 import React, { useId } from "react";
-import { useRowConfig } from "../../contexts/AxisConfigContext";
+import { AxisConfig, useRowConfig } from "../../contexts/AxisConfigContext";
 import { useRows } from "../../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
@@ -55,7 +55,18 @@ export default function HeatmapYAxis() {
         label={label}
         stroke={theme.text}
         tickStroke={theme.text}
-        tickComponent={TickComponent}
+        tickComponent={
+          selectedValues.size > 0
+            ? (props) =>
+                TickComponent({
+                  ...props,
+                  axisConfig,
+                  openInNewTab,
+                  tickTitle,
+                  tickLabelStyle,
+                })
+            : undefined
+        }
         tickLabelProps={(t) =>
           ({
             fontSize,
@@ -100,12 +111,16 @@ function TickComponent({
   x,
   y,
   formattedValue,
+  axisConfig,
+  openInNewTab,
+  tickTitle,
+  tickLabelStyle,
   ...tickLabelProps
-}: TickRendererProps) {
+}: TickRendererProps & {
+  axisConfig: AxisConfig;
+} & ReturnType<typeof useHeatmapAxis>) {
   const { selectedValues, expandedSize } = useYScale();
-  const rowConfig = useRowConfig();
-  const { flipAxisPosition } = rowConfig;
-  const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(rowConfig);
+  const { flipAxisPosition } = axisConfig;
   const { data } = useData();
 
   const panelSize = usePanelDimensions(
