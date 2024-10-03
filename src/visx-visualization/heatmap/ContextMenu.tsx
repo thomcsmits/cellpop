@@ -228,8 +228,8 @@ const ContextMenuComponent = () => {
   const { label: rowLabel } = useRowConfig();
   const { label: columnLabel } = useColumnConfig();
 
-  const { tooltipData } = useTooltipData();
-  if (!tooltipData) {
+  const { tooltipData, contextMenuOpen } = useTooltipData();
+  if (!tooltipData || !contextMenuOpen) {
     return null;
   }
 

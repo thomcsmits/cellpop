@@ -14,7 +14,6 @@ interface BarsProps {
   data: Record<string, number>;
   domainLimit: number;
   selectedValues?: Set<string>;
-  expandedSize: number;
   nonExpandedSize: number;
 }
 
@@ -34,7 +33,6 @@ export default function Bars({
   data,
   domainLimit,
   selectedValues,
-  expandedSize,
   nonExpandedSize,
 }: BarsProps) {
   const entries = Object.entries(data);
@@ -59,9 +57,11 @@ export default function Bars({
   return (
     <>
       {entries.map(([key, value]) => {
-        const barWidth = selectedValues?.has(key)
-          ? expandedSize
-          : nonExpandedSize;
+        if (selectedValues?.has(key)) {
+          // Display an axis scaled for the selected value
+          return null;
+        }
+        const barWidth = nonExpandedSize;
         const scaledKey = categoricalScale(key);
         const scaledValue = numericalScale(value);
         const x =

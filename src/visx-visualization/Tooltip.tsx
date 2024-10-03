@@ -1,7 +1,10 @@
 import { defaultStyles, TooltipWithBounds } from "@visx/tooltip";
-import React from "react";
+import React, { useEffect } from "react";
 import { useParentRef } from "../contexts/ContainerRefContext";
-import { useTooltipData } from "../contexts/TooltipDataContext";
+import {
+  useSetTooltipData,
+  useTooltipData,
+} from "../contexts/TooltipDataContext";
 
 /**
  * Component which renders a basic tooltip with the data set in the tooltip data context.
@@ -10,11 +13,18 @@ import { useTooltipData } from "../contexts/TooltipDataContext";
 export default function Tooltip() {
   const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
     useTooltipData();
+  const { closeTooltip } = useSetTooltipData();
 
   const parentRef = useParentRef();
   const visualizationBounds = parentRef.current?.getBoundingClientRect();
 
-  if (!tooltipOpen || !tooltipData) {
+  useEffect(() => {
+    if (!tooltipData) {
+      closeTooltip();
+    }
+  }, [tooltipData, closeTooltip]);
+
+  if (!tooltipOpen) {
     return null;
   }
 

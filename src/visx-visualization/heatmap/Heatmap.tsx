@@ -1,3 +1,4 @@
+import { scaleLinear } from "@visx/scale";
 import React, { useMemo } from "react";
 import {
   useColumnConfig,
@@ -26,13 +27,13 @@ function HeatmapCell({
   value: number;
 }) {
   const { scale: xScale } = useXScale();
-  const { scale: yScale, selectedValues } = useYScale();
+  const { scale: yScale, selectedValues, expandedSize } = useYScale();
   const { scale: colors } = useColorScale();
   const cellWidth = xScale.bandwidth();
   // @ts-expect-error - custom y scale provides the appropriate band width for the given row
   // and providing an arg to a regular scale's bandwidth function doesn't throw, so this is fine
   const cellHeight = yScale.bandwidth(row);
-  const { removedRows, removedColumns } = useData();
+  const { removedRows, removedColumns, rowCounts, data } = useData();
 
   const { label: rowLabel } = useRowConfig();
   const { label: columnLabel } = useColumnConfig();
@@ -65,19 +66,32 @@ function HeatmapCell({
     return null;
   }
 
+  const dataProps = {
+    "data-row": row,
+    "data-col": col,
+    "data-val": value,
+  };
+
   if (selectedValues.has(row)) {
+    // TODO: Lift this to a context so it doesn't have to recalculated
+    const max = Math.max(
+      ...data.countsMatrix.filter((d) => d.row === row).map((d) => d.value),
+    );
+    const inlineYScale = scaleLinear({
+      domain: [0, max],
+      range: [0, expandedSize],
+      nice: true,
+    });
     return (
       <rect
         x={xScale(col)}
-        y={yScale(row)}
+        y={yScale(row) + expandedSize - inlineYScale(value)}
         width={cellWidth}
-        height={cellHeight}
-        fill={colors(value)}
+        height={inlineYScale(value)}
+        fill="black"
         stroke="black"
         onMouseMove={onMouseOver}
-        data-row={row}
-        data-col={col}
-        data-val={value}
+        {...dataProps}
       />
     );
   }
@@ -90,9 +104,7 @@ function HeatmapCell({
       height={cellHeight}
       fill={colors(value)}
       onMouseMove={onMouseOver}
-      data-row={row}
-      data-col={col}
-      data-val={value}
+      {...dataProps}
     />
   );
 }

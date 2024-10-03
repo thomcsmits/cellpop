@@ -7,7 +7,10 @@ import Tooltip from "../Tooltip";
 import { ParentRefProvider } from "../../contexts/ContainerRefContext";
 
 import { Root as ContextMenuRoot, Trigger } from "@radix-ui/react-context-menu";
-import { useSetTooltipData } from "../../contexts/TooltipDataContext";
+import {
+  useSetTooltipData,
+  useTooltipData,
+} from "../../contexts/TooltipDataContext";
 import "../../visualization/style.css";
 import ContextMenuComponent from "../heatmap/ContextMenu";
 import BottomCenterPanel from "./BottomCenter";
@@ -36,12 +39,21 @@ export default function VizContainerGrid() {
 
   const id = useId();
 
-  const { openContextMenu, closeContextMenu } = useSetTooltipData();
+  const { openContextMenu, closeContextMenu, closeTooltip } =
+    useSetTooltipData();
+  const { tooltipData } = useTooltipData();
 
   return (
     <ParentRefProvider value={parentRef}>
       <ContextMenuRoot
-        onOpenChange={(open) => (open ? openContextMenu() : closeContextMenu())}
+        onOpenChange={(open) => {
+          if (open && tooltipData) {
+            openContextMenu();
+            return;
+          }
+          closeContextMenu();
+          closeTooltip();
+        }}
       >
         <Trigger asChild>
           <div

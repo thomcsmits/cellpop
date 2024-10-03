@@ -27,13 +27,13 @@ export function useTickTitle(
 
 export function useHeatmapAxis(
   { createHref, label, flipAxisPosition }: AxisConfig,
-  filterId: string,
+  filterId?: string,
 ) {
   const openInNewTab = useOpenInNewTab(createHref);
   const tickTitle = useTickTitle(createHref);
   const tickLabelStyle = {
     fontVariantNumeric: "tabular-nums",
-    filter: flipAxisPosition ? `url(#${filterId})` : "none",
+    filter: flipAxisPosition && filterId ? `url(#${filterId})` : "none",
     cursor: createHref ? "pointer" : "default",
   };
   return { openInNewTab, tickTitle, tickLabelStyle };
