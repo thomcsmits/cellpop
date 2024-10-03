@@ -28,7 +28,12 @@ function TopBar() {
   const { height } = usePanelDimensions("center_top");
   const { columnCounts } = useData();
   // Use same x scale as the heatmap
-  const { scale: xScale } = useXScale();
+  const {
+    scale: xScale,
+    selectedValues,
+    expandedSize,
+    nonExpandedSize,
+  } = useXScale();
   const yScale = useYAxisCountsScale();
 
   return (
@@ -39,6 +44,9 @@ function TopBar() {
         numericalScale={yScale}
         data={columnCounts}
         domainLimit={height}
+        selectedValues={selectedValues}
+        expandedSize={expandedSize}
+        nonExpandedSize={nonExpandedSize}
       />
     </g>
   );

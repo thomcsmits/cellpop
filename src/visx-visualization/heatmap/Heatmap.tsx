@@ -1,4 +1,8 @@
 import React, { useMemo } from "react";
+import {
+  useColumnConfig,
+  useRowConfig,
+} from "../../contexts/AxisConfigContext";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
@@ -30,6 +34,33 @@ function HeatmapCell({
   const cellHeight = yScale.bandwidth(row);
   const { removedRows, removedColumns } = useData();
 
+  const { label: rowLabel } = useRowConfig();
+  const { label: columnLabel } = useColumnConfig();
+  const { openTooltip } = useSetTooltipData();
+
+  const onMouseOver = (e: React.MouseEvent) => {
+    if (!selectedValues) {
+      return;
+    }
+    const target = e.target as SVGRectElement;
+    const row = target.getAttribute("data-row");
+    const col = target.getAttribute("data-col");
+    const value = target.getAttribute("data-val");
+
+    openTooltip(
+      {
+        title: `${row} - ${col}`,
+        data: {
+          "Cell Count": value,
+          [rowLabel]: row,
+          [columnLabel]: col,
+        },
+      },
+      e.clientX,
+      e.clientY,
+    );
+  };
+
   if (removedRows.has(row) || removedColumns.has(col)) {
     return null;
   }
@@ -43,6 +74,10 @@ function HeatmapCell({
         height={cellHeight}
         fill={colors(value)}
         stroke="black"
+        onMouseMove={onMouseOver}
+        data-row={row}
+        data-col={col}
+        data-val={value}
       />
     );
   }
@@ -54,6 +89,10 @@ function HeatmapCell({
       width={cellWidth}
       height={cellHeight}
       fill={colors(value)}
+      onMouseMove={onMouseOver}
+      data-row={row}
+      data-col={col}
+      data-val={value}
     />
   );
 }

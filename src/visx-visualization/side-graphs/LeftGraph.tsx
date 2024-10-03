@@ -28,7 +28,12 @@ function LeftBar() {
   const { rowCounts } = useData();
   const xScale = useXAxisCountsScale();
   // Use same y scale as the heatmap
-  const { scale: yScale } = useYScale();
+  const {
+    scale: yScale,
+    selectedValues,
+    expandedSize,
+    nonExpandedSize,
+  } = useYScale();
 
   return (
     <g className="barleft">
@@ -38,6 +43,9 @@ function LeftBar() {
         numericalScale={xScale}
         data={rowCounts}
         domainLimit={width}
+        selectedValues={selectedValues}
+        expandedSize={expandedSize}
+        nonExpandedSize={nonExpandedSize}
       />
     </g>
   );

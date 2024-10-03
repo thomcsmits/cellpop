@@ -21,6 +21,8 @@ interface DimensionScaleContext {
   tickLabelSize: number;
   setTickLabelSize: (size: number) => void;
   reset: () => void;
+  nonExpandedSize: number;
+  expandedSize: number;
 }
 const [XScaleContext, YScaleContext] = SCALES.map((dimension: string) => {
   return createContext<DimensionScaleContext>(`${dimension}ScaleContext`);
@@ -51,29 +53,43 @@ export function ScaleProvider({ children }: PropsWithChildren) {
   const [columns] = useColumns();
   const [rows] = useRows();
 
-  const x = useMemo(() => {
-    return scaleBand<string>({
+  const [x, xExpanded, xCollapsed] = useMemo(() => {
+    const scale = scaleBand<string>({
       range: [0, width],
       domain: columns,
       padding: 0.01,
     });
+    const expandedSize = scale.bandwidth();
+    const collapsedSize = scale.bandwidth();
+    return [scale, expandedSize, collapsedSize];
   }, [width, columns]);
 
   // TODO: The custom axis logic should ideally be moved to a separate file
   // since it's taking up more than half of this file's length
-  const y = useMemo(() => {
-    // Base case: no selected rows
-    if (selectedY.size === 0) {
-      return scaleBand<string>({
+  const [y, expandedSize, collapsedSize] = useMemo(() => {
+    // Base case: use regular band scale if:
+    // If no rows are selected,
+    // all rows are unselected,
+    // or all selected rows have been hidden.
+    if (
+      [0, rows.length].includes(selectedY.size) ||
+      [...selectedY].every((row) => !rows.includes(row))
+    ) {
+      const scale = scaleBand<string>({
         range: [height, 0],
         domain: rows,
         padding: 0.01,
       });
+      const expandedHeight = scale.step();
+      const collapsedHeight = scale.bandwidth();
+      return [scale, expandedHeight, collapsedHeight];
     }
-    // If there are selected rows, we need to adjust the scale to account for the expanded rows
+
+    // Otherwise, we need to adjust the scale to account for the expanded rows
     // First, we need to determine the height of the selected rows
     const expandedRowHeight = height / (2 + selectedY.size);
     const restRowsHeight = height - selectedY.size * expandedRowHeight;
+    const collapsedRowHeight = restRowsHeight / (rows.length - selectedY.size);
     // Then, we need to split the domain up, keeping the order of the existing rows
     // and creating separate domains for each subsection
     const domains = rows
@@ -124,23 +140,37 @@ export function ScaleProvider({ children }: PropsWithChildren) {
       }
       return 0;
     };
-    customScale.bandwidth = () => restRowsHeight / rows.length;
+    customScale.bandwidth = () => collapsedRowHeight;
     customScale.bandwidth = (item?: string) => {
       if (item === undefined) {
-        return restRowsHeight / rows.length;
+        return collapsedRowHeight;
       } else {
         for (const scale of scales) {
           if (scale.domain().includes(item)) {
             return scale.bandwidth();
           }
         }
-        return restRowsHeight / rows.length;
+        return collapsedRowHeight;
       }
     };
-    customScale.domain = () => rows;
-    customScale.range = () => [0, height];
+    customScale.domain = (newDomain?: string[]) =>
+      newDomain ? customScale : rows;
+    customScale.range = (newRange?: [number, number]) =>
+      newRange ? customScale : ([height, 0] as [number, number]);
+    customScale.rangeRound = (newRange?: [number, number]) =>
+      newRange ? customScale : [height, 0];
     customScale.round = () => false;
-    return customScale;
+    customScale.padding = () => 0.01;
+    customScale.paddingInner = () => 0;
+    customScale.paddingOuter = () => 0;
+    customScale.align = () => 0.5;
+    customScale.copy = () => customScale;
+    customScale.step = () => collapsedRowHeight;
+    return [
+      customScale as ScaleBand<string>,
+      expandedRowHeight,
+      collapsedRowHeight,
+    ];
   }, [height, rows, selectedY.size]);
 
   const [xTickLabelSize, setXTickLabelSize] = React.useState(0);
@@ -154,8 +184,10 @@ export function ScaleProvider({ children }: PropsWithChildren) {
       tickLabelSize: xTickLabelSize,
       setTickLabelSize: setXTickLabelSize,
       reset: resetX,
+      expandedSize: xExpanded,
+      nonExpandedSize: xCollapsed,
     }),
-    [x, selectedX, toggleX, xTickLabelSize, resetX],
+    [x, selectedX, toggleX, xTickLabelSize, resetX, xExpanded, xCollapsed],
   );
   const yScaleContext = useMemo(
     () => ({
@@ -165,8 +197,18 @@ export function ScaleProvider({ children }: PropsWithChildren) {
       tickLabelSize: yTickLabelSize,
       setTickLabelSize: setYTickLabelSize,
       reset: resetY,
+      expandedSize,
+      nonExpandedSize: collapsedSize,
     }),
-    [y, selectedY, toggleY, yTickLabelSize, resetY],
+    [
+      y,
+      selectedY,
+      toggleY,
+      yTickLabelSize,
+      resetY,
+      expandedSize,
+      collapsedSize,
+    ],
   );
   const colorScaleContext = useMemo(() => {
     const scale = scaleLinear<string>({

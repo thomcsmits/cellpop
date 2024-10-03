@@ -13,6 +13,9 @@ interface BarsProps {
   numericalScale: ScaleLinear<number, number>;
   data: Record<string, number>;
   domainLimit: number;
+  selectedValues?: Set<string>;
+  expandedSize: number;
+  nonExpandedSize: number;
 }
 
 /**
@@ -30,14 +33,11 @@ export default function Bars({
   numericalScale,
   data,
   domainLimit,
+  selectedValues,
+  expandedSize,
+  nonExpandedSize,
 }: BarsProps) {
   const entries = Object.entries(data);
-
-  // Hide bars if there is an expanded row
-  if (!("bandwidth" in categoricalScale)) {
-    return null;
-  }
-  const barWidth = categoricalScale.bandwidth();
 
   const { label: columnLabel } = useColumnConfig();
   const { label: rowLabel } = useRowConfig();
@@ -59,6 +59,9 @@ export default function Bars({
   return (
     <>
       {entries.map(([key, value]) => {
+        const barWidth = selectedValues?.has(key)
+          ? expandedSize
+          : nonExpandedSize;
         const scaledKey = categoricalScale(key);
         const scaledValue = numericalScale(value);
         const x =
