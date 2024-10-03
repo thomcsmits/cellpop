@@ -26,7 +26,7 @@ export const CellPop = (props: CellPopProps) => {
 		return <></>;
 	}
 
-	const cellPopRef = useRef<HTMLDivElement>(null);
+	const cellPopRef = React.useRef<HTMLDivElement>(null);
 
 	// const [data, setData] = useState(props.data);
 	const [theme, setTheme] = useState<CellPopTheme>(props.theme);

@@ -4,6 +4,9 @@
   "version": "0.0.0",
   "homepage": "https://hms-dbmi.github.io/",
   "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",

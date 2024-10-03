@@ -1,0 +1,19 @@
+{
+	"scripts": {
+		"dev": "npm run build -- --sourcemap=inline --watch",
+		"build": "esbuild js/widget.tsx --minify --format=esm --bundle --outdir=src/cellpop/static",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@anywidget/react": "^0.0.8",
+		"cellpop": "link:..",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
+	},
+	"devDependencies": {
+		"@types/react": "^18.3.9",
+		"@types/react-dom": "^18.3.0",
+		"esbuild": "^0.24.0",
+		"typescript": "^5.6.2"
+	}
+}
