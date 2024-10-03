@@ -1,0 +1,1 @@
+export { loadHuBMAPData } from "./dataHuBMAP";
