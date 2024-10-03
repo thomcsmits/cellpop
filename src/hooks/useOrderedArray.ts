@@ -1,10 +1,4 @@
-import {
-  startTransition,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export type SortOrder =
   | "Alphabetical Ascending"
@@ -27,7 +21,7 @@ export function useOrderedArrayState<T extends string | number>(
   filteredValues?: Set<T>,
 ) {
   const [orderedValues, setOrderedValues] = useState<T[]>(values);
-  const [sortOrder, setSortOrder] = useState<SortOrder>("Custom");
+  const [sortOrder, _setSortOrder] = useState<SortOrder>("Custom");
 
   useEffect(() => {
     if (filteredValues?.size > 0) {
@@ -38,29 +32,24 @@ export function useOrderedArrayState<T extends string | number>(
       setOrderedValues(values);
     }
   }, [filteredValues, values]);
-  const previousSortOrder = useRef<SortOrder>("Custom");
 
-  useEffect(() => {
-    if (sortOrder !== previousSortOrder.current) {
-      startTransition(() => {
-        previousSortOrder.current = sortOrder;
-        switch (sortOrder) {
-          case "Alphabetical Ascending":
-            setOrderedValues([...values].sort());
-            break;
-          case "Alphabetical Descending":
-            setOrderedValues([...values].sort().reverse());
-            break;
-          case "Counts Ascending":
-            setOrderedValues([...values].sort((a, b) => counts[a] - counts[b]));
-            break;
-          case "Counts Descending":
-            setOrderedValues([...values].sort((a, b) => counts[b] - counts[a]));
-            break;
-        }
-      });
-    }
-  }, [values, counts, sortOrder]);
+  const setSortOrder = useCallback((order: SortOrder) => {
+    setOrderedValues((ordered) => {
+      switch (order) {
+        case "Alphabetical Ascending":
+          return [...ordered].sort();
+        case "Alphabetical Descending":
+          return [...ordered].sort().reverse();
+        case "Counts Ascending":
+          return [...ordered].sort((a, b) => counts[a] - counts[b]);
+        case "Counts Descending":
+          return [...ordered].sort((a, b) => counts[b] - counts[a]);
+        default:
+          return ordered;
+      }
+    });
+    _setSortOrder(order);
+  }, []);
 
   const moveToStart = useCallback((value: T) => {
     setOrderedValues((ordered) => {
@@ -86,7 +75,7 @@ export function useOrderedArrayState<T extends string | number>(
     orderedValues,
     {
       setOrderedValues,
-      sortOrder,
+      sortOrder, // Still reporting this to indicate current sort in context menu
       setSortOrder,
       moveToStart,
       moveToEnd,

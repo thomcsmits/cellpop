@@ -33,7 +33,7 @@ function HeatmapCell({
   // @ts-expect-error - custom y scale provides the appropriate band width for the given row
   // and providing an arg to a regular scale's bandwidth function doesn't throw, so this is fine
   const cellHeight = yScale.bandwidth(row);
-  const { removedRows, removedColumns, rowMaxes, data } = useData();
+  const { removedRows, removedColumns, rowMaxes } = useData();
 
   const { label: rowLabel } = useRowConfig();
   const { label: columnLabel } = useColumnConfig();

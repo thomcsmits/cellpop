@@ -1,5 +1,5 @@
 import * as ContextMenu from "@radix-ui/react-context-menu";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   useColumnConfig,
   useRowConfig,
@@ -211,11 +211,7 @@ const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
               onClick={() => sort(order)}
             >
               {order}
-              {currentSortOrder === order ? (
-                <div className="RightSlot">✓</div>
-              ) : (
-                ""
-              )}
+              {currentSortOrder === order && <div className="RightSlot">✓</div>}
             </ContextMenu.Item>
           ))}
         </ContextMenu.SubContent>

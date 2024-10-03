@@ -124,9 +124,10 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     let cumulativeHeight = 0;
     const scales = domains.map((domain, index) => {
       const domainHeight = heights[index];
+      const initialHeight = cumulativeHeight;
       cumulativeHeight += domainHeight;
       return scaleBand<string>({
-        range: [cumulativeHeight, cumulativeHeight - domainHeight],
+        range: [cumulativeHeight, initialHeight],
         domain,
         padding: 0.01,
       });
