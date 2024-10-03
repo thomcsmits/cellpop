@@ -110,7 +110,7 @@ export default function HeatmapYAxis() {
 function TickComponent({
   x,
   y,
-  formattedValue,
+  formattedValue: row,
   axisConfig,
   openInNewTab,
   tickTitle,
@@ -121,22 +121,18 @@ function TickComponent({
 } & ReturnType<typeof useHeatmapAxis>) {
   const { selectedValues, expandedSize } = useYScale();
   const { flipAxisPosition } = axisConfig;
-  const { data } = useData();
+  const { rowMaxes } = useData();
 
   const panelSize = usePanelDimensions(
     flipAxisPosition ? "left_middle" : "right_middle",
   );
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  if (selectedValues.has(formattedValue)) {
+  if (selectedValues.has(row)) {
     // Display an axis scaled for the selected value instead of the tick if the value is expanded
     // Use the tick label as the axis label
     const Axis = flipAxisPosition ? AxisLeft : AxisRight;
-    const max = Math.max(
-      ...data.countsMatrix
-        .filter((d) => d.row === formattedValue)
-        .map((d) => d.value),
-    );
+    const max = rowMaxes[row];
     const yScale = scaleLinear({
       domain: [max, 0],
       range: [0, expandedSize],
@@ -147,14 +143,14 @@ function TickComponent({
         top={y}
         left={panelSize.width}
         scale={yScale}
-        label={formattedValue}
+        label={row}
         labelOffset={expandedSize / 2}
         labelProps={{
           style: tickLabelStyle,
           onMouseMove: (e) => {
             openTooltip(
               {
-                title: tickTitle(formattedValue),
+                title: tickTitle(row),
                 data: {
                   "Cell Count": max,
                 },
@@ -164,14 +160,14 @@ function TickComponent({
             );
           },
           onMouseOut: closeTooltip,
-          onClick: () => openInNewTab(formattedValue),
+          onClick: () => openInNewTab(row),
         }}
       />
     );
   }
   return (
     <Text x={x} y={y} {...tickLabelProps}>
-      {formattedValue}
+      {row}
     </Text>
   );
 }

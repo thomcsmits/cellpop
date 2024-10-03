@@ -30,6 +30,8 @@ interface DataContextType {
   maxCount: number;
   rowNames: string[];
   colNames: string[];
+  rowMaxes: Record<string, number>;
+  columnMaxes: Record<string, number>;
 }
 
 const DataContext = createContext<DataContextType | null>("CellPopData");
@@ -63,27 +65,22 @@ export function DataProvider({ children, data }: DataContextProps) {
     reset: resetRemovedColumns,
   } = useSet<string>();
 
-  const columnCounts = useMemo(() => {
-    const columnCounts: Record<string, number> = {};
-    data.countsMatrix.forEach(({ col, value }) => {
-      if (removedColumns.has(col)) {
-        return;
-      }
-      columnCounts[col] = (columnCounts[col] || 0) + value;
-    });
-    return columnCounts;
-  }, [data, removedColumns]);
-
-  const rowCounts = useMemo(() => {
+  const [rowCounts, columnCounts, rowMaxes, columnMaxes] = useMemo(() => {
     const rowCounts: Record<string, number> = {};
-    data.countsMatrix.forEach(({ row, value }) => {
-      if (removedRows.has(row)) {
+    const columnCounts: Record<string, number> = {};
+    const rowMaxes: Record<string, number> = {};
+    const columnMaxes: Record<string, number> = {};
+    data.countsMatrix.forEach(({ row, col, value }) => {
+      if (removedRows.has(row) || removedColumns.has(col)) {
         return;
       }
       rowCounts[row] = (rowCounts[row] || 0) + value;
+      columnCounts[col] = (columnCounts[col] || 0) + value;
+      rowMaxes[row] = Math.max(rowMaxes[row] || 0, value);
+      columnMaxes[col] = Math.max(columnMaxes[col] || 0, value);
     });
-    return rowCounts;
-  }, [data, removedRows]);
+    return [rowCounts, columnCounts, rowMaxes, columnMaxes];
+  }, [data, removedRows, removedColumns]);
 
   const upperBound = useMemo(
     () => getUpperBound(data.countsMatrix.map((r) => r.value)),
@@ -127,6 +124,8 @@ export function DataProvider({ children, data }: DataContextProps) {
         removeColumn,
         rowNames,
         colNames,
+        rowMaxes,
+        columnMaxes,
       }}
     >
       {children}

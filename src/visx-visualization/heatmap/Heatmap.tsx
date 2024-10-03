@@ -33,7 +33,7 @@ function HeatmapCell({
   // @ts-expect-error - custom y scale provides the appropriate band width for the given row
   // and providing an arg to a regular scale's bandwidth function doesn't throw, so this is fine
   const cellHeight = yScale.bandwidth(row);
-  const { removedRows, removedColumns, rowCounts, data } = useData();
+  const { removedRows, removedColumns, rowMaxes, data } = useData();
 
   const { label: rowLabel } = useRowConfig();
   const { label: columnLabel } = useColumnConfig();
@@ -73,10 +73,7 @@ function HeatmapCell({
   };
 
   if (selectedValues.has(row)) {
-    // TODO: Lift this to a context so it doesn't have to recalculated
-    const max = Math.max(
-      ...data.countsMatrix.filter((d) => d.row === row).map((d) => d.value),
-    );
+    const max = rowMaxes[row];
     const inlineYScale = scaleLinear({
       domain: [0, max],
       range: [0, expandedSize],
