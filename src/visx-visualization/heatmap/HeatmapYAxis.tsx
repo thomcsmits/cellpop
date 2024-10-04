@@ -127,6 +127,7 @@ function TickComponent({
     flipAxisPosition ? "left_middle" : "right_middle",
   );
   const { openTooltip, closeTooltip } = useSetTooltipData();
+  const { theme } = useCellPopTheme();
 
   if (selectedValues.has(row)) {
     // Display an axis scaled for the selected value instead of the tick if the value is expanded
@@ -145,8 +146,15 @@ function TickComponent({
         scale={yScale}
         label={row}
         labelOffset={expandedSize / 2}
+        tickLabelProps={{
+          fill: theme.text,
+          style: tickLabelStyle,
+          onMouseOut: closeTooltip,
+          onClick: () => openInNewTab(row),
+        }}
         labelProps={{
           style: tickLabelStyle,
+          fill: theme.text,
           onMouseMove: (e) => {
             openTooltip(
               {

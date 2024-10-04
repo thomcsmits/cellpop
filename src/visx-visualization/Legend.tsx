@@ -1,8 +1,11 @@
-import { rgbToHex } from "@mui/material";
 import React, { useId } from "react";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
-import { HEATMAP_THEMES, useColorScale } from "../contexts/ScaleContext";
+import {
+  HEATMAP_THEMES,
+  HeatmapTheme,
+  useColorScale,
+} from "../contexts/ScaleContext";
 
 export default function Legend() {
   const {
@@ -13,7 +16,6 @@ export default function Legend() {
   } = useColorScale();
   const { width } = usePanelDimensions("left_top");
   const { theme } = useCellPopTheme();
-  const domain = colors.domain();
   const id = useId() + "-legend";
 
   const adjustedWidth = width - 40; // 20px padding on each side
@@ -33,8 +35,8 @@ export default function Legend() {
       <svg width={adjustedWidth} id={id}>
         <defs>
           <linearGradient id="legendGradient" gradientTransform="rotate(0)">
-            <stop offset="5%" stopColor={rgbToHex(colors(domain[0]))} />
-            <stop offset="95%" stopColor={rgbToHex(colors(domain[1]))} />
+            <stop offset="5%" stopColor={colors(0)} />
+            <stop offset="95%" stopColor={colors(maxValue)} />
           </linearGradient>
         </defs>
         <rect
@@ -56,7 +58,7 @@ export default function Legend() {
       </svg>
       <select
         value={heatmapTheme}
-        onChange={(e) => setHeatmapTheme(e.target.value)}
+        onChange={(e) => setHeatmapTheme(e.target.value as HeatmapTheme)}
       >
         {HEATMAP_THEMES.map((theme) => (
           <option key={theme} value={theme}>

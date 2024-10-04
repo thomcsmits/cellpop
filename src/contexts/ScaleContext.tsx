@@ -74,7 +74,7 @@ const heatmapThemes = {
   greys: interpolateGreys,
 };
 
-type HeatmapTheme = keyof typeof heatmapThemes;
+export type HeatmapTheme = keyof typeof heatmapThemes;
 
 export const HEATMAP_THEMES = Object.keys(heatmapThemes) as HeatmapTheme[];
 
