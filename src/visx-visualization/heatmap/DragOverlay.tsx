@@ -20,10 +20,7 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
-import {
-  createSnapModifier,
-  restrictToParentElement,
-} from "@dnd-kit/modifiers";
+import { restrictToParentElement } from "@dnd-kit/modifiers";
 import {
   arrayMove,
   horizontalListSortingStrategy,
@@ -105,19 +102,11 @@ function DragOverlayContainer({
   const { scale: y } = useYScale();
   const { width, height } = useHeatmapDimensions();
 
-  const { snapModifier, strategy } = useMemo(() => {
-    const scale = selectedDimension === "X" ? x : y;
-    const gridSize = scale.bandwidth();
-    const snapModifier = createSnapModifier(gridSize);
-    const strategy =
-      selectedDimension === "X"
-        ? verticalListSortingStrategy
-        : horizontalListSortingStrategy;
-    return {
-      snapModifier,
-      strategy,
-    };
-  }, [selectedDimension, x, y]);
+  const strategy = useMemo(() => {
+    return selectedDimension === "X"
+      ? verticalListSortingStrategy
+      : horizontalListSortingStrategy;
+  }, [selectedDimension]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -148,14 +137,11 @@ function DragOverlayContainer({
 
       lastOver.current = over.id;
 
-      startTransition(() => {
-        setSort("Custom");
-        setItems((items) => {
-          const oldIndex = items.indexOf(active.id as string);
-          const newIndex = items.indexOf(over.id as string);
+      setItems((items) => {
+        const oldIndex = items.indexOf(active.id as string);
+        const newIndex = items.indexOf(over.id as string);
 
-          return arrayMove(items, oldIndex, newIndex);
-        });
+        return arrayMove(items, oldIndex, newIndex);
       });
     },
     [setItems, setSort],
@@ -173,7 +159,7 @@ function DragOverlayContainer({
       onDragCancel={cancelDrag}
       onDragMove={handleDrag}
       onDragEnd={handleDrag}
-      modifiers={[snapModifier, restrictToParentElement]}
+      modifiers={[restrictToParentElement]}
       measuring={{
         droppable: {
           strategy: MeasuringStrategy.BeforeDragging,
