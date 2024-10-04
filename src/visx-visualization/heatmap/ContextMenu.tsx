@@ -126,8 +126,7 @@ const CollapseRows = () => {
 };
 
 const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
-  // The visual "start" of the rows and columns is at the top and left, respectively.
-  const [, { moveToEnd: moveRowToStart }] = useRows();
+  const [, { moveToStart: moveRowToStart }] = useRows();
   const [, { moveToStart: moveColumnToStart }] = useColumns();
   const {
     tooltipData: { data },
@@ -155,7 +154,7 @@ const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
 };
 
 const MoveToEnd = ({ dimension }: { dimension: "row" | "column" }) => {
-  const [, { moveToStart: moveRowToEnd }] = useRows();
+  const [, { moveToEnd: moveRowToEnd }] = useRows();
   const [, { moveToEnd: moveColumnToEnd }] = useColumns();
   const {
     tooltipData: { data },
