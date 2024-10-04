@@ -89,6 +89,9 @@ importers:
       d3:
         specifier: ^6.7.0
         version: 6.7.0
+      d3-scale-chromatic:
+        specifier: ^3.1.0
+        version: 3.1.0
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -2653,6 +2656,10 @@ packages:
 
   d3-scale-chromatic@2.0.0:
     resolution: {integrity: sha512-LLqy7dJSL8yDy7NRmf6xSlsFZ6zYvJ4BcWFE4zBrOPnQERv9zj24ohnXKRbyi9YHnYV+HN1oEO3iFK971/gkzA==}
+
+  d3-scale-chromatic@3.1.0:
+    resolution: {integrity: sha512-A3s5PWiZ9YCXFye1o246KoscMWqf8BsD9eRiJ3He7C9OBaxKhAd5TFCdEx/7VbKtxxTsu//1mMJFrEt572cEyQ==}
+    engines: {node: '>=12'}
 
   d3-scale@3.3.0:
     resolution: {integrity: sha512-1JGp44NQCt5d1g+Yy+GeOnZP7xHo0ii8zsQp6PGzd+C1/dl0KGsp9A7Mxwp+1D1o4unbTTxVdU/ZOIEBoeZPbQ==}
@@ -8035,6 +8042,11 @@ snapshots:
     dependencies:
       d3-color: 2.0.0
       d3-interpolate: 2.0.1
+
+  d3-scale-chromatic@3.1.0:
+    dependencies:
+      d3-color: 3.1.0
+      d3-interpolate: 3.0.1
 
   d3-scale@3.3.0:
     dependencies:

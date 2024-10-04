@@ -2,10 +2,15 @@ import { rgbToHex } from "@mui/material";
 import React, { useId } from "react";
 import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
-import { useColorScale } from "../contexts/ScaleContext";
+import { HEATMAP_THEMES, useColorScale } from "../contexts/ScaleContext";
 
 export default function Legend() {
-  const { scale: colors, maxValue } = useColorScale();
+  const {
+    scale: colors,
+    maxValue,
+    setHeatmapTheme,
+    heatmapTheme,
+  } = useColorScale();
   const { width } = usePanelDimensions("left_top");
   const { theme } = useCellPopTheme();
   const domain = colors.domain();
@@ -42,13 +47,23 @@ export default function Legend() {
           stroke={theme.text}
           strokeWidth={2}
         />
-        <text y={36} x={8} fill={theme.text}>
+        <text y={36} x={8} fill={colors(maxValue)}>
           0
         </text>
-        <text y={36} x={adjustedWidth - 8} textAnchor="end" fill={theme.text}>
+        <text y={36} x={adjustedWidth - 8} textAnchor="end" fill={colors(0)}>
           {maxValue}
         </text>
       </svg>
+      <select
+        value={heatmapTheme}
+        onChange={(e) => setHeatmapTheme(e.target.value)}
+      >
+        {HEATMAP_THEMES.map((theme) => (
+          <option key={theme} value={theme}>
+            {theme}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }

@@ -1,10 +1,25 @@
 import { scaleBand, scaleLinear } from "@visx/scale";
-import React, { PropsWithChildren, useMemo } from "react";
+import React, { PropsWithChildren, useMemo, useState } from "react";
 
+import {
+  interpolateBlues,
+  interpolateCividis,
+  interpolateCool,
+  interpolateCubehelixDefault,
+  interpolateGreens,
+  interpolateGreys,
+  interpolateInferno,
+  interpolateMagma,
+  interpolateOranges,
+  interpolatePlasma,
+  interpolatePurples,
+  interpolateReds,
+  interpolateViridis,
+  interpolateWarm,
+} from "d3";
 import { useSet } from "../hooks/useSet";
 import { createContext, useContext } from "../utils/context";
 import { useColumns, useRows } from "./AxisOrderContext";
-import { useCellPopTheme } from "./CellPopThemeContext";
 import { useData } from "./DataContext";
 import { useHeatmapDimensions } from "./DimensionsContext";
 import { SelectedDimensionProvider } from "./SelectedDimensionContext";
@@ -34,11 +49,34 @@ export const useYScale = () => useContext(YScaleContext);
 interface ColorScaleContext {
   scale: ScaleLinear<string>;
   maxValue: number;
+  heatmapTheme: HeatmapTheme;
+  setHeatmapTheme: (theme: HeatmapTheme) => void;
 }
 const ColorScaleContext = createContext<ColorScaleContext>("ColorScaleContext");
 export const useColorScale = () => useContext(ColorScaleContext);
 
 export const EXPANDED_ROW_PADDING = 16; // add 8px on either side of the expanded row for padding
+
+const heatmapThemes = {
+  viridis: interpolateViridis,
+  inferno: interpolateInferno,
+  magma: interpolateMagma,
+  plasma: interpolatePlasma,
+  cividis: interpolateCividis,
+  warm: interpolateWarm,
+  cool: interpolateCool,
+  cubehelix: interpolateCubehelixDefault,
+  greens: interpolateGreens,
+  blues: interpolateBlues,
+  oranges: interpolateOranges,
+  reds: interpolateReds,
+  purples: interpolatePurples,
+  greys: interpolateGreys,
+};
+
+type HeatmapTheme = keyof typeof heatmapThemes;
+
+export const HEATMAP_THEMES = Object.keys(heatmapThemes) as HeatmapTheme[];
 
 /**
  * Provider which instantiates and manages the scales used for the heatmap.
@@ -46,11 +84,11 @@ export const EXPANDED_ROW_PADDING = 16; // add 8px on either side of the expande
 export function ScaleProvider({ children }: PropsWithChildren) {
   const { maxCount } = useData();
   const { width, height } = useHeatmapDimensions();
+  const [heatmapTheme, setHeatmapTheme] = useState<HeatmapTheme>(
+    HEATMAP_THEMES[0],
+  );
   const { set: selectedX, toggle: toggleX, reset: resetX } = useSet<string>();
   const { set: selectedY, toggle: toggleY, reset: resetY } = useSet<string>();
-  const {
-    theme: { heatmapZero, heatmapMax },
-  } = useCellPopTheme();
 
   const [columns] = useColumns();
   const [rows] = useRows();
@@ -215,15 +253,18 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     ],
   );
   const colorScaleContext = useMemo(() => {
+    const theme = heatmapThemes[heatmapTheme];
     const scale = scaleLinear<string>({
-      range: [heatmapZero, heatmapMax],
+      range: [theme(0), theme(1)],
       domain: [0, maxCount],
     });
     return {
       scale,
       maxValue: maxCount,
+      heatmapTheme,
+      setHeatmapTheme,
     };
-  }, [heatmapZero, heatmapMax, maxCount]);
+  }, [heatmapTheme, maxCount]);
 
   return (
     <XScaleContext.Provider value={xScaleContext}>

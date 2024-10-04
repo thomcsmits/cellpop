@@ -29,7 +29,7 @@ function HeatmapCell({
 }) {
   const { scale: xScale } = useXScale();
   const { scale: yScale, selectedValues } = useYScale();
-  const { scale: colors } = useColorScale();
+  const { scale: colors, maxValue } = useColorScale();
   const cellWidth = xScale.bandwidth();
   // @ts-expect-error - custom y scale provides the appropriate band width for the given row
   // and providing an arg to a regular scale's bandwidth function doesn't throw, so this is fine
@@ -77,13 +77,14 @@ function HeatmapCell({
     const max = rowMaxes[row];
     const inlineYScale = scaleLinear({
       domain: [0, max],
-      range: [0, cellHeight - EXPANDED_ROW_PADDING],
+      range: [0, cellHeight],
       nice: true,
     });
     const x = xScale(col);
     const yBackground = yScale(row);
     const barHeight = inlineYScale(value);
-    const yBar = yBackground + cellHeight - barHeight;
+    const yBar =
+      yBackground + cellHeight - barHeight - EXPANDED_ROW_PADDING / 4;
     return (
       <g onMouseMove={onMouseOver}>
         <rect
@@ -91,7 +92,7 @@ function HeatmapCell({
           y={yBackground}
           width={cellWidth}
           height={cellHeight}
-          fill={colors(value)}
+          fill={colors(0)}
           {...dataProps}
         />
         <rect
@@ -99,8 +100,7 @@ function HeatmapCell({
           y={yBar}
           width={cellWidth}
           height={barHeight}
-          fill="black"
-          stroke="black"
+          fill={colors(maxValue)}
           paintOrder="fill"
           {...dataProps}
         />
@@ -148,13 +148,18 @@ export default function Heatmap() {
 
   const { theme } = useCellPopTheme();
 
+  const { scale: colorScale } = useColorScale();
+
   return (
     <DragOverlayContainer items={items} setItems={setItems} setSort={setSort}>
       <svg
         width={width}
         height={height}
         className="heatmap"
-        style={{ outline: `1px solid ${theme.text}` }}
+        style={{
+          outline: `1px solid ${theme.text}`,
+          background: colorScale(0),
+        }}
         onMouseOut={closeTooltip}
       >
         {data.countsMatrix.map((cell) => (
