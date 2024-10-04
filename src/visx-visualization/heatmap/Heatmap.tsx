@@ -125,7 +125,6 @@ export default function Heatmap() {
   const { width, height } = useHeatmapDimensions();
   const { selectedDimension } = useSelectedDimension();
   const { data } = useData();
-  const { selectedValues } = useYScale();
   const [rows, { setOrderedValues: setRows, setSortOrder: setRowOrder }] =
     useRows();
   const [
@@ -137,14 +136,11 @@ export default function Heatmap() {
 
   // Dynamically determine which dimension to use based on the selected dimension
   const { items, setItems, setSort } = useMemo(() => {
-    if (selectedValues.size > 0) {
-      return { items: [], setItems: () => {}, setSort: () => {} };
-    }
     const items = selectedDimension === "X" ? columns : rows;
     const setItems = selectedDimension === "X" ? setColumns : setRows;
     const setSort = selectedDimension === "X" ? setColumnOrder : setRowOrder;
     return { items, setItems, setSort };
-  }, [selectedDimension, columns, rows, selectedValues]);
+  }, [selectedDimension, columns, rows]);
 
   const { theme } = useCellPopTheme();
 

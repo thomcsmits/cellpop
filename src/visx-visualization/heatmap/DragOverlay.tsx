@@ -194,7 +194,7 @@ function DragIndicator({
   top: (item: string) => number;
 }) {
   const { selectedDimension } = useSelectedDimension();
-  const { scale: x, selectedValues } = useXScale();
+  const { scale: x } = useXScale();
   const { scale: y } = useYScale();
 
   const { columnSizes, rowSizes } = useDimensions();
@@ -265,10 +265,6 @@ function DragIndicator({
     },
     [x, y, xOffset, yOffset, dataMap, rowLabel, columnLabel, width, height],
   );
-
-  if (selectedValues.size > 0) {
-    return null;
-  }
 
   return (
     <div
