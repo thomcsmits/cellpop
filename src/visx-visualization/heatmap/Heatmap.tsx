@@ -9,6 +9,7 @@ import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { useHeatmapDimensions } from "../../contexts/DimensionsContext";
 import {
+  EXPANDED_ROW_PADDING,
   useColorScale,
   useXScale,
   useYScale,
@@ -27,7 +28,7 @@ function HeatmapCell({
   value: number;
 }) {
   const { scale: xScale } = useXScale();
-  const { scale: yScale, selectedValues, expandedSize } = useYScale();
+  const { scale: yScale, selectedValues } = useYScale();
   const { scale: colors } = useColorScale();
   const cellWidth = xScale.bandwidth();
   // @ts-expect-error - custom y scale provides the appropriate band width for the given row
@@ -76,20 +77,34 @@ function HeatmapCell({
     const max = rowMaxes[row];
     const inlineYScale = scaleLinear({
       domain: [0, max],
-      range: [0, expandedSize],
+      range: [0, cellHeight - EXPANDED_ROW_PADDING],
       nice: true,
     });
+    const x = xScale(col);
+    const yBackground = yScale(row);
+    const barHeight = inlineYScale(value);
+    const yBar = yBackground + cellHeight - barHeight;
     return (
-      <rect
-        x={xScale(col)}
-        y={yScale(row) + expandedSize - inlineYScale(value)}
-        width={cellWidth}
-        height={inlineYScale(value)}
-        fill="black"
-        stroke="black"
-        onMouseMove={onMouseOver}
-        {...dataProps}
-      />
+      <g onMouseMove={onMouseOver}>
+        <rect
+          x={x}
+          y={yBackground}
+          width={cellWidth}
+          height={cellHeight}
+          fill={colors(value)}
+          {...dataProps}
+        />
+        <rect
+          x={x}
+          y={yBar}
+          width={cellWidth}
+          height={barHeight}
+          fill="black"
+          stroke="black"
+          paintOrder="fill"
+          {...dataProps}
+        />
+      </g>
     );
   }
 

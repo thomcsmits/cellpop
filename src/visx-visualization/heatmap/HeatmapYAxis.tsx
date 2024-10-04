@@ -12,7 +12,7 @@ import { useRows } from "../../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
-import { useYScale } from "../../contexts/ScaleContext";
+import { EXPANDED_ROW_PADDING, useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
 import { TICK_TEXT_SIZE } from "./constants";
@@ -135,7 +135,7 @@ function TickComponent({
     const max = rowMaxes[row];
     const yScale = scaleLinear({
       domain: [max, 0],
-      range: [0, expandedSize],
+      range: [0, expandedSize - EXPANDED_ROW_PADDING],
       nice: true,
     });
     return (

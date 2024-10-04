@@ -38,6 +38,8 @@ interface ColorScaleContext {
 const ColorScaleContext = createContext<ColorScaleContext>("ColorScaleContext");
 export const useColorScale = () => useContext(ColorScaleContext);
 
+export const EXPANDED_ROW_PADDING = 16; // add 8px on either side of the expanded row for padding
+
 /**
  * Provider which instantiates and manages the scales used for the heatmap.
  */
@@ -87,7 +89,8 @@ export function ScaleProvider({ children }: PropsWithChildren) {
 
     // Otherwise, we need to adjust the scale to account for the expanded rows
     // First, we need to determine the height of the selected rows
-    const expandedRowHeight = height / (2 + selectedY.size);
+    const expandedRowHeight =
+      height / (2 + selectedY.size) - EXPANDED_ROW_PADDING;
     const restRowsHeight = height - selectedY.size * expandedRowHeight;
     const collapsedRowHeight = restRowsHeight / (rows.length - selectedY.size);
     // Then, we need to split the domain up, keeping the order of the existing rows
