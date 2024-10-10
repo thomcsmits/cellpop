@@ -1,15 +1,15 @@
 import * as React from "react";
 import { createRender, useModelState } from "@anywidget/react";
 import * as cellpop from "cellpop";
+
 // test
 const render = createRender(() => {
-	const [value, setValue] = useModelState<number>("value");
+	const [uuids, setUuids] = useModelState<string[]>("uuids");
     let [data, setData] = React.useState(null);
 
       React.useEffect(() => {
-        cellpop.loadHuBMAPData(["018a905cdbdff684760859f594d3fd77"]).then(setData);
-          console.log("data has loaded");
-      }, [])
+        cellpop.loadHuBMAPData(uuids).then(setData);
+      }, [uuids])
     
     console.log("data", data);
 
@@ -18,11 +18,7 @@ const render = createRender(() => {
 
 	return (
 		<div className="cellpop">
-			<button onClick={() => setValue(value + 1)}>
-				count is {value}
-			</button>
-
-            {/* {data ? <cellpop.CellPop data={data} theme={"light"} dimensions={dimensions} /> : null} */}
+            {data ? <cellpop.CellPop data={data} theme={"light"} dimensions={dimensions} /> : null}
 		</div>
 	);
 });
