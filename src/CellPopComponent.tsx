@@ -209,7 +209,7 @@ export const CellPop = (props: CellPopProps) => {
 				</div>
 			</Popup>
 
-			<div id="cellpopvis" ref={cellPopRef} style={{position: "absolute", padding: "100px"}}></div>
+			<div id="cellpopvis" ref={cellPopRef} style={{position: "relative", padding: "100px", height: dimensions.global.height.total, width: dimensions.global.width.total}}></div>
 
 		</div>
 	);
