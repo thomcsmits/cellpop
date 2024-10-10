@@ -183,16 +183,6 @@ export const CellPop = (props: CellPopProps) => {
 					</Select>
 				</FormControl>
 
-				<ToggleButtonGroup
-						color="primary"
-						value={theme}
-						exclusive
-						onChange={changeTheme}
-						aria-label="Theme"
-					>
-						<ToggleButton value="light">Light</ToggleButton>
-						<ToggleButton value="dark">Dark</ToggleButton>
-					</ToggleButtonGroup>
 
 				{boundary ? 
 					<Button variant="outlined" onClick={removeBoundary}>Remove boundary boxes</Button>
