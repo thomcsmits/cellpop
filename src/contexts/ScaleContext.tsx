@@ -255,11 +255,9 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     customScale.lookup = (num: number) => {
       for (const scale of scales) {
         const [bottom, top] = scale.range();
-        console.log({ top, bottom, num });
         if (num >= bottom && num <= top) {
           const eachBand = scale.bandwidth();
           const diff = num - bottom;
-          console.log({ domain: scale.domain(), eachBand, diff });
 
           const index = Math.floor(diff / eachBand);
           return scale.domain()[index];
