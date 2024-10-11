@@ -122,6 +122,12 @@ export function ScaleProvider({ children }: PropsWithChildren) {
       });
       const expandedHeight = scale.bandwidth();
       const collapsedHeight = scale.bandwidth();
+      // @ts-expect-error augmenting scale with a lookup function
+      scale.lookup = (num: number) => {
+        const eachBand = scale.bandwidth();
+        const index = Math.floor((height - num) / eachBand);
+        return scale.domain()[index];
+      };
       return [scale, expandedHeight, collapsedHeight];
     }
 
@@ -164,20 +170,23 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     }
     // Create the scales for each domain
     let cumulativeHeight = height;
-    const scales = domains.map((domain, index) => {
-      const domainHeight = heights[index];
-      const initialHeight = cumulativeHeight;
-      cumulativeHeight -= domainHeight;
-      const rangeTop =
-        cumulativeHeight + (index === 0 ? 0 : EXPANDED_ROW_PADDING);
-      const rangeBottom =
-        initialHeight - (index === domains.length ? 0 : EXPANDED_ROW_PADDING);
-      return scaleBand<string>({
-        range: [rangeTop, rangeBottom],
-        domain,
-        padding: 0.01,
-      });
-    });
+    const scales = domains
+      .map((domain, index) => {
+        const domainHeight = heights[index];
+        const initialHeight = cumulativeHeight;
+        cumulativeHeight -= domainHeight;
+        const isExpanded = domain.some((row) => selectedY.has(row));
+        const rangeTop =
+          cumulativeHeight + (isExpanded ? EXPANDED_ROW_PADDING : 0);
+        const rangeBottom =
+          initialHeight - (isExpanded ? EXPANDED_ROW_PADDING : 0);
+        return scaleBand<string>({
+          range: [rangeTop, rangeBottom],
+          domain,
+          padding: 0.01,
+        });
+      })
+      .reverse();
     // Create a custom scale that uses the correct scale for each ordinal value
     const customScale = (value: string) => {
       for (const scale of scales) {
@@ -206,13 +215,58 @@ export function ScaleProvider({ children }: PropsWithChildren) {
       newRange ? customScale : ([height, 0] as [number, number]);
     customScale.rangeRound = (newRange?: [number, number]) =>
       newRange ? customScale : [height, 0];
-    customScale.round = () => false;
-    customScale.padding = () => 0.01;
-    customScale.paddingInner = () => 0;
-    customScale.paddingOuter = () => 0;
-    customScale.align = () => 0.5;
+    customScale.round = (arg?: boolean) => {
+      if (arg === undefined) {
+        return false;
+      }
+      scales.forEach((scale) => scale.round(arg));
+      return customScale;
+    };
+    customScale.padding = (arg?: number) => {
+      if (arg === undefined) {
+        return 0.01;
+      }
+      scales.forEach((scale) => scale.padding(arg));
+      return customScale;
+    };
+    customScale.paddingInner = (arg?: number) => {
+      if (arg === undefined) {
+        return 0.01;
+      }
+      scales.forEach((scale) => scale.paddingInner(arg));
+      return customScale;
+    };
+    customScale.paddingOuter = (arg?: number) => {
+      if (arg === undefined) {
+        return 0.0;
+      }
+      scales.forEach((scale) => scale.paddingOuter(arg));
+      return customScale;
+    };
+    customScale.align = (arg?: number) => {
+      if (arg === undefined) {
+        return 0.5 as number;
+      }
+      scales.forEach((scale) => scale.align(arg));
+      return customScale as ScaleBand<string>;
+    };
     customScale.copy = () => customScale;
     customScale.step = () => collapsedRowHeight;
+    customScale.lookup = (num: number) => {
+      for (const scale of scales) {
+        const [bottom, top] = scale.range();
+        console.log({ top, bottom, num });
+        if (num >= bottom && num <= top) {
+          const eachBand = scale.bandwidth();
+          const diff = num - bottom;
+          console.log({ domain: scale.domain(), eachBand, diff });
+
+          const index = Math.floor(diff / eachBand);
+          return scale.domain()[index];
+        }
+      }
+      return "";
+    };
     return [
       customScale as ScaleBand<string>,
       expandedRowHeight,

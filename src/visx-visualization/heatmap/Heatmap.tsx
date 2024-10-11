@@ -78,6 +78,14 @@ function HeatmapRow({ row }: { row: string }) {
             </g>
           );
         })}
+        <line
+          // x axis line for the embedded bar graph
+          x1={0}
+          x2={width}
+          y1={yScale(row) + cellHeight}
+          y2={yScale(row) + cellHeight}
+          stroke="black"
+        />
       </g>
     );
   }

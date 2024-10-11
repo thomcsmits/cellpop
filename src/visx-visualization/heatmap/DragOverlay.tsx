@@ -225,30 +225,38 @@ function DragIndicator({
       if (!visualizationBounds) {
         return;
       }
-      const xStep = x.bandwidth();
-      const yStep = y.bandwidth();
       const xValue = e.clientX - xOffset - visualizationBounds.left;
 
       const visualizationTotalHeight =
         yOffset + height + visualizationBounds.top;
       const yMousePosition = e.clientY;
-      const yValue = visualizationTotalHeight - yMousePosition;
+      const yValue = height - (visualizationTotalHeight - yMousePosition);
 
-      const columnCount = x.domain().length - 1;
-      const rowCount = y.domain().length - 1;
+      const columnCount = x.domain().length;
+      const rowCount = y.domain().length;
+
+      const xStep = x.bandwidth();
+      const yStep = y.bandwidth();
 
       // Clamp indices to prevent out of bounds errors
       const columnIndex = Math.min(
         Math.max(Math.floor(xValue / xStep), 0),
-        columnCount,
+        columnCount - 1,
       );
       const rowIndex = Math.min(
         Math.max(Math.floor(yValue / yStep), 0),
-        rowCount,
+        rowCount - 1,
       );
 
-      const rowKey = y.domain()[rowIndex];
+      // @ts-expect-error - y lookup is a custom method on the scale, added in
+      // ScaleContext. We should consider extending the d3 scale type to include
+      // this method.
+      const rowKey = y.lookup(yValue);
       const columnKey = x.domain()[columnIndex];
+
+      if (!rowKey || !columnKey) {
+        return;
+      }
 
       openTooltip(
         {
@@ -257,6 +265,10 @@ function DragIndicator({
             "Cell Count": dataMap[`${rowKey}-${columnKey}`],
             [rowLabel]: rowKey,
             [columnLabel]: columnKey,
+            ["Row Index"]: rowIndex,
+            ["Column Index"]: columnIndex,
+            xValue,
+            yValue,
           },
         },
         e.clientX,
