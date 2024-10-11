@@ -77,7 +77,7 @@ const indicatorProps = (
   },
   Y: {
     width,
-    height: y.bandwidth(),
+    height: (item) => y.bandwidth(item),
     left: () => 0,
     top: (item: string) => y(item),
   },
@@ -189,7 +189,7 @@ function DragIndicator({
 }: {
   item: string;
   width: number;
-  height: number;
+  height: number | ((item: string) => number);
   left: (item: string) => number;
   top: (item: string) => number;
 }) {
@@ -283,7 +283,7 @@ function DragIndicator({
       key={item}
       style={{
         width: itemWidth,
-        height: itemHeight,
+        height: itemHeight instanceof Function ? itemHeight(item) : itemHeight,
         position: "absolute",
         zIndex: 1,
         left: left(item),
