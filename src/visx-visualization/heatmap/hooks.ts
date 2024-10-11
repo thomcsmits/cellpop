@@ -33,7 +33,6 @@ export function useHeatmapAxis(
   const tickTitle = useTickTitle(createHref);
   const tickLabelStyle = {
     fontVariantNumeric: "tabular-nums",
-    filter: flipAxisPosition && filterId ? `url(#${filterId})` : "none",
     cursor: createHref ? "pointer" : "default",
   };
   return { openInNewTab, tickTitle, tickLabelStyle };

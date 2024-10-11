@@ -51,6 +51,7 @@ export function LeftGraphScale() {
   const { tickLabelSize } = useYScale();
 
   const axisScale = xScale.copy().range([width - LEFT_MARGIN, tickLabelSize]);
+  const axisTotalWidth = width - LEFT_MARGIN - tickLabelSize;
   const { theme } = useCellPopTheme();
   return (
     <svg
@@ -69,6 +70,7 @@ export function LeftGraphScale() {
         tickLabelProps={{ fill: theme.text }}
         tickStroke={theme.text}
         tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
+        tickValues={axisTotalWidth > 150 ? undefined : [xScale.domain()[1]]}
       />
     </svg>
   );

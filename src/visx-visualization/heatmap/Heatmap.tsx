@@ -1,15 +1,11 @@
 import { scaleLinear } from "@visx/scale";
 import React, { useMemo } from "react";
-import {
-  useColumnConfig,
-  useRowConfig,
-} from "../../contexts/AxisConfigContext";
+
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { useHeatmapDimensions } from "../../contexts/DimensionsContext";
 import {
-  EXPANDED_ROW_PADDING,
   useColorScale,
   useXScale,
   useYScale,
@@ -18,113 +14,106 @@ import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import DragOverlayContainer from "./DragOverlay";
 
-function HeatmapCell({
-  row,
-  col,
-  value,
-}: {
-  row: string;
-  col: string;
-  value: number;
-}) {
+function HeatmapRow({ row }: { row: string }) {
+  const { width } = useHeatmapDimensions();
   const { scale: xScale } = useXScale();
   const { scale: yScale, selectedValues } = useYScale();
-  const { scale: colors, maxValue } = useColorScale();
-  const cellWidth = xScale.bandwidth();
+  const { scale: colors } = useColorScale();
+  const cellWidth = Math.ceil(xScale.bandwidth());
   // @ts-expect-error - custom y scale provides the appropriate band width for the given row
   // and providing an arg to a regular scale's bandwidth function doesn't throw, so this is fine
-  const cellHeight = yScale.bandwidth(row);
-  const { removedRows, removedColumns, rowMaxes } = useData();
+  const cellHeight = Math.ceil(yScale.bandwidth(row));
+  const { removedRows, removedColumns, rowMaxes, dataMap } = useData();
+  const [columns] = useColumns();
 
-  const { label: rowLabel } = useRowConfig();
-  const { label: columnLabel } = useColumnConfig();
-  const { openTooltip } = useSetTooltipData();
-
-  const onMouseOver = (e: React.MouseEvent) => {
-    if (!selectedValues) {
-      return;
-    }
-    const target = e.target as SVGRectElement;
-    const row = target.getAttribute("data-row");
-    const col = target.getAttribute("data-col");
-    const value = target.getAttribute("data-val");
-
-    openTooltip(
-      {
-        title: `${row} - ${col}`,
-        data: {
-          "Cell Count": value,
-          [rowLabel]: row,
-          [columnLabel]: col,
-        },
-      },
-      e.clientX,
-      e.clientY,
-    );
-  };
-
-  if (removedRows.has(row) || removedColumns.has(col)) {
+  if (removedRows.has(row)) {
     return null;
   }
 
-  const dataProps = {
-    "data-row": row,
-    "data-col": col,
-    "data-val": value,
-  };
+  const rowKeys = columns.map((col) => `${row}-${col}`);
+  const max = rowMaxes[row];
 
   if (selectedValues.has(row)) {
-    const max = rowMaxes[row];
     const inlineYScale = scaleLinear({
       domain: [0, max],
       range: [0, cellHeight],
       nice: true,
     });
-    const x = xScale(col);
-    const yBackground = yScale(row);
-    const barHeight = inlineYScale(value);
-    const yBar =
-      yBackground + cellHeight - barHeight - EXPANDED_ROW_PADDING / 4;
     return (
-      <g onMouseMove={onMouseOver}>
+      <g>
         <rect
-          x={x}
-          y={yBackground}
-          width={cellWidth}
+          x={0}
+          y={yScale(row)}
+          width={width}
           height={cellHeight}
-          fill={colors(0)}
-          {...dataProps}
+          fill="white"
         />
-        <rect
-          x={x}
-          y={yBar}
-          width={cellWidth}
-          height={barHeight}
-          fill={colors(maxValue)}
-          paintOrder="fill"
-          {...dataProps}
-        />
+        {rowKeys.map((key) => {
+          const [row, col] = key.split("-");
+          if (removedColumns.has(col)) {
+            return null;
+          }
+          const value = dataMap[key as keyof typeof dataMap];
+          const x = xScale(col);
+          const yBackground = yScale(row);
+          const barHeight = inlineYScale(value);
+          const yBar = yBackground + cellHeight - barHeight;
+          return (
+            <g key={key}>
+              <rect
+                x={x}
+                y={yBackground}
+                width={cellWidth}
+                height={cellHeight}
+                fill={"white"}
+              />
+              <rect
+                x={x}
+                y={yBar}
+                width={cellWidth}
+                height={barHeight}
+                fill={"black"}
+                stroke="white"
+              />
+            </g>
+          );
+        })}
       </g>
     );
   }
-
   return (
-    <rect
-      x={xScale(col)}
-      y={yScale(row)}
-      width={cellWidth}
-      height={cellHeight}
-      fill={colors(value)}
-      onMouseMove={onMouseOver}
-      {...dataProps}
-    />
+    <g>
+      <rect
+        x={0}
+        y={yScale(row)}
+        width={width}
+        height={Math.ceil(cellHeight)}
+        fill={colors(0)}
+      />
+      {rowKeys.map((key) => {
+        const [row, col] = key.split("-");
+        if (removedColumns.has(col)) {
+          return null;
+        }
+        const value = dataMap[key as keyof typeof dataMap];
+        return (
+          <rect
+            key={key}
+            x={xScale(col)}
+            y={yScale(row)}
+            width={Math.ceil(cellWidth)}
+            height={Math.ceil(cellHeight)}
+            fill={colors(value)}
+          />
+        );
+      })}
+    </g>
   );
 }
 
 export default function Heatmap() {
   const { width, height } = useHeatmapDimensions();
   const { selectedDimension } = useSelectedDimension();
-  const { data } = useData();
   const [rows, { setOrderedValues: setRows, setSortOrder: setRowOrder }] =
     useRows();
   const [
@@ -144,8 +133,6 @@ export default function Heatmap() {
 
   const { theme } = useCellPopTheme();
 
-  const { scale: colorScale } = useColorScale();
-
   return (
     <DragOverlayContainer items={items} setItems={setItems} setSort={setSort}>
       <svg
@@ -154,12 +141,11 @@ export default function Heatmap() {
         className="heatmap"
         style={{
           outline: `1px solid ${theme.text}`,
-          background: colorScale(0),
         }}
         onMouseOut={closeTooltip}
       >
-        {data.countsMatrix.map((cell) => (
-          <HeatmapCell {...cell} key={`${cell.row}-${cell.col}`} />
+        {rows.map((row) => (
+          <HeatmapRow key={row} row={row} />
         ))}
       </svg>
     </DragOverlayContainer>

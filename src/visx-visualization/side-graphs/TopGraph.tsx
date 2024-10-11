@@ -53,6 +53,9 @@ export function TopGraphScale() {
   const { tickLabelSize } = useXScale();
 
   const axisScale = yScale.copy().range([tickLabelSize, height - TOP_MARGIN]);
+
+  const axisTotalHeight = height - TOP_MARGIN - tickLabelSize;
+
   const { theme } = useCellPopTheme();
 
   return (
@@ -72,6 +75,7 @@ export function TopGraphScale() {
         tickLabelProps={{ fill: theme.text }}
         tickStroke={theme.text}
         tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
+        tickValues={axisTotalHeight > 100 ? undefined : [yScale.domain()[0]]}
       />
     </svg>
   );

@@ -58,7 +58,7 @@ export default function HeatmapYAxis() {
         tickComponent={
           selectedValues.size > 0
             ? (props) =>
-                TickComponent({
+                ExpandedRowTick({
                   ...props,
                   axisConfig,
                   openInNewTab,
@@ -107,7 +107,7 @@ export default function HeatmapYAxis() {
   );
 }
 
-function TickComponent({
+function ExpandedRowTick({
   x,
   y,
   formattedValue: row,
@@ -136,12 +136,12 @@ function TickComponent({
     const max = rowMaxes[row];
     const yScale = scaleLinear({
       domain: [max, 0],
-      range: [0, expandedSize - EXPANDED_ROW_PADDING],
+      range: [EXPANDED_ROW_PADDING, expandedSize - EXPANDED_ROW_PADDING],
       nice: true,
     });
     return (
       <Axis
-        top={y}
+        top={y - EXPANDED_ROW_PADDING * 2}
         left={panelSize.width}
         scale={yScale}
         label={row}

@@ -55,8 +55,6 @@ interface ColorScaleContext {
 const ColorScaleContext = createContext<ColorScaleContext>("ColorScaleContext");
 export const useColorScale = () => useContext(ColorScaleContext);
 
-export const EXPANDED_ROW_PADDING = 16; // add 8px on either side of the expanded row for padding
-
 const heatmapThemes = {
   viridis: interpolateViridis,
   inferno: interpolateInferno,
@@ -77,6 +75,9 @@ const heatmapThemes = {
 export type HeatmapTheme = keyof typeof heatmapThemes;
 
 export const HEATMAP_THEMES = Object.keys(heatmapThemes) as HeatmapTheme[];
+
+// Add 8px between the expanded row and the next row
+export const EXPANDED_ROW_PADDING = 8;
 
 /**
  * Provider which instantiates and manages the scales used for the heatmap.
@@ -107,12 +108,11 @@ export function ScaleProvider({ children }: PropsWithChildren) {
   // TODO: The custom axis logic should ideally be moved to a separate file
   // since it's taking up more than half of this file's length
   const [y, expandedSize, collapsedSize] = useMemo(() => {
-    // Base case: use regular band scale if:
-    // If no rows are selected,
-    // all rows are unselected,
-    // or all selected rows have been hidden.
+    // Base case: use regular band scale
     if (
+      // if no rows are selected/all rows are selected
       [0, rows.length].includes(selectedY.size) ||
+      // if all selected rows are hidden
       [...selectedY].every((row) => !rows.includes(row))
     ) {
       const scale = scaleBand<string>({
@@ -120,17 +120,18 @@ export function ScaleProvider({ children }: PropsWithChildren) {
         domain: rows,
         padding: 0.01,
       });
-      const expandedHeight = scale.step();
+      const expandedHeight = scale.bandwidth();
       const collapsedHeight = scale.bandwidth();
       return [scale, expandedHeight, collapsedHeight];
     }
 
     // Otherwise, we need to adjust the scale to account for the expanded rows
     // First, we need to determine the height of the selected rows
-    const expandedRowHeight =
-      height / (2 + selectedY.size) - EXPANDED_ROW_PADDING;
-    const restRowsHeight = height - selectedY.size * expandedRowHeight;
-    const collapsedRowHeight = restRowsHeight / (rows.length - selectedY.size);
+    const expandedRowHeight = height / (2 + selectedY.size);
+    const totalExpandedHeight = selectedY.size * expandedRowHeight;
+    const totalCollapsedHeight = height - totalExpandedHeight;
+    const numberOfUnselectedRows = rows.length - selectedY.size;
+    const collapsedRowHeight = totalCollapsedHeight / numberOfUnselectedRows;
     // Then, we need to split the domain up, keeping the order of the existing rows
     // and creating separate domains for each subsection
     const domains = rows
@@ -154,21 +155,25 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     // Calculate heights allotted to each domain
     const heights: number[] = [];
     for (const domain of domains) {
-      if (domain.length === 1 && selectedY.has(domain[0])) {
+      if (selectedY.has(domain[0])) {
         heights.push(expandedRowHeight);
       } else {
-        const height = (domain.length / rows.length) * restRowsHeight;
+        const height = domain.length * collapsedRowHeight;
         heights.push(height);
       }
     }
     // Create the scales for each domain
-    let cumulativeHeight = 0;
+    let cumulativeHeight = height;
     const scales = domains.map((domain, index) => {
       const domainHeight = heights[index];
       const initialHeight = cumulativeHeight;
-      cumulativeHeight += domainHeight;
+      cumulativeHeight -= domainHeight;
+      const rangeTop =
+        cumulativeHeight + (index === 0 ? 0 : EXPANDED_ROW_PADDING);
+      const rangeBottom =
+        initialHeight - (index === domains.length ? 0 : EXPANDED_ROW_PADDING);
       return scaleBand<string>({
-        range: [cumulativeHeight, initialHeight],
+        range: [rangeTop, rangeBottom],
         domain,
         padding: 0.01,
       });
