@@ -45,8 +45,8 @@ export type CountsMatrixFractions = {
 };
 
 export type MetaData<T extends object = object> = {
-  rows?: { row: string; metadata: T }[];
-  cols?: { col: string; metadata: T }[];
+  rows?: Record<string, T>;
+  cols?: Record<string, T>;
 };
 
 export type extendedChart = {
@@ -71,12 +71,25 @@ export type ObsSets = {
   }[];
 };
 
-export type HuBMAPMetaData = {
+interface HuBMAPSearchSource {
+  hubmap_id: string;
+  donor: {
+    mapped_metadata: {
+      age_value: string[];
+      sex: string[];
+    };
+  };
+  title: string;
+  dataset_type: string;
+  anatomy_2: string[];
+}
+
+export type HuBMAPSearchHit = {
   _id: string;
   _index?: string;
   _score?: number;
   _type?: string;
-  _source: unknown;
+  _source: HuBMAPSearchSource;
 };
 
 /** OPTIONS */

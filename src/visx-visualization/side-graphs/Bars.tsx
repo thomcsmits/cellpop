@@ -5,6 +5,7 @@ import {
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
 import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
+import { useData } from "../../contexts/DataContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 
 interface BarsProps {
@@ -36,18 +37,24 @@ export default function Bars({
   nonExpandedSize,
 }: BarsProps) {
   const entries = Object.entries(data);
+  const {
+    data: { metadata },
+  } = useData();
 
   const { label: columnLabel } = useColumnConfig();
   const { label: rowLabel } = useRowConfig();
 
   const { openTooltip } = useSetTooltipData();
   const onMouse = (key: string) => (e: React.MouseEvent<SVGRectElement>) => {
+    const md = orientation === "vertical" ? metadata.cols : metadata.rows;
+    const metadataValue = md?.[key];
     openTooltip(
       {
         title: key,
         data: {
           "Cell Count": data[key],
           [orientation === "vertical" ? columnLabel : rowLabel]: key,
+          ...metadataValue,
         },
       },
       e.clientX,

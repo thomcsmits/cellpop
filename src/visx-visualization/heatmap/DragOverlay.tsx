@@ -77,7 +77,8 @@ const indicatorProps = (
   },
   Y: {
     width,
-    height: (item) => y.bandwidth(item),
+    // @ts-expect-error - y.bandwidth(string) is a custom method on the scale
+    height: (item: string) => y.bandwidth(item),
     left: () => 0,
     top: (item: string) => y(item),
   },
@@ -233,19 +234,12 @@ function DragIndicator({
       const yValue = height - (visualizationTotalHeight - yMousePosition);
 
       const columnCount = x.domain().length;
-      const rowCount = y.domain().length;
-
       const xStep = x.bandwidth();
-      const yStep = y.bandwidth();
 
       // Clamp indices to prevent out of bounds errors
       const columnIndex = Math.min(
         Math.max(Math.floor(xValue / xStep), 0),
         columnCount - 1,
-      );
-      const rowIndex = Math.min(
-        Math.max(Math.floor(yValue / yStep), 0),
-        rowCount - 1,
       );
 
       // @ts-expect-error - y lookup is a custom method on the scale, added in
@@ -265,10 +259,6 @@ function DragIndicator({
             "Cell Count": dataMap[`${rowKey}-${columnKey}`],
             [rowLabel]: rowKey,
             [columnLabel]: columnKey,
-            ["Row Index"]: rowIndex,
-            ["Column Index"]: columnIndex,
-            xValue,
-            yValue,
           },
         },
         e.clientX,

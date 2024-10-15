@@ -1,5 +1,5 @@
 import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
-import { HuBMAPMetaData, ObsSets, dataOrdering } from "../cellpop-schema";
+import { HuBMAPSearchHit, ObsSets, dataOrdering } from "../cellpop-schema";
 import { getCountsFromObsSetsList } from "./dataLoaders";
 import { loadDataWithCounts } from "./dataWrangling";
 
@@ -74,7 +74,7 @@ function getPromiseData(urls: string[]) {
 // get metadata
 function getPromiseMetadata(
   uuids: string[],
-): Promise<void | [string[], [string, any]]> {
+): Promise<void | [string[], Record<string, string | number>]> {
   const searchApi = "https://search.api.hubmapconsortium.org/v3/portal/search";
   const queryBody = {
     size: 10000,
@@ -98,24 +98,28 @@ function getPromiseMetadata(
     })
     .then((queryBody) => {
       const listAll = queryBody.hits.hits;
-      const metadata = listAll.map((l: HuBMAPMetaData) => {
-        const ls = l._source;
-        const dmm = l._source.donor.mapped_metadata;
-        return {
-          row: ls.hubmap_id,
-          metadata: {
-            title: ls.title,
-            dataset_type: ls.dataset_type,
-            anatomy_2: ls.anatomy_2[0],
-            sex: dmm.sex[0],
-            age: dmm.age_value[0],
-          },
-        };
-      }) as [string, any];
-      const hubmapIDs = listAll.map(
-        (l: HuBMAPMetaData) => l._source.hubmap_id,
-      ) as string[]; // return {[l._source.uuid]: l._source.hubmap_id};
-      return [hubmapIDs, metadata] as [string[], [string, any]];
+      const metadata: Record<string, string | number> = listAll.reduce(
+        (acc: Record<string, unknown>, l: HuBMAPSearchHit) => {
+          const ls = l._source;
+          const dmm = l._source.donor.mapped_metadata;
+          return {
+            ...acc,
+            [ls.hubmap_id]: {
+              title: ls.title,
+              dataset_type: ls.dataset_type,
+              anatomy: ls.anatomy_2[0],
+              sex: dmm.sex[0],
+              age: dmm.age_value[0],
+            },
+          };
+        },
+        {},
+      );
+      const hubmapIDs = Object.keys(metadata);
+      return [hubmapIDs, metadata] as [
+        string[],
+        Record<string, string | number>,
+      ];
     })
     .catch((error) => {
       console.error("Error:", error);

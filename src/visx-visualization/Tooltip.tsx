@@ -39,7 +39,9 @@ export default function Tooltip() {
         <div>
           {Object.entries(tooltipData.data).map(([key, value]) => (
             <div key={key}>
-              <span style={{ textTransform: "capitalize" }}>{key}: </span>
+              <span style={{ textTransform: "capitalize" }}>
+                {key.replace("_", " ")}:{" "}
+              </span>
               <span>{String(value)}</span>
             </div>
           ))}
