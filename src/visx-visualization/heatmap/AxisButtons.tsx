@@ -40,19 +40,21 @@ export function AxisButtons({
         ...positionProps[axis],
       }}
     >
-      {sortOrders.map((order) => (
-        <button
-          key={order}
-          onClick={() => {
-            setSortOrder(order);
-          }}
-        >
-          {order
-            .split("_")
-            .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-            .join(" ")}
-        </button>
-      ))}
+      {sortOrders
+        .filter((s) => s !== "Custom")
+        .map((order) => (
+          <button
+            key={order}
+            onClick={() => {
+              setSortOrder(order);
+            }}
+          >
+            {order
+              .split("_")
+              .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+              .join(" ")}
+          </button>
+        ))}
     </div>
   );
 }
