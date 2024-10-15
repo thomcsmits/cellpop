@@ -1,7 +1,7 @@
 import { rgbToHex } from "@mui/material/styles";
 import { scaleLinear, scaleOrdinal } from "@visx/scale";
 import { Text } from "@visx/text";
-import { interpolatePlasma, schemeCategory10, schemePaired } from "d3";
+import { interpolatePlasma, schemePaired } from "d3";
 import React, { useMemo } from "react";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
 import { useData } from "../../contexts/DataContext";

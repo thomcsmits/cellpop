@@ -9,7 +9,7 @@ import MetadataValueBar from "../heatmap/MetadataValueBar";
 import VisualizationPanel, { VisualizationPanelProps } from "./Panel";
 
 export default function BottomCenterPanel({ id }: VisualizationPanelProps) {
-  const [, { setSortOrder }] = useColumns();
+  const [, { setSortOrder, sortOrders }] = useColumns();
   const { flipAxisPosition } = useColumnConfig();
   const { width, height } = usePanelDimensions("center_bottom");
   return (
@@ -21,7 +21,11 @@ export default function BottomCenterPanel({ id }: VisualizationPanelProps) {
           <HeatmapXAxis />
         </svg>
       )}
-      <AxisButtons axis="X" setSortOrder={setSortOrder} />
+      <AxisButtons
+        axis="X"
+        setSortOrder={setSortOrder}
+        sortOrders={sortOrders}
+      />
     </VisualizationPanel>
   );
 }
