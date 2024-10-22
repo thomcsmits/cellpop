@@ -67,7 +67,7 @@ export function LeftGraphScale() {
         left={LEFT_MARGIN}
         orientation="bottom"
         stroke={theme.text}
-        tickLabelProps={{ fill: theme.text }}
+        tickLabelProps={{ fill: theme.text, className: "text" }}
         tickStroke={theme.text}
         tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
         tickValues={axisTotalWidth > 150 ? undefined : [xScale.domain()[1]]}

@@ -11,7 +11,6 @@ import {
   useSetTooltipData,
   useTooltipData,
 } from "../../contexts/TooltipDataContext";
-import "../../visualization/style.css";
 import ContextMenuComponent from "../heatmap/ContextMenu";
 import BottomCenterPanel from "./BottomCenter";
 import BottomLeftPanel from "./BottomLeft";
@@ -20,6 +19,7 @@ import MiddleCenterPanel from "./MiddleCenter";
 import MiddleLeftPanel from "./MiddleLeft";
 import MiddleRightPanel from "./MiddleRight";
 import VisualizationPanelResizer from "./PanelResizer";
+import "./style.css";
 import TopCenterPanel from "./TopCenter";
 import TopLeftPanel from "./TopLeft";
 import TopRightPanel from "./TopRight";

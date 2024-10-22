@@ -72,7 +72,7 @@ export function TopGraphScale() {
         hideZero
         hideAxisLine
         stroke={theme.text}
-        tickLabelProps={{ fill: theme.text }}
+        tickLabelProps={{ fill: theme.text, className: "text" }}
         tickStroke={theme.text}
         tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
         tickValues={axisTotalHeight > 100 ? undefined : [yScale.domain()[0]]}

@@ -30,7 +30,7 @@ import {
 import { addTooltip, defineTooltip, removeTooltip } from "./tooltips";
 import { getUpperBound } from "./util";
 
-import "./style.css";
+import "../visx-visualization/layout/style.css";
 
 export function renderHeatmap(
   data: CellPopData,

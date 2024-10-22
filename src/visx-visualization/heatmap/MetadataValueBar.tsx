@@ -198,6 +198,7 @@ export default function MetadataValueBar({
             <Text
               x={xVal}
               y={textY(bar)}
+              className="text"
               dx="1em"
               orientation={axis === "X" ? "horizontal" : "vertical"}
               onMouseMove={(e) => {
@@ -223,6 +224,7 @@ export default function MetadataValueBar({
         verticalAnchor="middle"
         textAnchor="middle"
         orientation={axis === "X" ? "horizontal" : "vertical"}
+        className="text"
         style={{
           textTransform: "capitalize",
         }}

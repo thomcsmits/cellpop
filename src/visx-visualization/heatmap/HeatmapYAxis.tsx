@@ -71,7 +71,7 @@ export default function HeatmapYAxis() {
           ({
             fontSize,
             fill: theme.text,
-            className: "y-axis-tick-label",
+            className: "y-axis-tick-label text",
             style: tickLabelStyle,
             transform: `translate(0, ${fontSize / 4})`,
             onMouseOver: (e) => {
@@ -100,6 +100,7 @@ export default function HeatmapYAxis() {
           fontSize: TICK_TEXT_SIZE * 1.5,
           fill: theme.text,
           pointerEvents: "none",
+          className: "y-axis-label text",
         }}
         hideTicks={selectedValues.size > 0}
       />
@@ -151,10 +152,12 @@ function ExpandedRowTick({
           style: tickLabelStyle,
           onMouseOut: closeTooltip,
           onClick: () => openInNewTab(row),
+          className: "text",
         }}
         labelProps={{
           style: tickLabelStyle,
           fill: theme.text,
+          className: "text",
           onMouseMove: (e) => {
             openTooltip(
               {
@@ -174,7 +177,7 @@ function ExpandedRowTick({
     );
   }
   return (
-    <Text x={x} y={y} {...tickLabelProps}>
+    <Text x={x} y={y} {...tickLabelProps} className="text">
       {row}
     </Text>
   );

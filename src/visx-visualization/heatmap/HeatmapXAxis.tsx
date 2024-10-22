@@ -50,7 +50,7 @@ export default function HeatmapXAxis() {
             style: tickLabelStyle,
             fill: theme.text,
             dy: "0.25em",
-            className: "x-axis-tick-label",
+            className: "x-axis-tick-label text",
             transform: `rotate(-90, ${x(t)}, ${size})translate(0, ${size / 4})`,
             onMouseOver: (e) => {
               openTooltip(
@@ -74,7 +74,7 @@ export default function HeatmapXAxis() {
         labelProps={{
           fontSize: TICK_TEXT_SIZE * 1.5,
           fill: theme.text,
-          className: "x-axis-label",
+          className: "x-axis-label text",
           pointerEvents: "none",
         }}
         labelOffset={tickLabelSize - TICK_TEXT_SIZE * 2}

@@ -29,7 +29,7 @@ export default function Legend() {
         height: "100%",
       }}
     >
-      <label htmlFor={id} style={{ color: theme.text }}>
+      <label htmlFor={id} style={{ color: theme.text }} className="text">
         Counts
       </label>
       <svg width={adjustedWidth} id={id}>
@@ -49,10 +49,16 @@ export default function Legend() {
           stroke={theme.text}
           strokeWidth={2}
         />
-        <text y={36} x={8} fill={colors(maxValue)}>
+        <text y={36} x={8} fill={colors(maxValue)} className="text">
           0
         </text>
-        <text y={36} x={adjustedWidth - 8} textAnchor="end" fill={colors(0)}>
+        <text
+          y={36}
+          x={adjustedWidth - 8}
+          textAnchor="end"
+          fill={colors(0)}
+          className="text"
+        >
           {maxValue}
         </text>
       </svg>
