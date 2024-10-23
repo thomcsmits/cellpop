@@ -1,0 +1,17 @@
+{
+  "eslint.format.enable": true,
+  "eslint.useFlatConfig": true,
+  "eslint.workingDirectories": ["./src"],
+  "[javascript|typescript|javascriptreact|typescriptreact]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "editor.codeActionsOnSave": {
+    "source.sortImports": "always",
+    "source.fixAll": "always"
+  },
+  "cSpell.words": [
+    "cellpop",
+    "epanechnikov",
+    "zustand"
+  ]
+}
