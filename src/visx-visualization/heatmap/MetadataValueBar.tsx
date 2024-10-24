@@ -229,12 +229,12 @@ export default function MetadataValueBar({
               x={xVal}
               y={textY(bar)}
               className="text"
-              dx="1em"
+              dx={cellWidth + 8}
               orientation={axis === "X" ? "horizontal" : "vertical"}
               onMouseMove={(e) => {
                 openTooltip(
                   {
-                    title: key,
+                    title: String(value),
                     data: { [selectedMetadata]: value },
                   },
                   e.clientX,

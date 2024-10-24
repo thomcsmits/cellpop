@@ -26,6 +26,7 @@ function HeatmapRow({ row }: { row: string }) {
   const { removedRows, removedColumns, rowMaxes, dataMap } = useData();
   const [columns] = useColumns();
 
+  const { theme } = useCellPopTheme();
   if (removedRows.has(row)) {
     return null;
   }
@@ -105,7 +106,8 @@ function HeatmapRow({ row }: { row: string }) {
             width={Math.ceil(cellWidth)}
             height={Math.ceil(cellHeight)}
             fill={colors(value)}
-            stroke={"#ffffff80"}
+            stroke={theme.text}
+            strokeOpacity={0.5}
           />
         );
       })}
