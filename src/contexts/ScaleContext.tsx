@@ -135,7 +135,7 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     ) {
       const scale = scaleBand<string>({
         range: [height, 0],
-        domain: rows,
+        domain: [...rows].reverse(),
         padding: 0.01,
       });
       const expandedHeight = scale.bandwidth();
