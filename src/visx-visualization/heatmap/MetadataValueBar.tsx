@@ -204,7 +204,7 @@ export default function MetadataValueBar({
             ? value.toString().slice(0, 10) + "..."
             : value;
         return (
-          <g key={value} x={xVal} y={yVal}>
+          <g key={keys.join(",")} x={xVal} y={yVal}>
             <rect
               x={xVal}
               y={yVal}

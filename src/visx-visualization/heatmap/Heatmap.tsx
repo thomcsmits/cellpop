@@ -91,13 +91,6 @@ function HeatmapRow({ row }: { row: string }) {
   }
   return (
     <g>
-      <rect
-        x={0}
-        y={yScale(row)}
-        width={width}
-        height={Math.ceil(cellHeight)}
-        fill={colors(0)}
-      />
       {rowKeys.map((key) => {
         const [row, col] = key.split("-");
         if (removedColumns.has(col)) {
@@ -112,6 +105,7 @@ function HeatmapRow({ row }: { row: string }) {
             width={Math.ceil(cellWidth)}
             height={Math.ceil(cellHeight)}
             fill={colors(value)}
+            stroke={"#ffffff80"}
           />
         );
       })}
