@@ -10,7 +10,11 @@ import {
 import React, { useCallback, useMemo } from "react";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
 import { useData } from "../../contexts/DataContext";
-import { useXScale, useYScale } from "../../contexts/ScaleContext";
+import {
+  EXPANDED_ROW_PADDING,
+  useXScale,
+  useYScale,
+} from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 
 interface MetadataValueBarProps {
@@ -141,7 +145,12 @@ export default function MetadataValueBar({
     const value = metadata[key][selectedMetadata] as string;
     const processedValue = metadataIsNumeric ? parseInt(value, 10) : value;
     // @ts-expect-error this is supported by the y axis
-    const height = y.bandwidth(key);
+    let height = y.bandwidth(key);
+    // Handle padding around expanded bars
+    if (height > y.bandwidth()) {
+      height += EXPANDED_ROW_PADDING * 2;
+    }
+    height = Math.ceil(height);
     // @ts-expect-error we're handling typechecking at runtime
     const color = metadataValueColorScale(processedValue);
 
