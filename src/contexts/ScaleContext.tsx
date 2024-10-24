@@ -175,7 +175,8 @@ export function ScaleProvider({ children }: PropsWithChildren) {
         },
         [[]] as string[][],
       )
-      .filter((domain) => domain.length > 0);
+      .filter((domain) => domain.length > 0)
+      .reverse();
     // Calculate heights allotted to each domain
     const heights: number[] = [];
     for (const domain of domains) {
