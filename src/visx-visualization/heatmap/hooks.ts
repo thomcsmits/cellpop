@@ -56,10 +56,8 @@ export function useSetTickLabelSize(
         const tickBounds = Array.from(ticks).map((t) =>
           t.getBoundingClientRect(),
         );
-        const tickStart = tickBounds[0][orientation === "x" ? "y" : "x"];
-        // We always use the width here, as vertically-oriented tick labels are rotated
-        const maxSize = Math.max(...tickBounds.map((b) => b.width));
-        setTickLabelSize(tickStart + maxSize);
+        const maxSize = Math.max(...tickBounds.map((b) => orientation === 'x' ? b.height : b.width));
+        setTickLabelSize(maxSize);
       }
     } else {
       setTickLabelSize(0);

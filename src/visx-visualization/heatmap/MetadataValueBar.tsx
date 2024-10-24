@@ -10,7 +10,11 @@ import {
 import React, { useCallback, useMemo } from "react";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
 import { useData } from "../../contexts/DataContext";
-import { useXScale, useYScale } from "../../contexts/ScaleContext";
+import {
+  EXPANDED_ROW_PADDING,
+  useXScale,
+  useYScale,
+} from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 
 interface MetadataValueBarProps {
@@ -31,7 +35,7 @@ interface BarHelper {
   color: string;
   x: number;
   y: number;
-  key: string;
+  keys: string[];
 }
 
 export default function MetadataValueBar({
@@ -94,11 +98,37 @@ export default function MetadataValueBar({
   const onMouseMove = useCallback(
     (e: React.MouseEvent<SVGRectElement>) => {
       const target = e.target as SVGRectElement;
-      const key = target.getAttribute("data-key");
+      const keys = target.getAttribute("data-keys")?.split(",") || [];
       const value = target.getAttribute("data-value");
+      if (keys.length === 0 || !value) {
+        return;
+      }
+      const targetBounds = target.getBoundingClientRect();
+      const x = e.clientX - targetBounds.left;
+      const y = e.clientY - targetBounds.top;
+      if (x < 0 || y < 0 || x > targetBounds.width || y > targetBounds.height) {
+        return;
+      }
+      const titleCreator = () => {
+        if (keys.length === 1) {
+          return keys[0];
+        }
+        const keysLength = keys.length;
+        const keysReverse = keys.slice().reverse();
+        if (axis === "Y") {
+          const keyHeight = targetBounds.height / keysLength;
+          const keyIndex = Math.floor(y / keyHeight);
+          return keysReverse[keyIndex];
+        } else if (axis === "X") {
+          const keyWidth = targetBounds.width / keysLength;
+          const keyIndex = Math.floor(x / keyWidth);
+          return keysReverse[keyIndex];
+        }
+      };
+      const title = titleCreator();
       openTooltip(
         {
-          title: key,
+          title,
           data: {
             [selectedMetadata]: value,
           },
@@ -115,12 +145,18 @@ export default function MetadataValueBar({
     const value = metadata[key][selectedMetadata] as string;
     const processedValue = metadataIsNumeric ? parseInt(value, 10) : value;
     // @ts-expect-error this is supported by the y axis
-    const height = y.bandwidth(key);
+    let height = y.bandwidth(key);
+    // Handle padding around expanded bars
+    if (height > y.bandwidth()) {
+      height += EXPANDED_ROW_PADDING * 2;
+    }
+    height = Math.ceil(height);
     // @ts-expect-error we're handling typechecking at runtime
     const color = metadataValueColorScale(processedValue);
 
-    const xVal = axis === "X" ? x(key) : 0;
-    const yVal = axis === "X" ? 0 : Math.ceil(y(key));
+    const xVal = axis === "X" ? x(key) : x.bandwidth() * 2;
+    const yVal = axis === "X" ? y.bandwidth() * 2 : Math.ceil(y(key));
+    // if first bar
     if (acc.length === 0) {
       return [
         {
@@ -129,16 +165,19 @@ export default function MetadataValueBar({
           color,
           x: xVal,
           y: yVal,
-          key,
+          keys: [key],
         },
       ];
     }
+    // otherwise, check if the last bar has the same value
+    // if so, combine them
     const lastBar = acc[acc.length - 1];
     if (lastBar.value === processedValue) {
       const newBar = {
         ...lastBar,
         y: Math.min(lastBar.y, yVal),
         height: lastBar.height + height,
+        keys: [...lastBar.keys, key],
       };
       return [...acc.slice(0, -1), newBar];
     }
@@ -150,7 +189,7 @@ export default function MetadataValueBar({
         color,
         x: xVal,
         y: yVal,
-        key,
+        keys: [key],
       },
     ];
   }, [] as BarHelper[]);
@@ -168,13 +207,13 @@ export default function MetadataValueBar({
   return (
     <svg width={width} height={height}>
       {bars.map((bar) => {
-        const { value, height, color, x: xVal, y: yVal, key } = bar;
+        const { value, height, color, x: xVal, y: yVal, keys } = bar;
         const shortenedValue =
           value.toString().length > 20
             ? value.toString().slice(0, 10) + "..."
             : value;
         return (
-          <g key={key} x={xVal} y={yVal}>
+          <g key={keys.join(",")} x={xVal} y={yVal}>
             <rect
               x={xVal}
               y={yVal}
@@ -182,7 +221,7 @@ export default function MetadataValueBar({
               height={Math.ceil(height)}
               fill={color}
               data-value={value}
-              data-key={key}
+              data-keys={keys.join(",")}
               onMouseMove={onMouseMove}
               onMouseOut={closeTooltip}
               onMouseDown={(e) => {
@@ -199,12 +238,12 @@ export default function MetadataValueBar({
               x={xVal}
               y={textY(bar)}
               className="text"
-              dx="1em"
+              dx={cellWidth + 8}
               orientation={axis === "X" ? "horizontal" : "vertical"}
               onMouseMove={(e) => {
                 openTooltip(
                   {
-                    title: key,
+                    title: String(value),
                     data: { [selectedMetadata]: value },
                   },
                   e.clientX,
