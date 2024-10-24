@@ -154,8 +154,8 @@ export default function MetadataValueBar({
     // @ts-expect-error we're handling typechecking at runtime
     const color = metadataValueColorScale(processedValue);
 
-    const xVal = axis === "X" ? x(key) : 0;
-    const yVal = axis === "X" ? 0 : Math.ceil(y(key));
+    const xVal = axis === "X" ? x(key) : x.bandwidth() * 2;
+    const yVal = axis === "X" ? y.bandwidth() * 2 : Math.ceil(y(key));
     // if first bar
     if (acc.length === 0) {
       return [
