@@ -33,7 +33,7 @@ export default function Legend() {
       <label htmlFor={id} style={{ color: theme.text }} className="text">
         Counts
       </label>
-      <div style={{ height: 20 }}>
+      <div style={{ height: "1.5rem" }}>
         <div
           style={{
             width: adjustedWidth,
