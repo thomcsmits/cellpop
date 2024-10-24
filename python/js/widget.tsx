@@ -1,19 +1,20 @@
 import { createRender, useModelState } from "@anywidget/react";
 import * as cellpop from "cellpop";
 import * as React from "react";
+import { CellPopData } from "../../src/cellpop-schema";
 
 // test
 const render = createRender(() => {
-	const [uuids, setUuids] = useModelState<string[]>("uuids");
-    let [data, setData] = React.useState(null);
+  const [uuids, setUuids] = useModelState<string[]>("uuids");
+  const [data, setData] = React.useState<CellPopData | null>(null);
 
-      React.useEffect(() => {
-        cellpop.loadHuBMAPData(uuids).then(setData);
-      }, [uuids])
+  React.useEffect(() => {
+    cellpop.loadHuBMAPData(uuids).then((d) => setData(d!));
+  }, [uuids]);
 
-	return (
-		<div className="cellpop">
-      {data ? 
+  return (
+    <div className="cellpop">
+      {data ? (
         <cellpop.CellPop
           data={data}
           theme={"light"}
@@ -31,9 +32,11 @@ const render = createRender(() => {
             flipAxisPosition: true,
           }}
         />
-      : null}
-		</div>
-	);
+      ) : (
+        "Loading..."
+      )}
+    </div>
+  );
 });
 
 export default { render };
