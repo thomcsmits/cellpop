@@ -27,51 +27,48 @@ export default function Legend() {
         flexDirection: "column",
         justifyContent: "center",
         height: "100%",
+        gap: "1rem",
       }}
     >
       <label htmlFor={id} style={{ color: theme.text }} className="text">
         Counts
       </label>
-      <svg width={adjustedWidth} id={id}>
-        <defs>
-          <linearGradient id="legendGradient" gradientTransform="rotate(0)">
-            <stop offset="5%" stopColor={colors(0)} />
-            <stop offset="95%" stopColor={colors(maxValue)} />
-          </linearGradient>
-        </defs>
-        <rect
-          width={adjustedWidth}
-          height={20}
-          y={20}
-          fill="url(#legendGradient)"
-          rx={5}
-          ry={5}
-          stroke={theme.text}
-          strokeWidth={2}
-        />
-        <text y={36} x={8} fill={colors(maxValue)} className="text">
-          0
-        </text>
-        <text
-          y={36}
-          x={adjustedWidth - 8}
-          textAnchor="end"
-          fill={colors(0)}
+      <div style={{ height: "1.5rem" }}>
+        <div
+          style={{
+            width: adjustedWidth,
+            display: "flex",
+            justifyContent: "space-between",
+            background: `linear-gradient(to right, ${colors(0)}, ${colors(maxValue)})`,
+            padding: ".25rem",
+            borderRadius: ".25rem",
+            outline: `1px solid ${theme.text}`,
+          }}
+        >
+          <div style={{ color: colors(maxValue) }}>0</div>
+          <div style={{ color: colors(0) }}>{maxValue} </div>
+        </div>
+      </div>
+      <div>
+        <label
+          htmlFor={"heatmap-theme-select"}
+          style={{ color: theme.text }}
           className="text"
         >
-          {maxValue}
-        </text>
-      </svg>
-      <select
-        value={heatmapTheme}
-        onChange={(e) => setHeatmapTheme(e.target.value as HeatmapTheme)}
-      >
-        {HEATMAP_THEMES.map((theme) => (
-          <option key={theme} value={theme}>
-            {theme}
-          </option>
-        ))}
-      </select>
+          Theme:
+        </label>
+        <select
+          id={"heatmap-theme-select"}
+          value={heatmapTheme}
+          onChange={(e) => setHeatmapTheme(e.target.value as HeatmapTheme)}
+        >
+          {HEATMAP_THEMES.map((theme) => (
+            <option key={theme} value={theme}>
+              {theme}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 }

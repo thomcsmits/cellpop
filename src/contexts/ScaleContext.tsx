@@ -55,6 +55,10 @@ interface ColorScaleContext {
 const ColorScaleContext = createContext<ColorScaleContext>("ColorScaleContext");
 export const useColorScale = () => useContext(ColorScaleContext);
 
+const invertInterpolation =
+  (interpolator: (t: number) => string) => (t: number) =>
+    interpolator(1 - t);
+
 const heatmapThemes = {
   viridis: interpolateViridis,
   inferno: interpolateInferno,
@@ -70,6 +74,20 @@ const heatmapThemes = {
   reds: interpolateReds,
   purples: interpolatePurples,
   greys: interpolateGreys,
+  invertedViridis: invertInterpolation(interpolateViridis),
+  invertedInferno: invertInterpolation(interpolateInferno),
+  invertedMagma: invertInterpolation(interpolateMagma),
+  invertedPlasma: invertInterpolation(interpolatePlasma),
+  invertedCividis: invertInterpolation(interpolateCividis),
+  invertedWarm: invertInterpolation(interpolateWarm),
+  invertedCool: invertInterpolation(interpolateCool),
+  invertedCubehelix: invertInterpolation(interpolateCubehelixDefault),
+  invertedGreens: invertInterpolation(interpolateGreens),
+  invertedBlues: invertInterpolation(interpolateBlues),
+  invertedOranges: invertInterpolation(interpolateOranges),
+  invertedReds: invertInterpolation(interpolateReds),
+  invertedPurples: invertInterpolation(interpolatePurples),
+  invertedGreys: invertInterpolation(interpolateGreys),
 };
 
 export type HeatmapTheme = keyof typeof heatmapThemes;
@@ -117,7 +135,7 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     ) {
       const scale = scaleBand<string>({
         range: [height, 0],
-        domain: rows,
+        domain: [...rows].reverse(),
         padding: 0.01,
       });
       const expandedHeight = scale.bandwidth();
@@ -157,7 +175,8 @@ export function ScaleProvider({ children }: PropsWithChildren) {
         },
         [[]] as string[][],
       )
-      .filter((domain) => domain.length > 0);
+      .filter((domain) => domain.length > 0)
+      .reverse();
     // Calculate heights allotted to each domain
     const heights: number[] = [];
     for (const domain of domains) {

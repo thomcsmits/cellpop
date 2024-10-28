@@ -278,7 +278,7 @@ function DragIndicator({
         zIndex: 1,
         left: left(item),
         top: top(item),
-        outline: isDragging ? `1px solid ${theme.text}` : "none",
+        outline: isDragging ? `3px solid ${theme.text}` : "none",
       }}
       ref={setNodeRef}
       {...attributes}
