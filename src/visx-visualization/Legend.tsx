@@ -1,11 +1,17 @@
 import { useTheme } from "@mui/material/styles";
 import React, { useId } from "react";
-import { usePanelDimensions } from "../contexts/DimensionsContext";
 import {
   HEATMAP_THEMES,
   HeatmapTheme,
   useColorScale,
 } from "../contexts/ScaleContext";
+
+import { Box, Stack } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import { useEventCallback } from "@mui/material/utils";
 
 export default function Legend() {
   const {
@@ -14,65 +20,59 @@ export default function Legend() {
     setHeatmapTheme,
     heatmapTheme,
   } = useColorScale();
-  const { width } = usePanelDimensions("left_top");
   const theme = useTheme();
   const id = useId() + "-legend";
 
-  const adjustedWidth = width - 40; // 20px padding on each side
+  const minColor = colors(0);
+  const maxColor = colors(maxValue);
+
+  const handleThemeChange = useEventCallback((e: SelectChangeEvent) => {
+    setHeatmapTheme(e.target.value as HeatmapTheme);
+  });
+
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "column",
-        justifyContent: "center",
-        height: "100%",
-        gap: "1rem",
-      }}
+    <Stack
+      alignItems="center"
+      flexDirection="column"
+      justifyContent="center"
+      height="100%"
+      gap="1rem"
+      paddingX="1.5rem"
     >
-      <label
-        htmlFor={id}
-        style={{ color: theme.palette.text.primary }}
-        className="text"
-      >
-        Counts
-      </label>
-      <div style={{ height: "1.5rem" }}>
-        <div
-          style={{
-            width: adjustedWidth,
+      <Stack width="100%">
+        <InputLabel id="heatmap-legend-select-label">Counts</InputLabel>
+        <Box
+          id={id}
+          sx={{
+            w: "100%",
             display: "flex",
+            flexGrow: 1,
             justifyContent: "space-between",
-            background: `linear-gradient(to right, ${colors(0)}, ${colors(maxValue)})`,
-            padding: ".25rem",
-            borderRadius: ".25rem",
+            background: `linear-gradient(to right, ${minColor}, ${maxColor})`,
+            borderRadius: 0.5,
+            p: 0.5,
             outline: `1px solid ${theme.palette.text.primary}`,
           }}
         >
-          <div style={{ color: colors(maxValue) }}>0</div>
-          <div style={{ color: colors(0) }}>{maxValue} </div>
-        </div>
-      </div>
-      <div>
-        <label
-          htmlFor={"heatmap-theme-select"}
-          style={{ color: theme.palette.text.primary }}
-          className="text"
-        >
-          Theme:
-        </label>
-        <select
-          id={"heatmap-theme-select"}
+          <div style={{ color: maxColor }}>0</div>
+          <div style={{ color: minColor }}>{maxValue} </div>
+        </Box>
+      </Stack>
+      <FormControl variant="standard" fullWidth>
+        <InputLabel id="heatmap-theme-select-label">Heatmap Theme</InputLabel>
+        <Select
+          labelId="heatmap-theme-select-label"
+          id="heatmap-theme-select"
           value={heatmapTheme}
-          onChange={(e) => setHeatmapTheme(e.target.value as HeatmapTheme)}
+          onChange={handleThemeChange}
         >
           {HEATMAP_THEMES.map((theme) => (
-            <option key={theme} value={theme}>
+            <MenuItem key={theme} value={theme}>
               {theme}
-            </option>
+            </MenuItem>
           ))}
-        </select>
-      </div>
-    </div>
+        </Select>
+      </FormControl>
+    </Stack>
   );
 }

@@ -62,7 +62,7 @@ export function TopGraphScale() {
     <svg
       width={width}
       height={height}
-      style={{ borderLeft: `1px solid ${theme.palette.background.default}` }}
+      style={{ borderLeft: `1px solid ${theme.palette.text.primary}` }}
     >
       <AxisRight
         scale={axisScale}

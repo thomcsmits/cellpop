@@ -58,7 +58,7 @@ export function LeftGraphScale() {
     <svg
       width={width}
       height={height}
-      style={{ borderTop: `1px solid ${theme.palette.background.default}` }}
+      style={{ borderTop: `1px solid ${theme.palette.text.primary}` }}
     >
       <AxisBottom
         scale={axisScale}
