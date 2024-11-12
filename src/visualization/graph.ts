@@ -134,37 +134,38 @@ export function renderGraph(dataFull: CellPopData, dimensions: CellPopDimensions
         node.on("click", change);
     }
     update();
-}
 
-
-function change(event,d) {
-    if (d.collapsed) {
-        showNode(event,d);
-    } else {
-        hideNode(event,d);
+    function change(event,d) {
+        if (d.collapsed) {
+            showNode(event,d);
+        } else {
+            hideNode(event,d);
+        }
     }
-}
 
 
-function hideNode(event,d) {
-    d.collapsed = true;
-    setVisibilityChildren(d, true);
-    d3.select(event.target).attr("fill", "red");
-    update();
-}
-
-
-function showNode(event,d) {
-    d.collapsed = false;
-    setVisibilityChildren(d, false);
-    d3.select(event.target).attr("fill", "black");
-    update();
-}
-
-
-function setVisibilityChildren(node, hidden) {
-    if (node.children) {
-        node.children.forEach(d => d.hidden = hidden);
-        node.children.forEach(d => setVisibilityChildren(d, hidden));
+    function hideNode(event,d) {
+        d.collapsed = true;
+        setVisibilityChildren(d, true);
+        d3.select(event.target).attr("fill", "red");
+        update();
     }
+
+
+    function showNode(event,d) {
+        d.collapsed = false;
+        setVisibilityChildren(d, false);
+        d3.select(event.target).attr("fill", "black");
+        update();
+    }
+
+
+    function setVisibilityChildren(node, hidden) {
+        if (node.children) {
+            node.children.forEach(d => d.hidden = hidden);
+            node.children.forEach(d => setVisibilityChildren(d, hidden));
+        }
+    }
+
+  })
 }
