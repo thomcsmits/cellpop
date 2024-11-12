@@ -1,21 +1,21 @@
-import React, { PropsWithChildren, useState } from "react";
-import { CellPopTheme, CellPopThemeColors } from "../cellpop-schema";
+import React, { PropsWithChildren, useMemo, useState } from "react";
+import { CellPopTheme } from "../cellpop-schema";
 import { createContext, useContext } from "../utils/context";
 
 import { Setter } from "../utils/types";
 
+import { ThemeProvider } from "@mui/material/styles";
 import { getTheme } from "../visualization/theme";
 
-interface ThemeContextType {
-  theme: CellPopThemeColors;
+interface ThemeSetterContextType {
   currentThemeName: CellPopTheme;
   setTheme: Setter<CellPopTheme>;
 }
 
-const ThemeContext = createContext<ThemeContextType | null>(
-  "CellPopThemeColors",
+const ThemeSetterContext = createContext<ThemeSetterContextType | null>(
+  "ThemeSetterContext",
 );
-export const useCellPopTheme = () => useContext(ThemeContext);
+export const useSetTheme = () => useContext(ThemeSetterContext);
 
 /**
  * Provider which manages the theme to use for the visualization.
@@ -26,11 +26,16 @@ export function CellPopThemeProvider({
   theme: initialTheme,
 }: PropsWithChildren<{ theme: CellPopTheme }>) {
   const [currentThemeName, setTheme] = useState(initialTheme);
-  const theme = getTheme(currentThemeName);
+
+  const theme = useMemo(() => {
+    return getTheme(currentThemeName);
+  }, [currentThemeName]);
 
   return (
-    <ThemeContext.Provider value={{ theme, currentThemeName, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeProvider theme={theme}>
+      <ThemeSetterContext.Provider value={{ currentThemeName, setTheme }}>
+        {children}
+      </ThemeSetterContext.Provider>
+    </ThemeProvider>
   );
 }

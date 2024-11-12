@@ -1,12 +1,12 @@
 import React, { useMemo } from "react";
 
+import { useTheme } from "@mui/material/styles";
 import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
 import { area } from "@visx/shape";
 import { curveBumpY, max, rollup } from "d3";
 import { CountsMatrixValue } from "../../cellpop-schema";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useXScale, useYScale } from "../../contexts/ScaleContext";
@@ -113,7 +113,7 @@ export default function Violins({ side = "top" }: ViolinsProps) {
     });
   }, [densityScale, violinScale, horizontal]);
 
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
 
   return (
     <>
@@ -136,8 +136,8 @@ export default function Violins({ side = "top" }: ViolinsProps) {
               key={group}
               d={violinAreaGenerator(violinData)}
               opacity={1}
-              stroke={theme.sideCharts}
-              fill={theme.sideCharts}
+              stroke={theme.palette.text.secondary}
+              fill={theme.palette.text.primary}
               fillOpacity={0.6}
               strokeWidth={1}
             />

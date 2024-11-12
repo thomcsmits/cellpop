@@ -1,8 +1,8 @@
+import { useTheme } from "@mui/material/styles";
 import { AxisBottom } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import React from "react";
 import { useRowConfig } from "../../contexts/AxisConfigContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useFraction } from "../../contexts/FractionContext";
@@ -52,12 +52,13 @@ export function LeftGraphScale() {
 
   const axisScale = xScale.copy().range([width - LEFT_MARGIN, tickLabelSize]);
   const axisTotalWidth = width - LEFT_MARGIN - tickLabelSize;
-  const { theme } = useCellPopTheme();
+
+  const theme = useTheme();
   return (
     <svg
       width={width}
       height={height}
-      style={{ borderTop: `1px solid ${theme.sideCharts}` }}
+      style={{ borderTop: `1px solid ${theme.palette.background.default}` }}
     >
       <AxisBottom
         scale={axisScale}
@@ -66,9 +67,9 @@ export function LeftGraphScale() {
         top={0}
         left={LEFT_MARGIN}
         orientation="bottom"
-        stroke={theme.text}
-        tickLabelProps={{ fill: theme.text, className: "text" }}
-        tickStroke={theme.text}
+        stroke={theme.palette.text.primary}
+        tickLabelProps={{ fill: theme.palette.text.primary, className: "text" }}
+        tickStroke={theme.palette.text.primary}
         tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
         tickValues={axisTotalWidth > 150 ? undefined : [xScale.domain()[1]]}
       />

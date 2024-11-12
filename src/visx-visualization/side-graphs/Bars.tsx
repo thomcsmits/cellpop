@@ -1,10 +1,10 @@
+import { useTheme } from "@mui/material/styles";
 import { ScaleBand, ScaleLinear } from "d3";
 import React from "react";
 import {
   useColumnConfig,
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 
@@ -115,7 +115,7 @@ function Bar({
   height,
 }: BarProps) {
   const { closeTooltip } = useSetTooltipData();
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
   return (
     <g
       onMouseOver={onMouse}
@@ -128,15 +128,15 @@ function Bar({
         y={orientation === "vertical" ? 0 : y}
         height={orientation === "vertical" ? "100%" : barWidth}
         width={orientation === "vertical" ? barWidth : "100%"}
-        fill={theme.background}
+        fill={theme.palette.background.default}
       />
       <rect
         x={x}
         y={y}
         width={width}
         height={height}
-        fill={theme.sideCharts}
-        stroke={theme.background}
+        fill={theme.palette.text.primary}
+        stroke={theme.palette.background.default}
       />
     </g>
   );

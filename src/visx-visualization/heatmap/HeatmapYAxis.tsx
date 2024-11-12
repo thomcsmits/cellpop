@@ -1,3 +1,4 @@
+import { useTheme } from "@mui/material/styles";
 import {
   AxisLeft,
   AxisRight,
@@ -9,7 +10,6 @@ import { Text } from "@visx/text";
 import React, { useId } from "react";
 import { AxisConfig, useRowConfig } from "../../contexts/AxisConfigContext";
 import { useRows } from "../../contexts/AxisOrderContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { EXPANDED_ROW_PADDING, useYScale } from "../../contexts/ScaleContext";
@@ -22,7 +22,7 @@ import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
  * Component which renders the y-axis of the heatmap.
  */
 export default function HeatmapYAxis() {
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
   const {
     scale: y,
     tickLabelSize,
@@ -49,12 +49,12 @@ export default function HeatmapYAxis() {
 
   return (
     <>
-      <SVGBackgroundColorFilter color={theme.background} id={filterId} />
+      <SVGBackgroundColorFilter color={theme.palette.background.default} id={filterId} />
       <AxisRight
         scale={y}
         label={label}
-        stroke={theme.text}
-        tickStroke={theme.text}
+        stroke={theme.palette.text.primary}
+        tickStroke={theme.palette.text.primary}
         tickComponent={
           selectedValues.size > 0
             ? (props) =>
@@ -70,7 +70,7 @@ export default function HeatmapYAxis() {
         tickLabelProps={(t) =>
           ({
             fontSize,
-            fill: theme.text,
+            fill: theme.palette.text.primary,
             className: "y-axis-tick-label text",
             style: tickLabelStyle,
             transform: `translate(0, ${fontSize / 4})`,
@@ -98,7 +98,7 @@ export default function HeatmapYAxis() {
         }
         labelProps={{
           fontSize: TICK_TEXT_SIZE * 1.5,
-          fill: theme.text,
+          fill: theme.palette.text.primary,
           pointerEvents: "none",
           className: "y-axis-label text",
         }}
@@ -128,7 +128,7 @@ function ExpandedRowTick({
     flipAxisPosition ? "left_middle" : "right_middle",
   );
   const { openTooltip, closeTooltip } = useSetTooltipData();
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
 
   if (selectedValues.has(row)) {
     // Display an axis scaled for the selected value instead of the tick if the value is expanded
@@ -148,7 +148,7 @@ function ExpandedRowTick({
         label={row}
         labelOffset={expandedSize / 2}
         tickLabelProps={{
-          fill: theme.text,
+          fill: theme.palette.text.primary,
           style: tickLabelStyle,
           onMouseOut: closeTooltip,
           onClick: () => openInNewTab(row),
@@ -156,7 +156,7 @@ function ExpandedRowTick({
         }}
         labelProps={{
           style: tickLabelStyle,
-          fill: theme.text,
+          fill: theme.palette.text.primary,
           className: "text",
           onMouseMove: (e) => {
             openTooltip(

@@ -1,9 +1,9 @@
 import React from "react";
 
+import { useTheme } from "@mui/material/styles";
 import { AxisRight } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useFraction } from "../../contexts/FractionContext";
@@ -56,13 +56,13 @@ export function TopGraphScale() {
 
   const axisTotalHeight = height - TOP_MARGIN - tickLabelSize;
 
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
 
   return (
     <svg
       width={width}
       height={height}
-      style={{ borderLeft: `1px solid ${theme.sideCharts}` }}
+      style={{ borderLeft: `1px solid ${theme.palette.background.default}` }}
     >
       <AxisRight
         scale={axisScale}
@@ -71,9 +71,9 @@ export function TopGraphScale() {
         orientation="right"
         hideZero
         hideAxisLine
-        stroke={theme.text}
-        tickLabelProps={{ fill: theme.text, className: "text" }}
-        tickStroke={theme.text}
+        stroke={theme.palette.text.primary}
+        tickLabelProps={{ fill: theme.palette.text.primary, className: "text" }}
+        tickStroke={theme.palette.text.primary}
         tickFormat={(t) => formatPrefix(".0k", t as number)(t)}
         tickValues={axisTotalHeight > 100 ? undefined : [yScale.domain()[0]]}
       />

@@ -29,12 +29,12 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useTheme } from "@mui/material/styles";
 import { ScaleBand } from "d3";
 import {
   useColumnConfig,
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useParentRef } from "../../contexts/ContainerRefContext";
 import { useData } from "../../contexts/DataContext";
 import {
@@ -204,7 +204,7 @@ function DragIndicator({
   const xOffset = columnSizes[0];
   const yOffset = rowSizes[0];
 
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
   const { label: rowLabel } = useRowConfig();
   const { label: columnLabel } = useColumnConfig();
   const { width, height } = useHeatmapDimensions();
@@ -278,7 +278,9 @@ function DragIndicator({
         zIndex: 1,
         left: left(item),
         top: top(item),
-        outline: isDragging ? `3px solid ${theme.text}` : "none",
+        outline: isDragging
+          ? `3px solid ${theme.palette.text.primary}`
+          : "none",
       }}
       ref={setNodeRef}
       {...attributes}

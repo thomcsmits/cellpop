@@ -1,8 +1,8 @@
 import { scaleLinear } from "@visx/scale";
 import React, { useMemo } from "react";
 
+import { useTheme } from "@mui/material/styles";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { useHeatmapDimensions } from "../../contexts/DimensionsContext";
 import {
@@ -26,7 +26,7 @@ function HeatmapRow({ row }: { row: string }) {
   const { removedRows, removedColumns, rowMaxes, dataMap } = useData();
   const [columns] = useColumns();
 
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
   if (removedRows.has(row)) {
     return null;
   }
@@ -106,7 +106,7 @@ function HeatmapRow({ row }: { row: string }) {
             width={Math.ceil(cellWidth)}
             height={Math.ceil(cellHeight)}
             fill={colors(value)}
-            stroke={theme.text}
+            stroke={theme.palette.text.primary}
             strokeOpacity={0.5}
           />
         );
@@ -135,7 +135,7 @@ export default function Heatmap() {
     return { items, setItems, setSort };
   }, [selectedDimension, columns, rows]);
 
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
 
   return (
     <DragOverlayContainer items={items} setItems={setItems} setSort={setSort}>
@@ -144,7 +144,7 @@ export default function Heatmap() {
         height={height}
         className="heatmap"
         style={{
-          outline: `1px solid ${theme.text}`,
+          outline: `1px solid ${theme.palette.text.primary}`,
         }}
         onMouseOut={closeTooltip}
       >

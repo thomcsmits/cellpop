@@ -1,5 +1,5 @@
+import { useTheme } from "@mui/material/styles";
 import React, { useId } from "react";
-import { useCellPopTheme } from "../contexts/CellPopThemeContext";
 import { usePanelDimensions } from "../contexts/DimensionsContext";
 import {
   HEATMAP_THEMES,
@@ -15,7 +15,7 @@ export default function Legend() {
     heatmapTheme,
   } = useColorScale();
   const { width } = usePanelDimensions("left_top");
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
   const id = useId() + "-legend";
 
   const adjustedWidth = width - 40; // 20px padding on each side
@@ -30,7 +30,11 @@ export default function Legend() {
         gap: "1rem",
       }}
     >
-      <label htmlFor={id} style={{ color: theme.text }} className="text">
+      <label
+        htmlFor={id}
+        style={{ color: theme.palette.text.primary }}
+        className="text"
+      >
         Counts
       </label>
       <div style={{ height: "1.5rem" }}>
@@ -42,7 +46,7 @@ export default function Legend() {
             background: `linear-gradient(to right, ${colors(0)}, ${colors(maxValue)})`,
             padding: ".25rem",
             borderRadius: ".25rem",
-            outline: `1px solid ${theme.text}`,
+            outline: `1px solid ${theme.palette.text.primary}`,
           }}
         >
           <div style={{ color: colors(maxValue) }}>0</div>
@@ -52,7 +56,7 @@ export default function Legend() {
       <div>
         <label
           htmlFor={"heatmap-theme-select"}
-          style={{ color: theme.text }}
+          style={{ color: theme.palette.text.primary }}
           className="text"
         >
           Theme:

@@ -1,8 +1,8 @@
+import { useTheme } from "@mui/material/styles";
 import { AxisBottom, Orientation } from "@visx/axis";
 import React, { useId } from "react";
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
 import { useColumns } from "../../contexts/AxisOrderContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { useXScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
@@ -16,7 +16,7 @@ import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
  */
 export default function HeatmapXAxis() {
   const { columnCounts } = useData();
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
   const { scale: x, tickLabelSize, setTickLabelSize } = useXScale();
   const axisConfig = useColumnConfig();
   const { label, flipAxisPosition } = axisConfig;
@@ -36,19 +36,22 @@ export default function HeatmapXAxis() {
 
   return (
     <>
-      <SVGBackgroundColorFilter color={theme.background} id={filterId} />
+      <SVGBackgroundColorFilter
+        color={theme.palette.background.default}
+        id={filterId}
+      />
       <AxisBottom
         scale={x}
         label={label}
         numTicks={x.domain().length}
-        stroke={theme.text}
-        tickStroke={theme.text}
+        stroke={theme.palette.text.primary}
+        tickStroke={theme.palette.text.primary}
         tickLabelProps={(t) =>
           ({
             textAnchor: "end",
             fontSize: size,
             style: tickLabelStyle,
-            fill: theme.text,
+            fill: theme.palette.text.primary,
             dy: "0.25em",
             className: "x-axis-tick-label text",
             transform: `rotate(-90, ${x(t)}, ${size})translate(0, ${size / 4})`,
@@ -73,7 +76,7 @@ export default function HeatmapXAxis() {
         orientation={Orientation.bottom}
         labelProps={{
           fontSize: TICK_TEXT_SIZE * 1.5,
-          fill: theme.text,
+          fill: theme.palette.text.primary,
           className: "x-axis-label text",
           pointerEvents: "none",
         }}

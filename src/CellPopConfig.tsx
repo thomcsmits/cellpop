@@ -5,29 +5,33 @@ import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { useEventCallback } from "@mui/material/utils";
 import React from "react";
 
-import { useCellPopTheme } from "./contexts/CellPopThemeContext";
+import { useSetTheme } from "./contexts/CellPopThemeContext";
 import { useFraction } from "./contexts/FractionContext";
 import { useSelectedDimension } from "./contexts/SelectedDimensionContext";
 
 export default function CellPopConfig() {
-  const { currentThemeName: theme, setTheme } = useCellPopTheme();
+  const { currentThemeName: theme, setTheme } = useSetTheme();
   const { fraction, setFraction } = useFraction();
   const { selectedDimension, setSelectedDimension } = useSelectedDimension();
 
   const undo = useEventCallback(() => {
     console.warn("Not yet implemented");
   });
-  const changeTheme = useEventCallback((_, newTheme: "dark" | "light") => {
-    if (newTheme) {
-      setTheme(newTheme);
-    }
-  });
+  const changeTheme = useEventCallback(
+    (_: unknown, newTheme: "dark" | "light") => {
+      if (newTheme) {
+        setTheme(newTheme);
+      }
+    },
+  );
 
-  const changeFraction = useEventCallback((_, newFraction: boolean) => {
-    if (newFraction !== null) {
-      setFraction(newFraction);
-    }
-  });
+  const changeFraction = useEventCallback(
+    (_: unknown, newFraction: boolean) => {
+      if (newFraction !== null) {
+        setFraction(newFraction);
+      }
+    },
+  );
 
   const changeSelectedDimension = useEventCallback(
     (event: React.MouseEvent<HTMLElement>) => {
