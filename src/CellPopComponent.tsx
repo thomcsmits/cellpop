@@ -1,16 +1,17 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 
 import Skeleton from "@mui/material/Skeleton";
+import { withParentSize, WithParentSizeProvidedProps } from "@visx/responsive";
 import { CellPopData, CellPopTheme } from "./cellpop-schema";
 import { AxisConfig } from "./contexts/AxisConfigContext";
 import { Dimensions } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
 import VizContainer from "./visx-visualization/layout";
 
-export interface CellPopProps {
+export interface CellPopProps extends WithParentSizeProvidedProps {
   data: CellPopData;
-  theme: CellPopTheme;
-  dimensions: Dimensions;
+  theme?: CellPopTheme;
+  dimensions?: Dimensions;
   xAxisConfig: AxisConfig;
   yAxisConfig: AxisConfig;
   onClick?: (e: React.MouseEvent) => void;
@@ -18,37 +19,53 @@ export interface CellPopProps {
 
 const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
 
-export const CellPop = ({
-  theme,
-  dimensions,
-  data,
-  xAxisConfig,
-  yAxisConfig,
-  onClick,
-}: CellPopProps) => {
-  const handleClick = useCallback(
-    (e: React.MouseEvent) => {
-      stopPropagation(e);
-      onClick?.(e);
-    },
-    [onClick],
-  );
+export const CellPop = withParentSize(
+  ({
+    theme = "light",
+    dimensions: definedDimensions,
+    data,
+    xAxisConfig,
+    yAxisConfig,
+    onClick,
+    parentHeight,
+    parentWidth,
+  }: CellPopProps) => {
+    // If dimensions are provided, use them.
+    // Otherwise, fall back to using parentWidth and parentHeight.
+    const dimensions = useMemo(() => {
+      if (definedDimensions) {
+        return definedDimensions;
+      }
+      return {
+        width: parentWidth || 0,
+        height: parentHeight || 0,
+      };
+    }, [definedDimensions, parentHeight, parentWidth]);
 
-  if (!data) {
-    return <Skeleton />;
-  }
+    const handleClick = useCallback(
+      (e: React.MouseEvent) => {
+        stopPropagation(e);
+        onClick?.(e);
+      },
+      [onClick],
+    );
 
-  return (
-    <div onClick={handleClick}>
-      <Providers
-        data={data}
-        dimensions={dimensions}
-        theme={theme}
-        xAxisConfig={xAxisConfig}
-        yAxisConfig={yAxisConfig}
-      >
-        <VizContainer />
-      </Providers>
-    </div>
-  );
-};
+    if (!data) {
+      return <Skeleton />;
+    }
+
+    return (
+      <div onClick={handleClick}>
+        <Providers
+          data={data}
+          dimensions={dimensions}
+          theme={theme}
+          xAxisConfig={xAxisConfig}
+          yAxisConfig={yAxisConfig}
+        >
+          <VizContainer />
+        </Providers>
+      </div>
+    );
+  },
+);

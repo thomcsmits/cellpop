@@ -51,35 +51,38 @@ function Demo() {
       });
   }, []);
 
-  // const props = {
-  // 	data: null,
-  // 	theme: "light",
-  // }
-
-  console.log(data);
-
   if (!data) {
     return <div>Loading...</div>;
   }
 
   return (
-    <CellPop
-      data={data}
-      theme={"light"}
-      dimensions={{ width: 1500, height: 1000 }}
-      yAxisConfig={{
-        label: "Sample",
-        createHref: (row) =>
-          `https://portal.hubmapconsortium.org/browse/${row}`,
-        flipAxisPosition: true,
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
       }}
-      xAxisConfig={{
-        label: "Cell Type",
-        createHref: (col) =>
-          `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`,
-        flipAxisPosition: true,
-      }}
-    />
+    >
+      <CellPop
+        data={data}
+        theme={"light"}
+        // dimensions={{
+        //   width: 1000,
+        //   height: 1000,
+        // }}
+        yAxisConfig={{
+          label: "Sample",
+          createHref: (row) =>
+            `https://portal.hubmapconsortium.org/browse/${row}`,
+          flipAxisPosition: true,
+        }}
+        xAxisConfig={{
+          label: "Cell Type",
+          createHref: (col) =>
+            `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`,
+          flipAxisPosition: true,
+        }}
+      />
+    </div>
   );
 }
 
