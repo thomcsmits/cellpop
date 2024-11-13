@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 
 import Skeleton from "@mui/material/Skeleton";
 import { CellPopData, CellPopTheme } from "./cellpop-schema";
@@ -13,7 +13,10 @@ export interface CellPopProps {
   dimensions: Dimensions;
   xAxisConfig: AxisConfig;
   yAxisConfig: AxisConfig;
+  onClick?: (e: React.MouseEvent) => void;
 }
+
+const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
 
 export const CellPop = ({
   theme,
@@ -21,13 +24,22 @@ export const CellPop = ({
   data,
   xAxisConfig,
   yAxisConfig,
+  onClick,
 }: CellPopProps) => {
+  const handleClick = useCallback(
+    (e: React.MouseEvent) => {
+      stopPropagation(e);
+      onClick?.(e);
+    },
+    [onClick],
+  );
+
   if (!data) {
     return <Skeleton />;
   }
 
   return (
-    <div>
+    <div onClick={handleClick}>
       <Providers
         data={data}
         dimensions={dimensions}
