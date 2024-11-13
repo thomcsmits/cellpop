@@ -3,7 +3,7 @@
 import eslint from "@eslint/js";
 import eslintConfigPrettier from "eslint-plugin-prettier/recommended";
 import reactPlugin from "eslint-plugin-react";
-import globals from 'globals';
+import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
@@ -11,11 +11,11 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
   {
-    files: ['**/*.{jsx,tsx}'],
+    files: ["**/*.{jsx,tsx}"],
     ...reactPlugin.configs.flat.recommended,
   },
   {
-    files: ['**/*.{jsx,tsx}'],
+    files: ["**/*.{jsx,tsx}"],
     languageOptions: {
       globals: {
         ...globals.serviceworker,
@@ -26,9 +26,9 @@ export default tseslint.config(
   {
     rules: {
       "linebreak-style": ["error", "unix"],
-      quotes: ["error", "double"],
+      quotes: ["error", "double", { avoidEscape: true }],
       semi: ["error", "always"],
       "no-trailing-spaces": "error",
     },
-  }
+  },
 );
