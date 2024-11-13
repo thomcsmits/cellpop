@@ -60,10 +60,16 @@ export function DimensionsProvider({
           case 0:
             newSizes[0] = newSize;
             newSizes[1] = newSizes[1] + oldSize - newSize;
+            if (newSizes[0] < 0 || newSizes[1] < 0) {
+              return prev;
+            }
             break;
           case 1:
             newSizes[1] = newSize - newSizes[0];
             newSizes[2] = totalSize - newSize;
+            if (newSizes[1] < 0 || newSizes[2] < 0) {
+              return prev;
+            }
             break;
         }
         return newSizes as [number, number, number];
