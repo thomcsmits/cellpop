@@ -1,4 +1,4 @@
-import { rgbToHex } from "@mui/material/styles";
+import { rgbToHex, useTheme } from "@mui/material/styles";
 import { scaleLinear, scaleOrdinal } from "@visx/scale";
 import { Text } from "@visx/text";
 import {
@@ -52,6 +52,7 @@ export default function MetadataValueBar({
   const metadata = axis === "X" ? md.cols : md.rows;
   const { scale: y } = useYScale();
   const { scale: x } = useXScale();
+  const theme = useTheme();
 
   const keys = data[0];
 
@@ -59,21 +60,24 @@ export default function MetadataValueBar({
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  if (!selectedMetadata || !metadata || !metadataKeys) {
-    return null;
-  }
-
-  const metadataIsNumeric = keys.every((key) => {
-    // @ts-expect-error we're handling typechecking at runtime
-    const value = metadata[key][selectedMetadata] as string;
-    return !isNaN(parseInt(value, 10)) && !isNaN(parseFloat(value));
-  });
-  const values: string[] = keys.map(
-    // @ts-expect-error we're handling typechecking at runtime
-    (key) => metadata[key][selectedMetadata] as string,
-  );
+  const metadataIsNumeric = metadata
+    ? keys.every((key) => {
+        // @ts-expect-error we're handling typechecking at runtime
+        const value = metadata[key][selectedMetadata] as string;
+        return !isNaN(parseInt(value, 10)) && !isNaN(parseFloat(value));
+      })
+    : false;
+  const values: string[] = metadata
+    ? keys.map(
+        // @ts-expect-error we're handling typechecking at runtime
+        (key) => metadata[key][selectedMetadata] as string,
+      )
+    : [];
 
   const metadataValueColorScale = useMemo(() => {
+    if (!selectedMetadata) {
+      return null;
+    }
     if (metadataIsNumeric) {
       const numericValues = values.map((v) => parseInt(v, 10));
       const min = Math.min(...numericValues);
@@ -139,6 +143,10 @@ export default function MetadataValueBar({
     },
     [selectedMetadata],
   );
+
+  if (!selectedMetadata || !metadata || !metadataKeys) {
+    return null;
+  }
 
   const bars = keys.reduce((acc, key) => {
     // @ts-expect-error we're handling typechecking at runtime
@@ -239,6 +247,7 @@ export default function MetadataValueBar({
               y={textY(bar)}
               className="text"
               dx={cellWidth + 8}
+              fill={theme.palette.text.primary}
               orientation={axis === "X" ? "horizontal" : "vertical"}
               onMouseMove={(e) => {
                 openTooltip(
@@ -264,6 +273,7 @@ export default function MetadataValueBar({
         textAnchor="middle"
         orientation={axis === "X" ? "horizontal" : "vertical"}
         className="text"
+        fill={theme.palette.text.primary}
         style={{
           textTransform: "capitalize",
         }}

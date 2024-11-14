@@ -20,12 +20,12 @@ interface ViolinsProps {
 
 // X scale is categorical for the top graph, Y scale is categorical for the left graph
 function useCategoricalScale(side: Side) {
-  const { scale: heatmapXScale } = useXScale();
-  const { scale: heatmapYScale } = useYScale();
+  const x = useXScale();
+  const y = useYScale();
   if (side === "top") {
-    return heatmapXScale;
+    return x;
   }
-  return heatmapYScale;
+  return y;
 }
 
 /**
@@ -51,7 +51,7 @@ export default function Violins({ side = "top" }: ViolinsProps) {
     side === "top" ? "center_top" : "left_middle",
   );
   const { width, height } = dimensions;
-  const categoricalScale = useCategoricalScale(side);
+  const { scale: categoricalScale, tickLabelSize } = useCategoricalScale(side);
   const groups = horizontal ? columns : rows;
 
   /**
@@ -59,7 +59,7 @@ export default function Violins({ side = "top" }: ViolinsProps) {
    */
   const violinScale = scaleLinear({
     range: [horizontal ? height : width, 0],
-    domain: [0, upperBound],
+    domain: [tickLabelSize, upperBound],
   });
 
   // Creates a map of group name to violin data

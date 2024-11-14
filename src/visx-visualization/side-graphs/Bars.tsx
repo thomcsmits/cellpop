@@ -5,6 +5,8 @@ import {
   useColumnConfig,
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
+import { useColumns, useRows } from "../../contexts/AxisOrderContext";
+import { useSetTheme } from "../../contexts/CellPopThemeContext";
 import { useData } from "../../contexts/DataContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 
@@ -61,6 +63,8 @@ export default function Bars({
       e.clientY,
     );
   };
+  const [rows] = useRows();
+  const [columns] = useColumns();
   return (
     <>
       {entries.map(([key, value]) => {
@@ -78,6 +82,8 @@ export default function Bars({
         const barHeight = scaledValue;
         const height = orientation === "vertical" ? barHeight : barWidth;
         const width = orientation === "vertical" ? barWidth : barHeight;
+        const index =
+          orientation === "vertical" ? columns.indexOf(key) : rows.indexOf(key);
         return (
           <Bar
             key={key}
@@ -88,6 +94,7 @@ export default function Bars({
             barWidth={barWidth}
             width={width}
             height={height}
+            index={index}
           />
         );
       })}
@@ -103,6 +110,7 @@ interface BarProps {
   barWidth: number;
   width: number;
   height: number;
+  index: number;
 }
 
 function Bar({
@@ -113,9 +121,15 @@ function Bar({
   barWidth,
   width,
   height,
+  index,
 }: BarProps) {
   const { closeTooltip } = useSetTooltipData();
   const theme = useTheme();
+  const { currentThemeName } = useSetTheme();
+  const stripeColor =
+    currentThemeName === "dark"
+      ? theme.palette.grey[800]
+      : theme.palette.grey[50];
   return (
     <g
       onMouseOver={onMouse}
@@ -128,7 +142,7 @@ function Bar({
         y={orientation === "vertical" ? 0 : y}
         height={orientation === "vertical" ? "100%" : barWidth}
         width={orientation === "vertical" ? barWidth : "100%"}
-        fill={theme.palette.background.default}
+        fill={index % 2 == 0 ? theme.palette.background.default : stripeColor}
       />
       <rect
         x={x}

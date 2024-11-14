@@ -58,8 +58,8 @@ function Demo() {
   return (
     <div
       style={{
-        width: "100vw",
-        height: "100vh",
+        width: "95vw",
+        height: "95vh",
       }}
     >
       <CellPop
@@ -70,7 +70,7 @@ function Demo() {
         //   height: 1000,
         // }}
         yAxisConfig={{
-          label: "Sample",
+          label: "Dataset",
           createHref: (row) =>
             `https://portal.hubmapconsortium.org/browse/${row}`,
           flipAxisPosition: true,

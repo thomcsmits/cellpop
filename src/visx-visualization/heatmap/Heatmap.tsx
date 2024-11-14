@@ -47,7 +47,7 @@ function HeatmapRow({ row }: { row: string }) {
           y={yScale(row)}
           width={width}
           height={cellHeight}
-          fill="white"
+          fill={theme.palette.background.default}
         />
         {rowKeys.map((key) => {
           const [row, col] = key.split("-");
@@ -66,15 +66,15 @@ function HeatmapRow({ row }: { row: string }) {
                 y={yBackground}
                 width={cellWidth}
                 height={cellHeight}
-                fill={"white"}
+                fill={theme.palette.background.default}
               />
               <rect
                 x={x}
                 y={yBar}
                 width={cellWidth}
                 height={barHeight}
-                fill={"black"}
-                stroke="white"
+                fill={theme.palette.text.primary}
+                stroke={theme.palette.background.default}
               />
             </g>
           );
@@ -85,7 +85,7 @@ function HeatmapRow({ row }: { row: string }) {
           x2={width}
           y1={yScale(row) + cellHeight}
           y2={yScale(row) + cellHeight}
-          stroke="black"
+          stroke={theme.palette.text.primary}
         />
       </g>
     );

@@ -1,3 +1,5 @@
+import { Divider, Stack, useTheme } from "@mui/material";
+import Typography from "@mui/material/Typography";
 import { defaultStyles, TooltipWithBounds } from "@visx/tooltip";
 import React, { useEffect } from "react";
 import { useParentRef } from "../contexts/ContainerRefContext";
@@ -17,6 +19,7 @@ export default function Tooltip() {
 
   const parentRef = useParentRef();
   const visualizationBounds = parentRef.current?.getBoundingClientRect();
+  const theme = useTheme();
 
   useEffect(() => {
     if (!tooltipData) {
@@ -32,21 +35,29 @@ export default function Tooltip() {
     <TooltipWithBounds
       top={tooltipTop - visualizationBounds?.top}
       left={tooltipLeft - visualizationBounds?.left}
-      style={{ ...defaultStyles, pointerEvents: "none", zIndex: 1000 }}
+      style={{
+        ...defaultStyles,
+        background: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+        pointerEvents: "none",
+        zIndex: 1000,
+      }}
     >
-      <div>
-        <strong>{tooltipData.title}</strong>
-        <div>
-          {Object.entries(tooltipData.data).map(([key, value]) => (
-            <div key={key}>
-              <span style={{ textTransform: "capitalize" }}>
-                {key.replace("_", " ")}:{" "}
-              </span>
-              <span>{String(value)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+      <Stack gap={0.25}>
+        <Typography variant="subtitle1">{tooltipData.title}</Typography>
+        <Divider />
+        {Object.entries(tooltipData.data).map(([key, value]) => (
+          <Stack direction="row" key={key} gap={0.25}>
+            <Typography
+              sx={{ textTransform: "capitalize", fontWeight: 700 }}
+              variant="caption"
+            >
+              {key.replace("_", " ")}:{" "}
+            </Typography>
+            <Typography variant="caption">{String(value)}</Typography>
+          </Stack>
+        ))}
+      </Stack>
     </TooltipWithBounds>
   );
 }
