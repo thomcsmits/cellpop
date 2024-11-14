@@ -49,7 +49,10 @@ export default function HeatmapYAxis() {
 
   return (
     <>
-      <SVGBackgroundColorFilter color={theme.palette.background.default} id={filterId} />
+      <SVGBackgroundColorFilter
+        color={theme.palette.background.default}
+        id={filterId}
+      />
       <AxisRight
         scale={y}
         label={label}

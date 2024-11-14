@@ -58,8 +58,8 @@ export default function Violins({ side = "top" }: ViolinsProps) {
    * Scale used to generate the density of the violin plots.
    */
   const violinScale = scaleLinear({
-    range: [horizontal ? height : width, 0],
-    domain: [tickLabelSize, upperBound],
+    range: [horizontal ? height : width, tickLabelSize],
+    domain: [0, upperBound],
   });
 
   // Creates a map of group name to violin data
