@@ -15,10 +15,12 @@ import { useCountsScale } from "./hooks";
 
 const useXAxisCountsScale = () => {
   const { width } = usePanelDimensions("left_middle");
-  const { rowCounts } = useData();
+  const { rowCounts, upperBound } = useData();
+  const { fraction } = useFraction();
   const { tickLabelSize } = useYScale();
+  const domainMax = fraction ? upperBound : max(Object.values(rowCounts));
   return useCountsScale(
-    [0, max(Object.values(rowCounts)) || 0],
+    [0, domainMax],
     [0, width - LEFT_MARGIN - tickLabelSize],
   );
 };

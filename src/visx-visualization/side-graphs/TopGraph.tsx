@@ -16,10 +16,12 @@ import { useCountsScale } from "./hooks";
 
 const useYAxisCountsScale = () => {
   const { height } = usePanelDimensions("center_top");
-  const { columnCounts } = useData();
+  const { columnCounts, upperBound } = useData();
   const { tickLabelSize } = useXScale();
+  const { fraction } = useFraction();
+  const domainMax = fraction ? upperBound : max(Object.values(columnCounts));
   return useCountsScale(
-    [max(Object.values(columnCounts)) || 0, 0],
+    [domainMax, 0],
     [height - TOP_MARGIN - tickLabelSize, 0],
   );
 };

@@ -4,13 +4,13 @@ import { useTheme } from "@mui/material/styles";
 import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
 import { area } from "@visx/shape";
-import { curveBumpY, max, rollup } from "d3";
-import { CountsMatrixValue } from "../../cellpop-schema";
+import { bin, max, mean, rollups } from "d3";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
 import { useData } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useXScale, useYScale } from "../../contexts/ScaleContext";
-import { epanechnikov, kde } from "../../utils/violin";
+import { useSetTooltipData } from "../../contexts/TooltipDataContext";
+import { TOP_MARGIN } from "./constants";
 
 type Side = "top" | "left";
 
@@ -34,107 +34,136 @@ function useCategoricalScale(side: Side) {
  * @returns
  */
 export default function Violins({ side = "top" }: ViolinsProps) {
-  const horizontal = side === "top";
+  const topViolins = side === "top";
   const {
-    data: { countsMatrixFractions },
+    data: { countsMatrix },
     upperBound,
   } = useData();
 
   const [rows] = useRows();
   const [columns] = useColumns();
 
-  const countsMatrix = horizontal
-    ? countsMatrixFractions.col
-    : countsMatrixFractions.row;
-
   const dimensions = usePanelDimensions(
     side === "top" ? "center_top" : "left_middle",
   );
   const { width, height } = dimensions;
   const { scale: categoricalScale, tickLabelSize } = useCategoricalScale(side);
-  const groups = horizontal ? columns : rows;
+  const dataGroups = topViolins ? columns : rows;
 
   /**
    * Scale used to generate the density of the violin plots.
    */
+  const rangeStart = topViolins ? height : width;
+  const rangeEnd = tickLabelSize + TOP_MARGIN;
   const violinScale = scaleLinear({
-    range: [horizontal ? height : width, tickLabelSize],
+    range: [rangeStart, rangeEnd],
     domain: [0, upperBound],
   });
 
   // Creates a map of group name to violin data
   const violins = useMemo(() => {
-    const bandwidth = 0.1;
-    const thresholds = violinScale.ticks(100);
-    const density = kde(epanechnikov(bandwidth), thresholds);
-    return rollup<CountsMatrixValue, [number, number][], string[]>(
+    const bins = bin()
+      .thresholds(50)
+      .domain([0, upperBound])
+      .value((d) => d);
+    const violinData = rollups(
       countsMatrix,
       (v) => {
-        return density(v.map((g) => g.value));
+        const values = v.map((d) => d.value);
+        const bin = bins(values);
+        const binLengths = bin.map((b) => b.length);
+        return binLengths;
       },
-      (d) => (horizontal ? d.col : d.row),
+      (d) => (topViolins ? d.col : d.row),
     );
-  }, [countsMatrix, horizontal, violinScale]);
+    return violinData;
+  }, [side, countsMatrix, topViolins, violinScale, upperBound]);
 
-  const allNums = useMemo(() => {
-    const violinValues = [...violins.values()];
-    const allNum = violinValues.reduce((allNum, d) => {
-      /* @ts-expect-error The d3 type annotations for `rollup` don't seem to be correct */
-      allNum.push(...d.map((d) => d[1]));
-      return allNum;
-    }, [] as number[]);
-    return allNum;
+  const maxBinCount = useMemo(() => {
+    return violins.reduce((acc, [_, violinData]) => {
+      const maxBin = max(violinData);
+      return maxBin > acc ? maxBin : acc;
+    }, 0);
   }, [violins]);
 
-  const categoricalScaleRescaled = categoricalScale.copy().paddingInner(0.25);
+  const categoricalScaleRescaled = categoricalScale.copy().paddingInner(0.1);
 
-  const maxNum = max(allNums) || 0;
   const densityScale = scaleLinear({
-    domain: [-maxNum, maxNum],
+    domain: [-maxBinCount, maxBinCount],
     range: [0, categoricalScaleRescaled.bandwidth()],
   });
 
   const violinAreaGenerator = useMemo(() => {
-    return area<[number, number]>({
-      ...(horizontal
-        ? ({
-            // top
-            x0: (d) => densityScale(-d[1]),
-            x1: (d) => densityScale(d[1]),
-            y: (d) => violinScale(d[0]),
-          } as const)
-        : ({
-            // left
-            y0: (d) => densityScale(-d[1]),
-            y1: (d) => densityScale(d[1]),
-            x: (d) => violinScale(d[0]),
-          } as const)),
-      curve: curveBumpY,
-    });
-  }, [densityScale, violinScale, horizontal]);
+    if (topViolins) {
+      return area<[number, number]>()
+        .y((d) => violinScale(d[0]))
+        .x0((d) => densityScale(-d[1]))
+        .x1((d) => densityScale(d[1]));
+    } else {
+      return area<[number, number]>()
+        .x((d) => violinScale(d[0]))
+        .y0((d) => densityScale(-d[1]))
+        .y1((d) => densityScale(d[1]));
+    }
+  }, [densityScale, violinScale, topViolins]);
 
   const theme = useTheme();
 
+  const { openTooltip, closeTooltip } = useSetTooltipData();
+
   return (
     <>
-      {groups.map((group) => {
-        // @ts-expect-error The d3 type annotations for `rollup` don't seem to be correct
-        const violinData = violins.get(group);
-        if (!violinData) {
-          return null;
-        }
+      {violins.map(([group, violinData]) => {
         // Position of violin corresponds to its row/column;
-        // bandwidth is used to center its position
-        const transformCoordinate =
-          categoricalScaleRescaled(group) - categoricalScale.bandwidth() / 2;
-        const transform = horizontal
+        const transformCoordinate = categoricalScaleRescaled(group);
+        const transform = topViolins
           ? `translate(${transformCoordinate}, 0)`
           : `translate(0, ${transformCoordinate})`;
+        const binsWithThresholds: [number, number][] = violinData.map(
+          (d, idx) => [idx * 200, d],
+        );
+        const tooltip = binsWithThresholds.reduce((acc, [threshold, count]) => {
+          if (count == 0) {
+            return acc;
+          }
+          return {
+            ...acc,
+            [`${threshold}-${threshold + 199}`]: `${count} ${count === 1 ? "entry" : "entries"}`,
+          };
+        }, {});
+
+        const range = Math.abs(rangeStart);
+
+        const backgroundWidth = topViolins
+          ? categoricalScale.bandwidth()
+          : range;
+
+        const backgroundHeight = topViolins
+          ? range
+          : categoricalScale.bandwidth();
         return (
           <Group key={group} transform={transform}>
+            <rect
+              onMouseMove={(e) => {
+                openTooltip(
+                  {
+                    title: group,
+                    data: tooltip,
+                  },
+                  e.clientX,
+                  e.clientY,
+                );
+              }}
+              onMouseOut={closeTooltip}
+              height={backgroundHeight}
+              width={backgroundWidth}
+              fill={"none"}
+              style={{ pointerEvents: "all" }}
+              data-testid={`violin-background-${group}`}
+            />
             <path
               key={group}
-              d={violinAreaGenerator(violinData)}
+              d={violinAreaGenerator(binsWithThresholds)}
               opacity={1}
               stroke={theme.palette.text.secondary}
               fill={theme.palette.text.primary}
