@@ -165,7 +165,6 @@ export default function Violins({ side = "top" }: ViolinsProps) {
               key={group}
               d={violinAreaGenerator(binsWithThresholds)}
               opacity={1}
-              stroke={theme.palette.text.secondary}
               fill={theme.palette.text.primary}
               fillOpacity={0.6}
               strokeWidth={1}
