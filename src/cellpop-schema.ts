@@ -44,7 +44,7 @@ export type CountsMatrixFractions = {
   row: CountsMatrixValue[];
 };
 
-export type MetaData<T extends object = object> = {
+export type MetaData<T extends number | string> = {
   rows?: Record<string, T>;
   cols?: Record<string, T>;
 };
@@ -67,7 +67,7 @@ export type ObsSets = {
     children: {
       name: string;
       set: [unknown, unknown][];
-    };
+    }[];
   }[];
 };
 

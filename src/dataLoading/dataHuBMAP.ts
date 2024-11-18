@@ -1,16 +1,10 @@
 import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
 import { HuBMAPSearchHit, ObsSets, dataOrdering } from "../cellpop-schema";
-import { getCountsFromObsSetsList } from "./dataLoaders";
+import { getCountsAndMetadataFromObsSetsList } from "./dataLoaders";
 import { loadDataWithCounts } from "./dataWrangling";
 
-export function loadHuBMAPData(
-  uuids: string[],
-  ordering?: dataOrdering,
-  metadataFields?: string[],
-) {
-  // let t0 = performance.now()
+export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
   const urls = uuids.map(getHuBMAPURL);
-  // for each url, check if predicted_CLID or predicted_label
 
   const obsSetsListPromises = getPromiseData(urls);
   const promiseData = Promise.all(obsSetsListPromises)
@@ -28,9 +22,10 @@ export function loadHuBMAPData(
         const obsSetsList = values[0];
         const hubmapIDs = values[1][0];
         const metadata = values[1][1];
-        const counts = getCountsFromObsSetsList(obsSetsList, hubmapIDs);
+        const { counts, metadata: datasetMetadata } =
+          getCountsAndMetadataFromObsSetsList(obsSetsList, hubmapIDs);
         const data = loadDataWithCounts(counts, undefined, ordering);
-        data.metadata = { rows: metadata };
+        data.metadata = { rows: metadata, cols: datasetMetadata };
         return data;
       }
     })
@@ -58,8 +53,12 @@ function getPromiseData(urls: string[]) {
       options: {
         obsSets: [
           {
-            name: "Cell Ontology Annotation",
-            path: "obs/predicted_CLID", //"obs/predicted_label"
+            name: "Cell Ontology CLID",
+            path: "obs/predicted_CLID",
+          },
+          {
+            name: "Cell Ontology Label",
+            path: "obs/predicted_label",
           },
         ],
       },
