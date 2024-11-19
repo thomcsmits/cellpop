@@ -32,6 +32,7 @@ const combinedColorScheme = [
 interface BarHelper {
   value: string | number;
   height: number;
+  width: number;
   color: string;
   x: number;
   y: number;
@@ -62,16 +63,12 @@ export default function MetadataValueBar({
 
   const metadataIsNumeric = metadata
     ? keys.every((key) => {
-        // @ts-expect-error we're handling typechecking at runtime
         const value = metadata[key][selectedMetadata] as string;
         return !isNaN(parseInt(value, 10)) && !isNaN(parseFloat(value));
       })
     : false;
   const values: string[] = metadata
-    ? keys.map(
-        // @ts-expect-error we're handling typechecking at runtime
-        (key) => metadata[key][selectedMetadata] as string,
-      )
+    ? keys.map((key) => metadata[key][selectedMetadata] as string)
     : [];
 
   const metadataValueColorScale = useMemo(() => {
@@ -148,61 +145,93 @@ export default function MetadataValueBar({
     return null;
   }
 
-  const bars = keys.reduce((acc, key) => {
-    // @ts-expect-error we're handling typechecking at runtime
+  const bars: BarHelper[] = keys.reduce((acc, key) => {
     const value = metadata[key][selectedMetadata] as string;
-    const processedValue = metadataIsNumeric ? parseInt(value, 10) : value;
-    // @ts-expect-error this is supported by the y axis
-    let height = y.bandwidth(key);
-    // Handle padding around expanded bars
-    if (height > y.bandwidth()) {
-      height += EXPANDED_ROW_PADDING * 2;
+    if (!value) {
+      console.warn("No value for key", metadata[key], selectedMetadata);
+      return acc;
     }
-    height = Math.ceil(height);
+    const processedValue = metadataIsNumeric ? parseInt(value, 10) : value;
     // @ts-expect-error we're handling typechecking at runtime
     const color = metadataValueColorScale(processedValue);
+    if (axis === "Y") {
+      // @ts-expect-error this is supported by the y axis
+      let height = y.bandwidth(key);
+      // Add padding around expanded bars
+      if (height > y.bandwidth()) {
+        height += EXPANDED_ROW_PADDING * 2;
+      }
+      height = Math.ceil(height);
+      const width = x.bandwidth();
 
-    const xVal = axis === "X" ? x(key) : x.bandwidth() * 2;
-    const yVal = axis === "X" ? y.bandwidth() * 2 : Math.ceil(y(key));
-    // if first bar
-    if (acc.length === 0) {
-      return [
-        {
-          value: processedValue,
-          height,
-          color,
-          x: xVal,
-          y: yVal,
-          keys: [key],
-        },
-      ];
-    }
-    // otherwise, check if the last bar has the same value
-    // if so, combine them
-    const lastBar = acc[acc.length - 1];
-    if (lastBar.value === processedValue) {
-      const newBar = {
-        ...lastBar,
-        y: Math.min(lastBar.y, yVal),
-        height: lastBar.height + height,
-        keys: [...lastBar.keys, key],
-      };
-      return [...acc.slice(0, -1), newBar];
-    }
-    return [
-      ...acc,
-      {
+      const xVal = x.bandwidth() * 2;
+      const yVal = Math.ceil(y(key));
+
+      const newBar: BarHelper = {
         value: processedValue,
+        height,
+        width,
+        color,
+        x: xVal,
+        y: yVal,
+        keys: [key],
+      };
+
+      // if first bar
+      if (acc.length === 0) {
+        return [newBar] as BarHelper[];
+      }
+      // otherwise, check if the last bar has the same value
+      // if so, combine them
+      const lastBar: BarHelper = acc[acc.length - 1];
+      if (lastBar.value === processedValue) {
+        const editedBar: BarHelper = {
+          ...lastBar,
+          y: Math.min(lastBar.y, yVal),
+          height: lastBar.height + height,
+          keys: [...lastBar.keys, key],
+        };
+        return [...acc.slice(0, -1), editedBar];
+      }
+      return [...acc, newBar];
+    } else if (axis === "X") {
+      const width = x.bandwidth();
+      const height = y.bandwidth();
+      const xVal = x(key);
+      const yVal = y.bandwidth();
+      const newBar: BarHelper = {
+        value: processedValue,
+        width,
         height,
         color,
         x: xVal,
         y: yVal,
         keys: [key],
-      },
-    ];
+      };
+      // if first bar
+      if (acc.length === 0) {
+        return [newBar] as BarHelper[];
+      }
+      // otherwise, check if the last bar has the same value and combine them if so
+      const lastBar: BarHelper = acc[acc.length - 1];
+      if (lastBar.value === processedValue) {
+        const editedBar = {
+          ...lastBar,
+          x: Math.min(lastBar.x, xVal),
+          width: lastBar.width + width,
+          keys: [...lastBar.keys, key],
+        };
+        return [...acc.slice(0, -1), editedBar];
+      }
+      // otherwise, add a new bar
+      return [...acc, newBar];
+    }
   }, [] as BarHelper[]);
 
   const textY = (bar: BarHelper) => {
+    if (axis === "X") {
+      return bar.y + bar.height / 2;
+    }
     if (bars.length === 1) {
       // Handle single-bar case by purposely un-centering the text
       // otherwise the label can overlap the metadata name
@@ -215,7 +244,15 @@ export default function MetadataValueBar({
   return (
     <svg width={width} height={height}>
       {bars.map((bar) => {
-        const { value, height, color, x: xVal, y: yVal, keys } = bar;
+        const {
+          value,
+          height,
+          width: barWidth,
+          color,
+          x: xVal,
+          y: yVal,
+          keys,
+        } = bar;
         const shortenedValue =
           value.toString().length > 20
             ? value.toString().slice(0, 10) + "..."
@@ -225,7 +262,7 @@ export default function MetadataValueBar({
             <rect
               x={xVal}
               y={yVal}
-              width={cellWidth}
+              width={barWidth}
               height={Math.ceil(height)}
               fill={color}
               data-value={value}
@@ -246,9 +283,10 @@ export default function MetadataValueBar({
               x={xVal}
               y={textY(bar)}
               className="text"
-              dx={cellWidth + 8}
+              dx={axis == "X" ? 0 : cellWidth + 8}
+              dy={axis == "X" ? cellWidth + 8 : 0}
               fill={theme.palette.text.primary}
-              orientation={axis === "X" ? "horizontal" : "vertical"}
+              angle={axis === "X" ? 90 : 0}
               onMouseMove={(e) => {
                 openTooltip(
                   {

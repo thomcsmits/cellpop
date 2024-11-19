@@ -7,6 +7,7 @@ import { AxisConfig } from "./contexts/AxisConfigContext";
 import { Dimensions } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
 import VizContainer from "./visx-visualization/layout";
+import Controls from "./visx-visualization/Controls";
 
 export interface CellPopProps extends WithParentSizeProvidedProps {
   data: CellPopData;
@@ -63,6 +64,7 @@ export const CellPop = withParentSize(
           xAxisConfig={xAxisConfig}
           yAxisConfig={yAxisConfig}
         >
+          <Controls />
           <VizContainer />
         </Providers>
       </div>
