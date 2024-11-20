@@ -205,8 +205,8 @@ function DragIndicator({
   const yOffset = rowSizes[0];
 
   const theme = useTheme();
-  const { label: rowLabel } = useRowConfig();
-  const { label: columnLabel } = useColumnConfig();
+  const rowLabel = useRowConfig((store) => store.label);
+  const columnLabel = useColumnConfig((store) => store.label);
   const { width, height } = useHeatmapDimensions();
 
   const strategy =

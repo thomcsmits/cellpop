@@ -24,7 +24,7 @@ export default function Controls() {
     setHeatmapTheme(e.target.value as HeatmapTheme);
   });
 
-  const { currentThemeName, setTheme } = useSetTheme();
+  const { currentTheme, setTheme } = useSetTheme();
   const { setFraction } = useFraction();
   const { setSelectedDimension } = useSelectedDimension();
 
@@ -51,7 +51,7 @@ export default function Controls() {
 
   return (
     <AppBar
-      color={currentThemeName === "dark" ? "default" : "transparent"}
+      color={currentTheme === "dark" ? "default" : "transparent"}
       position="static"
       elevation={0}
     >
@@ -82,21 +82,21 @@ export default function Controls() {
         </FormControl>
         <LabelledSwitch
           label="Graph Type"
-          leftLabel="Fraction"
-          rightLabel="Count"
+          leftLabel="Count"
+          rightLabel="Fraction"
           onChange={changeFraction}
+        />
+        <LabelledSwitch
+          label="Selection Tool"
+          leftLabel="Column"
+          rightLabel="Row"
+          onChange={changeSelectedDimension}
         />
         <LabelledSwitch
           label="Theme"
           leftLabel="Light"
           rightLabel="Dark"
           onChange={changeVisTheme}
-        />
-        <LabelledSwitch
-          label="Selection Tool"
-          leftLabel="X"
-          rightLabel="Y"
-          onChange={changeSelectedDimension}
         />
       </Stack>
     </AppBar>

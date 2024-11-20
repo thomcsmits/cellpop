@@ -23,7 +23,7 @@ import {
 
 const HideRow = () => {
   const { tooltipData } = useTooltipData();
-  const { label: rowLabel } = useRowConfig();
+  const rowLabel = useRowConfig((store) => store.label);
   const { removeRow } = useData();
 
   if (!tooltipData?.data) {
@@ -42,7 +42,7 @@ const HideRow = () => {
 
 const HideColumn = () => {
   const { tooltipData } = useTooltipData();
-  const { label: columnLabel } = useColumnConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
   const { removeColumn } = useData();
 
   if (!tooltipData?.data) {
@@ -61,7 +61,7 @@ const HideColumn = () => {
 
 const RestoreHiddenRows = () => {
   const { removedRows, resetRemovedRows } = useData();
-  const { label: rowLabel } = useRowConfig();
+  const rowLabel = useRowConfig((store) => store.label);
 
   if (!removedRows.size) {
     return null;
@@ -76,7 +76,7 @@ const RestoreHiddenRows = () => {
 
 const RestoreHiddenColumns = () => {
   const { removedColumns, resetRemovedColumns } = useData();
-  const { label: columnLabel } = useColumnConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
 
   if (!removedColumns.size) {
     return null;
@@ -93,7 +93,7 @@ const ExpandRow = () => {
   const {
     tooltipData: { data },
   } = useTooltipData();
-  const { label } = useRowConfig();
+  const label = useRowConfig((store) => store.label);
   const { toggleSelection, selectedValues } = useYScale();
   const { closeContextMenu } = useSetTooltipData();
 
@@ -127,9 +127,9 @@ const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
   const {
     tooltipData: { data },
   } = useTooltipData();
-  const { label: rowLabel } = useRowConfig();
 
-  const { label: columnLabel } = useColumnConfig();
+  const rowLabel = useRowConfig((store) => store.label);
+  const columnLabel = useColumnConfig((store) => store.label);
 
   const move = dimension === "row" ? moveRowToStart : moveColumnToStart;
   const label = dimension === "row" ? rowLabel : columnLabel;
@@ -152,9 +152,9 @@ const MoveToEnd = ({ dimension }: { dimension: "row" | "column" }) => {
   const {
     tooltipData: { data },
   } = useTooltipData();
-  const { label: rowLabel } = useRowConfig();
+  const rowLabel = useRowConfig((store) => store.label);
 
-  const { label: columnLabel } = useColumnConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
 
   const move = dimension === "row" ? moveRowToEnd : moveColumnToEnd;
   const label = dimension === "row" ? rowLabel : columnLabel;
@@ -192,7 +192,7 @@ const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
   const sort = dimension === "row" ? sortRows : sortColumns;
   const sortOrders = dimension === "row" ? rowSortOrders : colSortOrders;
   const { label: rowLabel } = useRowConfig();
-  const { label: columnLabel } = useColumnConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
   const label = dimension === "row" ? rowLabel : columnLabel;
   const currentSortOrder = dimension === "row" ? rowSortOrder : colSortOrder;
 
@@ -222,7 +222,7 @@ const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
 
 const ContextMenuComponent = () => {
   const { label: rowLabel } = useRowConfig();
-  const { label: columnLabel } = useColumnConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
 
   const { tooltipData, contextMenuOpen } = useTooltipData();
   if (!tooltipData || !contextMenuOpen) {

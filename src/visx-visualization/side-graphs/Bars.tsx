@@ -43,8 +43,8 @@ export default function Bars({
     data: { metadata },
   } = useData();
 
-  const { label: columnLabel } = useColumnConfig();
-  const { label: rowLabel } = useRowConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
+  const rowLabel = useRowConfig((store) => store.label);
 
   const { openTooltip } = useSetTooltipData();
   const onMouse = (key: string) => (e: React.MouseEvent<SVGRectElement>) => {
@@ -125,11 +125,9 @@ function Bar({
 }: BarProps) {
   const { closeTooltip } = useSetTooltipData();
   const theme = useTheme();
-  const { currentThemeName } = useSetTheme();
+  const currentTheme = useSetTheme((s) => s.currentTheme);
   const stripeColor =
-    currentThemeName === "dark"
-      ? theme.palette.grey[800]
-      : theme.palette.grey[50];
+    currentTheme === "dark" ? theme.palette.grey[800] : theme.palette.grey[50];
   return (
     <g
       onMouseOver={onMouse}

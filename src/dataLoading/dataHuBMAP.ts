@@ -4,7 +4,7 @@ import { getCountsAndMetadataFromObsSetsList } from "./dataLoaders";
 import { loadDataWithCounts } from "./dataWrangling";
 
 export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
-  const urls = uuids.map(getHuBMAPURL);
+  const urls = uuids.map(getHubmapURL);
 
   const obsSetsListPromises = getPromiseData(urls);
   const promiseData = Promise.all(obsSetsListPromises)
@@ -37,7 +37,7 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
 }
 
 // get hubmap url to zarr
-function getHuBMAPURL(uuid: string) {
+function getHubmapURL(uuid: string) {
   return `https://assets.hubmapconsortium.org/${uuid}/hubmap_ui/anndata-zarr/secondary_analysis.zarr`;
 }
 
@@ -97,6 +97,7 @@ function getPromiseMetadata(
     })
     .then((queryBody) => {
       const listAll = queryBody.hits.hits;
+      console.log({ listAll });
       const metadata: Record<string, string | number> = listAll.reduce(
         (acc: Record<string, unknown>, l: HuBMAPSearchHit) => {
           const ls = l._source;
@@ -106,7 +107,7 @@ function getPromiseMetadata(
             [ls.hubmap_id]: {
               title: ls.title,
               dataset_type: ls.dataset_type,
-              anatomy: ls.anatomy_2[0],
+              anatomy: ls?.anatomy_2?.[0] ?? ls?.anatomy_1?.[0],
               sex: dmm.sex[0],
               age: dmm.age_value[0],
             },

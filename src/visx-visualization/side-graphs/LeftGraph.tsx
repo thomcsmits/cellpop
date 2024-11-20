@@ -90,7 +90,7 @@ export default function LeftGraph() {
   const { width, height } = usePanelDimensions("left_middle");
 
   const { fraction } = useFraction();
-  const { flipAxisPosition } = useRowConfig();
+  const flipAxisPosition = useRowConfig((store) => store.flipAxisPosition);
   return (
     <svg className="left-graph-container" height={height} width={width}>
       {fraction ? <LeftViolin /> : <LeftBar />}

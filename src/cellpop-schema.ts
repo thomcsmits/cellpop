@@ -81,6 +81,7 @@ interface HuBMAPSearchSource {
   };
   title: string;
   dataset_type: string;
+  anatomy_1: string[];
   anatomy_2: string[];
 }
 

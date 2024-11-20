@@ -10,8 +10,12 @@
     "source.fixAll": "always"
   },
   "cSpell.words": [
+    "anndata",
     "cellpop",
+    "CLID",
     "epanechnikov",
+    "zarr",
+    "zundo",
     "zustand"
   ]
 }

@@ -37,6 +37,9 @@ function Demo() {
     "fae9a1f2e7abefca2203765a3c7a5ba1",
     "8d631eee88855ac59155edca2a3bc1ca",
     "1ea6c0ac5ba60fe35bf63af8699b6fbe",
+    "224e01ccfc20977ee5a6a6a5b96aa7d7",
+    "33b9c54d7c295897826e1e5271d4fc24",
+    "a48ab0bf5d8084da24859c4e64336e9c",
   ];
 
   // useEffect to make sure the data only loads once
@@ -65,17 +68,13 @@ function Demo() {
       <CellPop
         data={data}
         theme={"light"}
-        // dimensions={{
-        //   width: 1000,
-        //   height: 1000,
-        // }}
-        yAxisConfig={{
+        yAxis={{
           label: "Dataset",
           createHref: (row) =>
             `https://portal.hubmapconsortium.org/browse/${row}`,
           flipAxisPosition: true,
         }}
-        xAxisConfig={{
+        xAxis={{
           label: "Cell Type",
           createHref: (col) =>
             `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`,

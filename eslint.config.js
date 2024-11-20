@@ -31,4 +31,7 @@ export default tseslint.config(
       "no-trailing-spaces": "error",
     },
   },
+  {
+    ignores: ["node_modules", "dist", ".venv"],
+  },
 );

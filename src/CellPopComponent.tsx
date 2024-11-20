@@ -6,16 +6,21 @@ import { CellPopData, CellPopTheme } from "./cellpop-schema";
 import { AxisConfig } from "./contexts/AxisConfigContext";
 import { Dimensions } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
-import VizContainer from "./visx-visualization/layout";
 import Controls from "./visx-visualization/Controls";
+import VizContainer from "./visx-visualization/layout";
 
-export interface CellPopProps extends WithParentSizeProvidedProps {
-  data: CellPopData;
-  theme?: CellPopTheme;
-  dimensions?: Dimensions;
-  xAxisConfig: AxisConfig;
-  yAxisConfig: AxisConfig;
+interface CellPopConfig {
+  yAxis: AxisConfig;
+  xAxis: AxisConfig;
   onClick?: (e: React.MouseEvent) => void;
+  dimensions?: Dimensions;
+  theme?: CellPopTheme;
+}
+
+export interface CellPopProps
+  extends WithParentSizeProvidedProps,
+    CellPopConfig {
+  data: CellPopData;
 }
 
 const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
@@ -25,8 +30,8 @@ export const CellPop = withParentSize(
     theme = "light",
     dimensions: definedDimensions,
     data,
-    xAxisConfig,
-    yAxisConfig,
+    xAxis,
+    yAxis,
     onClick,
     parentHeight,
     parentWidth,
@@ -61,8 +66,8 @@ export const CellPop = withParentSize(
           data={data}
           dimensions={dimensions}
           theme={theme}
-          xAxisConfig={xAxisConfig}
-          yAxisConfig={yAxisConfig}
+          xAxis={xAxis}
+          yAxis={yAxis}
         >
           <Controls />
           <VizContainer />

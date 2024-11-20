@@ -10,7 +10,7 @@ import VisualizationPanel, { VisualizationPanelProps } from "./Panel";
 
 export default function BottomCenterPanel({ id }: VisualizationPanelProps) {
   const [, { setSortOrder, sortOrders }] = useColumns();
-  const { flipAxisPosition } = useColumnConfig();
+  const flipAxisPosition = useColumnConfig((store) => store.flipAxisPosition);
   const { width, height } = usePanelDimensions("center_bottom");
   return (
     <VisualizationPanel id={id}>

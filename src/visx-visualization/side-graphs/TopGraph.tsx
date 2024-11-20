@@ -93,7 +93,7 @@ function TopViolin() {
 export default function TopGraph() {
   const { width, height } = usePanelDimensions("center_top");
 
-  const { flipAxisPosition } = useColumnConfig();
+  const flipAxisPosition = useColumnConfig((store) => store.flipAxisPosition);
 
   const { fraction } = useFraction();
   return (

@@ -12,7 +12,7 @@ import VisualizationPanel, { VisualizationPanelProps } from "./Panel";
 export default function MiddleRightPanel({ id }: VisualizationPanelProps) {
   const [, { setSortOrder, sortOrders }] = useRows();
   const { width, height } = usePanelDimensions("right_middle");
-  const { flipAxisPosition } = useRowConfig();
+  const flipAxisPosition = useRowConfig((store) => store.flipAxisPosition);
 
   return (
     <VisualizationPanel id={id}>
