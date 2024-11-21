@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useRef,
 } from "react";
-import { useXScale, useYScale } from "../../contexts/ScaleContext";
+import { ScaleBand, useXScale, useYScale } from "../../contexts/ScaleContext";
 import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
 
 import {
@@ -30,7 +30,6 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useTheme } from "@mui/material/styles";
-import { ScaleBand } from "d3";
 import {
   useColumnConfig,
   useRowConfig,
@@ -77,7 +76,6 @@ const indicatorProps = (
   },
   Y: {
     width,
-    // @ts-expect-error - y.bandwidth(string) is a custom method on the scale
     height: (item: string) => y.bandwidth(item),
     left: () => 0,
     top: (item: string) => y(item),
@@ -226,24 +224,19 @@ function DragIndicator({
       if (!visualizationBounds) {
         return;
       }
+      // e.clientX = mouse position relative to the viewport
+      // xOffset = position of the heatmap relative to the bounds of the cellpop container
+      // visualizationBounds.left = position of the cellpop container relative to the viewport
       const xValue = e.clientX - xOffset - visualizationBounds.left;
 
+      // y position is inverted to match the y scale
       const visualizationTotalHeight =
         yOffset + height + visualizationBounds.top;
       const yMousePosition = e.clientY;
       const yValue = height - (visualizationTotalHeight - yMousePosition);
 
-      const columnCount = x.domain().length;
-      const xStep = x.bandwidth();
-
-      // Clamp indices to prevent out of bounds errors
-      const columnIndex = Math.min(
-        Math.max(Math.floor(xValue / xStep), 0),
-        columnCount - 1,
-      );
-
+      const columnKey = x.lookup(xValue);
       const rowKey = y.lookup(yValue);
-      const columnKey = x.domain()[columnIndex];
 
       if (!rowKey || !columnKey) {
         return;

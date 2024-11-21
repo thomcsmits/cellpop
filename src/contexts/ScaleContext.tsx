@@ -14,8 +14,8 @@ import { useSelectedValues } from "./ExpandedValuesContext";
 
 const SCALES = ["X", "Y", "Color"] as const;
 
-type ScaleLinear<T> = ReturnType<typeof scaleLinear<T>>;
-type ScaleBand<T> = ReturnType<typeof scaleBand<T>> & {
+export type ScaleLinear<T> = ReturnType<typeof scaleLinear<T>>;
+export type ScaleBand<T> = ReturnType<typeof scaleBand<T>> & {
   lookup: (num: number) => string;
   bandwidth: (item?: string) => number;
 };
@@ -65,7 +65,7 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     const scale = scaleBand<string>({
       range: [0, width],
       domain: columns,
-      padding: 0.01,
+      padding: 0,
     }) as ScaleBand<string>;
     const expandedSize = scale.bandwidth();
     const collapsedSize = scale.bandwidth();
@@ -78,7 +78,6 @@ export function ScaleProvider({ children }: PropsWithChildren) {
   }, [width, columns]);
 
   // TODO: The custom axis logic should ideally be moved to a separate file
-  // since it's taking up more than half of this file's length
   const [y, expandedSize, collapsedSize] = useMemo(() => {
     // Base case: use regular band scale
     if (
