@@ -1,3 +1,4 @@
+import { temporal } from "zundo";
 import { createStore } from "zustand";
 import { createStoreContext } from "../utils/zustand";
 
@@ -13,16 +14,29 @@ interface SelectedDimensionContext {
 const createSelectedDimensionContext = ({
   initialSelectedDimension,
 }: SelectedDimensionContextProps) => {
-  return createStore<SelectedDimensionContext>((set) => ({
-    selectedDimension: initialSelectedDimension,
-    setSelectedDimension: (dimension: "X" | "Y") =>
-      set({ selectedDimension: dimension }),
-  }));
+  return createStore<SelectedDimensionContext>()(
+    temporal((set) => ({
+      selectedDimension: initialSelectedDimension,
+      setSelectedDimension: (dimension: "X" | "Y") =>
+        set({ selectedDimension: dimension }),
+    })),
+  );
 };
 
-const [SelectedDimensionProvider, useSelectedDimension] = createStoreContext<
+const [
+  SelectedDimensionProvider,
+  useSelectedDimension,
+  ,
+  useSelectedDimensionHistory,
+] = createStoreContext<
   SelectedDimensionContext,
-  SelectedDimensionContextProps
->(createSelectedDimensionContext, "SelectedDimensionContext");
+  SelectedDimensionContextProps,
+  true
+>(createSelectedDimensionContext, "SelectedDimensionContext", true);
 
-export { SelectedDimensionProvider, useSelectedDimension };
+export {
+  SelectedDimensionProvider,
+  useSelectedDimension,
+  useSelectedDimensionHistory
+};
+

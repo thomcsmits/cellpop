@@ -1,3 +1,4 @@
+import { temporal } from "zundo";
 import { createStore } from "zustand";
 import { createStoreContext } from "../utils/zustand";
 
@@ -16,23 +17,26 @@ interface AxisConfigActions {
 type AxisConfigStore = AxisConfig & AxisConfigActions;
 
 const createAxisConfigStore = (initialArgs: AxisConfig) => {
-  return createStore<AxisConfigStore>((set) => ({
-    ...initialArgs,
-    setLabel: (label: string) => set({ label }),
-    setCreateHref: (createHref: (tick: string) => string) =>
-      set({ createHref }),
-    setFlipAxisPosition: (flipAxisPosition: boolean) =>
-      set({ flipAxisPosition }),
-  }));
+  return createStore<AxisConfigStore>()(
+    temporal((set) => ({
+      ...initialArgs,
+      setLabel: (label: string) => set({ label }),
+      setCreateHref: (createHref: (tick: string) => string) =>
+        set({ createHref }),
+      setFlipAxisPosition: (flipAxisPosition: boolean) =>
+        set({ flipAxisPosition }),
+    })),
+  );
 };
 
 const [
-  [RowConfigProvider, useRowConfig],
-  [ColumnConfigProvider, useColumnConfig],
+  [RowConfigProvider, useRowConfig, , useRowConfigHistory],
+  [ColumnConfigProvider, useColumnConfig, , useColumnConfigHistory],
 ] = ["Row", "Column"].map((direction) =>
-  createStoreContext<AxisConfigStore, AxisConfig>(
+  createStoreContext<AxisConfigStore, AxisConfig, true>(
     createAxisConfigStore,
     `${direction}ConfigContext`,
+    true,
   ),
 );
 
@@ -40,6 +44,8 @@ export {
   ColumnConfigProvider,
   RowConfigProvider,
   useColumnConfig,
-  useRowConfig
+  useColumnConfigHistory,
+  useRowConfig,
+  useRowConfigHistory
 };
 

@@ -3,6 +3,7 @@ import { createStore } from "zustand";
 import { CellPopTheme } from "../cellpop-schema";
 
 import { ThemeProvider } from "@mui/material/styles";
+import { temporal } from "zundo";
 import { createStoreContext } from "../utils/zustand";
 import { getTheme } from "../visualization/theme";
 
@@ -23,23 +24,27 @@ interface ThemeSetterStoreType extends ThemeSetterState, ThemeSetterActions {}
 const themeSetterStore = ({
   initialTheme = "light",
 }: InitialThemeSetterState) => {
-  return createStore<ThemeSetterStoreType>((set) => ({
-    currentTheme: initialTheme,
-    setTheme: (newTheme: CellPopTheme) => {
-      set({ currentTheme: newTheme });
-    },
-    reset: () => {
-      set({ currentTheme: initialTheme });
-    },
-  }));
+  return createStore<ThemeSetterStoreType>()(
+    temporal((set) => ({
+      currentTheme: initialTheme,
+      setTheme: (newTheme: CellPopTheme) => {
+        set({ currentTheme: newTheme });
+      },
+      reset: () => {
+        set({ currentTheme: initialTheme });
+      },
+    })),
+  );
 };
 
-const [ThemeSetterContextProvider, useSetTheme] = createStoreContext<
-  ThemeSetterStoreType,
-  InitialThemeSetterState
->(themeSetterStore, "Theme Setter Store");
+const [ThemeSetterContextProvider, useSetTheme, , useThemeHistory] =
+  createStoreContext<ThemeSetterStoreType, InitialThemeSetterState, true>(
+    themeSetterStore,
+    "Theme Setter Store",
+    true,
+  );
 
-export { useSetTheme };
+export { useSetTheme, useThemeHistory };
 
 /**
  * Provider which manages the theme to use for the visualization.

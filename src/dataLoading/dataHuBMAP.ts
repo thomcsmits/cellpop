@@ -97,7 +97,6 @@ function getPromiseMetadata(
     })
     .then((queryBody) => {
       const listAll = queryBody.hits.hits;
-      console.log({ listAll });
       const metadata: Record<string, string | number> = listAll.reduce(
         (acc: Record<string, unknown>, l: HuBMAPSearchHit) => {
           const ls = l._source;

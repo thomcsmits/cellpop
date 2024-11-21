@@ -5,14 +5,25 @@ import { IconButton, Stack } from "@mui/material";
 import { useEventCallback } from "@mui/material/utils";
 
 import Button from "@mui/material/Button";
+import { useThemeHistory } from "../contexts/CellPopThemeContext";
+import { useFractionHistory } from "../contexts/FractionContext";
+import { useSelectedDimensionHistory } from "../contexts/SelectedDimensionContext";
 
 export function TemporalControls() {
+  const themeHistory = useThemeHistory();
+  const selectedDimensionHistory = useSelectedDimensionHistory();
+  const fractionHistory = useFractionHistory();
+
   const undo = useEventCallback(() => {
-    console.warn("Not yet implemented");
+    themeHistory.undo();
+    selectedDimensionHistory.undo();
+    fractionHistory.undo();
   });
 
   const restoreToDefault = useEventCallback(() => {
-    console.warn("Not yet implemented");
+    themeHistory.undo(themeHistory.pastStates.length);
+    selectedDimensionHistory.undo(selectedDimensionHistory.pastStates.length);
+    fractionHistory.undo(fractionHistory.pastStates.length);
   });
   return (
     <Stack direction="row" spacing={2}>

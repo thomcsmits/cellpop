@@ -1,4 +1,5 @@
 import { memoize } from "proxy-memoize";
+import { temporal } from "zundo";
 import { createStore } from "zustand";
 import { CellPopData } from "../cellpop-schema";
 import { createStoreContext } from "../utils/zustand";
@@ -38,53 +39,56 @@ const createDataContextStore = ({
 }: {
   initialData: CellPopData;
 }) =>
-  createStore<DataContextStore>()((set) => ({
-    data: initialData,
-    removedRows: new Set<string>(),
-    removedColumns: new Set<string>(),
-    expandedRows: new Set<string>(),
-    resetRemovedRows: () => {
-      set({ removedRows: new Set<string>() });
-    },
-    resetRemovedColumns: () => {
-      set({ removedColumns: new Set<string>() });
-    },
-    removeRow: (row: string) => {
-      set((state) => {
-        const removedRows = new Set(state.removedRows);
-        removedRows.add(row);
-        return { removedRows };
-      });
-    },
-    removeColumn: (column: string) => {
-      set((state) => {
-        const removedColumns = new Set(state.removedColumns);
-        removedColumns.add(column);
-        return { removedColumns };
-      });
-    },
-    expandRow: (row: string) => {
-      set((state) => {
-        const expandedRows = new Set(state.expandedRows);
-        expandedRows.add(row);
-        return { expandedRows };
-      });
-    },
-    collapseRow: (row: string) => {
-      set((state) => {
-        const expandedRows = new Set(state.expandedRows);
-        expandedRows.delete(row);
-        return { expandedRows };
-      });
-    },
-    resetExpandedRows: () => {
-      set({ expandedRows: new Set<string>() });
-    },
-  }));
+  createStore<DataContextStore>()(
+    temporal((set) => ({
+      data: initialData,
+      removedRows: new Set<string>(),
+      removedColumns: new Set<string>(),
+      expandedRows: new Set<string>(),
+      resetRemovedRows: () => {
+        set({ removedRows: new Set<string>() });
+      },
+      resetRemovedColumns: () => {
+        set({ removedColumns: new Set<string>() });
+      },
+      removeRow: (row: string) => {
+        set((state) => {
+          const removedRows = new Set(state.removedRows);
+          removedRows.add(row);
+          return { removedRows };
+        });
+      },
+      removeColumn: (column: string) => {
+        set((state) => {
+          const removedColumns = new Set(state.removedColumns);
+          removedColumns.add(column);
+          return { removedColumns };
+        });
+      },
+      expandRow: (row: string) => {
+        set((state) => {
+          const expandedRows = new Set(state.expandedRows);
+          expandedRows.add(row);
+          return { expandedRows };
+        });
+      },
+      collapseRow: (row: string) => {
+        set((state) => {
+          const expandedRows = new Set(state.expandedRows);
+          expandedRows.delete(row);
+          return { expandedRows };
+        });
+      },
+      resetExpandedRows: () => {
+        set({ expandedRows: new Set<string>() });
+      },
+    })),
+  );
 
-const [DataProvider, useData] = createStoreContext<
+const [DataProvider, useData, , useDataHistory] = createStoreContext<
   DataContextStore,
-  DataContextProps
+  DataContextProps,
+  true
 >(createDataContextStore, "DataContextStore");
 
 const getDerivedStates = memoize((state: DataContextStore) => {
@@ -170,4 +174,4 @@ export const useHighestRowCount = () => {
   return Math.max(...Object.values(rowCounts).filter((count) => !isNaN(count)));
 };
 
-export { DataProvider, useData };
+export { DataProvider, useData, useDataHistory };

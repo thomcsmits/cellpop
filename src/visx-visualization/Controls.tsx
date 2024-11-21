@@ -22,8 +22,8 @@ export default function Controls() {
   });
 
   const { currentTheme, setTheme } = useSetTheme();
-  const { setFraction } = useFraction();
-  const { setSelectedDimension } = useSelectedDimension();
+  const { fraction, setFraction } = useFraction();
+  const { selectedDimension, setSelectedDimension } = useSelectedDimension();
 
   const changeVisTheme = useEventCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -45,6 +45,8 @@ export default function Controls() {
       setSelectedDimension(newSelectedDimension);
     },
   );
+
+  console.log({ currentTheme });
 
   return (
     <AppBar
@@ -82,18 +84,21 @@ export default function Controls() {
           leftLabel="Count"
           rightLabel="Fraction"
           onChange={changeFraction}
+          checked={fraction}
         />
         <LabelledSwitch
           label="Selection Tool"
           leftLabel="Column"
           rightLabel="Row"
           onChange={changeSelectedDimension}
+          checked={selectedDimension === "Y"}
         />
         <LabelledSwitch
           label="Theme"
           leftLabel="Light"
           rightLabel="Dark"
           onChange={changeVisTheme}
+          checked={currentTheme === "dark"}
         />
       </Stack>
     </AppBar>

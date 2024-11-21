@@ -1,3 +1,4 @@
+import { temporal } from "zundo";
 import { createStore } from "zustand";
 import { createStoreContext } from "../utils/zustand";
 
@@ -9,18 +10,18 @@ interface FractionStore {
   setFraction: (fraction: boolean) => void;
 }
 
-const createFractionStore = ({
-  initialFraction = false,
-}: {
-  initialFraction: boolean;
-}) => {
-  return createStore<FractionStore>((set) => ({
-    fraction: initialFraction,
-    setFraction: (fraction: boolean) => set({ fraction }),
-  }));
+const createFractionStore = ({ initialFraction = false }: FractionProps) => {
+  return createStore<FractionStore>()(
+    temporal((set) => ({
+      fraction: initialFraction,
+      setFraction: (fraction: boolean) => set({ fraction }),
+    })),
+  );
 };
 
-export const [FractionProvider, useFraction] = createStoreContext<
-  FractionStore,
-  FractionProps
->(createFractionStore, "FractionContext");
+export const [FractionProvider, useFraction, , useFractionHistory] =
+  createStoreContext<FractionStore, FractionProps, true>(
+    createFractionStore,
+    "FractionContext",
+    true,
+  );

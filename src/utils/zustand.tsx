@@ -10,6 +10,7 @@ import React, {
 } from "react";
 import { type StoreApi } from "zustand";
 
+import { TemporalState } from "zundo";
 import { createContext, useContext } from "./context";
 
 export type ExtractState<S> = S extends { getState: () => infer X } ? X : never;
@@ -33,6 +34,36 @@ interface CurriedUseStore<T extends StoreApi<unknown>> {
  * @param storeContext the Context object to create the hook for
  * @returns A `useStore` hook for the passed context which can be called with a selector and equality function
  */
+export function createTemporalStoreContextHook<MyState>(
+  storeContext: Context<
+    (MyState & { temporal: StoreApi<unknown> }) | undefined
+  >,
+) {
+  function useTemporalStore(): TemporalState<MyState>;
+  function useTemporalStore<T>(
+    selector: (state: TemporalState<MyState>) => TemporalState<T>,
+  ): T;
+  function useTemporalStore<T>(
+    selector: (state: TemporalState<MyState>) => TemporalState<T>,
+    equality: (a: TemporalState<T>, b: TemporalState<T>) => boolean,
+  ): T;
+  function useTemporalStore<T>(
+    selector?: (state: TemporalState<MyState>) => TemporalState<T>,
+    equality?: (a: TemporalState<T>, b: TemporalState<T>) => boolean,
+  ) {
+    const store = useContext(storeContext);
+    return useStoreWithEqualityFn(store.temporal, selector!, equality);
+  }
+  return useTemporalStore;
+}
+
+type TemporalStore<S> = ReturnType<typeof createTemporalStoreContextHook<S>>;
+
+/**
+ * Helper function for creating a `useStore` hook for a context-bound zustand store.
+ * @param storeContext the Context object to create the hook for
+ * @returns A `useStore` hook for the passed context which can be called with a selector and equality function
+ */
 export function createStoreContextHook<T, S extends StoreApi<T>>(
   storeContext: Context<S | undefined>,
 ) {
@@ -50,11 +81,21 @@ export function createStoreContextHook<T, S extends StoreApi<T>>(
 type CreateStoreContext<
   StoreType extends StoreApi<unknown>,
   CreateStoreArgs,
-> = [
-  (props: PropsWithChildren<CreateStoreArgs>) => ReactNode,
-  CurriedUseStore<StoreType>,
-  Context<StoreType | undefined>,
-];
+  Temporal extends boolean = false,
+> =
+  // If Temporal is true, return an array with the temporal hook and store
+  Temporal extends true
+    ? [
+        (props: PropsWithChildren<CreateStoreArgs>) => ReactNode,
+        CurriedUseStore<StoreType>,
+        Context<StoreType | undefined>,
+        TemporalStore<StoreType>,
+      ]
+    : [
+        (props: PropsWithChildren<CreateStoreArgs>) => ReactNode,
+        CurriedUseStore<StoreType>,
+        Context<StoreType | undefined>,
+      ];
 
 /**
  * Helper function for creating a context and provider for a zustand store.
@@ -63,9 +104,14 @@ type CreateStoreContext<
  * @param displayName The display name for the created context
  * @returns A Context and Provider for the created store
  */
-export function createStoreContext<T, CreateStoreArgs>(
+export function createStoreContext<
+  T,
+  CreateStoreArgs,
+  Temporal extends boolean,
+>(
   createStore: (initialArgs: CreateStoreArgs) => StoreApi<T>,
   displayName: string,
+  temporal: Temporal,
 ) {
   type StoreType = StoreApi<T>;
   // Create a context for the passed `createStore` function's return type
@@ -88,11 +134,22 @@ export function createStoreContext<T, CreateStoreArgs>(
       </StoreContext.Provider>
     );
   }
-  // Create a provider component which creates the store and passes it to the context
-  return [Provider, hook, StoreContext] as CreateStoreContext<
-    StoreApi<T>,
-    CreateStoreArgs
-  >;
+  if (temporal) {
+    // @ts-expect-error Temporal is true, so we need to create a temporal hook
+    // TODO: Figure out how to make it so that the Temporal flag properly infers types
+    const temporalHook = createTemporalStoreContextHook(StoreContext);
+    return [Provider, hook, StoreContext, temporalHook] as CreateStoreContext<
+      StoreApi<T>,
+      CreateStoreArgs,
+      true
+    >;
+  } else {
+    return [Provider, hook, StoreContext] as CreateStoreContext<
+      StoreApi<T>,
+      CreateStoreArgs,
+      false
+    >;
+  }
 }
 
 /**

@@ -1,3 +1,4 @@
+import { temporal } from "zundo";
 import { createStore } from "zustand";
 import { createStoreContext } from "../utils/zustand";
 
@@ -12,20 +13,22 @@ interface SelectedValuesStore {
 const createSelectedValuesContext = ({
   initialSelectedValues,
 }: SelectedValuesContextProps) => {
-  return createStore<SelectedValuesStore>((set) => ({
-    selectedValues: new Set(initialSelectedValues),
-    toggleValue: (value: string) => {
-      set((state) => {
-        const selectedValues = new Set(state.selectedValues);
-        if (selectedValues.has(value)) {
-          selectedValues.delete(value);
-        } else {
-          selectedValues.add(value);
-        }
-        return { selectedValues };
-      });
-    },
-  }));
+  return createStore<SelectedValuesStore>()(
+    temporal((set) => ({
+      selectedValues: new Set(initialSelectedValues),
+      toggleValue: (value: string) => {
+        set((state) => {
+          const selectedValues = new Set(state.selectedValues);
+          if (selectedValues.has(value)) {
+            selectedValues.delete(value);
+          } else {
+            selectedValues.add(value);
+          }
+          return { selectedValues };
+        });
+      },
+    })),
+  );
 };
 
 export const [SelectedValuesProvider, useSelectedValues] = createStoreContext<
