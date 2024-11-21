@@ -3,8 +3,9 @@ import { AxisBottom } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import React from "react";
 import { useRowConfig } from "../../contexts/AxisConfigContext";
-import { useData } from "../../contexts/DataContext";
+import { useHighestRowCount, useRowCounts } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
+import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { useFraction } from "../../contexts/FractionContext";
 import { useYScale } from "../../contexts/ScaleContext";
 import HeatmapYAxis from "../heatmap/HeatmapYAxis";
@@ -15,7 +16,8 @@ import { useCountsScale } from "./hooks";
 
 const useXAxisCountsScale = () => {
   const { width } = usePanelDimensions("left_middle");
-  const { rowCounts, upperBound } = useData();
+  const rowCounts = useRowCounts();
+  const upperBound = useHighestRowCount();
   const { fraction } = useFraction();
   const { tickLabelSize } = useYScale();
   const domainMax = fraction ? upperBound : max(Object.values(rowCounts));
@@ -27,10 +29,11 @@ const useXAxisCountsScale = () => {
 
 function LeftBar() {
   const { width } = usePanelDimensions("left_middle");
-  const { rowCounts } = useData();
+  const rowCounts = useRowCounts();
   const xScale = useXAxisCountsScale();
   // Use same y scale as the heatmap
-  const { scale: yScale, selectedValues, nonExpandedSize } = useYScale();
+  const { scale: yScale,  nonExpandedSize } = useYScale();
+    const selectedValues = useSelectedValues(s => s.selectedValues)
 
   return (
     <g className="barleft">

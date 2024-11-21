@@ -4,9 +4,8 @@ import { useTheme } from "@mui/material/styles";
 import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
 import { area } from "@visx/shape";
-import { bin, max, mean, rollups } from "d3";
-import { useColumns, useRows } from "../../contexts/AxisOrderContext";
-import { useData } from "../../contexts/DataContext";
+import { bin, max, rollups } from "d3";
+import { useData, useMaxCount } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useXScale, useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
@@ -37,18 +36,14 @@ export default function Violins({ side = "top" }: ViolinsProps) {
   const topViolins = side === "top";
   const {
     data: { countsMatrix },
-    upperBound,
   } = useData();
-
-  const [rows] = useRows();
-  const [columns] = useColumns();
+  const upperBound = useMaxCount();
 
   const dimensions = usePanelDimensions(
     side === "top" ? "center_top" : "left_middle",
   );
   const { width, height } = dimensions;
   const { scale: categoricalScale, tickLabelSize } = useCategoricalScale(side);
-  const dataGroups = topViolins ? columns : rows;
 
   /**
    * Scale used to generate the density of the violin plots.
@@ -80,7 +75,7 @@ export default function Violins({ side = "top" }: ViolinsProps) {
   }, [side, countsMatrix, topViolins, violinScale, upperBound]);
 
   const maxBinCount = useMemo(() => {
-    return violins.reduce((acc, [_, violinData]) => {
+    return violins.reduce((acc, [, violinData]) => {
       const maxBin = max(violinData);
       return maxBin > acc ? maxBin : acc;
     }, 0);

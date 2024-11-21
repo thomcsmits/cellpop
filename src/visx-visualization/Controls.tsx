@@ -1,9 +1,6 @@
 import React, { ChangeEvent } from "react";
-import {
-  HEATMAP_THEMES,
-  HeatmapTheme,
-  useColorScale,
-} from "../contexts/ScaleContext";
+import { useColorScale } from "../contexts/ScaleContext";
+import { HEATMAP_THEMES_LIST, HeatmapTheme } from "../utils/heatmap-themes";
 
 import { AppBar, Stack } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
@@ -69,7 +66,7 @@ export default function Controls() {
             label="Heatmap Themes"
             sx={{ textTransform: "capitalize", minWidth: 200 }}
           >
-            {HEATMAP_THEMES.map((theme) => (
+            {HEATMAP_THEMES_LIST.map((theme) => (
               <MenuItem
                 key={theme}
                 value={theme}

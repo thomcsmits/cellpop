@@ -1,23 +1,26 @@
-import React, { PropsWithChildren, useState } from "react";
-import { createContext, useContext } from "../utils/context";
-import { Setter } from "../utils/types";
+import { createStore } from "zustand";
+import { createStoreContext } from "../utils/zustand";
 
-interface FractionContextType {
+interface FractionProps {
+  initialFraction?: boolean;
+}
+interface FractionStore {
   fraction: boolean;
-  setFraction: Setter<boolean>;
+  setFraction: (fraction: boolean) => void;
 }
-const FractionContext = createContext<FractionContextType | null>("Fraction");
-export const useFraction = () => useContext(FractionContext);
 
-/**
- * Context for managing whether to display bar or violin plots.
- */
-export function FractionProvider({ children }: PropsWithChildren) {
-  const [fraction, setFraction] = useState<boolean>(false);
+const createFractionStore = ({
+  initialFraction = false,
+}: {
+  initialFraction: boolean;
+}) => {
+  return createStore<FractionStore>((set) => ({
+    fraction: initialFraction,
+    setFraction: (fraction: boolean) => set({ fraction }),
+  }));
+};
 
-  return (
-    <FractionContext.Provider value={{ fraction, setFraction }}>
-      {children}
-    </FractionContext.Provider>
-  );
-}
+export const [FractionProvider, useFraction] = createStoreContext<
+  FractionStore,
+  FractionProps
+>(createFractionStore, "FractionContext");

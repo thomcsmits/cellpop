@@ -155,7 +155,6 @@ export default function MetadataValueBar({
     // @ts-expect-error we're handling typechecking at runtime
     const color = metadataValueColorScale(processedValue);
     if (axis === "Y") {
-      // @ts-expect-error this is supported by the y axis
       let height = y.bandwidth(key);
       // Add padding around expanded bars
       if (height > y.bandwidth()) {

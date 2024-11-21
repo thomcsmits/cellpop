@@ -29,6 +29,7 @@ export default tseslint.config(
       quotes: ["error", "double", { avoidEscape: true }],
       semi: ["error", "always"],
       "no-trailing-spaces": "error",
+      "comma-dangle": ["error", "always-multiline"],
     },
   },
   {

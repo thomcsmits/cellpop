@@ -1,7 +1,13 @@
 import React, { PropsWithChildren } from "react";
 import { useOrderedArrayState } from "../hooks/useOrderedArray";
 import { createContext, useContext } from "../utils/context";
-import { useData } from "./DataContext";
+import {
+  useColumnCounts,
+  useColumnNames,
+  useData,
+  useRowCounts,
+  useRowNames,
+} from "./DataContext";
 
 type AxisOrderContext = ReturnType<typeof useOrderedArrayState<string>>;
 
@@ -23,7 +29,9 @@ export const useColumns = () => useContext(ColumnContext);
  * Context for managing heatmap row order.
  */
 export const RowProvider = ({ children }: PropsWithChildren) => {
-  const { rowNames, rowCounts, removedRows, data } = useData();
+  const rowNames = useRowNames();
+  const rowCounts = useRowCounts();
+  const { removedRows, data } = useData();
 
   const rowMetadata = data.metadata.rows;
 
@@ -41,7 +49,9 @@ export const RowProvider = ({ children }: PropsWithChildren) => {
  * Context for managing heatmap column order.
  */
 export const ColumnProvider = ({ children }: PropsWithChildren) => {
-  const { colNames, columnCounts, removedColumns, data } = useData();
+  const colNames = useColumnNames();
+  const columnCounts = useColumnCounts();
+  const { removedColumns, data } = useData();
 
   const columnMetadata = data.metadata.cols;
 

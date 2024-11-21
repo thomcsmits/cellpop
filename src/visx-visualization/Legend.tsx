@@ -1,13 +1,10 @@
-import { useTheme } from "@mui/material/styles";
 import React, { useId } from "react";
 import { useColorScale } from "../contexts/ScaleContext";
 
-import { RestoreOutlined, UndoRounded } from "@mui/icons-material";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
-import { useEventCallback } from "@mui/material/utils";
 
-import Button from "@mui/material/Button";
+import { TemporalControls } from "./TemporalControls";
 
 export default function Legend() {
   const { scale: colors, maxValue } = useColorScale();
@@ -15,13 +12,6 @@ export default function Legend() {
 
   const minColor = colors(0);
   const maxColor = colors(maxValue);
-  const undo = useEventCallback(() => {
-    console.warn("Not yet implemented");
-  });
-
-  const restoreToDefault = useEventCallback(() => {
-    console.warn("Not yet implemented");
-  });
 
   return (
     <Stack height="100%" gap="1rem" paddingX={1}>
@@ -53,29 +43,7 @@ export default function Legend() {
           </Stack>
         </Box>
       </Stack>
-
-      <Stack direction="row" spacing={2}>
-        <Button
-          variant="outlined"
-          onClick={restoreToDefault}
-          endIcon={<RestoreOutlined />}
-        >
-          Restore to Default
-        </Button>
-        <Button
-          onClick={undo}
-          aria-label="Undo"
-          variant="outlined"
-          component={IconButton}
-          sx={{
-            minWidth: 0,
-            padding: 0.5,
-            aspectRatio: "1/1",
-          }}
-        >
-          <UndoRounded />
-        </Button>
-      </Stack>
+      <TemporalControls />
     </Stack>
   );
 }

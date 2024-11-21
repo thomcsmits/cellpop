@@ -3,8 +3,9 @@ import React, { useMemo } from "react";
 
 import { useTheme } from "@mui/material/styles";
 import { useColumns, useRows } from "../../contexts/AxisOrderContext";
-import { useData } from "../../contexts/DataContext";
+import { useData, useDataMap, useRowMaxes } from "../../contexts/DataContext";
 import { useHeatmapDimensions } from "../../contexts/DimensionsContext";
+import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import {
   useColorScale,
   useXScale,
@@ -17,13 +18,14 @@ import DragOverlayContainer from "./DragOverlay";
 function HeatmapRow({ row }: { row: string }) {
   const { width } = useHeatmapDimensions();
   const { scale: xScale } = useXScale();
-  const { scale: yScale, selectedValues } = useYScale();
+  const { scale: yScale } = useYScale();
+  const selectedValues = useSelectedValues((s) => s.selectedValues);
   const { scale: colors } = useColorScale();
   const cellWidth = Math.ceil(xScale.bandwidth());
-  // @ts-expect-error - custom y scale provides the appropriate band width for the given row
-  // and providing an arg to a regular scale's bandwidth function doesn't throw, so this is fine
   const cellHeight = Math.ceil(yScale.bandwidth(row));
-  const { removedRows, removedColumns, rowMaxes, dataMap } = useData();
+  const { removedRows, removedColumns } = useData();
+  const dataMap = useDataMap();
+  const rowMaxes = useRowMaxes();
   const [columns] = useColumns();
 
   const theme = useTheme();

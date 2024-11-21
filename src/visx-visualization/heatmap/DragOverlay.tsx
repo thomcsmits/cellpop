@@ -36,7 +36,7 @@ import {
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
 import { useParentRef } from "../../contexts/ContainerRefContext";
-import { useData } from "../../contexts/DataContext";
+import { useDataMap } from "../../contexts/DataContext";
 import {
   useDimensions,
   useHeatmapDimensions,
@@ -199,7 +199,7 @@ function DragIndicator({
   const { scale: y } = useYScale();
 
   const { columnSizes, rowSizes } = useDimensions();
-  const { dataMap } = useData();
+  const dataMap = useDataMap();
 
   const xOffset = columnSizes[0];
   const yOffset = rowSizes[0];
@@ -242,9 +242,6 @@ function DragIndicator({
         columnCount - 1,
       );
 
-      // @ts-expect-error - y lookup is a custom method on the scale, added in
-      // ScaleContext. We should consider extending the d3 scale type to include
-      // this method.
       const rowKey = y.lookup(yValue);
       const columnKey = x.domain()[columnIndex];
 

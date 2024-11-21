@@ -10,7 +10,7 @@ import { Text } from "@visx/text";
 import React, { useId } from "react";
 import { AxisConfig, useRowConfig } from "../../contexts/AxisConfigContext";
 import { useRows } from "../../contexts/AxisOrderContext";
-import { useData } from "../../contexts/DataContext";
+import { useRowCounts, useRowMaxes } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { EXPANDED_ROW_PADDING, useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
@@ -34,7 +34,7 @@ export default function HeatmapYAxis() {
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
   const [rows] = useRows();
-  const { rowCounts } = useData();
+  const rowCounts = useRowCounts();
 
   const filterId = useId();
   const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(
@@ -125,7 +125,7 @@ function ExpandedRowTick({
 } & ReturnType<typeof useHeatmapAxis>) {
   const { selectedValues, expandedSize } = useYScale();
   const { flipAxisPosition } = axisConfig;
-  const { rowMaxes } = useData();
+  const rowMaxes = useRowMaxes();
 
   const panelSize = usePanelDimensions(
     flipAxisPosition ? "left_middle" : "right_middle",

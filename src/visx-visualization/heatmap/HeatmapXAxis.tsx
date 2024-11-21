@@ -3,7 +3,7 @@ import { AxisBottom, Orientation } from "@visx/axis";
 import React, { useId } from "react";
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
 import { useColumns } from "../../contexts/AxisOrderContext";
-import { useData } from "../../contexts/DataContext";
+import { useColumnCounts } from "../../contexts/DataContext";
 import { useXScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
@@ -15,7 +15,7 @@ import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
  * @returns
  */
 export default function HeatmapXAxis() {
-  const { columnCounts } = useData();
+  const columnCounts = useColumnCounts();
   const theme = useTheme();
   const { scale: x, tickLabelSize, setTickLabelSize } = useXScale();
   const axisConfig = useColumnConfig();

@@ -4,8 +4,12 @@ import { useTheme } from "@mui/material/styles";
 import { AxisRight } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
-import { useData } from "../../contexts/DataContext";
+import {
+  useColumnCounts,
+  useHighestColumnCount,
+} from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
+import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { useFraction } from "../../contexts/FractionContext";
 import { useXScale } from "../../contexts/ScaleContext";
 import HeatmapXAxis from "../heatmap/HeatmapXAxis";
@@ -16,7 +20,8 @@ import { useCountsScale } from "./hooks";
 
 const useYAxisCountsScale = () => {
   const { height } = usePanelDimensions("center_top");
-  const { columnCounts, upperBound } = useData();
+  const columnCounts = useColumnCounts();
+  const upperBound = useHighestColumnCount();
   const { tickLabelSize } = useXScale();
   const { fraction } = useFraction();
   const domainMax = fraction ? upperBound : max(Object.values(columnCounts));
@@ -28,9 +33,10 @@ const useYAxisCountsScale = () => {
 
 function TopBar() {
   const { height } = usePanelDimensions("center_top");
-  const { columnCounts } = useData();
+  const columnCounts = useColumnCounts();
   // Use same x scale as the heatmap
-  const { scale: xScale, selectedValues, nonExpandedSize } = useXScale();
+  const { scale: xScale, nonExpandedSize } = useXScale();
+  const selectedValues = useSelectedValues(s => s.selectedValues)
   const yScale = useYAxisCountsScale();
 
   return (
