@@ -19,7 +19,6 @@ export default function LabelledSwitch({
   label,
   ...rest
 }: LabelledSwitchProps) {
-  console.log({ ...rest });
   return (
     <FormControlLabel
       control={

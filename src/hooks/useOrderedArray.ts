@@ -53,8 +53,6 @@ export function useOrderedArrayState<
     return [...set];
   }, [metadata]);
 
-  console.log({ metadata });
-
   const sortOrders: SortOrder[] = useMemo(
     () => [
       ...SORT_ORDERS,
