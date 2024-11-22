@@ -2,7 +2,11 @@
 This is a Python widget for [CellPop](https://github.com/hms-dbmi/cellpop/), a scalable interactive cell population viewer. It is implemented with [anywidget](https://github.com/manzt/anywidget/). 
 
 ## Using the Cellpop Widget
-It is not yet available to download as a package. 
+The CellPop Widget is available at TestPyPi:
+
+```sh
+pip install -i https://test.pypi.org/simple/ cellpop
+```
 
 Example usage is shown in [example.ipynb](./example.ipynb).
 
