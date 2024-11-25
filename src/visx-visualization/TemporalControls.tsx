@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 import { RedoRounded, RestoreOutlined, UndoRounded } from "@mui/icons-material";
-import { IconButton, Stack } from "@mui/material";
+import { IconButton } from "@mui/material";
 import { useEventCallback } from "@mui/material/utils";
 
 import Button from "@mui/material/Button";
@@ -81,11 +81,12 @@ export function TemporalControls() {
   const { undo, canUndo, redo, canRedo, restoreToDefault } =
     useTemporalActions();
   return (
-    <Stack direction="row" spacing={2}>
+    <>
       <Button
         variant="outlined"
         onClick={restoreToDefault}
         disabled={!canUndo}
+        sx={{ whiteSpace: "nowrap" }}
         endIcon={<RestoreOutlined />}
       >
         Restore to Default
@@ -118,6 +119,6 @@ export function TemporalControls() {
       >
         <RedoRounded />
       </Button>
-    </Stack>
+    </>
   );
 }

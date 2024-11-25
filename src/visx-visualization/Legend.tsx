@@ -4,6 +4,7 @@ import { useColorScale } from "../contexts/ScaleContext";
 import { Box, Stack, Typography } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 
+import { PlotControlsButton } from "./plot-controls.tsx/PlotControls";
 import { TemporalControls } from "./TemporalControls";
 
 export default function Legend() {
@@ -43,7 +44,10 @@ export default function Legend() {
           </Stack>
         </Box>
       </Stack>
-      <TemporalControls />
+      <Stack direction="row" spacing={2}>
+        <PlotControlsButton />
+        <TemporalControls />
+      </Stack>
     </Stack>
   );
 }
