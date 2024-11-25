@@ -2,8 +2,7 @@ import { useTheme } from "@mui/material/styles";
 import { AxisBottom, Orientation } from "@visx/axis";
 import React, { useId } from "react";
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
-import { useColumns } from "../../contexts/AxisOrderContext";
-import { useColumnCounts } from "../../contexts/DataContext";
+import { useColumnCounts, useColumns } from "../../contexts/DataContext";
 import { useXScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
@@ -23,7 +22,7 @@ export default function HeatmapXAxis() {
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const [columns] = useColumns();
+  const columns = useColumns();
 
   const filterId = useId();
   const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(

@@ -1,11 +1,10 @@
 import React, { CSSProperties } from "react";
-import { SortOrder } from "../../hooks/useOrderedArray";
-import { Setter } from "../../utils/types";
+import { SORT_DIRECTIONS, SortOrder } from "../../contexts/DataContext";
 
 interface AxisButtonsProps {
   axis: "X" | "Y";
-  setSortOrder: Setter<SortOrder>;
-  sortOrders: SortOrder[];
+  setSortOrder: (order: [SortOrder<string>]) => void;
+  sortOrders: string[];
 }
 
 const positionProps: Record<"X" | "Y", CSSProperties> = {
@@ -40,21 +39,16 @@ export function AxisButtons({
         ...positionProps[axis],
       }}
     >
-      {sortOrders
-        .filter((s) => s !== "Custom")
-        .map((order) => (
+      {sortOrders.flatMap((key) =>
+        SORT_DIRECTIONS.map((direction) => (
           <button
-            key={order}
-            onClick={() => {
-              setSortOrder(order);
-            }}
+            key={`${key}-${direction}`}
+            onClick={() => setSortOrder([{ key, direction }])}
           >
-            {order
-              .split("_")
-              .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-              .join(" ")}
+            {key} {direction}
           </button>
-        ))}
+        )),
+      )}
     </div>
   );
 }

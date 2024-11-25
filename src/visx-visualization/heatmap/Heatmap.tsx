@@ -1,9 +1,14 @@
 import { scaleLinear } from "@visx/scale";
-import React, { useMemo } from "react";
+import React from "react";
 
 import { useTheme } from "@mui/material/styles";
-import { useColumns, useRows } from "../../contexts/AxisOrderContext";
-import { useData, useDataMap, useRowMaxes } from "../../contexts/DataContext";
+import {
+  useColumns,
+  useData,
+  useDataMap,
+  useRowMaxes,
+  useRows,
+} from "../../contexts/DataContext";
 import { useHeatmapDimensions } from "../../contexts/DimensionsContext";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import {
@@ -26,7 +31,7 @@ function HeatmapRow({ row }: { row: string }) {
   const { removedRows, removedColumns } = useData();
   const dataMap = useDataMap();
   const rowMaxes = useRowMaxes();
-  const [columns] = useColumns();
+  const columns = useColumns();
 
   const theme = useTheme();
   if (removedRows.has(row)) {
@@ -120,27 +125,30 @@ function HeatmapRow({ row }: { row: string }) {
 export default function Heatmap() {
   const { width, height } = useHeatmapDimensions();
   const { selectedDimension } = useSelectedDimension();
-  const [rows, { setOrderedValues: setRows, setSortOrder: setRowOrder }] =
-    useRows();
-  const [
-    columns,
-    { setOrderedValues: setColumns, setSortOrder: setColumnOrder },
-  ] = useColumns();
+  const rows = useRows();
+  const columns = useColumns();
+
+  const items = selectedDimension === "X" ? columns : rows;
+
+  const { setItems, resetSort } = useData((store) => ({
+    setItems:
+      selectedDimension === "X" ? store.setColumnOrder : store.setRowOrder,
+    resetSort:
+      selectedDimension === "X"
+        ? store.clearColumnSortOrder
+        : store.clearRowSortOrder,
+  }));
 
   const { closeTooltip } = useSetTooltipData();
-
-  // Dynamically determine which dimension to use based on the selected dimension
-  const { items, setItems, setSort } = useMemo(() => {
-    const items = selectedDimension === "X" ? columns : rows;
-    const setItems = selectedDimension === "X" ? setColumns : setRows;
-    const setSort = selectedDimension === "X" ? setColumnOrder : setRowOrder;
-    return { items, setItems, setSort };
-  }, [selectedDimension, columns, rows]);
 
   const theme = useTheme();
 
   return (
-    <DragOverlayContainer items={items} setItems={setItems} setSort={setSort}>
+    <DragOverlayContainer
+      items={items}
+      setItems={setItems}
+      resetSort={resetSort}
+    >
       <svg
         width={width}
         height={height}

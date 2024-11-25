@@ -1,7 +1,9 @@
 import { memoize } from "proxy-memoize";
+import { useMemo } from "react";
 import { temporal } from "zundo";
 import { createStore } from "zustand";
 import { CellPopData } from "../cellpop-schema";
+import { moveToEnd, moveToStart } from "../utils/array-reordering";
 import { createStoreContext } from "../utils/zustand";
 
 interface DataContextProps {
@@ -12,10 +14,14 @@ type RowKey = string;
 type ColumnKey = string;
 type DataMapKey = `${RowKey}-${ColumnKey}`;
 
-interface SortOrder<T> {
-  key: keyof T | "count" | "alphabetical";
-  direction: "asc" | "desc";
+export type SortDirection = "asc" | "desc";
+export const SORT_DIRECTIONS = ["asc", "desc"] as const;
+export interface SortOrder<T> {
+  key: T | "count" | "alphabetical";
+  direction: SortDirection;
 }
+
+export const DEFAULT_SORTS = ["count", "alphabetical"] as const;
 
 interface DataContextState {
   data: CellPopData;
@@ -36,6 +42,8 @@ interface DataContextActions {
   expandRow: (row: string) => void;
   collapseRow: (row: string) => void;
   resetExpandedRows: () => void;
+  setRowSortOrder: (sortOrder: SortOrder<string>[]) => void;
+  setColumnSortOrder: (sortOrder: SortOrder<string>[]) => void;
   addRowSortOrder: (sortOrder: SortOrder<string>) => void;
   addColumnSortOrder: (sortOrder: SortOrder<string>) => void;
   editRowSortOrder: (index: number, sortOrder: SortOrder<string>) => void;
@@ -55,13 +63,16 @@ type DataContextStore = DataContextState & DataContextActions;
  * @param array The array to sort
  * @param sorts The sort orders to apply
  * @param metadata The metadata object to use for sorting
+ * @param state The data context store
  * @returns The sorted array
  */
 const applySortOrders = (
   array: string[],
   sorts: SortOrder<string>[],
-  metadata: Record<string, Record<string, string | number>>,
+  state: DataContextStore,
+  row: boolean,
 ): string[] => {
+  const metadata = row ? state.data.metadata.rows : state.data.metadata.cols;
   // Avoid mutating the original array
   const arrayCopy = [...array];
   return sorts.reduce((sortedArray, { key, direction }) => {
@@ -73,19 +84,20 @@ const applySortOrders = (
       }
     }
     if (key === "count") {
+      const { rowCounts, columnCounts } = getDerivedStatesSelector(state);
+      const counts = row ? rowCounts : columnCounts;
       return sortedArray.sort((a, b) => {
-        const aValue = metadata[a][key] as number;
-        const bValue = metadata[b][key] as number;
+        const aValue = counts[a] as number;
+        const bValue = counts[b] as number;
         return direction === "asc" ? aValue - bValue : bValue - aValue;
       });
     }
     return sortedArray.sort((a, b) => {
-      const aValue = metadata[a][
-        key as keyof (typeof metadata)[typeof a]
-      ] as string;
-      const bValue = metadata[b][
-        key as keyof (typeof metadata)[typeof b]
-      ] as string;
+      const aValue = metadata[a][key as keyof (typeof metadata)[typeof a]];
+      const bValue = metadata[b][key as keyof (typeof metadata)[typeof b]];
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return direction === "asc" ? aValue - bValue : bValue - aValue;
+      }
       return direction === "asc"
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue);
@@ -95,13 +107,13 @@ const applySortOrders = (
 
 const createDataContextStore = ({ initialData }: DataContextProps) =>
   createStore<DataContextStore>()(
-    temporal((set) => ({
+    temporal((set, get) => ({
       data: initialData,
       removedRows: new Set<string>(),
       removedColumns: new Set<string>(),
       expandedRows: new Set<string>(),
-      rowSortOrder: [],
-      columnSortOrder: [],
+      rowSortOrder: [] as SortOrder<RowKey>[],
+      columnSortOrder: [] as SortOrder<ColumnKey>[],
       rowOrder: initialData.rowNames,
       columnOrder: initialData.colNames,
       resetRemovedRows: () => {
@@ -141,13 +153,32 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
       resetExpandedRows: () => {
         set({ expandedRows: new Set<string>() });
       },
+      setColumnSortOrder: (sortOrder: SortOrder<ColumnKey>[]) => {
+        const columnOrder = applySortOrders(
+          initialData.colNames,
+          sortOrder,
+          get(),
+          false,
+        );
+        set({ columnSortOrder: sortOrder, columnOrder });
+      },
+      setRowSortOrder: (sortOrder: SortOrder<RowKey>[]) => {
+        const rowOrder = applySortOrders(
+          initialData.rowNames,
+          sortOrder,
+          get(),
+          true,
+        );
+        set({ rowSortOrder: sortOrder, rowOrder });
+      },
       addRowSortOrder: (sortOrder: SortOrder<RowKey>) => {
         set((state) => {
           const rowSortOrder = [...state.rowSortOrder, sortOrder];
           const rowOrder = applySortOrders(
             state.rowOrder,
             rowSortOrder,
-            state.data.metadata.rows,
+            get(),
+            true,
           );
           return { rowSortOrder, rowOrder };
         });
@@ -158,7 +189,8 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
           const columnOrder = applySortOrders(
             state.columnOrder,
             columnSortOrder,
-            state.data.metadata.cols,
+            get(),
+            false,
           );
           return { columnSortOrder, columnOrder };
         });
@@ -170,7 +202,8 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
           const rowOrder = applySortOrders(
             state.rowOrder,
             rowSortOrder,
-            state.data.metadata.rows,
+            get(),
+            true,
           );
           return { rowSortOrder, rowOrder };
         });
@@ -182,7 +215,8 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
           const columnOrder = applySortOrders(
             state.columnOrder,
             columnSortOrder,
-            state.data.metadata.cols,
+            get(),
+            false,
           );
           return { columnSortOrder, columnOrder };
         });
@@ -193,7 +227,8 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
           const rowOrder = applySortOrders(
             state.rowOrder,
             rowSortOrder,
-            state.data.metadata.rows,
+            get(),
+            true,
           );
           return { rowSortOrder, rowOrder };
         });
@@ -204,7 +239,8 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
           const columnOrder = applySortOrders(
             state.columnOrder,
             columnSortOrder,
-            state.data.metadata.cols,
+            get(),
+            false,
           );
           return { columnSortOrder, columnOrder };
         });
@@ -224,18 +260,17 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
     })),
   );
 
-const [DataProvider, useData, , useDataHistory] = createStoreContext<
+export const [DataProvider, useData, , useDataHistory] = createStoreContext<
   DataContextStore,
   DataContextProps,
   true
 >(createDataContextStore, "DataContextStore", true);
 
-const getDerivedStates = memoize((state: DataContextStore) => {
+const getDerivedStatesSelector = (state: DataContextStore) => {
   const rowCounts: Record<string, number> = {};
   const columnCounts: Record<string, number> = {};
   const rowMaxes: Record<string, number> = {};
   const columnMaxes: Record<string, number> = {};
-  const dataMap: Record<DataMapKey, number> = {};
   let maxCount = 0;
   const { removedRows, removedColumns } = state;
   state.data.countsMatrix.forEach(({ row, col, value }) => {
@@ -246,7 +281,6 @@ const getDerivedStates = memoize((state: DataContextStore) => {
     columnCounts[col] = (columnCounts[col] || 0) + value;
     rowMaxes[row] = Math.max(rowMaxes[row] || 0, value);
     columnMaxes[col] = Math.max(columnMaxes[col] || 0, value);
-    dataMap[`${row}-${col}`] = value;
     maxCount = Math.max(maxCount, value);
   });
   return {
@@ -254,9 +288,18 @@ const getDerivedStates = memoize((state: DataContextStore) => {
     columnCounts,
     rowMaxes,
     columnMaxes,
-    dataMap,
     maxCount,
   };
+};
+
+const getDerivedStatesMemo = memoize(getDerivedStatesSelector);
+
+const getDataMap = memoize((state: DataContextStore) => {
+  const dataMap: Record<DataMapKey, number> = {};
+  state.data.countsMatrix.forEach(({ row, col, value }) => {
+    dataMap[`${row}-${col}`] = value;
+  });
+  return dataMap;
 });
 
 const getRowNames = memoize((state: DataContextStore) => {
@@ -285,44 +328,118 @@ const getMetadataKeys = (
   return [...set];
 };
 
-const getRowMetadataKeys = memoize((state: DataContextStore) => {
+const getRowSortKeys = memoize((state: DataContextStore) => {
   return getMetadataKeys(state.data.metadata.rows);
 });
 
-const getColumnMetadataKeys = memoize((state: DataContextStore) => {
+const getColumnSortKeys = memoize((state: DataContextStore) => {
   return getMetadataKeys(state.data.metadata.cols);
 });
 
+const useMetadataKeys = (direction: "row" | "column") => {
+  return useData(direction === "row" ? getRowSortKeys : getColumnSortKeys);
+};
+
+const useSortKeys = (direction: "row" | "column") => {
+  const metadataKeys = useMetadataKeys(direction);
+  return useMemo(
+    () => ["count", "alphabetical", ...metadataKeys],
+    [metadataKeys],
+  );
+};
+
+export const useRowSortKeys = () => {
+  return useSortKeys("row");
+};
+
+export const useRowMetadataKeys = () => {
+  return useMetadataKeys("row");
+};
+
+export const useRowSorts: () => SortOrder<string>[] = () => {
+  const keys = useRowSortKeys();
+  return useMemo(() => {
+    return ["asc", "desc"].flatMap((direction) =>
+      keys.map((key) => ({ key, direction }) as SortOrder<string>),
+    );
+  }, [keys]);
+};
+
+export const useColumnMetadataKeys = () => {
+  return useMetadataKeys("column");
+};
+
+export const useColumnSortKeys = () => {
+  return useSortKeys("column");
+};
+
+export const useColumnSorts: () => SortOrder<string>[] = () => {
+  const keys = useColumnSortKeys();
+  return useMemo(() => {
+    return ["asc", "desc"].flatMap((direction) =>
+      keys.map((key) => ({ key, direction }) as SortOrder<string>),
+    );
+  }, [keys]);
+};
+
 export const useDataMap = () => {
-  return useData(getDerivedStates).dataMap;
+  return useData(getDataMap);
 };
 
 export const useRowCounts = () => {
-  return useData(getDerivedStates).rowCounts;
+  return useData(getDerivedStatesMemo).rowCounts;
 };
 
 export const useColumnCounts = () => {
-  return useData(getDerivedStates).columnCounts;
+  return useData(getDerivedStatesMemo).columnCounts;
 };
 
 export const useRowMaxes = () => {
-  return useData(getDerivedStates).rowMaxes;
+  return useData(getDerivedStatesMemo).rowMaxes;
 };
 
 export const useColumnMaxes = () => {
-  return useData(getDerivedStates).columnMaxes;
+  return useData(getDerivedStatesMemo).columnMaxes;
 };
 
 export const useMaxCount = () => {
-  return useData(getDerivedStates).maxCount;
+  return useData(getDerivedStatesMemo).maxCount;
 };
 
-export const useRowNames = () => {
+export const useAllRowNames = () => {
   return useData(getRowNames);
 };
 
-export const useColumnNames = () => {
+export const useAllColumnNames = () => {
   return useData(getColumnNames);
+};
+
+export const useRows = () => {
+  const rowNames = useAllRowNames();
+  const { removedRows } = useData();
+  return rowNames.filter((row) => !removedRows.has(row));
+};
+
+export const useColumns = () => {
+  const columnNames = useAllColumnNames();
+  const { removedColumns } = useData();
+  return columnNames.filter((column) => !removedColumns.has(column));
+};
+
+export const useAvailableRowSorts = () => {
+  const rowSortKeys = useRowSortKeys();
+  const rowSortOrder = useData((s) => s.rowSortOrder);
+  return rowSortKeys.filter(
+    (key) => !rowSortOrder.some((sort) => sort.key === key),
+  );
+};
+
+export const useAvailableColumnSorts = () => {
+  const columnSortKeys = useColumnSortKeys();
+  const columnSortOrder = useData((s) => s.columnSortOrder);
+  return columnSortKeys.filter(
+    (key) => !columnSortOrder.some((sort) => sort.key === key),
+  );
 };
 
 export const useHighestColumnCount = () => {
@@ -337,4 +454,34 @@ export const useHighestRowCount = () => {
   return Math.max(...Object.values(rowCounts).filter((count) => !isNaN(count)));
 };
 
-export { DataProvider, useData, useDataHistory };
+export const useMoveRowToEnd = () => {
+  const setRowOrder = useData((s) => s.setRowOrder);
+  const rowOrder = useData((s) => s.rowOrder);
+  return (row: string) => {
+    setRowOrder(moveToEnd(rowOrder, row));
+  };
+};
+
+export const useMoveRowToStart = () => {
+  const setRowOrder = useData((s) => s.setRowOrder);
+  const rowOrder = useData((s) => s.rowOrder);
+  return (row: string) => {
+    setRowOrder(moveToStart(rowOrder, row));
+  };
+};
+
+export const useMoveColumnToEnd = () => {
+  const setColumnOrder = useData((s) => s.setColumnOrder);
+  const columnOrder = useData((s) => s.columnOrder);
+  return (column: string) => {
+    setColumnOrder(moveToEnd(columnOrder, column));
+  };
+};
+
+export const useMoveColumnToStart = () => {
+  const setColumnOrder = useData((s) => s.setColumnOrder);
+  const columnOrder = useData((s) => s.columnOrder);
+  return (column: string) => {
+    setColumnOrder(moveToStart(columnOrder, column));
+  };
+};

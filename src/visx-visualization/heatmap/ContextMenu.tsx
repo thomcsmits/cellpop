@@ -4,9 +4,15 @@ import {
   useColumnConfig,
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
-import { useColumns, useRows } from "../../contexts/AxisOrderContext";
-import { useData } from "../../contexts/DataContext";
-import { useYScale } from "../../contexts/ScaleContext";
+import {
+  useColumnSorts,
+  useData,
+  useMoveColumnToEnd,
+  useMoveColumnToStart,
+  useMoveRowToEnd,
+  useMoveRowToStart,
+  useRowSorts,
+} from "../../contexts/DataContext";
 import {
   useSetTooltipData,
   useTooltipData,
@@ -94,17 +100,18 @@ const ExpandRow = () => {
     tooltipData: { data },
   } = useTooltipData();
   const label = useRowConfig((store) => store.label);
-  const { toggleSelection, selectedValues } = useYScale();
+  const expandRow = useData((store) => store.expandRow);
+  const expandedRows = useData((store) => store.expandedRows);
   const { closeContextMenu } = useSetTooltipData();
 
-  if (!data[label] || selectedValues.has(data[label] as string)) {
+  if (!data[label] || expandedRows.has(data[label] as string)) {
     return null;
   }
 
   return (
     <ContextMenuItem
       onClick={() => {
-        toggleSelection(data[label] as string);
+        expandRow(data[label] as string);
         closeContextMenu();
       }}
     >
@@ -114,16 +121,17 @@ const ExpandRow = () => {
 };
 
 const CollapseRows = () => {
-  const { selectedValues, reset } = useYScale();
-  if (selectedValues.size === 0) {
+  const expandedRows = useData((store) => store.expandedRows);
+  const reset = useData((store) => store.resetExpandedRows);
+  if (expandedRows.size === 0) {
     return null;
   }
   return <ContextMenuItem onClick={reset}>Clear Selection</ContextMenuItem>;
 };
 
 const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
-  const [, { moveToStart: moveRowToStart }] = useRows();
-  const [, { moveToStart: moveColumnToStart }] = useColumns();
+  const moveRowToStart = useMoveRowToStart();
+  const moveColumnToStart = useMoveColumnToStart();
   const {
     tooltipData: { data },
   } = useTooltipData();
@@ -147,8 +155,9 @@ const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
 };
 
 const MoveToEnd = ({ dimension }: { dimension: "row" | "column" }) => {
-  const [, { moveToEnd: moveRowToEnd }] = useRows();
-  const [, { moveToEnd: moveColumnToEnd }] = useColumns();
+  const moveRowToEnd = useMoveRowToEnd();
+  const moveColumnToEnd = useMoveColumnToEnd();
+
   const {
     tooltipData: { data },
   } = useTooltipData();
@@ -172,22 +181,16 @@ const MoveToEnd = ({ dimension }: { dimension: "row" | "column" }) => {
 };
 
 const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
-  const [
-    ,
-    {
-      setSortOrder: sortColumns,
-      sortOrder: colSortOrder,
-      sortOrders: colSortOrders,
-    },
-  ] = useColumns();
-  const [
-    ,
-    {
-      setSortOrder: sortRows,
-      sortOrder: rowSortOrder,
-      sortOrders: rowSortOrders,
-    },
-  ] = useRows();
+  const { sortColumns, sortRows, colSortOrder, rowSortOrder } = useData((s) => {
+    return {
+      sortColumns: s.setColumnSortOrder,
+      sortRows: s.setRowSortOrder,
+      colSortOrder: s.columnSortOrder,
+      rowSortOrder: s.rowSortOrder,
+    };
+  });
+  const rowSortOrders = useRowSorts();
+  const colSortOrders = useColumnSorts();
 
   const sort = dimension === "row" ? sortRows : sortColumns;
   const sortOrders = dimension === "row" ? rowSortOrders : colSortOrders;
@@ -203,17 +206,13 @@ const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
       </ContextMenuSubTrigger>
       <ContextMenu.Portal>
         <ContextMenuSubContent sideOffset={2} alignOffset={-5}>
-          {sortOrders
-            .filter((order) => order !== "Custom")
-            .map((order) => (
-              <ContextMenuItem key={order} onClick={() => sort(order)}>
-                {order
-                  .split("_")
-                  .map((s) => `${s.charAt(0).toUpperCase()}${s.slice(1)}`)
-                  .join(" ")}
-                {currentSortOrder === order && <RightSlot>✓</RightSlot>}
-              </ContextMenuItem>
-            ))}
+          {sortOrders.map((order) => (
+            <ContextMenuItem key={order.key} onClick={() => sort([order])}>
+              {order.key.charAt(0).toUpperCase()} {order.key.slice(1)}{" "}
+              {order.direction === "asc" ? "Ascending" : "Descending"}
+              {currentSortOrder.includes(order) && <RightSlot>✓</RightSlot>}
+            </ContextMenuItem>
+          ))}
         </ContextMenuSubContent>
       </ContextMenu.Portal>
     </ContextMenu.Sub>

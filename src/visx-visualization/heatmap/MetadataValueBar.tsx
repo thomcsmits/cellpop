@@ -8,8 +8,7 @@ import {
   schemePastel2,
 } from "d3";
 import React, { useCallback, useMemo } from "react";
-import { useColumns, useRows } from "../../contexts/AxisOrderContext";
-import { useData } from "../../contexts/DataContext";
+import { useColumns, useData, useRows } from "../../contexts/DataContext";
 import {
   EXPANDED_ROW_PADDING,
   useXScale,
@@ -47,28 +46,38 @@ export default function MetadataValueBar({
   const {
     data: { metadata: md },
   } = useData();
-  const rows = useRows();
-  const columns = useColumns();
-  const data = axis === "X" ? columns : rows;
   const metadata = axis === "X" ? md.cols : md.rows;
   const { scale: y } = useYScale();
   const { scale: x } = useXScale();
+  const rows = useRows();
+  const columns = useColumns();
+  const rowSort = useData((s) => s.rowSortOrder);
+  const columnSort = useData((s) => s.columnSortOrder);
+  const sortOrder = (axis === "X" ? columnSort : rowSort)[0];
+  // If the sort order is alphabetical or count, we don't want to show the metadata bar
+  const selectedMetadata = ["count", "alphabetical"].includes(sortOrder?.key)
+    ? undefined
+    : sortOrder?.key;
+  const keys = axis === "X" ? columns : rows;
   const theme = useTheme();
-
-  const keys = data[0];
-
-  const { selectedMetadata, metadataKeys } = data[1];
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
   const metadataIsNumeric = metadata
     ? keys.every((key) => {
+        if (!metadata[key]) {
+          return false;
+        }
         const value = metadata[key][selectedMetadata] as string;
         return !isNaN(parseInt(value, 10)) && !isNaN(parseFloat(value));
       })
     : false;
   const values: string[] = metadata
-    ? keys.map((key) => metadata[key][selectedMetadata] as string)
+    ? keys
+        .map((key) =>
+          key in metadata ? (metadata[key][selectedMetadata] as string) : "",
+        )
+        .filter((v) => v !== "")
     : [];
 
   const metadataValueColorScale = useMemo(() => {
@@ -141,11 +150,14 @@ export default function MetadataValueBar({
     [selectedMetadata],
   );
 
-  if (!selectedMetadata || !metadata || !metadataKeys) {
+  if (!selectedMetadata || !metadata || !keys) {
     return null;
   }
 
   const bars: BarHelper[] = keys.reduce((acc, key) => {
+    if (!(key in metadata)) {
+      return acc;
+    }
     const value = metadata[key][selectedMetadata] as string;
     if (!value) {
       console.warn("No value for key", metadata[key], selectedMetadata);

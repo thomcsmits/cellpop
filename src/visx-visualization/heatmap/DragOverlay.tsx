@@ -29,25 +29,25 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useEventCallback } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import {
   useColumnConfig,
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
 import { useParentRef } from "../../contexts/ContainerRefContext";
-import { useDataMap } from "../../contexts/DataContext";
+import { useDataHistory, useDataMap } from "../../contexts/DataContext";
 import {
   useDimensions,
   useHeatmapDimensions,
 } from "../../contexts/DimensionsContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
-import { SortOrder } from "../../hooks/useOrderedArray";
 import { Setter } from "../../utils/types";
 
 interface DragOverlayContainerProps extends PropsWithChildren {
   items: string[];
   setItems: Setter<string[]>;
-  setSort: Setter<SortOrder>;
+  resetSort: () => void;
 }
 const customCollisionDetectionAlgorithm: CollisionDetection = (args) => {
   // First, let's see if there are any collisions with the pointer
@@ -86,16 +86,18 @@ const indicatorProps = (
  * Wrapper for the heatmap which allows for dragging and dropping of rows or columns.
  * @param props.items The items to be sorted.
  * @param props.setItems Setter for the items.
- * @param props.setSort Setter for the sort order. Used to reset the sort order when custom sorting is applied.
+ * @param props.resetSort Resetter for the sort order. Used to reset the sort order when custom sorting is applied.
  * @returns
  */
 function DragOverlayContainer({
   children,
   items,
   setItems,
-  setSort,
+  resetSort,
 }: DragOverlayContainerProps) {
   const { selectedDimension } = useSelectedDimension();
+
+  const dataHistory = useDataHistory();
 
   const { scale: x } = useXScale();
   const { scale: y } = useYScale();
@@ -117,34 +119,40 @@ function DragOverlayContainer({
   const initialItemOrder = useRef<string[]>(items);
   const lastOver = useRef<string | number | null>(null);
 
-  const startDrag = useCallback(() => {
+  const startDrag = useEventCallback(() => {
+    console.log("pausing data history");
+    if (dataHistory.pastStates.length === 0) {
+      dataHistory.pastStates.push();
+    }
+    dataHistory.pause();
     initialItemOrder.current = items;
     lastOver.current = null;
-  }, [items]);
+  });
 
-  const cancelDrag = useCallback(() => {
+  const cancelDrag = useEventCallback(() => {
     startTransition(() => {
       setItems(initialItemOrder.current);
     });
-  }, [setItems]);
+    dataHistory.resume();
+    console.log("resuming data history");
+  });
 
-  const handleDrag = useCallback(
-    ({ active, over }: DragEndEvent) => {
-      if (!over || active.id === over.id || lastOver.current === over.id) {
-        return;
-      }
-
+  const handleDrag = useEventCallback(({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id || lastOver.current === over.id) {
       lastOver.current = over.id;
+      return;
+    }
+    lastOver.current = over.id;
+    const oldIndex = items.indexOf(active.id as string);
+    const newIndex = items.indexOf(over.id as string);
+    setItems(arrayMove(items, oldIndex, newIndex));
+    resetSort();
+  });
 
-      setItems((items) => {
-        const oldIndex = items.indexOf(active.id as string);
-        const newIndex = items.indexOf(over.id as string);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    },
-    [setItems, setSort],
-  );
+  const handleDragEnd = useEventCallback((e: DragEndEvent) => {
+    dataHistory.resume();
+    handleDrag(e);
+  });
 
   if (items.length === 0) {
     return children;
@@ -157,7 +165,7 @@ function DragOverlayContainer({
       onDragStart={startDrag}
       onDragCancel={cancelDrag}
       onDragMove={handleDrag}
-      onDragEnd={handleDrag}
+      onDragEnd={handleDragEnd}
       modifiers={[restrictToParentElement]}
       measuring={{
         droppable: {

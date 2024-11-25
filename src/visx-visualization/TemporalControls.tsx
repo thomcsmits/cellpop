@@ -6,6 +6,7 @@ import { useEventCallback } from "@mui/material/utils";
 
 import Button from "@mui/material/Button";
 import { useThemeHistory } from "../contexts/CellPopThemeContext";
+import { useDataHistory } from "../contexts/DataContext";
 import { useFractionHistory } from "../contexts/FractionContext";
 import { useSelectedDimensionHistory } from "../contexts/SelectedDimensionContext";
 
@@ -13,17 +14,22 @@ export function TemporalControls() {
   const themeHistory = useThemeHistory();
   const selectedDimensionHistory = useSelectedDimensionHistory();
   const fractionHistory = useFractionHistory();
+  const dataHistory = useDataHistory();
 
   const undo = useEventCallback(() => {
     themeHistory.undo();
     selectedDimensionHistory.undo();
     fractionHistory.undo();
+    console.log("undoing data", dataHistory.pastStates);
+    dataHistory.undo();
+    console.log("done undoing data", dataHistory.pastStates);
   });
 
   const restoreToDefault = useEventCallback(() => {
     themeHistory.undo(themeHistory.pastStates.length);
     selectedDimensionHistory.undo(selectedDimensionHistory.pastStates.length);
     fractionHistory.undo(fractionHistory.pastStates.length);
+    dataHistory.undo(dataHistory.pastStates.length);
   });
   return (
     <Stack direction="row" spacing={2}>

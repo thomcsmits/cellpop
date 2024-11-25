@@ -7,8 +7,7 @@ import {
   HeatmapTheme,
   heatmapThemes,
 } from "../utils/heatmap-themes";
-import { useColumns, useRows } from "./AxisOrderContext";
-import { useMaxCount } from "./DataContext";
+import { useColumns, useMaxCount, useRows } from "./DataContext";
 import { useHeatmapDimensions } from "./DimensionsContext";
 import { useSelectedValues } from "./ExpandedValuesContext";
 
@@ -58,8 +57,8 @@ export function ScaleProvider({ children }: PropsWithChildren) {
   const { set: selectedX, toggle: toggleX, reset: resetX } = useSet<string>();
 
   const expandedRows = useSelectedValues((s) => s.selectedValues);
-  const [columns] = useColumns();
-  const [rows] = useRows();
+  const rows = useRows();
+  const columns = useColumns();
 
   const [x, xExpanded, xCollapsed] = useMemo(() => {
     const scale = scaleBand<string>({

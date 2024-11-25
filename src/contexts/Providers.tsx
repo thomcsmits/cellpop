@@ -5,7 +5,6 @@ import {
   ColumnConfigProvider,
   RowConfigProvider,
 } from "./AxisConfigContext";
-import { ColumnProvider, RowProvider } from "./AxisOrderContext";
 import { CellPopThemeProvider } from "./CellPopThemeContext";
 import { DataProvider } from "./DataContext";
 import { Dimensions, DimensionsProvider } from "./DimensionsContext";
@@ -42,25 +41,21 @@ export function Providers({
       <SelectedValuesProvider initialSelectedValues={selectedValues}>
         <RowConfigProvider {...yAxisConfig}>
           <ColumnConfigProvider {...xAxisConfig}>
-            <RowProvider>
-              <ColumnProvider>
-                <TooltipDataProvider>
-                  <CellPopThemeProvider theme={theme}>
-                    <DimensionsProvider dimensions={dimensions}>
-                      <FractionProvider initialFraction={fraction}>
-                        <ScaleProvider>
-                          <SelectedDimensionProvider
-                            initialSelectedDimension={selectedDimension}
-                          >
-                            {children}
-                          </SelectedDimensionProvider>
-                        </ScaleProvider>
-                      </FractionProvider>
-                    </DimensionsProvider>
-                  </CellPopThemeProvider>
-                </TooltipDataProvider>
-              </ColumnProvider>
-            </RowProvider>
+            <TooltipDataProvider>
+              <CellPopThemeProvider theme={theme}>
+                <DimensionsProvider dimensions={dimensions}>
+                  <FractionProvider initialFraction={fraction}>
+                    <ScaleProvider>
+                      <SelectedDimensionProvider
+                        initialSelectedDimension={selectedDimension}
+                      >
+                        {children}
+                      </SelectedDimensionProvider>
+                    </ScaleProvider>
+                  </FractionProvider>
+                </DimensionsProvider>
+              </CellPopThemeProvider>
+            </TooltipDataProvider>
           </ColumnConfigProvider>
         </RowConfigProvider>
       </SelectedValuesProvider>

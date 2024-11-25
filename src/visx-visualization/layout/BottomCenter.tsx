@@ -1,7 +1,7 @@
 import React from "react";
 
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
-import { useColumns } from "../../contexts/AxisOrderContext";
+import { useColumnSortKeys, useData } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { AxisButtons } from "../heatmap/AxisButtons";
 import HeatmapXAxis from "../heatmap/HeatmapXAxis";
@@ -9,7 +9,8 @@ import MetadataValueBar from "../heatmap/MetadataValueBar";
 import VisualizationPanel, { VisualizationPanelProps } from "./Panel";
 
 export default function BottomCenterPanel({ id }: VisualizationPanelProps) {
-  const [, { setSortOrder, sortOrders }] = useColumns();
+  const setSortOrder = useData((s) => s.setColumnSortOrder);
+  const sortOrders = useColumnSortKeys();
   const flipAxisPosition = useColumnConfig((store) => store.flipAxisPosition);
   const { width, height } = usePanelDimensions("center_bottom");
   return (

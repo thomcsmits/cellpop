@@ -5,9 +5,8 @@ import {
   useColumnConfig,
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
-import { useColumns, useRows } from "../../contexts/AxisOrderContext";
 import { useSetTheme } from "../../contexts/CellPopThemeContext";
-import { useData } from "../../contexts/DataContext";
+import { useColumns, useData, useRows } from "../../contexts/DataContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 
 interface BarsProps {
@@ -63,8 +62,8 @@ export default function Bars({
       e.clientY,
     );
   };
-  const [rows] = useRows();
-  const [columns] = useColumns();
+  const rows = useRows();
+  const columns = useColumns();
   return (
     <>
       {entries.map(([key, value]) => {
