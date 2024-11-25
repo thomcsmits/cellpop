@@ -1,17 +1,11 @@
-import React, {
-  PropsWithChildren,
-  startTransition,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
+import React, { PropsWithChildren, useCallback, useMemo, useRef } from "react";
 import { ScaleBand, useXScale, useYScale } from "../../contexts/ScaleContext";
 import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
 
 import {
   CollisionDetection,
   DndContext,
-  DragEndEvent,
+  DragOverEvent,
   KeyboardSensor,
   MeasuringStrategy,
   PointerSensor,
@@ -86,18 +80,18 @@ const indicatorProps = (
  * Wrapper for the heatmap which allows for dragging and dropping of rows or columns.
  * @param props.items The items to be sorted.
  * @param props.setItems Setter for the items.
- * @param props.resetSort Resetter for the sort order. Used to reset the sort order when custom sorting is applied.
  * @returns
  */
 function DragOverlayContainer({
   children,
   items,
   setItems,
-  resetSort,
 }: DragOverlayContainerProps) {
   const { selectedDimension } = useSelectedDimension();
 
   const dataHistory = useDataHistory();
+
+  const hasPastStates = dataHistory.pastStates.length > 0;
 
   const { scale: x } = useXScale();
   const { scale: y } = useYScale();
@@ -120,24 +114,20 @@ function DragOverlayContainer({
   const lastOver = useRef<string | number | null>(null);
 
   const startDrag = useEventCallback(() => {
-    console.log("pausing data history");
-    if (dataHistory.pastStates.length === 0) {
-      dataHistory.pastStates.push();
-    }
-    dataHistory.pause();
     initialItemOrder.current = items;
     lastOver.current = null;
+
+    if (hasPastStates) {
+      dataHistory.pause();
+    }
   });
 
   const cancelDrag = useEventCallback(() => {
-    startTransition(() => {
-      setItems(initialItemOrder.current);
-    });
+    setItems(initialItemOrder.current);
     dataHistory.resume();
-    console.log("resuming data history");
   });
 
-  const handleDrag = useEventCallback(({ active, over }: DragEndEvent) => {
+  const handleDrag = useEventCallback(({ active, over }: DragOverEvent) => {
     if (!over || active.id === over.id || lastOver.current === over.id) {
       lastOver.current = over.id;
       return;
@@ -145,13 +135,16 @@ function DragOverlayContainer({
     lastOver.current = over.id;
     const oldIndex = items.indexOf(active.id as string);
     const newIndex = items.indexOf(over.id as string);
+
+    if (hasPastStates) {
+      dataHistory.pause();
+    }
     setItems(arrayMove(items, oldIndex, newIndex));
-    resetSort();
   });
 
-  const handleDragEnd = useEventCallback((e: DragEndEvent) => {
+  const handleDragEnd = useEventCallback(() => {
     dataHistory.resume();
-    handleDrag(e);
+    setItems(items);
   });
 
   if (items.length === 0) {

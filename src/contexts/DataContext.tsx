@@ -35,24 +35,86 @@ interface DataContextState {
 }
 
 interface DataContextActions {
+  /**
+   * Restores the removed rows to the visualization.
+   */
   resetRemovedRows: () => void;
+  /**
+   * Restores the removed columns to the visualization.
+   */
   resetRemovedColumns: () => void;
+  /**
+   * Removes a row from the visualization and updates counts accordingly.
+   * @param row the row to remove
+   */
   removeRow: (row: string) => void;
+  /**
+   * Removes a column from the visualization and updates counts accordingly.
+   * @param column the column to remove
+   * @returns
+   */
   removeColumn: (column: string) => void;
+  /**
+   * Expands a row to show it as a bar chart.
+   */
   expandRow: (row: string) => void;
+  /**
+   * Collapses the row to hide the bar chart and restore the heatmap view
+   */
   collapseRow: (row: string) => void;
+  /**
+   * Collapses all rows to hide the bar charts and restore the heatmap view
+   */
   resetExpandedRows: () => void;
+  /**
+   * Sets the sort order for the rows and updates the row order accordingly.
+   */
   setRowSortOrder: (sortOrder: SortOrder<string>[]) => void;
+  /**
+   * Sets the sort order for the columns and updates the column order accordingly.
+   */
   setColumnSortOrder: (sortOrder: SortOrder<string>[]) => void;
+  /**
+   * Adds a sort order to the rows and updates the row order accordingly.
+   */
   addRowSortOrder: (sortOrder: SortOrder<string>) => void;
+  /**
+   * Adds a sort order to the columns and updates the column order accordingly.
+   */
   addColumnSortOrder: (sortOrder: SortOrder<string>) => void;
+  /**
+   * Updates a sort order for the rows at a given index and updates the row order accordingly.
+   * e.g. toggling the direction of the sort order or switching to a different metadata key.
+   */
   editRowSortOrder: (index: number, sortOrder: SortOrder<string>) => void;
+  /**
+   * Updates a sort order for the columns at a given index and updates the column order accordingly.
+   * e.g. toggling the direction of the sort order or switching to a different metadata key.
+   */
   editColumnSortOrder: (index: number, sortOrder: SortOrder<string>) => void;
+  /**
+   * Removes the sort order for the rows at a given index and updates the row order accordingly.
+   */
   removeRowSortOrder: (index: number) => void;
+  /**
+   * Removes the sort order for the columns at a given index and updates the column order accordingly.
+   */
   removeColumnSortOrder: (index: number) => void;
+  /**
+   * Removes all sort orders for the rows.
+   */
   clearRowSortOrder: () => void;
+  /**
+   * Removes all sort orders for the columns.
+   */
   clearColumnSortOrder: () => void;
+  /**
+   * Updates the order of the rows and clears the current sort orders.
+   */
   setRowOrder: (order: string[]) => void;
+  /**
+   * Updates the order of the columns and clears the current sort orders.
+   */
   setColumnOrder: (order: string[]) => void;
 }
 
@@ -252,10 +314,10 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
         set({ columnSortOrder: [] });
       },
       setRowOrder: (order: string[]) => {
-        set({ rowOrder: order });
+        set({ rowOrder: order, rowSortOrder: [] });
       },
       setColumnOrder: (order: string[]) => {
-        set({ columnOrder: order });
+        set({ columnOrder: order, columnSortOrder: [] });
       },
     })),
   );
