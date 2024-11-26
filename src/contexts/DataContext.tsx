@@ -27,7 +27,6 @@ interface DataContextState {
   data: CellPopData;
   removedRows: Set<string>;
   removedColumns: Set<string>;
-  expandedRows: Set<string>;
   rowOrder: string[];
   columnOrder: string[];
   rowSortOrder: SortOrder<string>[];
@@ -54,18 +53,17 @@ interface DataContextActions {
    * @returns
    */
   removeColumn: (column: string) => void;
+
   /**
-   * Expands a row to show it as a bar chart.
+   * Restores a row to the visualization.
+   * @param row the row to restore
    */
-  expandRow: (row: string) => void;
+  restoreRow: (row: string) => void;
   /**
-   * Collapses the row to hide the bar chart and restore the heatmap view
+   * Restores a column to the visualization.
+   * @param column the column to restore
    */
-  collapseRow: (row: string) => void;
-  /**
-   * Collapses all rows to hide the bar charts and restore the heatmap view
-   */
-  resetExpandedRows: () => void;
+  restoreColumn: (column: string) => void;
   /**
    * Sets the sort order for the rows and updates the row order accordingly.
    */
@@ -173,7 +171,6 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
       data: initialData,
       removedRows: new Set<string>(),
       removedColumns: new Set<string>(),
-      expandedRows: new Set<string>(),
       rowSortOrder: [] as SortOrder<RowKey>[],
       columnSortOrder: [] as SortOrder<ColumnKey>[],
       rowOrder: initialData.rowNames,
@@ -198,23 +195,21 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
           return { removedColumns };
         });
       },
-      expandRow: (row: string) => {
+      restoreRow: (row: string) => {
         set((state) => {
-          const expandedRows = new Set(state.expandedRows);
-          expandedRows.add(row);
-          return { expandedRows };
+          const removedRows = new Set(state.removedRows);
+          removedRows.delete(row);
+          return { removedRows };
         });
       },
-      collapseRow: (row: string) => {
+      restoreColumn: (column: string) => {
         set((state) => {
-          const expandedRows = new Set(state.expandedRows);
-          expandedRows.delete(row);
-          return { expandedRows };
+          const removedColumns = new Set(state.removedColumns);
+          removedColumns.delete(column);
+          return { removedColumns };
         });
       },
-      resetExpandedRows: () => {
-        set({ expandedRows: new Set<string>() });
-      },
+
       setColumnSortOrder: (sortOrder: SortOrder<ColumnKey>[]) => {
         const columnOrder = applySortOrders(
           initialData.colNames,
@@ -468,24 +463,12 @@ export const useMaxCount = () => {
   return useData(getDerivedStatesMemo).maxCount;
 };
 
-export const useAllRowNames = () => {
+export const useRows = () => {
   return useData(getRowNames);
 };
 
-export const useAllColumnNames = () => {
-  return useData(getColumnNames);
-};
-
-export const useRows = () => {
-  const rowNames = useAllRowNames();
-  const { removedRows } = useData();
-  return rowNames.filter((row) => !removedRows.has(row));
-};
-
 export const useColumns = () => {
-  const columnNames = useAllColumnNames();
-  const { removedColumns } = useData();
-  return columnNames.filter((column) => !removedColumns.has(column));
+  return useData(getColumnNames);
 };
 
 export const useAvailableRowSorts = () => {

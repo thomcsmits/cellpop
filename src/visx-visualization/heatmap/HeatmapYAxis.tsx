@@ -9,13 +9,9 @@ import { scaleLinear } from "@visx/scale";
 import { Text } from "@visx/text";
 import React, { useId } from "react";
 import { AxisConfig, useRowConfig } from "../../contexts/AxisConfigContext";
-import {
-  useData,
-  useRowCounts,
-  useRowMaxes,
-  useRows,
-} from "../../contexts/DataContext";
+import { useRowCounts, useRowMaxes, useRows } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
+import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { EXPANDED_ROW_PADDING, useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
@@ -27,7 +23,7 @@ import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
  */
 export default function HeatmapYAxis() {
   const theme = useTheme();
-  const selectedValues = useData((s) => s.expandedRows);
+  const selectedValues = useSelectedValues((s) => s.selectedValues);
   const { scale: y, tickLabelSize, setTickLabelSize } = useYScale();
   const axisConfig = useRowConfig();
   const { label, flipAxisPosition } = axisConfig;
@@ -124,7 +120,7 @@ function ExpandedRowTick({
   axisConfig: AxisConfig;
 } & ReturnType<typeof useHeatmapAxis>) {
   const { expandedSize } = useYScale();
-  const selectedValues = useData((s) => s.expandedRows);
+  const selectedValues = useSelectedValues((s) => s.selectedValues);
   const { flipAxisPosition } = axisConfig;
   const rowMaxes = useRowMaxes();
 

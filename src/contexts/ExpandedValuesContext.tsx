@@ -33,5 +33,6 @@ const createSelectedValuesContext = ({
 
 export const [SelectedValuesProvider, useSelectedValues] = createStoreContext<
   SelectedValuesStore,
-  SelectedValuesContextProps
->(createSelectedValuesContext, "SelectedValuesContext");
+  SelectedValuesContextProps,
+  true
+>(createSelectedValuesContext, "SelectedValuesContext", true);
