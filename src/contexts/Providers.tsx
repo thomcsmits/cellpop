@@ -1,3 +1,4 @@
+import { Theme } from "@mui/material";
 import React, { PropsWithChildren } from "react";
 import { CellPopData, CellPopTheme } from "../cellpop-schema";
 import {
@@ -23,6 +24,7 @@ interface CellPopConfigProps extends PropsWithChildren {
   selectedDimension?: "X" | "Y";
   fraction?: boolean;
   selectedValues?: string[];
+  customTheme?: Theme;
 }
 
 export function Providers({
@@ -35,6 +37,7 @@ export function Providers({
   selectedDimension = "X",
   xAxis: xAxisConfig,
   yAxis: yAxisConfig,
+  customTheme,
 }: CellPopConfigProps) {
   return (
     <DataProvider initialData={data}>
@@ -42,7 +45,7 @@ export function Providers({
         <RowConfigProvider {...yAxisConfig}>
           <ColumnConfigProvider {...xAxisConfig}>
             <TooltipDataProvider>
-              <CellPopThemeProvider theme={theme}>
+              <CellPopThemeProvider theme={theme} customTheme={customTheme}>
                 <DimensionsProvider dimensions={dimensions}>
                   <FractionProvider initialFraction={fraction}>
                     <ScaleProvider>

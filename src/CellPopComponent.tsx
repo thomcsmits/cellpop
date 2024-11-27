@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 
+import { Theme } from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
 import { withParentSize, WithParentSizeProvidedProps } from "@visx/responsive";
 import { CellPopData, CellPopTheme } from "./cellpop-schema";
@@ -15,6 +16,7 @@ interface CellPopConfig {
   onClick?: (e: React.MouseEvent) => void;
   dimensions?: Dimensions;
   theme?: CellPopTheme;
+  customTheme?: Theme;
 }
 
 export interface CellPopProps
@@ -35,6 +37,7 @@ export const CellPop = withParentSize(
     onClick,
     parentHeight,
     parentWidth,
+    customTheme,
   }: CellPopProps) => {
     // If dimensions are provided, use them.
     // Otherwise, fall back to using parentWidth and parentHeight.
@@ -66,6 +69,7 @@ export const CellPop = withParentSize(
           data={data}
           dimensions={dimensions}
           theme={theme}
+          customTheme={customTheme}
           xAxis={xAxis}
           yAxis={yAxis}
         >

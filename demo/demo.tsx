@@ -3,6 +3,9 @@ import { CellPop } from "../src/CellPopComponent";
 import { CellPopData } from "../src/cellpop-schema";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
 
+import ScatterPlot from "@mui/icons-material/ScatterPlot";
+import TableChartIcon from "@mui/icons-material/TableChartRounded";
+
 function Demo() {
   const [data, setData] = useState<CellPopData>();
 
@@ -73,12 +76,22 @@ function Demo() {
           createHref: (row) =>
             `https://portal.hubmapconsortium.org/browse/${row}`,
           flipAxisPosition: true,
+          createSubtitle: (value, metadataValues) => {
+            const anatomy = metadataValues["anatomy"];
+            const datasetType = metadataValues["dataset_type"];
+            return `${anatomy} | ${datasetType}`;
+          },
+          icon: <TableChartIcon />,
         }}
         xAxis={{
           label: "Cell Type",
           createHref: (col) =>
             `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`,
           flipAxisPosition: true,
+          createSubtitle: (value, metadataValues) => {
+            return metadataValues["Cell Ontology Label"];
+          },
+          icon: <ScatterPlot />,
         }}
       />
     </div>

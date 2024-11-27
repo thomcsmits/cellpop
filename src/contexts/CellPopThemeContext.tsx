@@ -2,7 +2,7 @@ import React, { PropsWithChildren, useMemo } from "react";
 import { createStore } from "zustand";
 import { CellPopTheme } from "../cellpop-schema";
 
-import { ThemeProvider } from "@mui/material/styles";
+import { Theme, ThemeProvider } from "@mui/material/styles";
 import { temporal } from "zundo";
 import { createStoreContext } from "../utils/zustand";
 import { getTheme } from "../visualization/theme";
@@ -53,19 +53,26 @@ export { useSetTheme, useThemeHistory };
 export function CellPopThemeProvider({
   children,
   theme: initialTheme,
-}: PropsWithChildren<{ theme: CellPopTheme }>) {
+  customTheme,
+}: PropsWithChildren<{ theme: CellPopTheme; customTheme?: Theme }>) {
   return (
     <ThemeSetterContextProvider initialTheme={initialTheme}>
-      <MuiThemeProvider>{children}</MuiThemeProvider>
+      <MuiThemeProvider customTheme={customTheme}>{children}</MuiThemeProvider>
     </ThemeSetterContextProvider>
   );
 }
 
-function MuiThemeProvider({ children }: PropsWithChildren) {
+function MuiThemeProvider({
+  children,
+  customTheme,
+}: PropsWithChildren<{ customTheme?: Theme }>) {
   const { currentTheme } = useSetTheme();
   const theme = useMemo(() => {
+    if (customTheme) {
+      return { ...getTheme(currentTheme), ...customTheme };
+    }
     return getTheme(currentTheme);
-  }, [currentTheme]);
+  }, [currentTheme, customTheme]);
 
   return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }

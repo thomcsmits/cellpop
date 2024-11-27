@@ -118,7 +118,10 @@ export function SortControls() {
 
   return (
     <Accordion defaultExpanded>
-      <AccordionSummary expandIcon={<ExpandMoreRounded />}>
+      <AccordionSummary
+        expandIcon={<ExpandMoreRounded />}
+        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+      >
         <Sort />
         <Typography variant="subtitle1">Sorts</Typography>
       </AccordionSummary>

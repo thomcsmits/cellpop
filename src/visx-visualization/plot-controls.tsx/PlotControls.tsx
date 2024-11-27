@@ -56,7 +56,9 @@ function PlotControlSection({
 function PlotControls({ onClose }: PlotControlsProps) {
   const [selectedTab, setSelectedTab] = useState<PlotControlsSection>("Column");
   const columnLabel = useColumnConfig((s) => s.label);
+  const columnIcon = useColumnConfig((s) => s.icon);
   const rowLabel = useRowConfig((s) => s.label);
+  const rowIcon = useRowConfig((s) => s.icon);
 
   return (
     <Stack spacing={2} padding={2} direction="column">
@@ -78,8 +80,18 @@ function PlotControls({ onClose }: PlotControlsProps) {
         value={selectedTab}
         onChange={(_e, value) => setSelectedTab(value)}
       >
-        <Tab label={`Column: ${columnLabel}`} value="Column" />
-        <Tab label={`Row: ${rowLabel}`} value="Row" />
+        <Tab
+          label={`Column: ${columnLabel}`}
+          value="Column"
+          icon={columnIcon}
+          iconPosition="start"
+        />
+        <Tab
+          label={`Row: ${rowLabel}`}
+          value="Row"
+          icon={rowIcon}
+          iconPosition="start"
+        />
       </Tabs>
       <PlotControlSection value="Column" selectedValue={selectedTab} />
       <PlotControlSection value="Row" selectedValue={selectedTab} />

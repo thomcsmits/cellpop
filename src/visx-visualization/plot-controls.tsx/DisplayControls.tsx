@@ -28,12 +28,17 @@ import {
   Box,
   FormControl,
   Icon,
+  Stack,
   Switch,
   TextField,
   Typography,
   useEventCallback,
 } from "@mui/material";
 import React, { ChangeEvent, useState } from "react";
+import {
+  useColumnConfig,
+  useRowConfig,
+} from "../../contexts/AxisConfigContext";
 import { useData } from "../../contexts/DataContext";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { usePlotControlsContext } from "./PlotControlsContext";
@@ -98,7 +103,7 @@ export function DisplayControls() {
     <Accordion defaultExpanded>
       <AccordionSummary
         expandIcon={<ExpandMoreRounded />}
-        sx={{ alignItems: "center", gap: 1 }}
+        sx={{ display: "flex", alignItems: "center", gap: 1 }}
       >
         <Visibility />
         <Typography variant="subtitle1">Display Options</Typography>
@@ -132,14 +137,14 @@ export function DisplayControls() {
                 gridTemplateRows: "auto",
               }}
             >
-              <Box gridRow={1} gridColumn={1} />
-              <Box gridRow={1} gridColumn={2}>
+              <Typography component="label" gridRow={1} gridColumn={1} />
+              <Typography component="label" gridRow={1} gridColumn={2}>
                 Visible
-              </Box>
+              </Typography>
               {canBeEmbedded && (
-                <Box gridRow={1} gridColumn={3}>
+                <Typography component="label" gridRow={1} gridColumn={3}>
                   Embedded
-                </Box>
+                </Typography>
               )}
               {filteredItems.map((item) => (
                 <DisplayItem key={item} item={item} />
@@ -178,11 +183,24 @@ const useToggleExpansion = () => {
   return handleChange;
 };
 
+const useSubtitleFunction = () => {
+  const rowSubtitle = useRowConfig((s) => s.createSubtitle) ?? (() => "");
+  const columnSubtitle = useColumnConfig((s) => s.createSubtitle) ?? (() => "");
+  const section = usePlotControlsContext();
+  return section === "Column" ? columnSubtitle : rowSubtitle;
+};
+
 function DisplayItem({ item }: { item: string }) {
   const section = usePlotControlsContext();
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: item });
 
+  const createSubtitle = useSubtitleFunction();
+  const metadata = useData((s) =>
+    section === "Column" ? s.data.metadata.cols : s.data.metadata.rows,
+  );
+
+  const subtitle = createSubtitle(item, metadata[item]);
   const canBeEmbedded = useCanBeEmbedded();
 
   const style = {
@@ -220,7 +238,10 @@ function DisplayItem({ item }: { item: string }) {
         }}
       >
         <Icon component={DragHandle} {...attributes} {...listeners} />
-        <Typography variant="subtitle2">{item}</Typography>
+        <Stack>
+          <Typography variant="subtitle2">{item}</Typography>
+          {subtitle && <Typography variant="body2">{subtitle}</Typography>}
+        </Stack>
       </Box>
       <Box gridColumn={2}>
         <Switch

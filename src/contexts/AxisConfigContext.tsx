@@ -6,6 +6,11 @@ export interface AxisConfig {
   label: string;
   createHref?: (tick: string) => string;
   flipAxisPosition?: boolean;
+  createSubtitle?: (
+    value: string,
+    metadataValues: Record<string, string>,
+  ) => string;
+  icon?: React.ReactElement<unknown>;
 }
 
 interface AxisConfigActions {
@@ -29,7 +34,7 @@ const createAxisConfigStore = (initialArgs: AxisConfig) => {
   );
 };
 
-const [
+export const [
   [RowConfigProvider, useRowConfig, , useRowConfigHistory],
   [ColumnConfigProvider, useColumnConfig, , useColumnConfigHistory],
 ] = ["Row", "Column"].map((direction) =>
@@ -39,13 +44,3 @@ const [
     true,
   ),
 );
-
-export {
-  ColumnConfigProvider,
-  RowConfigProvider,
-  useColumnConfig,
-  useColumnConfigHistory,
-  useRowConfig,
-  useRowConfigHistory
-};
-
