@@ -8,6 +8,7 @@ interface SelectedValuesContextProps {
 interface SelectedValuesStore {
   selectedValues: Set<string>;
   toggleValue: (value: string) => void;
+  reset: () => void;
 }
 
 const createSelectedValuesContext = ({
@@ -27,12 +28,18 @@ const createSelectedValuesContext = ({
           return { selectedValues };
         });
       },
+      reset: () => set({ selectedValues: new Set() }),
     })),
   );
 };
 
-export const [SelectedValuesProvider, useSelectedValues] = createStoreContext<
-  SelectedValuesStore,
-  SelectedValuesContextProps,
-  true
->(createSelectedValuesContext, "SelectedValuesContext", true);
+export const [
+  SelectedValuesProvider,
+  useSelectedValues,
+  ,
+  useExpandedValuesHistory,
+] = createStoreContext<SelectedValuesStore, SelectedValuesContextProps, true>(
+  createSelectedValuesContext,
+  "SelectedValuesContext",
+  true,
+);

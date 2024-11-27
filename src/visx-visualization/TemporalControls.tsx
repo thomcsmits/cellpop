@@ -9,6 +9,7 @@ import { TemporalState } from "zundo";
 import { StoreApi } from "zustand";
 import { useThemeHistory } from "../contexts/CellPopThemeContext";
 import { useDataHistory } from "../contexts/DataContext";
+import { useExpandedValuesHistory } from "../contexts/ExpandedValuesContext";
 import { useFractionHistory } from "../contexts/FractionContext";
 import { useSelectedDimensionHistory } from "../contexts/SelectedDimensionContext";
 
@@ -18,31 +19,27 @@ function useTemporalActions() {
   const selectedDimensionHistory = useSelectedDimensionHistory();
   const fractionHistory = useFractionHistory();
   const dataHistory = useDataHistory();
+  const expandedHistory = useExpandedValuesHistory();
+
   const undoQueue = useRef<TemporalState<StoreApi<unknown>>[]>([]);
   const redoQueue = useRef<TemporalState<StoreApi<unknown>>[]>([]);
 
   useEffect(() => {
-    themeHistory.setOnSave(() => {
-      undoQueue.current.push(themeHistory);
+    const onSave = (state: TemporalState<StoreApi<unknown>>) => () => {
+      undoQueue.current.push(state);
       redoQueue.current = [];
-    });
-    selectedDimensionHistory.setOnSave(() => {
-      undoQueue.current.push(selectedDimensionHistory);
-      redoQueue.current = [];
-    });
-    fractionHistory.setOnSave(() => {
-      undoQueue.current.push(fractionHistory);
-      redoQueue.current = [];
-    });
-    dataHistory.setOnSave(() => {
-      undoQueue.current.push(dataHistory);
-      redoQueue.current = [];
-    });
+    };
+    themeHistory.setOnSave(onSave(themeHistory));
+    selectedDimensionHistory.setOnSave(onSave(selectedDimensionHistory));
+    fractionHistory.setOnSave(onSave(fractionHistory));
+    dataHistory.setOnSave(onSave(dataHistory));
+    expandedHistory.setOnSave(onSave(expandedHistory));
     return () => {
       themeHistory.setOnSave(undefined);
       selectedDimensionHistory.setOnSave(undefined);
       fractionHistory.setOnSave(undefined);
       dataHistory.setOnSave(undefined);
+      expandedHistory.setOnSave(undefined);
     };
   }, []);
 
@@ -67,6 +64,7 @@ function useTemporalActions() {
     selectedDimensionHistory.undo(selectedDimensionHistory.pastStates.length);
     fractionHistory.undo(fractionHistory.pastStates.length);
     dataHistory.undo(dataHistory.pastStates.length);
+    expandedHistory.undo(expandedHistory.pastStates.length);
     undoQueue.current = [];
     redoQueue.current = [];
   });

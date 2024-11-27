@@ -13,6 +13,7 @@ import {
   useMoveRowToStart,
   useRowSorts,
 } from "../../contexts/DataContext";
+import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import {
   useSetTooltipData,
   useTooltipData,
@@ -100,8 +101,8 @@ const ExpandRow = () => {
     tooltipData: { data },
   } = useTooltipData();
   const label = useRowConfig((store) => store.label);
-  const expandRow = useData((store) => store.expandRow);
-  const expandedRows = useData((store) => store.expandedRows);
+  const expandRow = useSelectedValues((s) => s.toggleValue);
+  const expandedRows = useSelectedValues((s) => s.selectedValues);
   const { closeContextMenu } = useSetTooltipData();
 
   if (!data[label] || expandedRows.has(data[label] as string)) {
@@ -121,8 +122,8 @@ const ExpandRow = () => {
 };
 
 const CollapseRows = () => {
-  const expandedRows = useData((store) => store.expandedRows);
-  const reset = useData((store) => store.resetExpandedRows);
+  const expandedRows = useSelectedValues((s) => s.selectedValues);
+  const reset = useSelectedValues((s) => s.reset);
   if (expandedRows.size === 0) {
     return null;
   }
