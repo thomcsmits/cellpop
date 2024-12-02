@@ -56,8 +56,8 @@ export default function VisualizationPanelResizer({
       data-orientation={orientation}
       onMouseDown={onMouseDown}
       style={{
-        // Offset by 5px to align the handle with the edge of the panel
-        [positionKey]: `${position - 5}px`,
+        // Offset by 3px to align the center of the handle with the edge of the panel
+        [positionKey]: `${position - 3}px`,
       }}
     />
   );

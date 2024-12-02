@@ -22,11 +22,21 @@ const DimensionsContext = createContext<DimensionsContextType | null>(
   "CellPopDimensions",
 );
 
-type GridSizeTuple = [number, number, number];
+export type GridSizeTuple = [number, number, number];
+
+export const INITIAL_PROPORTIONS: GridSizeTuple = [0.3, 0.4, 0.3];
 
 // Helper function to get the initial size of the panels
-function getInitialSize(total: number) {
-  return [0.3 * total, 0.4 * total, 0.3 * total] as GridSizeTuple;
+function getInitialSize(
+  total: number,
+  initialProportions: GridSizeTuple = INITIAL_PROPORTIONS,
+): GridSizeTuple {
+  return initialProportions.map((prop) => total * prop) as GridSizeTuple;
+}
+
+interface DimensionsProviderProps extends PropsWithChildren {
+  dimensions: Dimensions;
+  initialProportions?: [GridSizeTuple, GridSizeTuple];
 }
 
 /**
@@ -36,12 +46,16 @@ function getInitialSize(total: number) {
 export function DimensionsProvider({
   children,
   dimensions: { width, height },
-}: PropsWithChildren<{ dimensions: Dimensions }>) {
+  initialProportions: [initialColumnProportions, initialRowProportions] = [
+    INITIAL_PROPORTIONS,
+    INITIAL_PROPORTIONS,
+  ],
+}: DimensionsProviderProps) {
   const [columnSizes, setColumnSizes] = useState<GridSizeTuple>(
-    getInitialSize(width),
+    getInitialSize(width, initialColumnProportions),
   );
   const [rowSizes, setRowSizes] = useState<GridSizeTuple>(
-    getInitialSize(height),
+    getInitialSize(height, initialRowProportions),
   );
 
   const resize = useCallback(

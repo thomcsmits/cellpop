@@ -103,9 +103,11 @@ export function DisplayControls() {
     item.toLowerCase().includes(search.toLowerCase()),
   );
 
+  const section = usePlotControlsContext();
+
   return (
     <Accordion
-      id={`display-options-${usePlotControlsContext()}`}
+      id={`display-options-${section}`}
       defaultExpanded
       elevation={0}
       disableGutters
@@ -155,13 +157,32 @@ export function DisplayControls() {
                   : "1fr auto",
                 gridTemplateRows: "auto",
               }}
+              role="list"
             >
-              <Typography component="label" gridRow={1} gridColumn={1} />
-              <Typography component="label" gridRow={1} gridColumn={2}>
+              <Typography
+                component="label"
+                gridRow={1}
+                gridColumn={1}
+                aria-label={`${section} name and description`}
+                role="columnheader"
+              />
+              <Typography
+                component="label"
+                variant="subtitle1"
+                gridRow={1}
+                gridColumn={2}
+                role="columnheader"
+              >
                 Visible
               </Typography>
               {canBeEmbedded && (
-                <Typography component="label" gridRow={1} gridColumn={3}>
+                <Typography
+                  component="label"
+                  variant="subtitle1"
+                  gridRow={1}
+                  gridColumn={3}
+                  role="columnheader"
+                >
                   Embedded
                 </Typography>
               )}
@@ -238,6 +259,7 @@ function DisplayItem({ item }: { item: string }) {
     <Box
       style={style}
       ref={setNodeRef}
+      role="listitem"
       sx={{
         display: "grid",
         gap: 1,
@@ -251,7 +273,7 @@ function DisplayItem({ item }: { item: string }) {
         sx={{
           display: "inline-flex",
           flexDirection: "row",
-          alignItems: "center",
+          alignItems: "start",
           spacing: 1,
           gridColumn: 1,
         }}

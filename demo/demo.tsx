@@ -5,6 +5,7 @@ import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
 
 import ScatterPlot from "@mui/icons-material/ScatterPlot";
 import TableChartIcon from "@mui/icons-material/TableChartRounded";
+import { GridSizeTuple } from "../src/contexts/DimensionsContext";
 
 function Demo() {
   const [data, setData] = useState<CellPopData>();
@@ -67,6 +68,11 @@ function Demo() {
         width: "95vw",
         height: "95vh",
       }}
+      // style={{
+      //   width: "70vw",
+      //   height: "70vh",
+      //   margin: "auto",
+      // }}
     >
       <CellPop
         data={data}
@@ -93,6 +99,10 @@ function Demo() {
           },
           icon: <ScatterPlot />,
         }}
+        initialProportions={[
+          [0.5, 0.5, 0] as GridSizeTuple,
+          [0.5, 0.5, 0] as GridSizeTuple,
+        ]}
       />
     </div>
   );

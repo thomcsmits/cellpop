@@ -5,7 +5,7 @@ import Skeleton from "@mui/material/Skeleton";
 import { withParentSize, WithParentSizeProvidedProps } from "@visx/responsive";
 import { CellPopData, CellPopTheme } from "./cellpop-schema";
 import { AxisConfig } from "./contexts/AxisConfigContext";
-import { Dimensions } from "./contexts/DimensionsContext";
+import { Dimensions, GridSizeTuple } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
 import Controls from "./visx-visualization/Controls";
 import VizContainer from "./visx-visualization/layout";
@@ -20,6 +20,7 @@ interface CellPopConfig {
   theme?: CellPopTheme;
   customTheme?: Theme;
   disabledControls?: DisableableControls[];
+  initialProportions?: [GridSizeTuple, GridSizeTuple];
 }
 
 export interface CellPopProps
@@ -42,6 +43,7 @@ export const CellPop = withParentSize(
     parentWidth,
     customTheme,
     disabledControls,
+    initialProportions,
   }: CellPopProps) => {
     // If dimensions are provided, use them.
     // Otherwise, fall back to using parentWidth and parentHeight.
@@ -77,6 +79,7 @@ export const CellPop = withParentSize(
           xAxis={xAxis}
           yAxis={yAxis}
           disabledControls={disabledControls}
+          initialProportions={initialProportions}
         >
           <Controls />
           <VizContainer />

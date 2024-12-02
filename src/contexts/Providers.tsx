@@ -8,7 +8,12 @@ import {
 } from "./AxisConfigContext";
 import { CellPopThemeProvider } from "./CellPopThemeContext";
 import { DataProvider } from "./DataContext";
-import { Dimensions, DimensionsProvider } from "./DimensionsContext";
+import {
+  Dimensions,
+  DimensionsProvider,
+  GridSizeTuple,
+  INITIAL_PROPORTIONS,
+} from "./DimensionsContext";
 import {
   DisableableControls,
   DisabledControlProvider,
@@ -30,6 +35,7 @@ interface CellPopConfigProps extends PropsWithChildren {
   selectedValues?: string[];
   customTheme?: Theme;
   disabledControls?: DisableableControls[];
+  initialProportions?: [GridSizeTuple, GridSizeTuple];
 }
 
 export function Providers({
@@ -44,6 +50,7 @@ export function Providers({
   yAxis: yAxisConfig,
   customTheme,
   disabledControls = [],
+  initialProportions = [INITIAL_PROPORTIONS, INITIAL_PROPORTIONS],
 }: CellPopConfigProps) {
   return (
     <DisabledControlProvider disabledControls={disabledControls}>
@@ -53,7 +60,10 @@ export function Providers({
             <ColumnConfigProvider {...xAxisConfig}>
               <TooltipDataProvider>
                 <CellPopThemeProvider theme={theme} customTheme={customTheme}>
-                  <DimensionsProvider dimensions={dimensions}>
+                  <DimensionsProvider
+                    dimensions={dimensions}
+                    initialProportions={initialProportions}
+                  >
                     <FractionProvider initialFraction={fraction}>
                       <ScaleProvider>
                         <SelectedDimensionProvider
