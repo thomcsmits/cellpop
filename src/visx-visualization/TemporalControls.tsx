@@ -9,6 +9,7 @@ import { TemporalState } from "zundo";
 import { StoreApi } from "zustand";
 import { useThemeHistory } from "../contexts/CellPopThemeContext";
 import { useDataHistory } from "../contexts/DataContext";
+import { useThemeControlIsDisabled } from "../contexts/DisabledControlProvider";
 import { useExpandedValuesHistory } from "../contexts/ExpandedValuesContext";
 import { useFractionHistory } from "../contexts/FractionContext";
 import { useSelectedDimensionHistory } from "../contexts/SelectedDimensionContext";
@@ -21,6 +22,10 @@ function useTemporalActions() {
   const dataHistory = useDataHistory();
   const expandedHistory = useExpandedValuesHistory();
 
+  const themeIsDisabled = useThemeControlIsDisabled();
+  const selectedDimensionIsDisabled = useThemeControlIsDisabled();
+  const fractionIsDisabled = useThemeControlIsDisabled();
+
   const undoQueue = useRef<TemporalState<StoreApi<unknown>>[]>([]);
   const redoQueue = useRef<TemporalState<StoreApi<unknown>>[]>([]);
 
@@ -29,9 +34,15 @@ function useTemporalActions() {
       undoQueue.current.push(state);
       redoQueue.current = [];
     };
-    themeHistory.setOnSave(onSave(themeHistory));
-    selectedDimensionHistory.setOnSave(onSave(selectedDimensionHistory));
-    fractionHistory.setOnSave(onSave(fractionHistory));
+    if (!themeIsDisabled) {
+      themeHistory.setOnSave(onSave(themeHistory));
+    }
+    if (!selectedDimensionIsDisabled) {
+      selectedDimensionHistory.setOnSave(onSave(selectedDimensionHistory));
+    }
+    if (!fractionIsDisabled) {
+      fractionHistory.setOnSave(onSave(fractionHistory));
+    }
     dataHistory.setOnSave(onSave(dataHistory));
     expandedHistory.setOnSave(onSave(expandedHistory));
     return () => {
@@ -41,7 +52,7 @@ function useTemporalActions() {
       dataHistory.setOnSave(undefined);
       expandedHistory.setOnSave(undefined);
     };
-  }, []);
+  }, [themeIsDisabled, selectedDimensionIsDisabled, fractionIsDisabled]);
 
   const undo = useEventCallback(() => {
     const last = undoQueue.current.pop();

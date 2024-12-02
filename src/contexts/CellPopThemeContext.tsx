@@ -6,6 +6,7 @@ import { Theme, ThemeProvider } from "@mui/material/styles";
 import { temporal } from "zundo";
 import { createStoreContext } from "../utils/zustand";
 import { getTheme } from "../visualization/theme";
+import { useThemeControlIsDisabled } from "./DisabledControlProvider";
 
 interface InitialThemeSetterState {
   initialTheme?: CellPopTheme;
@@ -55,8 +56,12 @@ export function CellPopThemeProvider({
   theme: initialTheme,
   customTheme,
 }: PropsWithChildren<{ theme: CellPopTheme; customTheme?: Theme }>) {
+  const themeIsDisabled = useThemeControlIsDisabled();
   return (
-    <ThemeSetterContextProvider initialTheme={initialTheme}>
+    <ThemeSetterContextProvider
+      initialTheme={initialTheme}
+      reactive={themeIsDisabled}
+    >
       <MuiThemeProvider customTheme={customTheme}>{children}</MuiThemeProvider>
     </ThemeSetterContextProvider>
   );

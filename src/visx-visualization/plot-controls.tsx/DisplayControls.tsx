@@ -95,15 +95,32 @@ export function DisplayControls() {
 
   const [search, setSearch] = useState("");
 
+  const updateSearch = useEventCallback((e: ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  });
+
   const filteredItems = items.filter((item) =>
     item.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
-    <Accordion defaultExpanded>
+    <Accordion
+      id={`display-options-${usePlotControlsContext()}`}
+      defaultExpanded
+      elevation={0}
+      disableGutters
+      sx={{
+        "&.MuiAccordion-root::before": { display: "none" },
+      }}
+    >
       <AccordionSummary
         expandIcon={<ExpandMoreRounded />}
-        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+        sx={{
+          "& .MuiAccordionSummary-content": {
+            alignItems: "center",
+            gap: 1,
+          },
+        }}
       >
         <Visibility />
         <Typography variant="subtitle1">Display Options</Typography>
@@ -115,7 +132,7 @@ export function DisplayControls() {
             placeholder="Search"
             aria-label="Search items"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={updateSearch}
             slotProps={{
               input: {
                 startAdornment: <Icon component={Search} />,
@@ -133,7 +150,9 @@ export function DisplayControls() {
               sx={{
                 display: "grid",
                 gap: 1,
-                gridTemplateColumns: canBeEmbedded ? "2fr 1fr 1fr" : "2fr 2fr",
+                gridTemplateColumns: canBeEmbedded
+                  ? "1fr auto auto"
+                  : "1fr auto",
                 gridTemplateRows: "auto",
               }}
             >
@@ -237,7 +256,13 @@ function DisplayItem({ item }: { item: string }) {
           gridColumn: 1,
         }}
       >
-        <Icon component={DragHandle} {...attributes} {...listeners} />
+        <Icon
+          component={DragHandle}
+          {...attributes}
+          {...listeners}
+          sx={{ cursor: "pointer" }}
+          tabIndex={0}
+        />
         <Stack>
           <Typography variant="subtitle2">{item}</Typography>
           {subtitle && <Typography variant="body2">{subtitle}</Typography>}

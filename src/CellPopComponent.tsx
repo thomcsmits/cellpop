@@ -10,6 +10,8 @@ import { Providers } from "./contexts/Providers";
 import Controls from "./visx-visualization/Controls";
 import VizContainer from "./visx-visualization/layout";
 
+type DisableableControls = "fraction" | "selection" | "theme";
+
 interface CellPopConfig {
   yAxis: AxisConfig;
   xAxis: AxisConfig;
@@ -17,6 +19,7 @@ interface CellPopConfig {
   dimensions?: Dimensions;
   theme?: CellPopTheme;
   customTheme?: Theme;
+  disabledControls?: DisableableControls[];
 }
 
 export interface CellPopProps
@@ -38,6 +41,7 @@ export const CellPop = withParentSize(
     parentHeight,
     parentWidth,
     customTheme,
+    disabledControls,
   }: CellPopProps) => {
     // If dimensions are provided, use them.
     // Otherwise, fall back to using parentWidth and parentHeight.
@@ -72,6 +76,7 @@ export const CellPop = withParentSize(
           customTheme={customTheme}
           xAxis={xAxis}
           yAxis={yAxis}
+          disabledControls={disabledControls}
         >
           <Controls />
           <VizContainer />

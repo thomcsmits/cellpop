@@ -23,7 +23,7 @@ const createSelectedDimensionContext = ({
   );
 };
 
-const [
+export const [
   SelectedDimensionProvider,
   useSelectedDimension,
   ,
@@ -33,10 +33,3 @@ const [
   SelectedDimensionContextProps,
   true
 >(createSelectedDimensionContext, "SelectedDimensionContext", true);
-
-export {
-  SelectedDimensionProvider,
-  useSelectedDimension,
-  useSelectedDimensionHistory
-};
-

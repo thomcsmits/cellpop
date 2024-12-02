@@ -4,6 +4,7 @@ import { useStoreWithEqualityFn } from "zustand/traditional";
 import React, {
   PropsWithChildren,
   RefObject,
+  useEffect,
   useRef,
   type Context,
   type ReactNode,
@@ -86,22 +87,32 @@ type CreateStoreContext<
   // If Temporal is true, return an array with the temporal hook and store
   Temporal extends true
     ? [
-        (props: PropsWithChildren<CreateStoreArgs>) => ReactNode,
+        (
+          props: PropsWithChildren<CreateStoreArgs & ProviderEnhancements>,
+        ) => ReactNode,
         CurriedUseStore<StoreType>,
         Context<StoreType | undefined>,
         TemporalStore<StoreType>,
       ]
     : [
-        (props: PropsWithChildren<CreateStoreArgs>) => ReactNode,
+        (
+          props: PropsWithChildren<CreateStoreArgs & ProviderEnhancements>,
+        ) => ReactNode,
         CurriedUseStore<StoreType>,
         Context<StoreType | undefined>,
       ];
+
+interface ProviderEnhancements {
+  // Reactive providers reset the store when the props change
+  reactive?: boolean;
+}
 
 /**
  * Helper function for creating a context and provider for a zustand store.
  *
  * @param createStore The initializer function that creates the zustand store. Its parameters are the expected props for the provider.
  * @param displayName The display name for the created context
+ * @param temporal Whether or not the store is temporal, i.e. whether there is a temporal store associated with it
  * @returns A Context and Provider for the created store
  */
 export function createStoreContext<
@@ -121,13 +132,22 @@ export function createStoreContext<
   // Create a provider component which creates the store and passes it to the context
   function Provider({
     children,
+    reactive = false,
     ...props
-  }: PropsWithChildren<CreateStoreArgs>) {
+  }: PropsWithChildren<CreateStoreArgs & ProviderEnhancements>) {
     // Keep the store in a ref so it is only created once per instance of the provider
     const store = useRef<StoreType>();
     if (!store.current) {
       store.current = createStore(props as CreateStoreArgs);
     }
+
+    useEffect(() => {
+      if (reactive) {
+        const newStore = createStore(props as CreateStoreArgs);
+        store.current.setState(newStore.getState());
+      }
+    }, [props]);
+
     return (
       <StoreContext.Provider value={store.current}>
         {children}
@@ -185,6 +205,9 @@ export function createStoreContextWithRef<T, CreateStoreArgs, RefType>(
     const ref = useRef<RefType>(null);
     if (!store.current) {
       store.current = createStore(props as CreateStoreArgs, ref);
+      if ("temporal" in store) {
+        (store.temporal as TemporalState<unknown>).clear();
+      }
     }
     return (
       <StoreContext.Provider value={store.current}>

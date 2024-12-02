@@ -4,6 +4,7 @@ import React, { PropsWithChildren, useState } from "react";
 import { useParentRef } from "../../contexts/ContainerRefContext";
 
 import {
+  Divider,
   IconButton,
   Stack,
   Tab,
@@ -17,6 +18,7 @@ import {
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
 import { DisplayControls } from "./DisplayControls";
+import { JumpToSection } from "./JumpToSection";
 import {
   PlotControlsSection,
   PlotControlsSectionProvider,
@@ -46,7 +48,10 @@ function PlotControlSection({
         aria-labelledby={`simple-tab-${value}`}
         {...other}
       >
+        <JumpToSection />
+        <Divider />
         <SortControls />
+        <Divider />
         <DisplayControls />
       </div>
     </PlotControlsSectionProvider>
@@ -61,12 +66,14 @@ function PlotControls({ onClose }: PlotControlsProps) {
   const rowIcon = useRowConfig((s) => s.icon);
 
   return (
-    <Stack spacing={2} padding={2} direction="column">
+    <Stack spacing={2} padding={2} direction="column" position="relative">
       <Stack
         spacing={2}
         alignItems="center"
         justifyContent="space-between"
         direction="row"
+        position="sticky"
+        top={0}
       >
         <Typography variant="h5" component="label">
           Plot Controls
@@ -117,9 +124,19 @@ export function PlotControlsButton() {
       </Button>
       <Drawer
         container={parentRef.current}
+        disablePortal
         open={showDrawer}
         onClose={closeDrawer}
         anchor="right"
+        PaperProps={{
+          sx: {
+            maxWidth: {
+              xs: "100%",
+              md: 450,
+            },
+            scrollBehavior: "smooth",
+          },
+        }}
       >
         <PlotControls onClose={closeDrawer} />
       </Drawer>

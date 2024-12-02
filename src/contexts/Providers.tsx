@@ -9,6 +9,10 @@ import {
 import { CellPopThemeProvider } from "./CellPopThemeContext";
 import { DataProvider } from "./DataContext";
 import { Dimensions, DimensionsProvider } from "./DimensionsContext";
+import {
+  DisableableControls,
+  DisabledControlProvider,
+} from "./DisabledControlProvider";
 import { SelectedValuesProvider } from "./ExpandedValuesContext";
 import { FractionProvider } from "./FractionContext";
 import { ScaleProvider } from "./ScaleContext";
@@ -25,6 +29,7 @@ interface CellPopConfigProps extends PropsWithChildren {
   fraction?: boolean;
   selectedValues?: string[];
   customTheme?: Theme;
+  disabledControls?: DisableableControls[];
 }
 
 export function Providers({
@@ -38,30 +43,33 @@ export function Providers({
   xAxis: xAxisConfig,
   yAxis: yAxisConfig,
   customTheme,
+  disabledControls = [],
 }: CellPopConfigProps) {
   return (
-    <DataProvider initialData={data}>
-      <SelectedValuesProvider initialSelectedValues={selectedValues}>
-        <RowConfigProvider {...yAxisConfig}>
-          <ColumnConfigProvider {...xAxisConfig}>
-            <TooltipDataProvider>
-              <CellPopThemeProvider theme={theme} customTheme={customTheme}>
-                <DimensionsProvider dimensions={dimensions}>
-                  <FractionProvider initialFraction={fraction}>
-                    <ScaleProvider>
-                      <SelectedDimensionProvider
-                        initialSelectedDimension={selectedDimension}
-                      >
-                        {children}
-                      </SelectedDimensionProvider>
-                    </ScaleProvider>
-                  </FractionProvider>
-                </DimensionsProvider>
-              </CellPopThemeProvider>
-            </TooltipDataProvider>
-          </ColumnConfigProvider>
-        </RowConfigProvider>
-      </SelectedValuesProvider>
-    </DataProvider>
+    <DisabledControlProvider disabledControls={disabledControls}>
+      <DataProvider initialData={data}>
+        <SelectedValuesProvider initialSelectedValues={selectedValues}>
+          <RowConfigProvider {...yAxisConfig}>
+            <ColumnConfigProvider {...xAxisConfig}>
+              <TooltipDataProvider>
+                <CellPopThemeProvider theme={theme} customTheme={customTheme}>
+                  <DimensionsProvider dimensions={dimensions}>
+                    <FractionProvider initialFraction={fraction}>
+                      <ScaleProvider>
+                        <SelectedDimensionProvider
+                          initialSelectedDimension={selectedDimension}
+                        >
+                          {children}
+                        </SelectedDimensionProvider>
+                      </ScaleProvider>
+                    </FractionProvider>
+                  </DimensionsProvider>
+                </CellPopThemeProvider>
+              </TooltipDataProvider>
+            </ColumnConfigProvider>
+          </RowConfigProvider>
+        </SelectedValuesProvider>
+      </DataProvider>
+    </DisabledControlProvider>
   );
 }

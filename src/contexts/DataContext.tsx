@@ -133,36 +133,60 @@ const applySortOrders = (
   row: boolean,
 ): string[] => {
   const metadata = row ? state.data.metadata.rows : state.data.metadata.cols;
-  // Avoid mutating the original array
+  // Avoid mutating the original array by creating a copy
   const arrayCopy = [...array];
-  return sorts.reduce((sortedArray, { key, direction }) => {
-    if (key === "alphabetical") {
-      if (direction === "desc") {
-        return sortedArray.sort();
-      } else {
-        return sortedArray.sort().reverse();
+  // Consolidate the sort orders into a single comparison function by converting
+  // them into a recursive function that calls the next comparison function
+  // if the current comparison returns 0.
+  const comparisonFunction = sorts.reduceRight(
+    (acc, { key, direction }) => {
+      switch (key) {
+        case "alphabetical":
+          return (a: string, b: string) => {
+            const compare =
+              direction === "asc" ? a.localeCompare(b) : b.localeCompare(a);
+            if (compare === 0) {
+              return acc(a, b);
+            }
+            return compare;
+          };
+        case "count": {
+          const { rowCounts, columnCounts } = getDerivedStatesSelector(state);
+          const counts = row ? rowCounts : columnCounts;
+          return (a: string, b: string) => {
+            const aValue = counts[a] as number;
+            const bValue = counts[b] as number;
+            const compare =
+              direction === "asc" ? aValue - bValue : bValue - aValue;
+            if (compare === 0) {
+              return acc(a, b);
+            }
+            return compare;
+          };
+        }
+        default:
+          return (a: string, b: string) => {
+            const aValue =
+              metadata[a][key as keyof (typeof metadata)[typeof a]];
+            const bValue =
+              metadata[b][key as keyof (typeof metadata)[typeof b]];
+            if (typeof aValue === "number" && typeof bValue === "number") {
+              return direction === "asc" ? aValue - bValue : bValue - aValue;
+            }
+            const compare =
+              direction === "asc"
+                ? aValue.localeCompare(bValue)
+                : bValue.localeCompare(aValue);
+            if (compare === 0) {
+              return acc(a, b);
+            }
+            return compare;
+          };
       }
-    }
-    if (key === "count") {
-      const { rowCounts, columnCounts } = getDerivedStatesSelector(state);
-      const counts = row ? rowCounts : columnCounts;
-      return sortedArray.sort((a, b) => {
-        const aValue = counts[a] as number;
-        const bValue = counts[b] as number;
-        return direction === "asc" ? aValue - bValue : bValue - aValue;
-      });
-    }
-    return sortedArray.sort((a, b) => {
-      const aValue = metadata[a][key as keyof (typeof metadata)[typeof a]];
-      const bValue = metadata[b][key as keyof (typeof metadata)[typeof b]];
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return direction === "asc" ? aValue - bValue : bValue - aValue;
-      }
-      return direction === "asc"
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
-    });
-  }, arrayCopy);
+    },
+    (a: string, b: string) => a.localeCompare(b),
+  );
+  return arrayCopy.sort(comparisonFunction);
 };
 
 const createDataContextStore = ({ initialData }: DataContextProps) =>

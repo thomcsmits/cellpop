@@ -10,6 +10,10 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useEventCallback } from "@mui/material/utils";
 
 import { useSetTheme } from "../contexts/CellPopThemeContext";
+import {
+  useFractionControlIsDisabled,
+  useThemeControlIsDisabled,
+} from "../contexts/DisabledControlProvider";
 import { useFraction } from "../contexts/FractionContext";
 import { useSelectedDimension } from "../contexts/SelectedDimensionContext";
 import LabelledSwitch from "./LabelledSwitch";
@@ -46,7 +50,9 @@ export default function Controls() {
     },
   );
 
-  console.log({ currentTheme });
+  const themeIsDisabled = useThemeControlIsDisabled();
+  const fractionIsDisabled = useFractionControlIsDisabled();
+  const selectedDimensionIsDisabled = useFractionControlIsDisabled();
 
   return (
     <AppBar
@@ -79,27 +85,33 @@ export default function Controls() {
             ))}
           </Select>
         </FormControl>
-        <LabelledSwitch
-          label="Graph Type"
-          leftLabel="Count"
-          rightLabel="Fraction"
-          onChange={changeFraction}
-          checked={fraction}
-        />
-        <LabelledSwitch
-          label="Selection Tool"
-          leftLabel="Column"
-          rightLabel="Row"
-          onChange={changeSelectedDimension}
-          checked={selectedDimension === "Y"}
-        />
-        <LabelledSwitch
-          label="Theme"
-          leftLabel="Light"
-          rightLabel="Dark"
-          onChange={changeVisTheme}
-          checked={currentTheme === "dark"}
-        />
+        {!fractionIsDisabled && (
+          <LabelledSwitch
+            label="Graph Type"
+            leftLabel="Count"
+            rightLabel="Fraction"
+            onChange={changeFraction}
+            checked={fraction}
+          />
+        )}
+        {!selectedDimensionIsDisabled && (
+          <LabelledSwitch
+            label="Selection Tool"
+            leftLabel="Column"
+            rightLabel="Row"
+            onChange={changeSelectedDimension}
+            checked={selectedDimension === "Y"}
+          />
+        )}
+        {!themeIsDisabled && (
+          <LabelledSwitch
+            label="Theme"
+            leftLabel="Light"
+            rightLabel="Dark"
+            onChange={changeVisTheme}
+            checked={currentTheme === "dark"}
+          />
+        )}
       </Stack>
     </AppBar>
   );

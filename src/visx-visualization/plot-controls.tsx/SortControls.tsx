@@ -117,10 +117,23 @@ export function SortControls() {
   });
 
   return (
-    <Accordion defaultExpanded>
+    <Accordion
+      id={`sort-options-${usePlotControlsContext()}`}
+      defaultExpanded
+      elevation={0}
+      disableGutters
+      sx={{
+        "&.MuiAccordion-root::before": { display: "none" },
+      }}
+    >
       <AccordionSummary
         expandIcon={<ExpandMoreRounded />}
-        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+        sx={{
+          "& .MuiAccordionSummary-content": {
+            alignItems: "center",
+            gap: 1,
+          },
+        }}
       >
         <Sort />
         <Typography variant="subtitle1">Sorts</Typography>
@@ -206,24 +219,34 @@ function SortItem({ sort, index }: { sort: SortOrder<string>; index: number }) {
     editSort(index, { ...sort, key });
   });
 
+  const remove = useEventCallback(() => {
+    removeSort(index);
+  });
+
   return (
     <Stack key={sort.key} style={style} ref={setNodeRef}>
       <Stack direction="row" alignItems="center" spacing={1}>
-        <Icon component={DragHandle} {...attributes} {...listeners} />
+        <Icon
+          component={DragHandle}
+          {...attributes}
+          {...listeners}
+          sx={{ cursor: "pointer" }}
+          tabIndex={0}
+        />
         <Typography variant="subtitle1" noWrap sx={{ flexShrink: 0 }}>
           {sortText}
         </Typography>
         <Select value={sort.key} onChange={onSelectChange} fullWidth>
           {[sort.key, ...availableSorts].map((key) => (
             <MenuItem key={key} value={key}>
-              {key}
+              {key.replace(/_/g, " ")}
             </MenuItem>
           ))}
         </Select>
         <Button
           aria-label={`Remove ${sort.key}`}
           component={IconButton}
-          onClick={() => removeSort(index)}
+          onClick={remove}
           sx={{
             minWidth: 0,
             padding: 0.5,
