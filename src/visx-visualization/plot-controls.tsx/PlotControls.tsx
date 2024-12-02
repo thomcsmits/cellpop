@@ -111,6 +111,8 @@ export function PlotControlsButton() {
   const [showDrawer, setShowDrawer] = useState(false);
   const closeDrawer = useEventCallback(() => setShowDrawer(false));
   const openDrawer = useEventCallback(() => setShowDrawer(true));
+  const parentBoundingBox = parentRef.current?.getBoundingClientRect();
+  const windowBoundingBox = window.document.body.getBoundingClientRect();
   return (
     <>
       <Button
@@ -124,16 +126,35 @@ export function PlotControlsButton() {
       </Button>
       <Drawer
         container={parentRef.current}
-        disablePortal
         open={showDrawer}
         onClose={closeDrawer}
         anchor="right"
+        ModalProps={{
+          sx: {
+            top: parentBoundingBox?.top,
+            height: parentBoundingBox?.height,
+            right: windowBoundingBox.right - parentBoundingBox?.right,
+          },
+        }}
+        slotProps={{
+          backdrop: {
+            sx: {
+              top: parentBoundingBox?.top,
+              height: parentBoundingBox?.height,
+              left: parentBoundingBox?.left,
+              width: parentBoundingBox?.width,
+            },
+          },
+        }}
         PaperProps={{
           sx: {
             maxWidth: {
               xs: "100%",
               md: 450,
             },
+            top: parentBoundingBox?.top,
+            height: parentBoundingBox?.height,
+            right: windowBoundingBox.right - parentBoundingBox?.right,
             scrollBehavior: "smooth",
           },
         }}
