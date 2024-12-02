@@ -26,6 +26,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
   FormControl,
   Icon,
   Stack,
@@ -50,12 +51,26 @@ function useItems() {
   return section === "Column" ? columns : rows;
 }
 
+function useItemMetadata() {
+  const section = usePlotControlsContext();
+  return useData((s) =>
+    section === "Column" ? s.data.metadata.cols : s.data.metadata.rows,
+  );
+}
+
 function useSetItems() {
   const section = usePlotControlsContext();
   const setItems = useData((s) =>
     section === "Column" ? s.setColumnOrder : s.setRowOrder,
   );
   return setItems;
+}
+
+function useRemoveItems() {
+  const section = usePlotControlsContext();
+  return useData((s) =>
+    section === "Column" ? s.removeColumns : s.removeRows,
+  );
 }
 
 function useCanBeEmbedded() {
@@ -73,6 +88,7 @@ export function DisplayControls() {
   const description = canBeEmbedded ? RowDescription : ColumnDescription;
 
   const items = useItems();
+  const metadata = useItemMetadata();
   const setItems = useSetItems();
 
   const sensors = useSensors(
@@ -98,12 +114,26 @@ export function DisplayControls() {
   const updateSearch = useEventCallback((e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   });
+  const createSubtitle = useSubtitleFunction();
 
-  const filteredItems = items.filter((item) =>
-    item.toLowerCase().includes(search.toLowerCase()),
+  const filteredItems = items.filter(
+    (item) =>
+      item.toLowerCase().includes(search.toLowerCase()) ||
+      createSubtitle(item, metadata[item])
+        .toLowerCase()
+        .includes(search.toLowerCase()),
   );
 
   const section = usePlotControlsContext();
+
+  const itemsAreFiltered =
+    items.length !== filteredItems.length && filteredItems.length > 0;
+  const removeItems = useRemoveItems();
+
+  const hideFilteredItems = useEventCallback(() => {
+    const hiddenItems = items.filter((item) => !filteredItems.includes(item));
+    removeItems(hiddenItems);
+  });
 
   return (
     <Accordion
@@ -189,6 +219,13 @@ export function DisplayControls() {
               {filteredItems.map((item) => (
                 <DisplayItem key={item} item={item} />
               ))}
+              {itemsAreFiltered && (
+                <Box gridRow="auto" gridColumn="span 3">
+                  <Button onClick={hideFilteredItems}>
+                    Hide All Filtered Items
+                  </Button>
+                </Box>
+              )}
             </Box>
           </SortableContext>
         </DndContext>

@@ -53,7 +53,16 @@ interface DataContextActions {
    * @returns
    */
   removeColumn: (column: string) => void;
-
+  /**
+   * Removes multiple rows from the visualization and updates counts accordingly.
+   * @param rows the rows to remove
+   */
+  removeRows: (rows: string[]) => void;
+  /**
+   * Removes multiple columns from the visualization and updates counts accordingly.
+   * @param columns the columns to remove
+   */
+  removeColumns: (columns: string[]) => void;
   /**
    * Restores a row to the visualization.
    * @param row the row to restore
@@ -233,7 +242,20 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
           return { removedColumns };
         });
       },
-
+      removeRows: (rows: string[]) => {
+        set((state) => {
+          const removedRows = new Set(state.removedRows);
+          rows.forEach((row) => removedRows.add(row));
+          return { removedRows };
+        });
+      },
+      removeColumns: (columns: string[]) => {
+        set((state) => {
+          const removedColumns = new Set(state.removedColumns);
+          columns.forEach((column) => removedColumns.add(column));
+          return { removedColumns };
+        });
+      },
       setColumnSortOrder: (sortOrder: SortOrder<ColumnKey>[]) => {
         const columnOrder = applySortOrders(
           initialData.colNames,

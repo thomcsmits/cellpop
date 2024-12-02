@@ -9,7 +9,12 @@ import { scaleLinear } from "@visx/scale";
 import { Text } from "@visx/text";
 import React, { useId } from "react";
 import { AxisConfig, useRowConfig } from "../../contexts/AxisConfigContext";
-import { useRowCounts, useRowMaxes, useRows } from "../../contexts/DataContext";
+import {
+  useData,
+  useRowCounts,
+  useRowMaxes,
+  useRows,
+} from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { EXPANDED_ROW_PADDING, useYScale } from "../../contexts/ScaleContext";
@@ -31,6 +36,13 @@ export default function HeatmapYAxis() {
 
   const rows = useRows();
   const rowCounts = useRowCounts();
+  const filteredRowsCount = rows.length;
+  const allColumnsCount = useData((s) => s.rowOrder.length);
+
+  const labelWithCounts =
+    filteredRowsCount !== allColumnsCount
+      ? `${label} (${filteredRowsCount}/${allColumnsCount})`
+      : `${label} (${allColumnsCount})`;
 
   const filterId = useId();
   const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(
@@ -51,7 +63,7 @@ export default function HeatmapYAxis() {
       />
       <AxisRight
         scale={y}
-        label={label}
+        label={labelWithCounts}
         stroke={theme.palette.text.primary}
         tickStroke={theme.palette.text.primary}
         tickComponent={

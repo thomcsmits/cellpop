@@ -2,7 +2,11 @@ import { useTheme } from "@mui/material/styles";
 import { AxisBottom, Orientation } from "@visx/axis";
 import React, { useId } from "react";
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
-import { useColumnCounts, useColumns } from "../../contexts/DataContext";
+import {
+  useColumnCounts,
+  useColumns,
+  useData,
+} from "../../contexts/DataContext";
 import { useXScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
@@ -23,6 +27,13 @@ export default function HeatmapXAxis() {
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
   const columns = useColumns();
+  const filteredColumns = columns.length;
+  const allColumns = useData((s) => s.columnOrder.length);
+
+  const labelWithCounts =
+    filteredColumns !== allColumns
+      ? `${label} (${filteredColumns}/${allColumns})`
+      : `${label} (${allColumns})`;
 
   const filterId = useId();
   const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(
@@ -41,7 +52,7 @@ export default function HeatmapXAxis() {
       />
       <AxisBottom
         scale={x}
-        label={label}
+        label={labelWithCounts}
         numTicks={x.domain().length}
         stroke={theme.palette.text.primary}
         tickStroke={theme.palette.text.primary}
