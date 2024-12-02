@@ -21,15 +21,16 @@
   ],
   "cSpell.words": [
     "anndata",
+    "anywidget",
     "cellpop",
     "CLID",
     "Disableable",
     "epanechnikov",
+    "predeploy",
+    "rollups",
+    "vitessce",
     "zarr",
     "zundo",
-    "zustand",
-    "vitessce",
-    "predeploy",
-    "anywidget"
+    "zustand"
   ]
 }

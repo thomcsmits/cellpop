@@ -5,6 +5,7 @@ import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
 import { area } from "@visx/shape";
 import { bin, max, rollups } from "d3";
+import { useSetTheme } from "../../contexts/CellPopThemeContext";
 import { useData, useMaxCount } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useXScale, useYScale } from "../../contexts/ScaleContext";
@@ -64,7 +65,7 @@ export default function Violins({ side = "top" }: ViolinsProps) {
     const violinData = rollups(
       countsMatrix,
       (v) => {
-        const values = v.map((d) => d.value);
+        const values = v.map((d) => d.value).filter((v) => v > 0);
         const bin = bins(values);
         const binLengths = bin.map((b) => b.length);
         return binLengths;
@@ -105,10 +106,13 @@ export default function Violins({ side = "top" }: ViolinsProps) {
   const theme = useTheme();
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
+  const currentTheme = useSetTheme((s) => s.currentTheme);
+  const stripeColor =
+    currentTheme === "dark" ? theme.palette.grey[800] : theme.palette.grey[50];
 
   return (
     <>
-      {violins.map(([group, violinData]) => {
+      {violins.map(([group, violinData], idx) => {
         // Position of violin corresponds to its row/column;
         const transformCoordinate = categoricalScaleRescaled(group);
         const transform = topViolins
@@ -152,7 +156,9 @@ export default function Violins({ side = "top" }: ViolinsProps) {
               onMouseOut={closeTooltip}
               height={backgroundHeight}
               width={backgroundWidth}
-              fill={"none"}
+              fill={
+                idx % 2 == 0 ? theme.palette.background.default : stripeColor
+              }
               style={{ pointerEvents: "all" }}
               data-testid={`violin-background-${group}`}
             />
