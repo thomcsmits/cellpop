@@ -8,6 +8,8 @@ interface SelectedValuesContextProps {
 interface SelectedValuesStore {
   selectedValues: Set<string>;
   toggleValue: (value: string) => void;
+  selectValue: (value: string) => void;
+  deselectValue: (value: string) => void;
   reset: () => void;
 }
 
@@ -29,6 +31,20 @@ const createSelectedValuesContext = ({
         });
       },
       reset: () => set({ selectedValues: new Set() }),
+      selectValue: (value: string) => {
+        set((state) => {
+          const selectedValues = new Set(state.selectedValues);
+          selectedValues.add(value);
+          return { selectedValues };
+        });
+      },
+      deselectValue: (value: string) => {
+        set((state) => {
+          const selectedValues = new Set(state.selectedValues);
+          selectedValues.delete(value);
+          return { selectedValues };
+        });
+      },
     })),
   );
 };

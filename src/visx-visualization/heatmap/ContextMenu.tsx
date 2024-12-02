@@ -1,3 +1,4 @@
+import { useEventCallback } from "@mui/material";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import React from "react";
 import {
@@ -32,6 +33,15 @@ const HideRow = () => {
   const { tooltipData } = useTooltipData();
   const rowLabel = useRowConfig((store) => store.label);
   const { removeRow } = useData();
+  const { deselectValue, selectedValues } = useSelectedValues();
+
+  const onClick = useEventCallback(() => {
+    const rowValue = tooltipData.data[rowLabel] as string;
+    if (selectedValues.has(tooltipData.data[rowLabel] as string)) {
+      deselectValue(tooltipData.data[rowLabel] as string);
+    }
+    removeRow(rowValue);
+  });
 
   if (!tooltipData?.data) {
     return null;
@@ -40,7 +50,7 @@ const HideRow = () => {
   if (tooltipData.data[rowLabel]) {
     const rowValue = tooltipData.data[rowLabel] as string;
     return (
-      <ContextMenuItem onClick={() => removeRow(rowValue)}>
+      <ContextMenuItem onClick={onClick}>
         Hide {rowLabel} ({rowValue})
       </ContextMenuItem>
     );
