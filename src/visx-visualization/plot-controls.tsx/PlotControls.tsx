@@ -119,7 +119,6 @@ export function PlotControlsButton() {
         variant="contained"
         color="primary"
         startIcon={<Settings />}
-        sx={{ whiteSpace: "nowrap" }}
         onClick={openDrawer}
       >
         Plot Controls

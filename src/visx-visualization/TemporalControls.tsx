@@ -95,7 +95,6 @@ export function TemporalControls() {
         variant="outlined"
         onClick={restoreToDefault}
         disabled={!canUndo}
-        sx={{ whiteSpace: "nowrap" }}
         endIcon={<RestoreOutlined />}
       >
         Restore to Default

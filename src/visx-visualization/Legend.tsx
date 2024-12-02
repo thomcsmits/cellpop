@@ -44,7 +44,7 @@ export default function Legend() {
           </Stack>
         </Box>
       </Stack>
-      <Stack direction="row" spacing={2}>
+      <Stack direction="row" gap={2} flexWrap="wrap">
         <PlotControlsButton />
         <TemporalControls />
       </Stack>
