@@ -38,6 +38,57 @@ interface BarHelper {
   keys: string[];
 }
 
+const useAxisMetadata = (axis: "X" | "Y") => {
+  const metadata = useData(({ data }) =>
+    axis === "X" ? data.metadata.cols : data.metadata.rows,
+  );
+  return metadata;
+};
+
+const useFilteredSortOrder = (axis: "X" | "Y") => {
+  const rowSort = useData((s) => s.rowSortOrder);
+  const columnSort = useData((s) => s.columnSortOrder);
+  return (axis === "X" ? columnSort : rowSort).filter(
+    (s) => s.key !== "count" && s.key !== "alphabetical",
+  );
+};
+
+// Use numeric scale if all metadata values in current sort are numeric
+const useMetadataIsNumeric = (axis: "X" | "Y") => {
+  const metadata = useAxisMetadata(axis);
+  const cols = useColumns();
+  const rows = useRows();
+  const keys = axis === "X" ? cols : rows;
+  const sortOrder = useFilteredSortOrder(axis);
+  const selectedMetadata = sortOrder.map((s) => s.key);
+  if (!metadata || !keys || !selectedMetadata.length || sortOrder.length > 1) {
+    return false;
+  }
+  return keys.every((key) => {
+    if (!metadata[key]) {
+      return false;
+    }
+    return selectedMetadata.every(
+      (mdKey) => !isNaN(parseInt(metadata[key][mdKey] as string, 10)),
+    );
+  });
+};
+
+const useMetadataValues = (axis: "X" | "Y") => {
+  const metadata = useAxisMetadata(axis);
+  const cols = useColumns();
+  const rows = useRows();
+  const keys = axis === "X" ? cols : rows;
+  const sortOrder = useFilteredSortOrder(axis);
+  const selectedMetadata = sortOrder.map((s) => s.key);
+  if (!metadata || !keys || !selectedMetadata.length) {
+    return [];
+  }
+  return keys.map((key) =>
+    selectedMetadata.map((mdKey) => metadata[key][mdKey]).join(", "),
+  );
+};
+
 export default function MetadataValueBar({
   axis,
   width,
@@ -51,37 +102,18 @@ export default function MetadataValueBar({
   const { scale: x } = useXScale();
   const rows = useRows();
   const columns = useColumns();
-  const rowSort = useData((s) => s.rowSortOrder);
-  const columnSort = useData((s) => s.columnSortOrder);
-  const sortOrder = (axis === "X" ? columnSort : rowSort)[0];
-  // If the sort order is alphabetical or count, we don't want to show the metadata bar
-  const selectedMetadata = ["count", "alphabetical"].includes(sortOrder?.key)
-    ? undefined
-    : sortOrder?.key;
+
   const keys = axis === "X" ? columns : rows;
   const theme = useTheme();
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const metadataIsNumeric = metadata
-    ? keys.every((key) => {
-        if (!metadata[key]) {
-          return false;
-        }
-        const value = metadata[key][selectedMetadata] as string;
-        return !isNaN(parseInt(value, 10)) && !isNaN(parseFloat(value));
-      })
-    : false;
-  const values: string[] = metadata
-    ? keys
-        .map((key) =>
-          key in metadata ? (metadata[key][selectedMetadata] as string) : "",
-        )
-        .filter((v) => v !== "")
-    : [];
+  const values = useMetadataValues(axis);
+  const metadataIsNumeric = useMetadataIsNumeric(axis);
+  const sortOrder = useFilteredSortOrder(axis);
 
   const metadataValueColorScale = useMemo(() => {
-    if (!selectedMetadata) {
+    if (!values) {
       return null;
     }
     if (metadataIsNumeric) {
@@ -98,59 +130,56 @@ export default function MetadataValueBar({
         domain: values,
       });
     }
-  }, [keys, values, selectedMetadata, metadataIsNumeric]);
+  }, [keys, values, metadataIsNumeric]);
 
   const cellWidth = x.bandwidth();
 
   const axisLabelX = axis === "X" ? width / 2 : width / 3;
   const axisLabelY = axis === "X" ? height / 3 : height / 2;
 
-  const onMouseMove = useCallback(
-    (e: React.MouseEvent<SVGRectElement>) => {
-      const target = e.target as SVGRectElement;
-      const keys = target.getAttribute("data-keys")?.split(",") || [];
-      const value = target.getAttribute("data-value");
-      if (keys.length === 0 || !value) {
-        return;
+  const onMouseMove = useCallback((e: React.MouseEvent<SVGRectElement>) => {
+    const target = e.target as SVGRectElement;
+    const keys = target.getAttribute("data-keys")?.split(",") || [];
+    const value = target.getAttribute("data-value");
+    if (keys.length === 0 || !value) {
+      return;
+    }
+    const targetBounds = target.getBoundingClientRect();
+    const x = e.clientX - targetBounds.left;
+    const y = e.clientY - targetBounds.top;
+    if (x < 0 || y < 0 || x > targetBounds.width || y > targetBounds.height) {
+      return;
+    }
+    const titleCreator = () => {
+      if (keys.length === 1) {
+        return keys[0];
       }
-      const targetBounds = target.getBoundingClientRect();
-      const x = e.clientX - targetBounds.left;
-      const y = e.clientY - targetBounds.top;
-      if (x < 0 || y < 0 || x > targetBounds.width || y > targetBounds.height) {
-        return;
+      const keysLength = keys.length;
+      const keysReverse = keys.slice().reverse();
+      if (axis === "Y") {
+        const keyHeight = targetBounds.height / keysLength;
+        const keyIndex = Math.floor(y / keyHeight);
+        return keysReverse[keyIndex];
+      } else if (axis === "X") {
+        const keyWidth = targetBounds.width / keysLength;
+        const keyIndex = Math.floor(x / keyWidth);
+        return keysReverse[keyIndex];
       }
-      const titleCreator = () => {
-        if (keys.length === 1) {
-          return keys[0];
-        }
-        const keysLength = keys.length;
-        const keysReverse = keys.slice().reverse();
-        if (axis === "Y") {
-          const keyHeight = targetBounds.height / keysLength;
-          const keyIndex = Math.floor(y / keyHeight);
-          return keysReverse[keyIndex];
-        } else if (axis === "X") {
-          const keyWidth = targetBounds.width / keysLength;
-          const keyIndex = Math.floor(x / keyWidth);
-          return keysReverse[keyIndex];
-        }
-      };
-      const title = titleCreator();
-      openTooltip(
-        {
-          title,
-          data: {
-            [selectedMetadata]: value,
-          },
+    };
+    const title = titleCreator();
+    openTooltip(
+      {
+        title,
+        data: {
+          ["key"]: value,
         },
-        e.clientX,
-        e.clientY,
-      );
-    },
-    [selectedMetadata],
-  );
+      },
+      e.clientX,
+      e.clientY,
+    );
+  }, []);
 
-  if (!selectedMetadata || !metadata || !keys) {
+  if (!metadata || !keys || sortOrder.length === 0) {
     return null;
   }
 
@@ -158,7 +187,9 @@ export default function MetadataValueBar({
     if (!(key in metadata)) {
       return acc;
     }
-    const value = metadata[key][selectedMetadata] as string;
+    const currentMd = metadata[key];
+    const selectedMetadata = sortOrder.map((s) => s.key);
+    const value = selectedMetadata.map((mdKey) => currentMd[mdKey]).join(", ");
     if (!value) {
       console.warn("No value for key", metadata[key], selectedMetadata);
       return acc;
@@ -302,7 +333,7 @@ export default function MetadataValueBar({
                 openTooltip(
                   {
                     title: String(value),
-                    data: { [selectedMetadata]: value },
+                    data: { ["key"]: value },
                   },
                   e.clientX,
                   e.clientY,
@@ -315,20 +346,22 @@ export default function MetadataValueBar({
           </g>
         );
       })}
-      <Text
-        x={axisLabelX}
-        y={axisLabelY}
-        verticalAnchor="middle"
-        textAnchor="middle"
-        orientation={axis === "X" ? "horizontal" : "vertical"}
-        className="text"
-        fill={theme.palette.text.primary}
-        style={{
-          textTransform: "capitalize",
-        }}
-      >
-        {selectedMetadata.split("_").join(" ")}
-      </Text>
+      {sortOrder.length === 1 ? (
+        <Text
+          x={axisLabelX}
+          y={axisLabelY}
+          verticalAnchor="middle"
+          textAnchor="middle"
+          orientation={axis === "X" ? "horizontal" : "vertical"}
+          className="text"
+          fill={theme.palette.text.primary}
+          style={{
+            textTransform: "capitalize",
+          }}
+        >
+          {sortOrder.map((s) => s.key.split("_").join(" ")).join(", ")}
+        </Text>
+      ) : null}
     </svg>
   );
 }

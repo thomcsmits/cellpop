@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 
 import { RedoRounded, RestoreOutlined, UndoRounded } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
+import { Box, IconButton } from "@mui/material";
 import { useEventCallback } from "@mui/material/utils";
 
 import Button from "@mui/material/Button";
@@ -99,34 +99,37 @@ export function TemporalControls() {
       >
         Restore to Default
       </Button>
-      <Button
-        onClick={undo}
-        aria-label="Undo"
-        variant="outlined"
-        component={IconButton}
-        disabled={!canUndo}
-        sx={{
-          minWidth: 0,
-          padding: 0.5,
-          aspectRatio: "1/1",
-        }}
-      >
-        <UndoRounded />
-      </Button>
-      <Button
-        onClick={redo}
-        aria-label="Redo"
-        variant="outlined"
-        component={IconButton}
-        disabled={!canRedo}
-        sx={{
-          minWidth: 0,
-          padding: 0.5,
-          aspectRatio: "1/1",
-        }}
-      >
-        <RedoRounded />
-      </Button>
+      {/* Keep undo/redo grouped together */}
+      <Box display="inline-flex" gap={1}>
+        <Button
+          onClick={undo}
+          aria-label="Undo"
+          variant="outlined"
+          component={IconButton}
+          disabled={!canUndo}
+          sx={{
+            minWidth: 0,
+            padding: 0.5,
+            aspectRatio: "1/1",
+          }}
+        >
+          <UndoRounded />
+        </Button>
+        <Button
+          onClick={redo}
+          aria-label="Redo"
+          variant="outlined"
+          component={IconButton}
+          disabled={!canRedo}
+          sx={{
+            minWidth: 0,
+            padding: 0.5,
+            aspectRatio: "1/1",
+          }}
+        >
+          <RedoRounded />
+        </Button>
+      </Box>
     </>
   );
 }
