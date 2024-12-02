@@ -1,9 +1,7 @@
 import { Sort, Visibility } from "@mui/icons-material";
 import { Link, Typography } from "@mui/material";
 import React from "react";
-import { usePlotControlsContext } from "./PlotControlsContext";
-export function JumpToSection() {
-  const section = usePlotControlsContext();
+export function JumpToSection({ section }: { section: string }) {
   return (
     <Typography
       variant="subtitle1"
@@ -19,6 +17,7 @@ export function JumpToSection() {
         display="flex"
         alignItems="center"
         underline="none"
+        gap={1}
       >
         <Sort /> Sorts
       </Link>
@@ -28,6 +27,7 @@ export function JumpToSection() {
         display="flex"
         alignItems="center"
         underline="none"
+        gap={1}
       >
         <Visibility /> Display Options
       </Link>

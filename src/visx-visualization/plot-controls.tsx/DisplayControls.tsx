@@ -143,6 +143,7 @@ export function DisplayControls() {
       disableGutters
       sx={{
         "&.MuiAccordion-root::before": { display: "none" },
+        scrollMarginTop: 160,
       }}
     >
       <AccordionSummary

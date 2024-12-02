@@ -4,6 +4,7 @@ import React, { PropsWithChildren, useState } from "react";
 import { useParentRef } from "../../contexts/ContainerRefContext";
 
 import {
+  Box,
   Divider,
   IconButton,
   Stack,
@@ -48,7 +49,6 @@ function PlotControlSection({
         aria-labelledby={`simple-tab-${value}`}
         {...other}
       >
-        <JumpToSection />
         <Divider />
         <SortControls />
         <Divider />
@@ -67,39 +67,53 @@ function PlotControls({ onClose }: PlotControlsProps) {
 
   return (
     <Stack spacing={2} padding={2} direction="column" position="relative">
-      <Stack
-        spacing={2}
-        alignItems="center"
-        justifyContent="space-between"
-        direction="row"
-        position="sticky"
-        top={0}
+      <Box
+        sx={{
+          position: "sticky",
+          top: 0,
+          zIndex: 1,
+          bgcolor: "background.paper",
+          pt: 1.5,
+        }}
       >
-        <Typography variant="h5" component="label">
-          Plot Controls
-        </Typography>
-        <IconButton aria-label="Close Plot Controls" onClick={onClose}>
-          <CloseRounded />
-        </IconButton>
-      </Stack>
-      <Tabs
-        variant="fullWidth"
-        value={selectedTab}
-        onChange={(_e, value) => setSelectedTab(value)}
-      >
-        <Tab
-          label={`Column: ${columnLabel}`}
-          value="Column"
-          icon={columnIcon}
-          iconPosition="start"
-        />
-        <Tab
-          label={`Row: ${rowLabel}`}
-          value="Row"
-          icon={rowIcon}
-          iconPosition="start"
-        />
-      </Tabs>
+        <Stack
+          spacing={2}
+          alignItems="center"
+          justifyContent="space-between"
+          direction="row"
+        >
+          <Typography variant="h5" component="label">
+            Plot Controls
+          </Typography>
+          <IconButton aria-label="Close Plot Controls" onClick={onClose}>
+            <CloseRounded />
+          </IconButton>
+        </Stack>
+        <Tabs
+          variant="fullWidth"
+          value={selectedTab}
+          onChange={(_e, value) => setSelectedTab(value)}
+          sx={{
+            position: "sticky",
+            top: 0,
+            zIndex: 1,
+          }}
+        >
+          <Tab
+            label={`Column: ${columnLabel}`}
+            value="Column"
+            icon={columnIcon}
+            iconPosition="start"
+          />
+          <Tab
+            label={`Row: ${rowLabel}`}
+            value="Row"
+            icon={rowIcon}
+            iconPosition="start"
+          />
+        </Tabs>
+        <JumpToSection section={selectedTab} />
+      </Box>
       <PlotControlSection value="Column" selectedValue={selectedTab} />
       <PlotControlSection value="Row" selectedValue={selectedTab} />
     </Stack>
