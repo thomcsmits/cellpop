@@ -180,7 +180,9 @@ export function DisplayControls() {
         <Typography variant="subtitle1">Display Options</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <Typography variant="body2">{description}</Typography>
+        <Typography variant="body2" mb={2}>
+          {description}
+        </Typography>
         <FormControl fullWidth>
           <TextField
             placeholder="Search"
