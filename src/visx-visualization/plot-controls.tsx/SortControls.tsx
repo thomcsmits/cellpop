@@ -29,6 +29,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
   Button,
   FormControl,
   FormControlLabel,
@@ -60,20 +61,33 @@ function useAvailableSorts() {
   return section === "Column" ? columns : rows;
 }
 
-function useAddSort() {
+function AddSort() {
   const section = usePlotControlsContext();
 
   const availableSorts = useAvailableSorts();
   const addSort = useData((s) =>
     section === "Column" ? s.addColumnSortOrder : s.addRowSortOrder,
   );
+  const sortIsInvalidated = useSortIsInvalidated();
   const disabled = availableSorts.length === 0;
   const onClick = useEventCallback(() => {
     if (availableSorts.length > 0) {
       addSort({ key: availableSorts[0], direction: "asc" });
     }
   });
-  return { disabled, onClick };
+  if (sortIsInvalidated) {
+    return null;
+  }
+  return (
+    <LeftAlignedButton
+      variant="text"
+      startIcon={<Add />}
+      disabled={disabled}
+      onClick={onClick}
+    >
+      Add Sort
+    </LeftAlignedButton>
+  );
 }
 
 function useResetSorts() {
@@ -89,6 +103,44 @@ function useResetSorts() {
     resetSorts();
   });
   return { disabled, onClick };
+}
+
+function useSortIsInvalidated() {
+  const section = usePlotControlsContext();
+  return useData((s) =>
+    section === "Column" ? s.columnSortInvalidated : s.rowSortInvalidated,
+  );
+}
+
+function useRevalidateSort() {
+  const section = usePlotControlsContext();
+  const revalidateSort = useData((s) =>
+    section === "Column" ? s.revalidateColumnSort : s.revalidateRowSort,
+  );
+  return useEventCallback(() => {
+    revalidateSort();
+  });
+}
+
+function InvalidationAlert() {
+  const sortIsInvalidated = useSortIsInvalidated();
+  const revalidateSort = useRevalidateSort();
+  if (!sortIsInvalidated) return null;
+  return (
+    <Alert
+      severity="info"
+      variant="outlined"
+      sx={{ alignItems: "center", mb: 2 }}
+      action={
+        <Button color="inherit" size="small" onClick={revalidateSort}>
+          Restore Sorts
+        </Button>
+      }
+    >
+      The data order has been manually changed and the sort order is no longer
+      valid. Sorting is currently disabled.
+    </Alert>
+  );
 }
 
 export function SortControls() {
@@ -116,6 +168,8 @@ export function SortControls() {
     }
   });
 
+  const sortIsInvalidated = useSortIsInvalidated();
+
   return (
     <Accordion
       id={`sort-options-${usePlotControlsContext()}`}
@@ -141,10 +195,14 @@ export function SortControls() {
       </AccordionSummary>
 
       <AccordionDetails>
-        <Typography variant="body2">
-          Customize how columns are sorted by selecting the primary sorting
-          field. Drag and reorder sorting fields to adjust their priority.
-        </Typography>
+        {sortIsInvalidated ? (
+          <InvalidationAlert />
+        ) : (
+          <Typography variant="body2">
+            Customize how columns are sorted by selecting the primary sorting
+            field. Drag and reorder sorting fields to adjust their priority.
+          </Typography>
+        )}
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -162,13 +220,7 @@ export function SortControls() {
           </SortableContext>
         </DndContext>
         <Stack direction="column">
-          <LeftAlignedButton
-            variant="text"
-            startIcon={<Add />}
-            {...useAddSort()}
-          >
-            Add Sort
-          </LeftAlignedButton>
+          <AddSort />
           <LeftAlignedButton
             variant="text"
             startIcon={<Restore />}
@@ -215,13 +267,15 @@ function SortItem({ sort, index }: { sort: SortOrder<string>; index: number }) {
     },
   );
 
+  const sortIsInvalidated = useSortIsInvalidated();
+
   const onSelectChange = useEventCallback((event: SelectChangeEvent) => {
     const key = event.target.value as string;
     editSort(index, { ...sort, key });
   });
 
   const remove = useEventCallback(() => {
-    removeSort(index);
+    removeSort(sort.key);
   });
 
   return (
@@ -231,13 +285,18 @@ function SortItem({ sort, index }: { sort: SortOrder<string>; index: number }) {
           component={DragHandle}
           {...attributes}
           {...listeners}
-          sx={{ cursor: "pointer" }}
+          sx={{ cursor: "pointer", mr: 2 }}
           tabIndex={0}
         />
         <Typography variant="subtitle1" noWrap sx={{ flexShrink: 0 }}>
           {sortText}
         </Typography>
-        <Select value={sort.key} onChange={onSelectChange} fullWidth>
+        <Select
+          value={sort.key}
+          onChange={onSelectChange}
+          fullWidth
+          disabled={sortIsInvalidated}
+        >
           {[sort.key, ...availableSorts].map((key) => (
             <MenuItem key={key} value={key}>
               {key.replace(/_/g, " ")}
@@ -248,6 +307,7 @@ function SortItem({ sort, index }: { sort: SortOrder<string>; index: number }) {
           aria-label={`Remove ${sort.key}`}
           component={IconButton}
           onClick={remove}
+          disabled={sortIsInvalidated}
           sx={{
             minWidth: 0,
             padding: 0.5,
@@ -257,7 +317,7 @@ function SortItem({ sort, index }: { sort: SortOrder<string>; index: number }) {
           <Close />
         </Button>
       </Stack>
-      <FormControl>
+      <FormControl disabled={sortIsInvalidated}>
         <RadioGroup onChange={onRadioChange} value={sort.direction}>
           <FormControlLabel
             value="asc"

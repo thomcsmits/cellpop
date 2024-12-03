@@ -9,9 +9,10 @@ export function JumpToSection({ section }: { section: string }) {
       alignItems="center"
       flexDirection="row"
       gap={1}
-      padding={1}
+      py={1}
+      px={2}
     >
-      Jump To Section:
+      Jump to Section:
       <Link
         href={`#sort-options-${section}`}
         display="flex"

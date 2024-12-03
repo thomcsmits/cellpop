@@ -18,6 +18,8 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   DragHandle,
   ExpandMoreRounded,
+  InfoOutlined,
+  InfoRounded,
   Restore,
   Search,
   Visibility,
@@ -34,6 +36,7 @@ import {
   Stack,
   Switch,
   TextField,
+  Tooltip,
   Typography,
   useEventCallback,
 } from "@mui/material";
@@ -199,6 +202,7 @@ export function DisplayControls() {
           sx={{
             visibility: hasHiddenItems ? "visible" : "hidden",
           }}
+          fullWidth
         >
           Set all to visible
         </LeftAlignedButton>
@@ -242,8 +246,17 @@ export function DisplayControls() {
                   gridRow={1}
                   gridColumn={3}
                   role="columnheader"
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
                 >
                   Embedded
+                  <Tooltip
+                    title="Toggle between displaying row as heatmap cells or a bar plot."
+                    placement="top"
+                  >
+                    <Icon component={InfoRounded} fontSize="small" />
+                  </Tooltip>
                 </Typography>
               )}
               {filteredItems.map((item) => (
@@ -352,7 +365,7 @@ function DisplayItem({ item }: { item: string }) {
           component={DragHandle}
           {...attributes}
           {...listeners}
-          sx={{ cursor: "pointer" }}
+          sx={{ cursor: "pointer", mr: 2 }}
           tabIndex={0}
         />
         <Stack>

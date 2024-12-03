@@ -129,7 +129,7 @@ function DragOverlayContainer({
 
   const handleDrag = useEventCallback(({ active, over }: DragOverEvent) => {
     if (!over || active.id === over.id || lastOver.current === over.id) {
-      lastOver.current = over.id;
+      if (over) lastOver.current = over.id;
       return;
     }
     lastOver.current = over.id;

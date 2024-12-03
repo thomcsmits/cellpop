@@ -66,7 +66,7 @@ function PlotControls({ onClose }: PlotControlsProps) {
   const rowIcon = useRowConfig((s) => s.icon);
 
   return (
-    <Stack spacing={2} padding={2} direction="column" position="relative">
+    <Stack spacing={2} paddingY={2} direction="column" position="relative">
       <Box
         sx={{
           position: "sticky",
@@ -78,6 +78,7 @@ function PlotControls({ onClose }: PlotControlsProps) {
       >
         <Stack
           spacing={2}
+          px={2}
           alignItems="center"
           justifyContent="space-between"
           direction="row"

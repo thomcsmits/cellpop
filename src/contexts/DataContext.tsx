@@ -31,6 +31,8 @@ interface DataContextState {
   columnOrder: string[];
   rowSortOrder: SortOrder<string>[];
   columnSortOrder: SortOrder<string>[];
+  rowSortInvalidated: boolean;
+  columnSortInvalidated: boolean;
 }
 
 interface DataContextActions {
@@ -100,13 +102,13 @@ interface DataContextActions {
    */
   editColumnSortOrder: (index: number, sortOrder: SortOrder<string>) => void;
   /**
-   * Removes the sort order for the rows at a given index and updates the row order accordingly.
+   * Removes the sort order with the given sort key and updates the row order accordingly.
    */
-  removeRowSortOrder: (index: number) => void;
+  removeRowSortOrder: (key: string) => void;
   /**
-   * Removes the sort order for the columns at a given index and updates the column order accordingly.
+   * Removes the sort order with the given sort key and updates the column order accordingly.
    */
-  removeColumnSortOrder: (index: number) => void;
+  removeColumnSortOrder: (key: string) => void;
   /**
    * Removes all sort orders for the rows.
    */
@@ -123,6 +125,14 @@ interface DataContextActions {
    * Updates the order of the columns and clears the current sort orders.
    */
   setColumnOrder: (order: string[]) => void;
+  /**
+   * Revalidates the column sort order, updating the column order to match the current sort order.
+   */
+  revalidateColumnSort: () => void;
+  /**
+   * Revalidates the row sort order, updating the row order to match the current sort order.
+   */
+  revalidateRowSort: () => void;
 }
 
 type DataContextStore = DataContextState & DataContextActions;
@@ -208,6 +218,8 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
       columnSortOrder: [] as SortOrder<ColumnKey>[],
       rowOrder: initialData.rowNames,
       columnOrder: initialData.colNames,
+      rowSortInvalidated: false,
+      columnSortInvalidated: false,
       resetRemovedRows: () => {
         set({ removedRows: new Set<string>() });
       },
@@ -283,7 +295,7 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
             get(),
             true,
           );
-          return { rowSortOrder, rowOrder };
+          return { rowSortOrder, rowOrder, rowSortInvalidated: false };
         });
       },
       addColumnSortOrder: (sortOrder: SortOrder<ColumnKey>) => {
@@ -295,7 +307,7 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
             get(),
             false,
           );
-          return { columnSortOrder, columnOrder };
+          return { columnSortOrder, columnOrder, columnSortInvalidated: false };
         });
       },
       editRowSortOrder: (index: number, sortOrder: SortOrder<RowKey>) => {
@@ -308,7 +320,7 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
             get(),
             true,
           );
-          return { rowSortOrder, rowOrder };
+          return { rowSortOrder, rowOrder, rowSortInvalidated: false };
         });
       },
       editColumnSortOrder: (index: number, sortOrder: SortOrder<ColumnKey>) => {
@@ -321,44 +333,73 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
             get(),
             false,
           );
-          return { columnSortOrder, columnOrder };
+          return { columnSortOrder, columnOrder, columnSortInvalidated: false };
         });
       },
-      removeRowSortOrder: (index: number) => {
+      removeRowSortOrder: (key: string) => {
         set((state) => {
-          const rowSortOrder = state.rowSortOrder.slice(index, index + 1);
+          const rowSortOrder = state.rowSortOrder.filter((s) => s.key !== key);
           const rowOrder = applySortOrders(
             state.rowOrder,
             rowSortOrder,
             get(),
             true,
           );
-          return { rowSortOrder, rowOrder };
+          return { rowSortOrder, rowOrder, rowSortInvalidated: false };
         });
       },
-      removeColumnSortOrder: (index: number) => {
+      removeColumnSortOrder: (key: string) => {
         set((state) => {
-          const columnSortOrder = state.columnSortOrder.slice(index, index + 1);
+          const columnSortOrder = state.columnSortOrder.filter(
+            (s) => s.key !== key,
+          );
           const columnOrder = applySortOrders(
             state.columnOrder,
             columnSortOrder,
             get(),
             false,
           );
-          return { columnSortOrder, columnOrder };
+          return { columnSortOrder, columnOrder, columnSortInvalidated: false };
         });
       },
       clearRowSortOrder: () => {
-        set({ rowSortOrder: [] });
+        set({ rowSortOrder: [], rowSortInvalidated: false });
       },
       clearColumnSortOrder: () => {
-        set({ columnSortOrder: [] });
+        set({ columnSortOrder: [], columnSortInvalidated: false });
       },
       setRowOrder: (order: string[]) => {
-        set({ rowOrder: order, rowSortOrder: [] });
+        const rowSortOrder = get().rowSortOrder;
+        set({ rowOrder: order, rowSortInvalidated: rowSortOrder.length > 0 });
       },
       setColumnOrder: (order: string[]) => {
-        set({ columnOrder: order, columnSortOrder: [] });
+        const columnSortOrder = get().columnSortOrder;
+        set({
+          columnOrder: order,
+          columnSortInvalidated: columnSortOrder.length > 0,
+        });
+      },
+      revalidateColumnSort: () => {
+        set((state) => {
+          const columnOrder = applySortOrders(
+            state.columnOrder,
+            state.columnSortOrder,
+            state,
+            false,
+          );
+          return { columnOrder, columnSortInvalidated: false };
+        });
+      },
+      revalidateRowSort: () => {
+        set((state) => {
+          const rowOrder = applySortOrders(
+            state.rowOrder,
+            state.rowSortOrder,
+            state,
+            true,
+          );
+          return { rowOrder, rowSortInvalidated: false };
+        });
       },
     })),
   );
