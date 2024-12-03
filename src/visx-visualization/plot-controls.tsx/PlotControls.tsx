@@ -1,7 +1,7 @@
 import { CloseRounded, Settings } from "@mui/icons-material";
 import Button from "@mui/material/Button";
 import React, { PropsWithChildren, useState } from "react";
-import { useParentRef } from "../../contexts/ContainerRefContext";
+import { useOuterContainerRef } from "../../contexts/ContainerRefContext";
 
 import {
   Box,
@@ -122,12 +122,13 @@ function PlotControls({ onClose }: PlotControlsProps) {
 }
 
 export function PlotControlsButton() {
-  const parentRef = useParentRef();
+  const parentRef = useOuterContainerRef();
   const [showDrawer, setShowDrawer] = useState(false);
   const closeDrawer = useEventCallback(() => setShowDrawer(false));
   const openDrawer = useEventCallback(() => setShowDrawer(true));
   const parentBoundingBox = parentRef.current?.getBoundingClientRect();
   const windowBoundingBox = window.document.body.getBoundingClientRect();
+
   return (
     <>
       <Button

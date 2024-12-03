@@ -5,6 +5,7 @@ import Skeleton from "@mui/material/Skeleton";
 import { withParentSize, WithParentSizeProvidedProps } from "@visx/responsive";
 import { CellPopData, CellPopTheme } from "./cellpop-schema";
 import { AxisConfig } from "./contexts/AxisConfigContext";
+import { OuterContainerRefProvider } from "./contexts/ContainerRefContext";
 import { Dimensions, GridSizeTuple } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
 import Controls from "./visx-visualization/Controls";
@@ -65,26 +66,30 @@ export const CellPop = withParentSize(
       [onClick],
     );
 
+    const outerContainerRef = React.useRef<HTMLDivElement | null>(null);
+
     if (!data) {
       return <Skeleton />;
     }
 
     return (
-      <div onClick={handleClick}>
-        <Providers
-          data={data}
-          dimensions={dimensions}
-          theme={theme}
-          customTheme={customTheme}
-          xAxis={xAxis}
-          yAxis={yAxis}
-          disabledControls={disabledControls}
-          initialProportions={initialProportions}
-        >
-          <Controls />
-          <VizContainer />
-        </Providers>
-      </div>
+      <OuterContainerRefProvider value={outerContainerRef}>
+        <div onClick={handleClick} ref={outerContainerRef}>
+          <Providers
+            data={data}
+            dimensions={dimensions}
+            theme={theme}
+            customTheme={customTheme}
+            xAxis={xAxis}
+            yAxis={yAxis}
+            disabledControls={disabledControls}
+            initialProportions={initialProportions}
+          >
+            <Controls />
+            <VizContainer />
+          </Providers>
+        </div>
+      </OuterContainerRefProvider>
     );
   },
 );
