@@ -1,4 +1,10 @@
-import React, { PropsWithChildren, useCallback, useState } from "react";
+import React, {
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { createContext, useContext } from "../utils/context";
 import { Setter } from "../utils/types";
 
@@ -34,6 +40,10 @@ function getInitialSize(
   return initialProportions.map((prop) => total * prop) as GridSizeTuple;
 }
 
+function calculateProportions(total: number, sizes: GridSizeTuple) {
+  return sizes.map((size) => size / total) as GridSizeTuple;
+}
+
 interface DimensionsProviderProps extends PropsWithChildren {
   dimensions: Dimensions;
   initialProportions?: [GridSizeTuple, GridSizeTuple];
@@ -57,6 +67,21 @@ export function DimensionsProvider({
   const [rowSizes, setRowSizes] = useState<GridSizeTuple>(
     getInitialSize(height, initialRowProportions),
   );
+
+  const dimensionsRef = useRef({ width, height });
+
+  // Update the column and row sizes when container dimensions change,
+  // keeping proportions between the panels
+  useEffect(() => {
+    const previous = dimensionsRef.current;
+    setColumnSizes((columnSizes) =>
+      getInitialSize(width, calculateProportions(previous.width, columnSizes)),
+    );
+    setRowSizes((rowSizes) =>
+      getInitialSize(height, calculateProportions(previous.height, rowSizes)),
+    );
+    dimensionsRef.current = { width, height };
+  }, [width, height]);
 
   const resize = useCallback(
     (setter: Setter<GridSizeTuple>) => (newSize: number, index: number) => {

@@ -56,6 +56,7 @@ export default function HeatmapXAxis() {
         numTicks={x.domain().length}
         stroke={theme.palette.text.primary}
         tickStroke={theme.palette.text.primary}
+        top={1}
         tickLabelProps={(t) =>
           ({
             textAnchor: "end",
@@ -90,7 +91,7 @@ export default function HeatmapXAxis() {
           className: "x-axis-label text",
           pointerEvents: "none",
         }}
-        labelOffset={tickLabelSize - TICK_TEXT_SIZE * 2}
+        labelOffset={tickLabelSize + TICK_TEXT_SIZE}
       />
     </>
   );

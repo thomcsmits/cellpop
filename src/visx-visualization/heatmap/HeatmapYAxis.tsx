@@ -64,6 +64,7 @@ export default function HeatmapYAxis() {
       <AxisRight
         scale={y}
         label={labelWithCounts}
+        left={1}
         stroke={theme.palette.text.primary}
         tickStroke={theme.palette.text.primary}
         tickComponent={
@@ -104,9 +105,7 @@ export default function HeatmapYAxis() {
         }
         tickValues={rows}
         orientation={Orientation.right}
-        labelOffset={
-          tickLabelSize || Math.max(...y.domain().map((s) => s.length)) * 8
-        }
+        labelOffset={tickLabelSize + TICK_TEXT_SIZE}
         labelProps={{
           fontSize: TICK_TEXT_SIZE * 1.5,
           fill: theme.palette.text.primary,

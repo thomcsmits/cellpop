@@ -18,7 +18,6 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   DragHandle,
   ExpandMoreRounded,
-  InfoOutlined,
   InfoRounded,
   Restore,
   Search,
