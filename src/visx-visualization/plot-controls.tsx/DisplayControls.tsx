@@ -18,8 +18,10 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   DragHandle,
   ExpandMoreRounded,
+  Restore,
   Search,
   Visibility,
+  VisibilityOff,
 } from "@mui/icons-material";
 import {
   Accordion,
@@ -43,6 +45,7 @@ import {
 import { useData } from "../../contexts/DataContext";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { usePlotControlsContext } from "./PlotControlsContext";
+import { LeftAlignedButton } from "./style";
 
 function useItems() {
   const rows = useData((s) => s.rowOrder);
@@ -70,6 +73,21 @@ function useRemoveItems() {
   const section = usePlotControlsContext();
   return useData((s) =>
     section === "Column" ? s.removeColumns : s.removeRows,
+  );
+}
+
+function useRestoreItems() {
+  const section = usePlotControlsContext();
+  return useData((s) =>
+    section === "Column"
+      ? {
+          restoreItems: s.resetRemovedColumns,
+          hasHiddenItems: s.removedColumns.size > 0,
+        }
+      : {
+          restoreItems: s.resetRemovedRows,
+          hasHiddenItems: s.removedRows.size > 0,
+        },
   );
 }
 
@@ -129,6 +147,7 @@ export function DisplayControls() {
   const itemsAreFiltered =
     items.length !== filteredItems.length && filteredItems.length > 0;
   const removeItems = useRemoveItems();
+  const { restoreItems, hasHiddenItems } = useRestoreItems();
 
   const hideFilteredItems = useEventCallback(() => {
     const hiddenItems = items.filter((item) => !filteredItems.includes(item));
@@ -173,6 +192,16 @@ export function DisplayControls() {
             }}
           />
         </FormControl>
+        <LeftAlignedButton
+          variant="text"
+          startIcon={<Restore />}
+          onClick={restoreItems}
+          sx={{
+            visibility: hasHiddenItems ? "visible" : "hidden",
+          }}
+        >
+          Set all to visible
+        </LeftAlignedButton>
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -222,8 +251,11 @@ export function DisplayControls() {
               ))}
               {itemsAreFiltered && (
                 <Box gridRow="auto" gridColumn="span 3">
-                  <Button onClick={hideFilteredItems}>
-                    Hide All Filtered Items
+                  <Button
+                    onClick={hideFilteredItems}
+                    startIcon={<VisibilityOff />}
+                  >
+                    Hide all other results
                   </Button>
                 </Box>
               )}
