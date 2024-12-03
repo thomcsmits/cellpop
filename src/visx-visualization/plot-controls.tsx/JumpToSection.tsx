@@ -19,6 +19,12 @@ export function JumpToSection({ section }: { section: string }) {
         alignItems="center"
         underline="none"
         gap={1}
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById(`sort-options-${section}`)?.scrollIntoView({
+            behavior: "smooth",
+          });
+        }}
       >
         <Sort /> Sorts
       </Link>
@@ -29,6 +35,14 @@ export function JumpToSection({ section }: { section: string }) {
         alignItems="center"
         underline="none"
         gap={1}
+        onClick={(e) => {
+          e.preventDefault();
+          document
+            .getElementById(`display-options-${section}`)
+            ?.scrollIntoView({
+              behavior: "smooth",
+            });
+        }}
       >
         <Visibility /> Display Options
       </Link>
