@@ -59,7 +59,7 @@ function PlotControlSection({
 }
 
 function PlotControls({ onClose }: PlotControlsProps) {
-  const [selectedTab, setSelectedTab] = useState<PlotControlsSection>("Column");
+  const [selectedTab, setSelectedTab] = useState<PlotControlsSection>("Row");
   const columnLabel = useColumnConfig((s) => s.label);
   const columnIcon = useColumnConfig((s) => s.icon);
   const rowLabel = useRowConfig((s) => s.label);
@@ -101,22 +101,22 @@ function PlotControls({ onClose }: PlotControlsProps) {
           }}
         >
           <Tab
-            label={`Column: ${columnLabel}`}
-            value="Column"
-            icon={columnIcon}
-            iconPosition="start"
-          />
-          <Tab
             label={`Row: ${rowLabel}`}
             value="Row"
             icon={rowIcon}
             iconPosition="start"
           />
+          <Tab
+            label={`Column: ${columnLabel}`}
+            value="Column"
+            icon={columnIcon}
+            iconPosition="start"
+          />
         </Tabs>
         <JumpToSection section={selectedTab} />
       </Box>
-      <PlotControlSection value="Column" selectedValue={selectedTab} />
       <PlotControlSection value="Row" selectedValue={selectedTab} />
+      <PlotControlSection value="Column" selectedValue={selectedTab} />
     </Stack>
   );
 }
