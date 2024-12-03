@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { CellPop } from "../src/CellPopComponent";
 import { CellPopData } from "../src/cellpop-schema";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
+import { testData } from "./testData";
 
 import ScatterPlot from "@mui/icons-material/ScatterPlot";
 import TableChartIcon from "@mui/icons-material/TableChartRounded";
 import { GridSizeTuple } from "../src/contexts/DimensionsContext";
 
 function Demo() {
-  const [data, setData] = useState<CellPopData>();
+  const [data, setData] = useState<CellPopData>(testData);
 
   // data
   const uuids = [
@@ -47,15 +48,18 @@ function Demo() {
   ];
 
   // useEffect to make sure the data only loads once
+  // The `!data` check allows us to plug in test data as desired
   useEffect(() => {
-    loadHuBMAPData(uuids)
-      .then((data) => {
-        setData(data!);
-        // getMainVis(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    if (!data) {
+      loadHuBMAPData(uuids)
+        .then((data) => {
+          setData(data!);
+          // getMainVis(data);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   }, []);
 
   if (!data) {
@@ -82,7 +86,7 @@ function Demo() {
           createHref: (row) =>
             `https://portal.hubmapconsortium.org/browse/${row}`,
           flipAxisPosition: true,
-          createSubtitle: (value, metadataValues) => {
+          createSubtitle: (_, metadataValues) => {
             const anatomy = metadataValues["anatomy"];
             const datasetType = metadataValues["dataset_type"];
             return `${anatomy} | ${datasetType}`;
@@ -94,14 +98,14 @@ function Demo() {
           createHref: (col) =>
             `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`,
           flipAxisPosition: true,
-          createSubtitle: (value, metadataValues) => {
+          createSubtitle: (_, metadataValues) => {
             return metadataValues["Cell Ontology Label"];
           },
           icon: <ScatterPlot />,
         }}
         initialProportions={[
-          [0.5, 0.5, 0] as GridSizeTuple,
-          [0.5, 0.5, 0] as GridSizeTuple,
+          [0.35, 0.55, 0.1] as GridSizeTuple,
+          [0.3, 0.6, 0.1] as GridSizeTuple,
         ]}
       />
     </div>
