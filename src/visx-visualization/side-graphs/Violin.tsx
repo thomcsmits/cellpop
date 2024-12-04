@@ -7,6 +7,7 @@ import { area } from "@visx/shape";
 import { bin, max, rollups } from "d3";
 import { useData, useMaxCount } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
+import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { useXScale, useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import { BackgroundStripe } from "./BackgroundStripe";
@@ -27,10 +28,50 @@ interface ViolinsProps {
 function useCategoricalScale(side: Side) {
   const x = useXScale();
   const y = useYScale();
-  if (side === "top") {
-    return x;
+  switch (side) {
+    case "top":
+      return x;
+    case "left":
+      return y;
+    default:
+      console.log("Invalid side in Violin.useCategoricalScale: ", side);
+      return x;
   }
-  return y;
+}
+
+function getMultiplier(side: Side) {
+  switch (side) {
+    case "top":
+      return TOP_MULTIPLIER;
+    case "left":
+      return LEFT_MULTIPLIER;
+    default:
+      console.log("Invalid side in Violin.getMultiplier: ", side);
+      return 1;
+  }
+}
+
+function useViolinScale(side: Side) {
+  const topViolins = side === "top";
+  const { width, height } = usePanelDimensions(
+    topViolins ? "center_top" : "left_middle",
+  );
+  const { tickLabelSize } = useCategoricalScale(side);
+
+  const upperBound = useMaxCount();
+  /**
+   * Scale used to generate the density of the violin plots.
+   */
+  const rangeStart = topViolins ? height : width;
+  const multiplier = getMultiplier(side);
+  const rangeEnd = tickLabelSize * multiplier;
+
+  const violinScale = scaleLinear({
+    range: [rangeStart, rangeEnd],
+    domain: [0, upperBound],
+  });
+
+  return violinScale;
 }
 
 /**
@@ -57,10 +98,7 @@ export default function Violins({ side = "top" }: ViolinsProps) {
   const multiplier = topViolins ? TOP_MULTIPLIER : LEFT_MULTIPLIER;
   const rangeEnd = tickLabelSize * multiplier;
 
-  const violinScale = scaleLinear({
-    range: [rangeStart, rangeEnd],
-    domain: [0, upperBound],
-  });
+  const violinScale = useViolinScale(side);
 
   // Creates a map of group name to violin data
   const violins = useMemo(() => {
@@ -111,9 +149,14 @@ export default function Violins({ side = "top" }: ViolinsProps) {
 
   const { openTooltip } = useSetTooltipData();
 
+  const selectedValues = useSelectedValues((s) => s.selectedValues);
+
   return (
     <>
       {violins.map(([group, violinData]) => {
+        if (selectedValues.size > 0 && selectedValues.has(group)) {
+          return null;
+        }
         // Position of violin corresponds to its row/column;
         const transformCoordinate = categoricalScale(group);
         const transform = topViolins

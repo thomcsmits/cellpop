@@ -142,6 +142,8 @@ function ExpandedRowTick({
   const { openTooltip, closeTooltip } = useSetTooltipData();
   const theme = useTheme();
 
+  const { tickLabelSize } = useYScale();
+
   if (selectedValues.has(row)) {
     // Display an axis scaled for the selected value instead of the tick if the value is expanded
     // Use the tick label as the axis label
@@ -155,7 +157,8 @@ function ExpandedRowTick({
     return (
       <Axis
         top={y - EXPANDED_ROW_PADDING * 2}
-        left={panelSize.width}
+        orientation="left"
+        left={panelSize.width - tickLabelSize * LEFT_MULTIPLIER}
         scale={yScale}
         label={row}
         labelOffset={expandedSize / 2}
