@@ -1,5 +1,6 @@
 import { useTheme } from "@mui/material/styles";
 import {
+  Axis,
   AxisLeft,
   AxisRight,
   Orientation,
@@ -19,6 +20,7 @@ import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { EXPANDED_ROW_PADDING, useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
+import { LEFT_MULTIPLIER } from "../side-graphs/constants";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
 import { TICK_TEXT_SIZE } from "./constants";
 import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
@@ -45,10 +47,8 @@ export default function HeatmapYAxis() {
       : `${label} (${allColumnsCount})`;
 
   const filterId = useId();
-  const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(
-    axisConfig,
-    filterId,
-  );
+  const { openInNewTab, tickTitle, tickLabelStyle } =
+    useHeatmapAxis(axisConfig);
 
   const fontSize =
     y.bandwidth() > TICK_TEXT_SIZE ? TICK_TEXT_SIZE : y.bandwidth();
@@ -61,10 +61,10 @@ export default function HeatmapYAxis() {
         color={theme.palette.background.default}
         id={filterId}
       />
-      <AxisRight
+      <Axis
         scale={y}
         label={labelWithCounts}
-        left={1}
+        left={tickLabelSize * LEFT_MULTIPLIER}
         stroke={theme.palette.text.primary}
         tickStroke={theme.palette.text.primary}
         tickComponent={
@@ -82,10 +82,11 @@ export default function HeatmapYAxis() {
         tickLabelProps={(t) =>
           ({
             fontSize,
+            textAnchor: "end",
             fill: theme.palette.text.primary,
             className: "y-axis-tick-label text",
             style: tickLabelStyle,
-            transform: `translate(0, ${fontSize / 4})`,
+            dy: "0.25em",
             onMouseOver: (e) => {
               openTooltip(
                 {
@@ -104,10 +105,10 @@ export default function HeatmapYAxis() {
           }) as const
         }
         tickValues={rows}
-        orientation={Orientation.right}
-        labelOffset={tickLabelSize + TICK_TEXT_SIZE}
+        orientation={Orientation.left}
+        labelOffset={tickLabelSize}
         labelProps={{
-          fontSize: TICK_TEXT_SIZE * 1.5,
+          fontSize: TICK_TEXT_SIZE * LEFT_MULTIPLIER,
           fill: theme.palette.text.primary,
           pointerEvents: "none",
           className: "y-axis-label text",

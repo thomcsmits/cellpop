@@ -1,22 +1,45 @@
+import { useEventCallback } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import { ScaleBand, ScaleLinear } from "d3";
-import React from "react";
+import React, { useMemo } from "react";
 import {
   useColumnConfig,
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
-import { useSetTheme } from "../../contexts/CellPopThemeContext";
-import { useColumns, useData, useRows } from "../../contexts/DataContext";
+import {
+  useColumnCounts,
+  useData,
+  useRowCounts,
+} from "../../contexts/DataContext";
+import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
+import { BackgroundStripe } from "./BackgroundStripe";
 
 interface BarsProps {
   orientation: "horizontal" | "vertical";
   categoricalScale: ScaleBand<string>;
   numericalScale: ScaleLinear<number, number>;
-  data: Record<string, number>;
   domainLimit: number;
   selectedValues?: Set<string>;
   nonExpandedSize: number;
+}
+
+function useCurrentCounts(orientation: string) {
+  const rowCounts = useRowCounts();
+  const columnCounts = useColumnCounts();
+  return orientation === "vertical" ? columnCounts : rowCounts;
+}
+
+function useCurrentMetadata(orientation: string) {
+  return useData((s) =>
+    orientation === "vertical" ? s.data.metadata.cols : s.data.metadata.rows,
+  );
+}
+
+function useCurrentLabel(orientation: string) {
+  const columnLabel = useColumnConfig((store) => store.label);
+  const rowLabel = useRowConfig((store) => store.label);
+  return orientation === "vertical" ? columnLabel : rowLabel;
 }
 
 /**
@@ -24,7 +47,6 @@ interface BarsProps {
  * @param props.orientation The orientation of the bars.
  * @param props.categoricalScale The scale for the categorical axis (i.e. the x-axis if looking at a vertically oriented bar chart).
  * @param props.numericalScale The scale for the numerical axis (i.e. the y-axis if looking at a vertically oriented bar chart).
- * @param props.data The data to render (either row or column counts).
  * @param props.domainLimit The limit of the domain (i.e. the maximum height of a bar on the chart).
  * @returns
  */
@@ -32,45 +54,20 @@ export default function Bars({
   orientation,
   categoricalScale,
   numericalScale,
-  data,
   domainLimit,
-  selectedValues,
   nonExpandedSize,
 }: BarsProps) {
-  const entries = Object.entries(data);
-  const {
-    data: { metadata },
-  } = useData();
-
-  const columnLabel = useColumnConfig((store) => store.label);
-  const rowLabel = useRowConfig((store) => store.label);
-
-  const { openTooltip } = useSetTooltipData();
-  const onMouse = (key: string) => (e: React.MouseEvent<SVGRectElement>) => {
-    const md = orientation === "vertical" ? metadata.cols : metadata.rows;
-    const metadataValue = md?.[key];
-    openTooltip(
-      {
-        title: key,
-        data: {
-          "Cell Count": data[key],
-          [orientation === "vertical" ? columnLabel : rowLabel]: key,
-          ...metadataValue,
-        },
-      },
-      e.clientX,
-      e.clientY,
-    );
-  };
-  const rows = useRows();
-  const columns = useColumns();
-  return (
-    <>
-      {entries.map(([key, value]) => {
-        if (selectedValues?.has(key)) {
-          // Display an axis scaled for the selected value
+  const data = useCurrentCounts(orientation);
+  const selectedValues = useSelectedValues((s) => s.selectedValues);
+  const bars = useMemo(() => {
+    const entries = Object.entries(data);
+    return entries
+      .map(([key, value]) => {
+        if (orientation === "horizontal" && selectedValues?.has(key)) {
+          // Display an axis scaled for the selected value instead of the tick if the value is expanded
           return null;
         }
+
         const barWidth = nonExpandedSize;
         const scaledKey = categoricalScale(key);
         const scaledValue = numericalScale(value);
@@ -81,52 +78,95 @@ export default function Bars({
         const barHeight = scaledValue;
         const height = orientation === "vertical" ? barHeight : barWidth;
         const width = orientation === "vertical" ? barWidth : barHeight;
-        const index =
-          orientation === "vertical" ? columns.indexOf(key) : rows.indexOf(key);
-        return (
-          <Bar
-            key={key}
-            onMouse={onMouse(key)}
-            orientation={orientation}
-            x={x}
-            y={y}
-            barWidth={barWidth}
-            width={width}
-            height={height}
-            index={index}
-          />
-        );
+
+        const [rangeStart, rangeEnd] = numericalScale.range();
+        const backgroundX =
+          orientation === "vertical" ? x : domainLimit - rangeEnd;
+        const backgroundY =
+          orientation === "vertical" ? domainLimit - rangeStart : y;
+        const backgroundHeight =
+          orientation === "vertical" ? rangeStart : barWidth;
+        const backgroundWidth =
+          orientation === "vertical" ? barWidth : rangeEnd;
+        return {
+          x,
+          y,
+          width,
+          height,
+          value: key,
+          orientation,
+          backgroundX,
+          backgroundY,
+          backgroundHeight,
+          backgroundWidth,
+          key,
+        };
+      })
+      .filter((bar) => bar !== null);
+  }, [
+    orientation,
+    data,
+    categoricalScale,
+    numericalScale,
+    domainLimit,
+    nonExpandedSize,
+    selectedValues,
+  ]);
+  return (
+    <>
+      {bars.map((bar) => {
+        return <Bar {...bar} key={bar.key} />;
       })}
     </>
   );
 }
 
 interface BarProps {
-  onMouse: (e: React.MouseEvent<SVGRectElement>) => void;
-  orientation: "horizontal" | "vertical";
   x: number;
   y: number;
-  barWidth: number;
   width: number;
   height: number;
-  index: number;
+  value: string;
+  orientation: "horizontal" | "vertical";
+  backgroundX: number;
+  backgroundY: number;
+  backgroundHeight: number | string;
+  backgroundWidth: number | string;
 }
 
 function Bar({
-  onMouse,
-  orientation,
   x,
   y,
-  barWidth,
   width,
   height,
-  index,
+  backgroundX,
+  backgroundY,
+  backgroundHeight,
+  backgroundWidth,
+  value,
+  orientation,
 }: BarProps) {
+  const metadata = useCurrentMetadata(orientation);
+  const data = useCurrentCounts(orientation);
+  const { openTooltip } = useSetTooltipData();
+  const label = useCurrentLabel(orientation);
+  const onMouse = useEventCallback((e: React.MouseEvent<SVGRectElement>) => {
+    const metadataValues = metadata?.[value];
+    openTooltip(
+      {
+        title: value,
+        data: {
+          "Cell Count": data[value],
+          [label]: value,
+          ...metadataValues,
+        },
+      },
+      e.clientX,
+      e.clientY,
+    );
+  });
   const { closeTooltip } = useSetTooltipData();
   const theme = useTheme();
-  const currentTheme = useSetTheme((s) => s.currentTheme);
-  const stripeColor =
-    currentTheme === "dark" ? theme.palette.grey[800] : theme.palette.grey[50];
   return (
     <g
       onMouseOver={onMouse}
@@ -134,12 +174,13 @@ function Bar({
       onMouseOut={closeTooltip}
       pointerEvents={"all"}
     >
-      <rect
-        x={orientation === "vertical" ? x : 0}
-        y={orientation === "vertical" ? 0 : y}
-        height={orientation === "vertical" ? "100%" : barWidth}
-        width={orientation === "vertical" ? barWidth : "100%"}
-        fill={index % 2 == 0 ? theme.palette.background.default : stripeColor}
+      <BackgroundStripe
+        x={backgroundX}
+        y={backgroundY}
+        height={backgroundHeight}
+        width={backgroundWidth}
+        orientation={orientation}
+        value={value}
       />
       <rect
         x={x}

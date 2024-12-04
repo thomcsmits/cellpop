@@ -3,7 +3,7 @@ import { AxisBottom } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import React from "react";
 import { useRowConfig } from "../../contexts/AxisConfigContext";
-import { useHighestRowCount, useRowCounts } from "../../contexts/DataContext";
+import { useMaxCount, useRowCounts } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { useFraction } from "../../contexts/FractionContext";
@@ -11,37 +11,35 @@ import { useYScale } from "../../contexts/ScaleContext";
 import HeatmapYAxis from "../heatmap/HeatmapYAxis";
 import Bars from "./Bars";
 import Violins from "./Violin";
-import { LEFT_MARGIN } from "./constants";
+import { LEFT_MULTIPLIER } from "./constants";
 import { useCountsScale } from "./hooks";
 
 const useXAxisCountsScale = () => {
   const { width } = usePanelDimensions("left_middle");
   const rowCounts = useRowCounts();
-  const upperBound = useHighestRowCount();
-  const { fraction } = useFraction();
+  const upperBound = useMaxCount();
+  const fraction = useFraction((s) => s.fraction);
   const { tickLabelSize } = useYScale();
   const domainMax = fraction ? upperBound : max(Object.values(rowCounts));
   return useCountsScale(
     [0, domainMax],
-    [0, width - LEFT_MARGIN - tickLabelSize],
+    [0, width - tickLabelSize * LEFT_MULTIPLIER],
   );
 };
 
 function LeftBar() {
   const { width } = usePanelDimensions("left_middle");
-  const rowCounts = useRowCounts();
   const xScale = useXAxisCountsScale();
   // Use same y scale as the heatmap
   const { scale: yScale, nonExpandedSize } = useYScale();
   const selectedValues = useSelectedValues((s) => s.selectedValues);
 
   return (
-    <g className="barleft">
+    <g className="bar-graph-left">
       <Bars
         orientation="horizontal"
         categoricalScale={yScale}
         numericalScale={xScale}
-        data={rowCounts}
         domainLimit={width}
         selectedValues={selectedValues}
         nonExpandedSize={nonExpandedSize}
@@ -55,8 +53,8 @@ export function LeftGraphScale() {
   const xScale = useXAxisCountsScale();
   const { tickLabelSize } = useYScale();
 
-  const axisScale = xScale.copy().range([width - LEFT_MARGIN, tickLabelSize]);
-  const axisTotalWidth = width - LEFT_MARGIN - tickLabelSize;
+  const axisScale = xScale.copy().range([width, tickLabelSize * 1.25]);
+  const axisTotalWidth = width - tickLabelSize * LEFT_MULTIPLIER;
 
   const theme = useTheme();
   return (
@@ -70,7 +68,6 @@ export function LeftGraphScale() {
         hideZero
         hideAxisLine
         top={0}
-        left={LEFT_MARGIN}
         orientation="bottom"
         stroke={theme.palette.text.primary}
         tickLabelProps={{ fill: theme.palette.text.primary, className: "text" }}

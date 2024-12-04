@@ -5,12 +5,17 @@ import { Group } from "@visx/group";
 import { scaleLinear } from "@visx/scale";
 import { area } from "@visx/shape";
 import { bin, max, rollups } from "d3";
-import { useSetTheme } from "../../contexts/CellPopThemeContext";
 import { useData, useMaxCount } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useXScale, useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
-import { TOP_MARGIN } from "./constants";
+import { BackgroundStripe } from "./BackgroundStripe";
+import {
+  LEFT_MARGIN,
+  LEFT_MULTIPLIER,
+  TOP_MARGIN,
+  TOP_MULTIPLIER,
+} from "./constants";
 
 type Side = "top" | "left";
 
@@ -40,17 +45,18 @@ export default function Violins({ side = "top" }: ViolinsProps) {
   } = useData();
   const upperBound = useMaxCount();
 
-  const dimensions = usePanelDimensions(
+  const { width, height } = usePanelDimensions(
     side === "top" ? "center_top" : "left_middle",
   );
-  const { width, height } = dimensions;
   const { scale: categoricalScale, tickLabelSize } = useCategoricalScale(side);
 
   /**
    * Scale used to generate the density of the violin plots.
    */
   const rangeStart = topViolins ? height : width;
-  const rangeEnd = tickLabelSize + TOP_MARGIN;
+  const multiplier = topViolins ? TOP_MULTIPLIER : LEFT_MULTIPLIER;
+  const rangeEnd = tickLabelSize * multiplier;
+
   const violinScale = scaleLinear({
     range: [rangeStart, rangeEnd],
     domain: [0, upperBound],
@@ -82,11 +88,9 @@ export default function Violins({ side = "top" }: ViolinsProps) {
     }, 0);
   }, [violins]);
 
-  const categoricalScaleRescaled = categoricalScale.copy().paddingInner(0.1);
-
   const densityScale = scaleLinear({
     domain: [-maxBinCount, maxBinCount],
-    range: [0, categoricalScaleRescaled.bandwidth()],
+    range: [0, categoricalScale.bandwidth()],
   });
 
   const violinAreaGenerator = useMemo(() => {
@@ -105,16 +109,13 @@ export default function Violins({ side = "top" }: ViolinsProps) {
 
   const theme = useTheme();
 
-  const { openTooltip, closeTooltip } = useSetTooltipData();
-  const currentTheme = useSetTheme((s) => s.currentTheme);
-  const stripeColor =
-    currentTheme === "dark" ? theme.palette.grey[800] : theme.palette.grey[50];
+  const { openTooltip } = useSetTooltipData();
 
   return (
     <>
-      {violins.map(([group, violinData], idx) => {
+      {violins.map(([group, violinData]) => {
         // Position of violin corresponds to its row/column;
-        const transformCoordinate = categoricalScaleRescaled(group);
+        const transformCoordinate = categoricalScale(group);
         const transform = topViolins
           ? `translate(${transformCoordinate}, 0)`
           : `translate(0, ${transformCoordinate})`;
@@ -131,19 +132,20 @@ export default function Violins({ side = "top" }: ViolinsProps) {
           };
         }, {});
 
-        const range = Math.abs(rangeStart);
+        const backgroundY = topViolins ? rangeEnd : 0;
+        const backgroundX = topViolins ? 0 : rangeEnd;
 
         const backgroundWidth = topViolins
           ? categoricalScale.bandwidth()
-          : range;
+          : rangeStart + LEFT_MARGIN;
 
         const backgroundHeight = topViolins
-          ? range
+          ? rangeStart + TOP_MARGIN
           : categoricalScale.bandwidth();
         return (
           <Group key={group} transform={transform}>
-            <rect
-              onMouseMove={(e) => {
+            <BackgroundStripe
+              onMouseOver={(e) => {
                 openTooltip(
                   {
                     title: group,
@@ -153,14 +155,12 @@ export default function Violins({ side = "top" }: ViolinsProps) {
                   e.clientY,
                 );
               }}
-              onMouseOut={closeTooltip}
+              x={backgroundX}
+              y={backgroundY}
               height={backgroundHeight}
               width={backgroundWidth}
-              fill={
-                idx % 2 == 0 ? theme.palette.background.default : stripeColor
-              }
-              style={{ pointerEvents: "all" }}
-              data-testid={`violin-background-${group}`}
+              value={group}
+              orientation={topViolins ? "vertical" : "horizontal"}
             />
             <path
               key={group}

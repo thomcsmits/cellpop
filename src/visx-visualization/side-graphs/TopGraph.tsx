@@ -4,50 +4,42 @@ import { useTheme } from "@mui/material/styles";
 import { AxisRight } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
-import {
-  useColumnCounts,
-  useHighestColumnCount,
-} from "../../contexts/DataContext";
+import { useColumnCounts, useMaxCount } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
-import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { useFraction } from "../../contexts/FractionContext";
 import { useXScale } from "../../contexts/ScaleContext";
 import HeatmapXAxis from "../heatmap/HeatmapXAxis";
 import Bars from "./Bars";
 import Violins from "./Violin";
-import { TOP_MARGIN } from "./constants";
+import { TOP_MULTIPLIER } from "./constants";
 import { useCountsScale } from "./hooks";
 
-const useYAxisCountsScale = () => {
+const useColumnCountsScale = () => {
   const { height } = usePanelDimensions("center_top");
   const columnCounts = useColumnCounts();
-  const upperBound = useHighestColumnCount();
+  const upperBound = useMaxCount();
   const { tickLabelSize } = useXScale();
-  const { fraction } = useFraction();
+  const fraction = useFraction((s) => s.fraction);
   const domainMax = fraction ? upperBound : max(Object.values(columnCounts));
   return useCountsScale(
     [domainMax, 0],
-    [height - TOP_MARGIN - tickLabelSize, 0],
+    [height - tickLabelSize * TOP_MULTIPLIER, 0],
   );
 };
 
 function TopBar() {
   const { height } = usePanelDimensions("center_top");
-  const columnCounts = useColumnCounts();
   // Use same x scale as the heatmap
   const { scale: xScale, nonExpandedSize } = useXScale();
-  const selectedValues = useSelectedValues(s => s.selectedValues)
-  const yScale = useYAxisCountsScale();
+  const yScale = useColumnCountsScale();
 
   return (
-    <g className="bartop">
+    <g className="bar-graph-top">
       <Bars
         orientation="vertical"
         categoricalScale={xScale}
         numericalScale={yScale}
-        data={columnCounts}
         domainLimit={height}
-        selectedValues={selectedValues}
         nonExpandedSize={nonExpandedSize}
       />
     </g>
@@ -57,12 +49,12 @@ function TopBar() {
 export function TopGraphScale() {
   const { width, height } = usePanelDimensions("right_top");
   // Use same x scale as the heatmap
-  const yScale = useYAxisCountsScale();
+  const yScale = useColumnCountsScale();
   const { tickLabelSize } = useXScale();
 
-  const axisScale = yScale.copy().range([tickLabelSize, height - TOP_MARGIN]);
+  const axisScale = yScale.copy().range([tickLabelSize * 1.5, height]);
 
-  const axisTotalHeight = height - TOP_MARGIN - tickLabelSize;
+  const axisTotalHeight = height - tickLabelSize * TOP_MULTIPLIER;
 
   const theme = useTheme();
 
@@ -74,7 +66,7 @@ export function TopGraphScale() {
     >
       <AxisRight
         scale={axisScale}
-        top={16}
+        top={0}
         left={0}
         orientation="right"
         hideZero
