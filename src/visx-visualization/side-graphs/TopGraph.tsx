@@ -52,7 +52,9 @@ export function TopGraphScale() {
   const yScale = useColumnCountsScale();
   const { tickLabelSize } = useXScale();
 
-  const axisScale = yScale.copy().range([tickLabelSize * 1.5, height]);
+  const axisScale = yScale
+    .copy()
+    .range([tickLabelSize * TOP_MULTIPLIER, height]);
 
   const axisTotalHeight = height - tickLabelSize * TOP_MULTIPLIER;
 
