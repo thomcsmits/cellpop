@@ -45,7 +45,7 @@ export function Providers({
   theme,
   fraction = false,
   selectedValues = [],
-  selectedDimension = "X",
+  selectedDimension = "Y",
   xAxis: xAxisConfig,
   yAxis: yAxisConfig,
   customTheme,

@@ -45,7 +45,7 @@ export default function Controls() {
 
   const changeSelectedDimension = useEventCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const newSelectedDimension = event.target.checked ? "Y" : "X";
+      const newSelectedDimension = event.target.checked ? "X" : "Y";
       setSelectedDimension(newSelectedDimension);
     },
   );
@@ -97,10 +97,10 @@ export default function Controls() {
         {!selectedDimensionIsDisabled && (
           <LabelledSwitch
             label="Selection Tool"
-            leftLabel="Column"
-            rightLabel="Row"
+            leftLabel="Row"
+            rightLabel="Column"
             onChange={changeSelectedDimension}
-            checked={selectedDimension === "Y"}
+            checked={selectedDimension === "X"}
           />
         )}
         {!themeIsDisabled && (
