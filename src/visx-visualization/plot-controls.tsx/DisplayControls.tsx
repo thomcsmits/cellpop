@@ -93,7 +93,7 @@ function useRestoreItems() {
   );
 }
 
-function useCanBeEmbedded() {
+function useCanBeExpanded() {
   const section = usePlotControlsContext();
   return section === "Row";
 }
@@ -103,9 +103,9 @@ const RowDescription =
   "Toggle to show or hide a row, or enable an embedded detailed plot for the row within the visualization.";
 
 export function DisplayControls() {
-  const canBeEmbedded = useCanBeEmbedded();
+  const canBeExpanded = useCanBeExpanded();
 
-  const description = canBeEmbedded ? RowDescription : ColumnDescription;
+  const description = canBeExpanded ? RowDescription : ColumnDescription;
 
   const items = useItems();
   const metadata = useItemMetadata();
@@ -217,7 +217,7 @@ export function DisplayControls() {
               sx={{
                 display: "grid",
                 gap: 1,
-                gridTemplateColumns: canBeEmbedded
+                gridTemplateColumns: canBeExpanded
                   ? "1fr auto auto"
                   : "1fr auto",
                 gridTemplateRows: "auto",
@@ -240,7 +240,7 @@ export function DisplayControls() {
               >
                 Visible
               </Typography>
-              {canBeEmbedded && (
+              {canBeExpanded && (
                 <Typography
                   component="label"
                   variant="subtitle1"
@@ -251,7 +251,7 @@ export function DisplayControls() {
                   alignItems="center"
                   gap={1}
                 >
-                  Embedded
+                  Expanded
                   <Tooltip
                     title="Toggle between displaying row as heatmap cells or a bar plot."
                     placement="top"
@@ -325,7 +325,7 @@ function DisplayItem({ item }: { item: string }) {
   );
 
   const subtitle = createSubtitle(item, metadata[item]);
-  const canBeEmbedded = useCanBeEmbedded();
+  const canBeExpanded = useCanBeExpanded();
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -382,7 +382,7 @@ function DisplayItem({ item }: { item: string }) {
           checked={isVisible}
         />
       </Box>
-      {canBeEmbedded && (
+      {canBeExpanded && (
         <Box gridColumn={3}>
           <Switch
             name={item}

@@ -48,7 +48,6 @@ function TopBar() {
 
 export function TopGraphScale() {
   const { width, height } = usePanelDimensions("right_top");
-  // Use same x scale as the heatmap
   const yScale = useColumnCountsScale();
   const { tickLabelSize } = useXScale();
 
