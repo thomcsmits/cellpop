@@ -3,7 +3,7 @@ import { AxisBottom } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import React from "react";
 import { useRowConfig } from "../../contexts/AxisConfigContext";
-import { useMaxCount, useRowCounts } from "../../contexts/DataContext";
+import { useRowCounts } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { useFraction } from "../../contexts/FractionContext";
@@ -17,10 +17,9 @@ import { useCountsScale } from "./hooks";
 const useXAxisCountsScale = () => {
   const { width } = usePanelDimensions("left_middle");
   const rowCounts = useRowCounts();
-  const upperBound = useMaxCount();
   const fraction = useFraction((s) => s.fraction);
   const { tickLabelSize } = useYScale();
-  const domainMax = fraction ? upperBound : max(Object.values(rowCounts));
+  const domainMax = fraction ? 100 : max(Object.values(rowCounts));
   return useCountsScale(
     [0, domainMax],
     [0, width - tickLabelSize * LEFT_MULTIPLIER],
@@ -56,7 +55,11 @@ export function LeftGraphScale() {
   const axisScale = xScale.copy().range([width, tickLabelSize * 1.25]);
   const axisTotalWidth = width - tickLabelSize * LEFT_MULTIPLIER;
 
+  const fraction = useFraction((s) => s.fraction);
   const theme = useTheme();
+  if (fraction) {
+    return null;
+  }
   return (
     <svg
       width={width}

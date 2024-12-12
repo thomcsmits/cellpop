@@ -1,9 +1,13 @@
 import React, { useId } from "react";
-import { useColorScale } from "../contexts/ScaleContext";
+import { useColorScale } from "../contexts/ColorScaleContext";
 
 import { Box, Stack, Typography } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 
+import {
+  useIsNormalized,
+  useNormalization,
+} from "../contexts/NormalizationContext";
 import { PlotControlsButton } from "./plot-controls.tsx/PlotControls";
 import { TemporalControls } from "./TemporalControls";
 
@@ -13,11 +17,19 @@ export default function Legend() {
 
   const minColor = colors(0);
   const maxColor = colors(maxValue);
+  const isNormalized = useIsNormalized();
+  const normalization = useNormalization((state) => state.normalization);
+
+  const legendLabel = isNormalized
+    ? `Percent of all cells in ${normalization}`
+    : "Counts";
+  const minValueLabel = isNormalized ? "0%" : "0";
+  const maxValueLabel = isNormalized ? "100%" : maxValue;
 
   return (
     <Stack height="100%" gap="1rem" paddingX={1}>
       <Stack width="100%">
-        <InputLabel id="heatmap-legend-select-label">Counts</InputLabel>
+        <InputLabel id="heatmap-legend-label">{legendLabel}</InputLabel>
         <Box
           id={id}
           sx={{
@@ -36,10 +48,10 @@ export default function Legend() {
             py={0.75}
           >
             <Typography variant="body2" style={{ color: maxColor }}>
-              0
+              {minValueLabel}
             </Typography>
             <Typography variant="body2" style={{ color: minColor }}>
-              {maxValue}
+              {maxValueLabel}
             </Typography>
           </Stack>
         </Box>

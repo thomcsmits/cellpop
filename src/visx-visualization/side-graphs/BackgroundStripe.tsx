@@ -9,6 +9,7 @@ interface BackgroundStripeProps {
   width: number | string;
   value: string;
   onMouseOver?: (e: React.MouseEvent<SVGRectElement>) => void;
+  onMouseMove?: (e: React.MouseEvent<SVGRectElement>) => void;
   onMouseOut?: (e: React.MouseEvent<SVGRectElement>) => void;
   orientation: "horizontal" | "vertical";
 }

@@ -219,7 +219,8 @@ const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
         <ContextMenuSubContent sideOffset={2} alignOffset={-5}>
           {sortOrders.map((order) => (
             <ContextMenuItem key={order.key} onClick={() => sort([order])}>
-              {order.key.charAt(0).toUpperCase()} {order.key.slice(1)}{" "}
+              {order.key.charAt(0).toUpperCase()}
+              {order.key.slice(1).replace("_", " ")}{" "}
               {order.direction === "asc" ? "Ascending" : "Descending"}
               {currentSortOrder.includes(order) && <RightSlot>✓</RightSlot>}
             </ContextMenuItem>

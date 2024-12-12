@@ -1,7 +1,11 @@
 import React, { PropsWithChildren } from "react";
 import { createContext, useContext } from "../utils/context";
 
-export type DisableableControls = "fraction" | "selection" | "theme";
+export type DisableableControls =
+  | "fraction"
+  | "selection"
+  | "theme"
+  | "normalization";
 
 interface DisabledControlContextType {
   disabledControls: DisableableControls[];
@@ -21,6 +25,9 @@ export const useFractionControlIsDisabled = () =>
 
 export const useSelectionControlIsDisabled = () =>
   useDisabledControls().includes("selection");
+
+export const useNormalizationControlIsDisabled = () =>
+  useDisabledControls().includes("normalization");
 
 export function DisabledControlProvider({
   children,

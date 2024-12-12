@@ -2,6 +2,7 @@ import { scaleLinear } from "@visx/scale";
 import React from "react";
 
 import { useTheme } from "@mui/material/styles";
+import { useColorScale } from "../../contexts/ColorScaleContext";
 import {
   useColumns,
   useData,
@@ -11,11 +12,8 @@ import {
 } from "../../contexts/DataContext";
 import { useHeatmapDimensions } from "../../contexts/DimensionsContext";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
-import {
-  useColorScale,
-  useXScale,
-  useYScale,
-} from "../../contexts/ScaleContext";
+import { useNormalization } from "../../contexts/NormalizationContext";
+import { useXScale, useYScale } from "../../contexts/ScaleContext";
 import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import DragOverlayContainer from "./DragOverlay";
@@ -25,7 +23,8 @@ function HeatmapRow({ row }: { row: string }) {
   const { scale: xScale } = useXScale();
   const { scale: yScale } = useYScale();
   const selectedValues = useSelectedValues((s) => s.selectedValues);
-  const { scale: colors } = useColorScale();
+  const normalization = useNormalization((s) => s.normalization);
+  const { scale: globalScale, rowScales, columnScales } = useColorScale();
   const cellWidth = Math.ceil(xScale.bandwidth());
   const cellHeight = Math.ceil(yScale.bandwidth(row));
   const { removedRows, removedColumns } = useData();
@@ -101,6 +100,12 @@ function HeatmapRow({ row }: { row: string }) {
     <g>
       {rowKeys.map((key) => {
         const [row, col] = key.split("-");
+        const colors =
+          normalization === "Row"
+            ? rowScales[row]
+            : normalization === "Column"
+              ? columnScales[col]
+              : globalScale;
         if (removedColumns.has(col)) {
           return null;
         }
@@ -113,7 +118,7 @@ function HeatmapRow({ row }: { row: string }) {
             width={Math.ceil(cellWidth)}
             height={Math.ceil(cellHeight)}
             fill={colors(value)}
-            stroke={theme.palette.text.primary}
+            stroke={colors(colors.domain()[1] / 2)}
             strokeOpacity={0.5}
           />
         );

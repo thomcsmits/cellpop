@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from "react";
-import { useColorScale } from "../contexts/ScaleContext";
+import { useColorScale } from "../contexts/ColorScaleContext";
 import { HEATMAP_THEMES_LIST, HeatmapTheme } from "../utils/heatmap-themes";
 
 import { AppBar, Stack } from "@mui/material";
@@ -15,6 +15,10 @@ import {
   useThemeControlIsDisabled,
 } from "../contexts/DisabledControlProvider";
 import { useFraction } from "../contexts/FractionContext";
+import {
+  NORMALIZATIONS,
+  useNormalization,
+} from "../contexts/NormalizationContext";
 import { useSelectedDimension } from "../contexts/SelectedDimensionContext";
 import LabelledSwitch from "./LabelledSwitch";
 
@@ -28,6 +32,7 @@ export default function Controls() {
   const { currentTheme, setTheme } = useSetTheme();
   const { fraction, setFraction } = useFraction();
   const { selectedDimension, setSelectedDimension } = useSelectedDimension();
+  const { normalization, setNormalization } = useNormalization();
 
   const changeVisTheme = useEventCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +54,10 @@ export default function Controls() {
       setSelectedDimension(newSelectedDimension);
     },
   );
+
+  const changeNormalization = useEventCallback((event: SelectChangeEvent) => {
+    setNormalization(event.target.value as (typeof NORMALIZATIONS)[number]);
+  });
 
   const themeIsDisabled = useThemeControlIsDisabled();
   const fractionIsDisabled = useFractionControlIsDisabled();
@@ -81,6 +90,30 @@ export default function Controls() {
                 sx={{ textTransform: "capitalize" }}
               >
                 {theme}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl sx={{ maxWidth: 300 }}>
+          <InputLabel id="heatmap-normalization-select-label">
+            Heatmap Normalization
+          </InputLabel>
+          <Select
+            labelId="heatmap-normalization-select-label"
+            id="heatmap-normalization-select"
+            value={normalization}
+            onChange={changeNormalization}
+            variant="outlined"
+            label="Heatmap Themes"
+            sx={{ textTransform: "capitalize", minWidth: 200 }}
+          >
+            {NORMALIZATIONS.map((normalization) => (
+              <MenuItem
+                key={normalization}
+                value={normalization}
+                sx={{ textTransform: "capitalize" }}
+              >
+                {normalization}
               </MenuItem>
             ))}
           </Select>

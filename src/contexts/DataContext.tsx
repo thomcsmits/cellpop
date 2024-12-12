@@ -5,6 +5,7 @@ import { createStore } from "zustand";
 import { CellPopData } from "../cellpop-schema";
 import { moveToEnd, moveToStart } from "../utils/array-reordering";
 import { createStoreContext } from "../utils/zustand";
+import { Normalization } from "./NormalizationContext";
 
 interface DataContextProps {
   initialData: CellPopData;
@@ -446,6 +447,24 @@ const getDataMap = memoize((state: DataContextStore) => {
   return dataMap;
 });
 
+const getRowFractionDataMap = memoize((state: DataContextStore) => {
+  const dataMap: Record<DataMapKey, number> = {};
+  const { rowCounts } = getDerivedStatesSelector(state);
+  state.data.countsMatrix.forEach(({ row, col, value }) => {
+    dataMap[`${row}-${col}`] = value / rowCounts[row];
+  });
+  return dataMap;
+});
+
+const getColumnFractionDataMap = memoize((state: DataContextStore) => {
+  const dataMap: Record<DataMapKey, number> = {};
+  const { columnCounts } = getDerivedStatesSelector(state);
+  state.data.countsMatrix.forEach(({ row, col, value }) => {
+    dataMap[`${row}-${col}`] = value / columnCounts[col];
+  });
+  return dataMap;
+});
+
 const getRowNames = memoize((state: DataContextStore) => {
   const { rowOrder, removedRows } = state;
   return rowOrder.filter((row) => !removedRows.has(row));
@@ -528,6 +547,14 @@ export const useColumnSorts: () => SortOrder<string>[] = () => {
 
 export const useDataMap = () => {
   return useData(getDataMap);
+};
+
+export const useRowFractionDataMap = () => {
+  return useData(getRowFractionDataMap);
+};
+
+export const useColumnFractionDataMap = () => {
+  return useData(getColumnFractionDataMap);
 };
 
 export const useRowCounts = () => {
@@ -616,4 +643,18 @@ export const useMoveColumnToStart = () => {
   return (column: string) => {
     setColumnOrder(moveToStart(columnOrder, column));
   };
+};
+
+export const useFractionDataMap = (normalization: Normalization) => {
+  const selector = useMemo(() => {
+    switch (normalization) {
+      case "Row":
+        return getRowFractionDataMap;
+      case "Column":
+        return getColumnFractionDataMap;
+      default:
+        return getDataMap;
+    }
+  }, [normalization]);
+  return useData(selector);
 };

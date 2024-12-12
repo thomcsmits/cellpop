@@ -69,14 +69,11 @@ function Demo() {
   return (
     <div
       style={{
-        width: "95vw",
-        height: "95vh",
+        width: "90vw",
+        height: "90vh",
+        margin: "auto",
+        marginTop: "5vh",
       }}
-      // style={{
-      //   width: "70vw",
-      //   height: "70vh",
-      //   margin: "auto",
-      // }}
     >
       <CellPop
         data={data}

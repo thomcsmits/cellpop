@@ -12,6 +12,7 @@ import { useDataHistory } from "../contexts/DataContext";
 import { useThemeControlIsDisabled } from "../contexts/DisabledControlProvider";
 import { useExpandedValuesHistory } from "../contexts/ExpandedValuesContext";
 import { useFractionHistory } from "../contexts/FractionContext";
+import { useNormalizationHistory } from "../contexts/NormalizationContext";
 import { useSelectedDimensionHistory } from "../contexts/SelectedDimensionContext";
 
 // Function to hook into the various state histories and provide undo/redo functionality
@@ -21,10 +22,12 @@ function useTemporalActions() {
   const fractionHistory = useFractionHistory();
   const dataHistory = useDataHistory();
   const expandedHistory = useExpandedValuesHistory();
+  const normalizationHistory = useNormalizationHistory();
 
   const themeIsDisabled = useThemeControlIsDisabled();
   const selectedDimensionIsDisabled = useThemeControlIsDisabled();
   const fractionIsDisabled = useThemeControlIsDisabled();
+  const normalizationIsDisabled = useThemeControlIsDisabled();
 
   const undoQueue = useRef<TemporalState<StoreApi<unknown>>[]>([]);
   const redoQueue = useRef<TemporalState<StoreApi<unknown>>[]>([]);
@@ -43,6 +46,9 @@ function useTemporalActions() {
     if (!fractionIsDisabled) {
       fractionHistory.setOnSave(onSave(fractionHistory));
     }
+    if (!normalizationIsDisabled) {
+      normalizationHistory.setOnSave(onSave(normalizationHistory));
+    }
     dataHistory.setOnSave(onSave(dataHistory));
     expandedHistory.setOnSave(onSave(expandedHistory));
     return () => {
@@ -51,6 +57,7 @@ function useTemporalActions() {
       fractionHistory.setOnSave(undefined);
       dataHistory.setOnSave(undefined);
       expandedHistory.setOnSave(undefined);
+      normalizationHistory.setOnSave(undefined);
     };
   }, [themeIsDisabled, selectedDimensionIsDisabled, fractionIsDisabled]);
 
@@ -76,6 +83,7 @@ function useTemporalActions() {
     fractionHistory.undo(fractionHistory.pastStates.length);
     dataHistory.undo(dataHistory.pastStates.length);
     expandedHistory.undo(expandedHistory.pastStates.length);
+    normalizationHistory.undo(normalizationHistory.pastStates.length);
     undoQueue.current = [];
     redoQueue.current = [];
   });

@@ -1,17 +1,12 @@
 import { scaleBand, scaleLinear } from "@visx/scale";
-import React, { PropsWithChildren, useMemo, useState } from "react";
+import React, { PropsWithChildren, useMemo } from "react";
 import { useSet } from "../hooks/useSet";
 import { createContext, useContext } from "../utils/context";
-import {
-  HEATMAP_THEMES_LIST,
-  HeatmapTheme,
-  heatmapThemes,
-} from "../utils/heatmap-themes";
-import { useColumns, useMaxCount, useRows } from "./DataContext";
+import { useColumns, useRows } from "./DataContext";
 import { useHeatmapDimensions } from "./DimensionsContext";
 import { useSelectedValues } from "./ExpandedValuesContext";
 
-const SCALES = ["X", "Y", "Color"] as const;
+const SCALES = ["X", "Y"] as const;
 
 export type ScaleLinear<T> = ReturnType<typeof scaleLinear<T>>;
 export type ScaleBand<T> = ReturnType<typeof scaleBand<T>> & {
@@ -32,16 +27,6 @@ const [XScaleContext, YScaleContext] = SCALES.map((dimension: string) => {
 export const useXScale = () => useContext(XScaleContext);
 export const useYScale = () => useContext(YScaleContext);
 
-// Color context does not have selection
-interface ColorScaleContext {
-  scale: ScaleLinear<string>;
-  maxValue: number;
-  heatmapTheme: HeatmapTheme;
-  setHeatmapTheme: (theme: HeatmapTheme) => void;
-}
-const ColorScaleContext = createContext<ColorScaleContext>("ColorScaleContext");
-export const useColorScale = () => useContext(ColorScaleContext);
-
 // Add 8px between the expanded row and the next row
 export const EXPANDED_ROW_PADDING = 8;
 
@@ -49,11 +34,7 @@ export const EXPANDED_ROW_PADDING = 8;
  * Provider which instantiates and manages the scales used for the heatmap.
  */
 export function ScaleProvider({ children }: PropsWithChildren) {
-  const maxCount = useMaxCount();
   const { width, height } = useHeatmapDimensions();
-  const [heatmapTheme, setHeatmapTheme] = useState<HeatmapTheme>(
-    HEATMAP_THEMES_LIST[0],
-  );
   const { set: selectedX, toggle: toggleX, reset: resetX } = useSet<string>();
 
   const expandedRows = useSelectedValues((s) => s.selectedValues);
@@ -266,26 +247,11 @@ export function ScaleProvider({ children }: PropsWithChildren) {
     }),
     [y, expandedRows, yTickLabelSize, expandedSize, collapsedSize],
   );
-  const colorScaleContext = useMemo(() => {
-    const theme = heatmapThemes[heatmapTheme];
-    const scale = scaleLinear<string>({
-      range: [theme(0), theme(1)],
-      domain: [0, maxCount],
-    });
-    return {
-      scale,
-      maxValue: maxCount,
-      heatmapTheme,
-      setHeatmapTheme,
-    };
-  }, [heatmapTheme, maxCount]);
 
   return (
     <XScaleContext.Provider value={xScaleContext}>
       <YScaleContext.Provider value={yScaleContext}>
-        <ColorScaleContext.Provider value={colorScaleContext}>
-          {children}
-        </ColorScaleContext.Provider>
+        {children}
       </YScaleContext.Provider>
     </XScaleContext.Provider>
   );

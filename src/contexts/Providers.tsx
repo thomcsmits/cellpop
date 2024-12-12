@@ -7,6 +7,7 @@ import {
   RowConfigProvider,
 } from "./AxisConfigContext";
 import { CellPopThemeProvider } from "./CellPopThemeContext";
+import { ColorScaleProvider } from "./ColorScaleContext";
 import { DataProvider } from "./DataContext";
 import {
   Dimensions,
@@ -20,6 +21,7 @@ import {
 } from "./DisabledControlProvider";
 import { SelectedValuesProvider } from "./ExpandedValuesContext";
 import { FractionProvider } from "./FractionContext";
+import { NormalizationProvider } from "./NormalizationContext";
 import { ScaleProvider } from "./ScaleContext";
 import { SelectedDimensionProvider } from "./SelectedDimensionContext";
 import { TooltipDataProvider } from "./TooltipDataContext";
@@ -33,6 +35,7 @@ interface CellPopConfigProps extends PropsWithChildren {
   selectedDimension?: "X" | "Y";
   fraction?: boolean;
   selectedValues?: string[];
+  normalization?: "Row" | "Column";
   customTheme?: Theme;
   disabledControls?: DisableableControls[];
   initialProportions?: [GridSizeTuple, GridSizeTuple];
@@ -50,6 +53,7 @@ export function Providers({
   yAxis: yAxisConfig,
   customTheme,
   disabledControls = [],
+  normalization: initialNormalization,
   initialProportions = [INITIAL_PROPORTIONS, INITIAL_PROPORTIONS],
 }: CellPopConfigProps) {
   return (
@@ -65,13 +69,19 @@ export function Providers({
                     initialProportions={initialProportions}
                   >
                     <FractionProvider initialFraction={fraction}>
-                      <ScaleProvider>
-                        <SelectedDimensionProvider
-                          initialSelectedDimension={selectedDimension}
-                        >
-                          {children}
-                        </SelectedDimensionProvider>
-                      </ScaleProvider>
+                      <NormalizationProvider
+                        initialNormalization={initialNormalization}
+                      >
+                        <ScaleProvider>
+                          <ColorScaleProvider>
+                            <SelectedDimensionProvider
+                              initialSelectedDimension={selectedDimension}
+                            >
+                              {children}
+                            </SelectedDimensionProvider>
+                          </ColorScaleProvider>
+                        </ScaleProvider>
+                      </NormalizationProvider>
                     </FractionProvider>
                   </DimensionsProvider>
                 </CellPopThemeProvider>

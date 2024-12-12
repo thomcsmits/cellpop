@@ -4,7 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import { AxisRight } from "@visx/axis";
 import { formatPrefix, max } from "d3";
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
-import { useColumnCounts, useMaxCount } from "../../contexts/DataContext";
+import { useColumnCounts } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useFraction } from "../../contexts/FractionContext";
 import { useXScale } from "../../contexts/ScaleContext";
@@ -17,10 +17,9 @@ import { useCountsScale } from "./hooks";
 const useColumnCountsScale = () => {
   const { height } = usePanelDimensions("center_top");
   const columnCounts = useColumnCounts();
-  const upperBound = useMaxCount();
   const { tickLabelSize } = useXScale();
   const fraction = useFraction((s) => s.fraction);
-  const domainMax = fraction ? upperBound : max(Object.values(columnCounts));
+  const domainMax = fraction ? 100 : max(Object.values(columnCounts));
   return useCountsScale(
     [domainMax, 0],
     [height - tickLabelSize * TOP_MULTIPLIER, 0],
@@ -58,6 +57,12 @@ export function TopGraphScale() {
   const axisTotalHeight = height - tickLabelSize * TOP_MULTIPLIER;
 
   const theme = useTheme();
+
+  const fraction = useFraction((s) => s.fraction);
+
+  if (fraction) {
+    return null;
+  }
 
   return (
     <svg

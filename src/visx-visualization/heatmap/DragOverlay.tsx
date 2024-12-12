@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useCallback, useMemo, useRef } from "react";
+import React, { PropsWithChildren, useMemo, useRef } from "react";
 import { ScaleBand, useXScale, useYScale } from "../../contexts/ScaleContext";
 import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
 
@@ -30,11 +30,16 @@ import {
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
 import { useParentRef } from "../../contexts/ContainerRefContext";
-import { useDataHistory, useDataMap } from "../../contexts/DataContext";
+import {
+  useDataHistory,
+  useDataMap,
+  useFractionDataMap,
+} from "../../contexts/DataContext";
 import {
   useDimensions,
   useHeatmapDimensions,
 } from "../../contexts/DimensionsContext";
+import { useNormalization } from "../../contexts/NormalizationContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import { Setter } from "../../utils/types";
 
@@ -199,6 +204,8 @@ function DragIndicator({
 
   const { columnSizes, rowSizes } = useDimensions();
   const dataMap = useDataMap();
+  const normalization = useNormalization((store) => store.normalization);
+  const normalizedDataMap = useFractionDataMap(normalization);
 
   const xOffset = columnSizes[0];
   const yOffset = rowSizes[0];
@@ -206,7 +213,7 @@ function DragIndicator({
   const theme = useTheme();
   const rowLabel = useRowConfig((store) => store.label);
   const columnLabel = useColumnConfig((store) => store.label);
-  const { width, height } = useHeatmapDimensions();
+  const { height } = useHeatmapDimensions();
 
   const strategy =
     selectedDimension === "X"
@@ -219,45 +226,52 @@ function DragIndicator({
   const parentRef = useParentRef();
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const onMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      const visualizationBounds = parentRef.current?.getBoundingClientRect();
-      if (!visualizationBounds) {
-        return;
-      }
-      // e.clientX = mouse position relative to the viewport
-      // xOffset = position of the heatmap relative to the bounds of the cellpop container
-      // visualizationBounds.left = position of the cellpop container relative to the viewport
-      const xValue = e.clientX - xOffset - visualizationBounds.left;
+  const onMouseMove = useEventCallback((e: React.MouseEvent) => {
+    const visualizationBounds = parentRef.current?.getBoundingClientRect();
+    if (!visualizationBounds) {
+      return;
+    }
+    // e.clientX = mouse position relative to the viewport
+    // xOffset = position of the heatmap relative to the bounds of the cellpop container
+    // visualizationBounds.left = position of the cellpop container relative to the viewport
+    const xValue = e.clientX - xOffset - visualizationBounds.left;
 
-      // y position is inverted to match the y scale
-      const visualizationTotalHeight =
-        yOffset + height + visualizationBounds.top;
-      const yMousePosition = e.clientY;
-      const yValue = height - (visualizationTotalHeight - yMousePosition);
+    // y position is inverted to match the y scale
+    const visualizationTotalHeight = yOffset + height + visualizationBounds.top;
+    const yMousePosition = e.clientY;
+    const yValue = height - (visualizationTotalHeight - yMousePosition);
 
-      const columnKey = x.lookup(xValue);
-      const rowKey = y.lookup(yValue);
+    const columnKey = x.lookup(xValue);
+    const rowKey = y.lookup(yValue);
 
-      if (!rowKey || !columnKey) {
-        return;
-      }
+    if (!rowKey || !columnKey) {
+      return;
+    }
 
-      openTooltip(
-        {
-          title: `${rowKey} - ${columnKey}`,
-          data: {
-            "Cell Count": dataMap[`${rowKey}-${columnKey}`],
-            [rowLabel]: rowKey,
-            [columnLabel]: columnKey,
-          },
+    const key = `${rowKey}-${columnKey}` as keyof typeof dataMap;
+
+    const normalizationInfo =
+      normalization !== "None"
+        ? {
+            [`Percentage of total cells in ${normalization}`]:
+              (normalizedDataMap[key] * 100).toFixed(2) + "%",
+          }
+        : {};
+
+    openTooltip(
+      {
+        title: `${rowKey} - ${columnKey}`,
+        data: {
+          "Cell Count": dataMap[`${rowKey}-${columnKey}`],
+          [rowLabel]: rowKey,
+          [columnLabel]: columnKey,
+          ...normalizationInfo,
         },
-        e.clientX,
-        e.clientY,
-      );
-    },
-    [x, y, xOffset, yOffset, dataMap, rowLabel, columnLabel, width, height],
-  );
+      },
+      e.clientX,
+      e.clientY,
+    );
+  });
 
   return (
     <div
