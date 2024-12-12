@@ -1,12 +1,12 @@
 import { scaleLinear } from "@visx/scale";
-import React from "react";
+import React, { useLayoutEffect, useRef } from "react";
 
 import { useTheme } from "@mui/material/styles";
 import { useColorScale } from "../../contexts/ColorScaleContext";
 import {
   useColumns,
   useData,
-  useDataMap,
+  useFractionDataMap,
   useRowMaxes,
   useRows,
 } from "../../contexts/DataContext";
@@ -18,117 +18,99 @@ import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import DragOverlayContainer from "./DragOverlay";
 
-function HeatmapRow({ row }: { row: string }) {
-  const { width } = useHeatmapDimensions();
-  const { scale: xScale } = useXScale();
-  const { scale: yScale } = useYScale();
-  const selectedValues = useSelectedValues((s) => s.selectedValues);
-  const normalization = useNormalization((s) => s.normalization);
-  const { scale: globalScale, rowScales, columnScales } = useColorScale();
-  const cellWidth = Math.ceil(xScale.bandwidth());
-  const cellHeight = Math.ceil(yScale.bandwidth(row));
-  const { removedRows, removedColumns } = useData();
-  const dataMap = useDataMap();
-  const rowMaxes = useRowMaxes();
+function CanvasHeatmapRenderer() {
+  const { width, height } = useHeatmapDimensions();
+  const rows = useRows();
   const columns = useColumns();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const xScale = useXScale();
+  const yScale = useYScale();
+  const selectedValues = useSelectedValues((s) => s.selectedValues);
+
+  const { scale: globalScale, rowScales, columnScales } = useColorScale();
+  const normalization = useNormalization((s) => s.normalization);
+  const dataMap = useFractionDataMap(normalization);
+  const rowMaxes = useRowMaxes();
   const theme = useTheme();
-  if (removedRows.has(row)) {
-    return null;
-  }
 
-  const rowKeys = columns.map((col) => `${row}-${col}`);
-  const max = rowMaxes[row];
+  const { closeTooltip } = useSetTooltipData();
 
-  if (selectedValues.has(row)) {
-    const inlineYScale = scaleLinear({
-      domain: [0, max],
-      range: [0, cellHeight],
-      nice: true,
-    });
-    return (
-      <g>
-        <rect
-          x={0}
-          y={yScale(row)}
-          width={width}
-          height={cellHeight}
-          fill={theme.palette.background.default}
-        />
-        {rowKeys.map((key) => {
-          const [row, col] = key.split("-");
-          if (removedColumns.has(col)) {
-            return null;
-          }
+  useLayoutEffect(() => {
+    if (!canvasRef.current) {
+      return;
+    }
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      return;
+    }
+    ctx.clearRect(0, 0, width, height);
+    const cellWidth = Math.ceil(xScale.scale.bandwidth());
+    rows.forEach((row) => {
+      const cellHeight = Math.ceil(yScale.scale.bandwidth(row));
+      if (selectedValues.has(row)) {
+        // draw bar graph
+        const max = rowMaxes[row];
+
+        const inlineYScale = scaleLinear({
+          domain: [0, max],
+          range: [0, cellHeight],
+          nice: true,
+        });
+        columns.forEach((col) => {
+          const key = `${row}-${col}`;
           const value = dataMap[key as keyof typeof dataMap];
-          const x = xScale(col);
-          const yBackground = yScale(row);
+          const x = xScale.scale(col);
+          const yBackground = yScale.scale(row);
           const barHeight = inlineYScale(value);
           const yBar = yBackground + cellHeight - barHeight;
-          return (
-            <g key={key}>
-              <rect
-                x={x}
-                y={yBackground}
-                width={cellWidth}
-                height={cellHeight}
-                fill={theme.palette.background.default}
-              />
-              <rect
-                x={x}
-                y={yBar}
-                width={cellWidth}
-                height={barHeight}
-                fill={theme.palette.text.primary}
-                stroke={theme.palette.background.default}
-              />
-            </g>
+          ctx.fillStyle = theme.palette.background.default;
+          ctx.fillRect(x, yBackground, cellWidth, cellHeight);
+          ctx.fillStyle = theme.palette.text.primary;
+          ctx.fillRect(x, yBar, cellWidth, barHeight);
+        });
+      } else {
+        // draw heatmap cells
+        columns.forEach((col) => {
+          const colors =
+            normalization === "Row"
+              ? rowScales[row]
+              : normalization === "Column"
+                ? columnScales[col]
+                : globalScale;
+          const value = dataMap[`${row}-${col}` as keyof typeof dataMap];
+          ctx.fillStyle = colors(value);
+          ctx.strokeStyle = colors(colors.domain()[1] / 2);
+          ctx.strokeRect(
+            xScale.scale(col),
+            yScale.scale(row),
+            Math.ceil(cellWidth),
+            Math.ceil(cellHeight),
           );
-        })}
-        <line
-          // x axis line for the embedded bar graph
-          x1={0}
-          x2={width}
-          y1={yScale(row) + cellHeight}
-          y2={yScale(row) + cellHeight}
-          stroke={theme.palette.text.primary}
-        />
-      </g>
-    );
-  }
+          ctx.fillRect(
+            xScale.scale(col),
+            yScale.scale(row),
+            Math.ceil(cellWidth),
+            Math.ceil(cellHeight),
+          );
+        });
+      }
+    });
+  }, [xScale, yScale, dataMap, rowMaxes, selectedValues, normalization]);
+
   return (
-    <g>
-      {rowKeys.map((key) => {
-        const [row, col] = key.split("-");
-        const colors =
-          normalization === "Row"
-            ? rowScales[row]
-            : normalization === "Column"
-              ? columnScales[col]
-              : globalScale;
-        if (removedColumns.has(col)) {
-          return null;
-        }
-        const value = dataMap[key as keyof typeof dataMap];
-        return (
-          <rect
-            key={key}
-            x={xScale(col)}
-            y={yScale(row)}
-            width={Math.ceil(cellWidth)}
-            height={Math.ceil(cellHeight)}
-            fill={colors(value)}
-            stroke={colors(colors.domain()[1] / 2)}
-            strokeOpacity={0.5}
-          />
-        );
-      })}
-    </g>
+    <canvas
+      onMouseOut={closeTooltip}
+      ref={canvasRef}
+      width={width}
+      height={height}
+      className="heatmap"
+    />
   );
 }
 
 export default function Heatmap() {
-  const { width, height } = useHeatmapDimensions();
   const { selectedDimension } = useSelectedDimension();
   const rows = useRows();
   const columns = useColumns();
@@ -144,29 +126,13 @@ export default function Heatmap() {
         : store.clearRowSortOrder,
   }));
 
-  const { closeTooltip } = useSetTooltipData();
-
-  const theme = useTheme();
-
   return (
     <DragOverlayContainer
       items={items}
       setItems={setItems}
       resetSort={resetSort}
     >
-      <svg
-        width={width}
-        height={height}
-        className="heatmap"
-        style={{
-          outline: `1px solid ${theme.palette.text.primary}`,
-        }}
-        onMouseOut={closeTooltip}
-      >
-        {rows.map((row) => (
-          <HeatmapRow key={row} row={row} />
-        ))}
-      </svg>
+      <CanvasHeatmapRenderer />
     </DragOverlayContainer>
   );
 }
