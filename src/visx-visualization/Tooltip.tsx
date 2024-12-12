@@ -13,7 +13,7 @@ import {
  * @returns
  */
 export default function Tooltip() {
-  const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen } =
+  const { tooltipData, tooltipLeft, tooltipTop, tooltipOpen, contextMenuOpen } =
     useTooltipData();
   const { closeTooltip } = useSetTooltipData();
 
@@ -27,7 +27,7 @@ export default function Tooltip() {
     }
   }, [tooltipData, closeTooltip]);
 
-  if (!tooltipOpen) {
+  if (!tooltipOpen || contextMenuOpen) {
     return null;
   }
 
