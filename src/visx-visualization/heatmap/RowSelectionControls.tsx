@@ -9,6 +9,9 @@ export default function RowSelectionControls() {
   const { scale } = useYScale();
   const selectedValues = useSelectedValues((s) => s.selectedValues);
   const toggleSelection = useSelectedValues((s) => s.toggleValue);
+  if (scale.bandwidth() < 10) {
+    return null;
+  }
   return (
     <>
       {rows.map((row) => (
