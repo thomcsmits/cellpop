@@ -9,12 +9,11 @@ export default function RowSelectionControls() {
   const { scale } = useYScale();
   const selectedValues = useSelectedValues((s) => s.selectedValues);
   const toggleSelection = useSelectedValues((s) => s.toggleValue);
-  if (scale.bandwidth() < 10) {
-    return null;
-  }
+  const smallScale = scale.bandwidth() < 10;
+  const rowsToRender = smallScale ? [...selectedValues] : rows;
   return (
     <>
-      {rows.map((row) => (
+      {rowsToRender.map((row) => (
         <Tooltip
           title={`Toggle ${row}`}
           key={row}
