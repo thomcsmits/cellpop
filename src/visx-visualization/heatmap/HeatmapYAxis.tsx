@@ -165,6 +165,7 @@ function ExpandedRowTick({
         tickLabelProps={{
           fill: theme.palette.text.primary,
           style: tickLabelStyle,
+          fontFamily: theme.typography.fontFamily,
           onMouseOut: closeTooltip,
           onClick: () => openInNewTab(row),
           className: "text",
@@ -173,6 +174,7 @@ function ExpandedRowTick({
           style: tickLabelStyle,
           fill: theme.palette.text.primary,
           className: "text",
+          fontFamily: theme.typography.fontFamily,
           onMouseMove: (e) => {
             openTooltip(
               {

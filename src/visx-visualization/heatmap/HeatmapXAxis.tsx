@@ -65,7 +65,8 @@ export default function HeatmapXAxis() {
             fontSize: size,
             style: tickLabelStyle,
             fill: theme.palette.text.primary,
-            className: "x-axis-tick-label text",
+            className: "x-axis-tick-label",
+            fontFamily: theme.typography.fontFamily,
             onMouseOver: (e) => {
               openTooltip(
                 {
@@ -90,6 +91,7 @@ export default function HeatmapXAxis() {
           fill: theme.palette.text.primary,
           className: "x-axis-label text",
           pointerEvents: "none",
+          fontFamily: theme.typography.fontFamily,
         }}
         labelOffset={tickLabelSize}
       />
