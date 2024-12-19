@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
             "index.html": "index.html",
             "demo/index.tsx": "demo/index.tsx",
             "index.ts": "src/index.ts",
+            "favicon.ico": "favicon.ico",
           },
         },
       },
