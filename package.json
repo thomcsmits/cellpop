@@ -4,8 +4,14 @@
   "version": "0.0.0",
   "homepage": "https://hms-dbmi.github.io/",
   "type": "module",
+  "files": ["dist"],
+  "main": "./dist/index.umd.js",
+  "module": "./dist/index.es.js",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.umd.js"
+    }
   },
   "scripts": {
     "dev": "vite",
