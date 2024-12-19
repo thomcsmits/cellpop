@@ -9,7 +9,9 @@ export default defineConfig(({ mode }) => {
       build: {
         rollupOptions: {
           input: {
-            "index.html": path.resolve(__dirname, "index.html"),
+            "index.html": "index.html",
+            "demo/index.tsx": "demo/index.tsx",
+            "src/index.ts": "src/index.ts",
           },
         },
       },
