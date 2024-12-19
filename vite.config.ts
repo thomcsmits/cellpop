@@ -11,8 +11,8 @@ export default defineConfig(({ mode }) => {
           input: {
             "index.html": "index.html",
             "demo/index.tsx": "demo/index.tsx",
-            "src/index.ts": "src/index.ts",
-            "src/style.css": "src/style.css",
+            "index.ts": "src/index.ts",
+            "style.css": "src/style.css",
           },
         },
       },
