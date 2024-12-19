@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
-      base: "/cellpop/",
+      base: "/",
       plugins: [react()],
     };
   }
