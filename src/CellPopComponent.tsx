@@ -8,6 +8,7 @@ import { AxisConfig } from "./contexts/AxisConfigContext";
 import { OuterContainerRefProvider } from "./contexts/ContainerRefContext";
 import { Dimensions, GridSizeTuple } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
+import "./style.css";
 import Controls from "./visx-visualization/Controls";
 import VizContainer from "./visx-visualization/layout";
 
