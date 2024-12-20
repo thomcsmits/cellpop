@@ -6,14 +6,13 @@ import {
   HeatmapTheme,
   heatmapThemes,
 } from "../utils/heatmap-themes";
-import { useColumnCounts, useMaxCount, useRowCounts } from "./DataContext";
+import { useMaxCount } from "./DataContext";
 import { ScaleLinear } from "./ScaleContext";
 
 // Color context does not have selection
 interface ColorScaleContext {
   scale: ScaleLinear<string>;
-  rowScales: Record<string, ScaleLinear<string>>;
-  columnScales: Record<string, ScaleLinear<string>>;
+  percentageScale: ScaleLinear<string>;
   maxValue: number;
   heatmapTheme: HeatmapTheme;
   setHeatmapTheme: (theme: HeatmapTheme) => void;
@@ -29,8 +28,6 @@ export function ColorScaleProvider({ children }: PropsWithChildren) {
   const [heatmapTheme, setHeatmapTheme] = useState<HeatmapTheme>(
     HEATMAP_THEMES_LIST[0],
   );
-  const columnCounts = useColumnCounts();
-  const rowCounts = useRowCounts();
 
   const colorScaleContext = useMemo(() => {
     const theme = heatmapThemes[heatmapTheme];
@@ -41,32 +38,17 @@ export function ColorScaleProvider({ children }: PropsWithChildren) {
       domain: [0, maxCount],
     });
 
-    const rowScales: Record<string, ScaleLinear<string>> = {};
-    const columnScales: Record<string, ScaleLinear<string>> = {};
-
-    for (const row of Object.keys(rowCounts)) {
-      const count = rowCounts[row];
-      rowScales[row] = scaleLinear<string>({
-        range: [lowColor, highColor],
-        domain: [0, count],
-      });
-    }
-
-    for (const column of Object.keys(columnCounts)) {
-      const count = columnCounts[column];
-      columnScales[column] = scaleLinear<string>({
-        range: [lowColor, highColor],
-        domain: [0, count],
-      });
-    }
+    const percentageScale = scaleLinear<string>({
+      range: [lowColor, highColor],
+      domain: [0, 1],
+    });
 
     return {
       scale,
+      percentageScale,
       maxValue: maxCount,
       heatmapTheme,
       setHeatmapTheme,
-      rowScales,
-      columnScales,
     };
   }, [heatmapTheme, maxCount]);
 

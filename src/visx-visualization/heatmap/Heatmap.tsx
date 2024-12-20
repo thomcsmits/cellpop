@@ -28,7 +28,7 @@ function CanvasHeatmapRenderer() {
   const yScale = useYScale();
   const selectedValues = useSelectedValues((s) => s.selectedValues);
 
-  const { scale: globalScale, rowScales, columnScales } = useColorScale();
+  const { scale: globalScale, percentageScale } = useColorScale();
   const normalization = useNormalization((s) => s.normalization);
   const dataMap = useFractionDataMap(normalization);
   const rowMaxes = useRowMaxes();
@@ -74,11 +74,7 @@ function CanvasHeatmapRenderer() {
         // draw heatmap cells
         columns.forEach((col) => {
           const colors =
-            normalization === "Row"
-              ? rowScales[row]
-              : normalization === "Column"
-                ? columnScales[col]
-                : globalScale;
+            normalization !== "None" ? percentageScale : globalScale;
           const value = dataMap[`${row}-${col}` as keyof typeof dataMap];
           ctx.fillStyle = colors(value);
           ctx.strokeStyle = colors(colors.domain()[1] / 2);
