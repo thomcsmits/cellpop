@@ -28,7 +28,7 @@ function CanvasHeatmapRenderer() {
   const yScale = useYScale();
   const selectedValues = useSelectedValues((s) => s.selectedValues);
 
-  const { scale: globalScale, percentageScale } = useColorScale();
+  const { scale: globalScale, percentageScale, heatmapTheme } = useColorScale();
   const normalization = useNormalization((s) => s.normalization);
   const dataMap = useFractionDataMap(normalization);
   const rowMaxes = useRowMaxes();
@@ -93,7 +93,15 @@ function CanvasHeatmapRenderer() {
         });
       }
     });
-  }, [xScale, yScale, dataMap, rowMaxes, selectedValues, normalization]);
+  }, [
+    xScale,
+    yScale,
+    dataMap,
+    rowMaxes,
+    selectedValues,
+    normalization,
+    heatmapTheme,
+  ]);
 
   return (
     <canvas
