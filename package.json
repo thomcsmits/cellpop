@@ -1,7 +1,10 @@
 {
   "name": "cellpop",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "license": "MIT",
+  "author": "Thomas Smits",
+  "description": "A React component for visualizing cell populations in two-dimensional array data.",
   "homepage": "https://hms-dbmi.github.io/",
   "type": "module",
   "main": "./dist/index.umd.js",
@@ -12,28 +15,37 @@
       "require": "./dist/index.umd.js"
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hms-dbmi/cellpop.git"
+  },
+  "bugs": {
+    "url": "https://github.com/hms-dbmi/cellpop/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "build-demo": "vite build --mode demo",
     "preview": "vite preview",
+    "preview-demo": "vite preview --mode demo",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.1.0",
     "@vitejs/plugin-react": "^4.3.4",
     "eslint": "^9.17.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.37.2",
-    "gh-pages": "^6.2.0",
     "globals": "^15.14.0",
     "prettier": "^3.4.2",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
-    "vite": "^6.0.5"
+    "vite": "^6.0.5",
+    "vitest": "^2.1.8"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -42,7 +54,6 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/base": "5.0.0-beta.67",
     "@mui/icons-material": "^6.2.1",
     "@mui/material": "^6.2.1",
     "@radix-ui/react-context-menu": "^2.2.4",
