@@ -25,12 +25,6 @@ export function loadDataWithCounts(
   const data = { countsMatrix: countsMatrix, countsMatrixOrder: ["row", "col", "value"] } as CellPopData;
   loadDataWrapper(data, ordering);
   data.metadata = metadata;
-
-  // Revert to old data format!
-  const formatObject = true;
-  if (formatObject) {
-    return translateDataToObjectFormat(data);
-  }
   return data;
 }
 

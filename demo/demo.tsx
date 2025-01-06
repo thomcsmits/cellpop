@@ -54,8 +54,11 @@ function Demo() {
     if (!data) {
       loadHuBMAPData(uuids)
         .then((data) => {
-          setData(data!);
-          // getMainVis(data);
+          // setData(data!);
+          if (data) {
+            const dataPreviousFormat = translateDataToObjectFormat(data) as CellPopData;
+            setData(dataPreviousFormat!);
+          }
         })
         .catch((error) => {
           console.error(error);
