@@ -191,11 +191,14 @@ export function calculateFractions(data: CellPopData) {
 // Temporary new -> old data conversion
 export function translateDataToObjectFormat(data: CellPopData) {
   const countsMatrixOld = translateCountsMatrixToObjectFormat(data.countsMatrix);
-  const countsMatrixFractionsOld = {
-    row: translateCountsMatrixToObjectFormat(data.countsMatrixFractions.row),
-    col: translateCountsMatrixToObjectFormat(data.countsMatrixFractions.col)
+  const dataOld = {...data, countsMatrix: countsMatrixOld} as CellPopDataFlexible;
+  if (data.countsMatrixFractions) {
+    const countsMatrixFractionsOld = {
+      row: translateCountsMatrixToObjectFormat(data.countsMatrixFractions.row),
+      col: translateCountsMatrixToObjectFormat(data.countsMatrixFractions.col)
+    }
+    dataOld.countsMatrixFractions = countsMatrixFractionsOld;
   }
-  const dataOld = {...data, countsMatrix: countsMatrixOld, countsMatrixFractions: countsMatrixFractionsOld} as CellPopDataFlexible;
   return dataOld;
 }
 

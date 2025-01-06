@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { CellPop } from "../src/CellPopComponent";
 import { CellPopData } from "../src/cellpop-schema";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
+import { translateDataToObjectFormat } from "../src/dataLoading/dataWrangling";
 import { testData, testData_200_300 } from "./testData";
 
 import ScatterPlot from "@mui/icons-material/ScatterPlot";
@@ -9,7 +10,7 @@ import TableChartIcon from "@mui/icons-material/TableChartRounded";
 import { GridSizeTuple } from "../src/contexts/DimensionsContext";
 
 function Demo() {
-  const [data, setData] = useState<CellPopData>(testData);
+  const [data, setData] = useState<CellPopData>(translateDataToObjectFormat(testData) as CellPopData);
 
   // data
   const uuids = [
