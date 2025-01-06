@@ -10,7 +10,6 @@
 
 import {
   CellPopData,
-  CellPopDataFlexible,
   CountsMatrixValue,
   MetaData,
   dataOrdering,
@@ -179,27 +178,4 @@ export function calculateFractions(data: CellPopData) {
     row: countsMatrixRowFractions,
     col: countsMatrixColFractions,
   };
-}
-
-
-// Temporary new -> old data conversion
-export function translateDataToObjectFormat(data: CellPopData) {
-  const countsMatrixOld = translateCountsMatrixToObjectFormat(data.countsMatrix);
-  const dataOld = {...data, countsMatrix: countsMatrixOld} as CellPopDataFlexible;
-  if (data.countsMatrixFractions) {
-    const countsMatrixFractionsOld = {
-      row: translateCountsMatrixToObjectFormat(data.countsMatrixFractions.row),
-      col: translateCountsMatrixToObjectFormat(data.countsMatrixFractions.col)
-    }
-    dataOld.countsMatrixFractions = countsMatrixFractionsOld;
-  }
-  return dataOld;
-}
-
-export function translateCountsMatrixToObjectFormat(countsMatrix: CountsMatrixValue[]) {
-  const countsMatrixOld = [] as {row: string, col: string, value: number}[]
-  for (const val of countsMatrix) {
-    countsMatrixOld.push({row: val[0], col: val[1], value: val[2]});
-  }
-  return countsMatrixOld;
 }
