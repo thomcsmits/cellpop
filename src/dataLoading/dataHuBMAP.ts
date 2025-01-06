@@ -7,23 +7,29 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
   const urls = uuids.map(getHubmapURL);
 
   const obsSetsListPromises = getPromiseData(urls);
-  const promiseData = Promise.all(obsSetsListPromises)
+  const obsSetsPromiseData = Promise.allSettled(obsSetsListPromises)
     .then((obsSetsListWrapped) => {
-      // wrangle data
-      const obsSetsList = obsSetsListWrapped.map((o) => o.data.obsSets);
-      return obsSetsList as ObsSets[];
+      // filter out rejected
+      const obsSetsList = obsSetsListWrapped.filter((o) => o.status === "fulfilled").map((o) => o.value.data.obsSets);
+      const filtering = obsSetsListWrapped.map((o) => (o.status === "fulfilled" ? 1 : 0));
+      const uuidsRemoved = uuids.filter((_, index) => filtering[index] === 0);
+      console.warn(`The following uuids were removed: ${uuidsRemoved}`);
+      return [obsSetsList, filtering] as [ObsSets[], number[]];
     })
     .catch((error) => {
       console.error(error);
     });
-  const hubmapData = Promise.all([promiseData, getPromiseMetadata(uuids)])
+
+    const hubmapData = Promise.all([obsSetsPromiseData, getPromiseMetadata(uuids)])
     .then((values) => {
       if (values[0] && values[1]) {
-        const obsSetsList = values[0];
+        const obsSetsList = values[0][0];
+        const filtering = values[0][1];
         const hubmapIDs = values[1][0];
+        const hubmapIDsFiltered = hubmapIDs.filter((_, index) => filtering[index] === 1);
         const metadata = values[1][1];
         const { counts, metadata: datasetMetadata } =
-          getCountsAndMetadataFromObsSetsList(obsSetsList, hubmapIDs);
+          getCountsAndMetadataFromObsSetsList(obsSetsList, hubmapIDsFiltered);
         const data = loadDataWithCounts(counts, undefined, ordering);
         data.metadata = { rows: metadata, cols: datasetMetadata };
         return data;
