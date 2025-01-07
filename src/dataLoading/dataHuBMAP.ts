@@ -13,7 +13,9 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
       const obsSetsList = obsSetsListWrapped.filter((o) => o.status === "fulfilled").map((o) => o.value.data.obsSets);
       const filtering = obsSetsListWrapped.map((o) => (o.status === "fulfilled" ? 1 : 0));
       const uuidsRemoved = uuids.filter((_, index) => filtering[index] === 0);
-      console.warn(`The following uuids were removed: ${uuidsRemoved}`);
+      if (uuidsRemoved.length > 0) {
+        console.warn(`The following uuids were removed: ${uuidsRemoved}`);
+      }
       return [obsSetsList, filtering] as [ObsSets[], number[]];
     })
     .catch((error) => {
