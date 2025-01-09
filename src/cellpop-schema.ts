@@ -13,8 +13,8 @@ export type CellPopData = {
   colNames: string[];
   colNamesRaw: string[];
   colNamesWrapped: ColNamesWrapped[];
+  countsMatrixOrder: string[]
   countsMatrix: CountsMatrixValue[];
-  countsMatrixFractions: CountsMatrixFractions;
   metadata: MetaData;
   extendedChart: extendedChart;
 };
@@ -23,11 +23,7 @@ export type RowNamesWrapped = { row: string };
 
 export type ColNamesWrapped = { col: string };
 
-export type CountsMatrixValue = {
-  row: string;
-  col: string;
-  value: number;
-};
+export type CountsMatrixValue = [string, string, number]
 
 export type CountsTotalRowValue = {
   row: string;
@@ -39,12 +35,7 @@ export type CountsTotalColValue = {
   countTotal: number;
 };
 
-export type CountsMatrixFractions = {
-  col: CountsMatrixValue[];
-  row: CountsMatrixValue[];
-};
-
-export type MetaData<T extends object = object> = {
+export type MetaData<T extends number | string> = {
   rows?: Record<string, T>;
   cols?: Record<string, T>;
 };
@@ -67,7 +58,7 @@ export type ObsSets = {
     children: {
       name: string;
       set: [unknown, unknown][];
-    };
+    }[];
   }[];
 };
 
@@ -81,6 +72,7 @@ interface HuBMAPSearchSource {
   };
   title: string;
   dataset_type: string;
+  anatomy_1: string[];
   anatomy_2: string[];
 }
 

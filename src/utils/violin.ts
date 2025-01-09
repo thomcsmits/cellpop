@@ -7,9 +7,7 @@ export function kde<T extends number>(
   thresholds: number[],
 ) {
   return (V: Iterable<T>) =>
-    thresholds.map(
-      (t) => [t, mean(V, (d: T) => kernel(t - d))] as [number, number],
-    );
+    thresholds.map((t) => [t, mean(V, (d: T) => kernel(t - d))]);
 }
 
 // Epanechnikov kernel

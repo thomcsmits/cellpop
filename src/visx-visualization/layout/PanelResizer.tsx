@@ -1,5 +1,6 @@
-import React, { MouseEventHandler, useCallback, useRef } from "react";
+import React, { MouseEventHandler, useCallback, useRef, useState } from "react";
 
+import Box from "@mui/material/Box";
 import { useParentRef } from "../../contexts/ContainerRefContext";
 import { useDimensions } from "../../contexts/DimensionsContext";
 
@@ -9,6 +10,18 @@ interface VisualizationPanelResizerProps {
   orientation: "X" | "Y";
 }
 
+const orientationStyles = {
+  X: {
+    width: 5,
+    height: "100%",
+    cursor: "ew-resize",
+  },
+  Y: {
+    width: "100%",
+    height: 5,
+    cursor: "ns-resize",
+  },
+};
 export default function VisualizationPanelResizer({
   index,
   resize,
@@ -22,6 +35,7 @@ export default function VisualizationPanelResizer({
   const position = positionValues
     .slice(0, index + 1)
     .reduce((acc, size) => acc + size, 0);
+  const [active, setActive] = useState(false);
 
   const onMouseDown: MouseEventHandler = useCallback(
     (e) => {
@@ -40,25 +54,37 @@ export default function VisualizationPanelResizer({
       const onMouseUp = () => {
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("mouseup", onMouseUp);
-        ref.current?.classList.remove("active");
       };
       window.addEventListener("mousemove", onMouseMove);
       window.addEventListener("mouseup", onMouseUp);
-      ref.current?.classList.add("active");
     },
     [orientation],
   );
 
   return (
-    <div
+    <Box
       ref={ref}
-      className={`resize-handle resize-${orientation.toLowerCase()}`}
+      sx={(theme) => ({
+        ...orientationStyles[orientation],
+        display: "block",
+        position: "absolute",
+        zIndex: 5,
+        pointerEvents: "auto",
+        backgroundColor: theme.palette.action.hover,
+        top: 0,
+        left: 0,
+        transition: "background-color 0.3s",
+        "&.active": {
+          backgroundColor: theme.palette.action.active,
+        },
+        "&:hover": {
+          backgroundColor: theme.palette.action.active,
+        },
+        [positionKey]: `${position - 3}px`,
+      })}
+      className={active ? "active" : ""}
       data-orientation={orientation}
       onMouseDown={onMouseDown}
-      style={{
-        // Offset by 5px to align the handle with the edge of the panel
-        [positionKey]: `${position - 5}px`,
-      }}
     />
   );
 }
