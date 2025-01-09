@@ -69,7 +69,6 @@ function loadDataWrapper(data: CellPopData, ordering?: dataOrdering) {
   }
   wrapRowNames(data);
   wrapColNames(data);
-  calculateFractions(data);
 
   // copy's
   data.rowNamesRaw = [...data.rowNames];
@@ -144,38 +143,4 @@ export function resetRowNames(data: CellPopData) {
 export function resetColNames(data: CellPopData) {
   data.colNames = [...data.colNamesRaw];
   wrapColNames(data);
-}
-
-export function calculateFractions(data: CellPopData) {
-  const countsMatrixRowFractions = [];
-  const countsMatrixColFractions = [];
-  for (const row of data.rowNames) {
-    const countsMatrixRow = data.countsMatrix.filter((r) => r[0] === row);
-    const countsMatrixRowValues = countsMatrixRow.map((r) => r[2]);
-    const countsMatrixRowValuesSum = countsMatrixRowValues.reduce(
-      (a, b) => a + b,
-      0,
-    );
-    const countsMatrixRowFraction = countsMatrixRow.map((r) => ([
-      r[0], r[1], r[2] / countsMatrixRowValuesSum,
-    ] as CountsMatrixValue));
-    countsMatrixRowFractions.push(...countsMatrixRowFraction);
-  }
-
-  for (const col of data.colNames) {
-    const countsMatrixCol = data.countsMatrix.filter((r) => r[1] === col);
-    const countsMatrixColValues = countsMatrixCol.map((r) => r[2]);
-    const countsMatrixColValuesSum = countsMatrixColValues.reduce(
-      (a, b) => a + b,
-      0,
-    );
-    const countsMatrixColFraction = countsMatrixCol.map((r) => ([
-      r[0], r[1], r[2] / countsMatrixColValuesSum,
-    ] as CountsMatrixValue));
-    countsMatrixColFractions.push(...countsMatrixColFraction);
-  }
-  data.countsMatrixFractions = {
-    row: countsMatrixRowFractions,
-    col: countsMatrixColFractions,
-  };
 }
