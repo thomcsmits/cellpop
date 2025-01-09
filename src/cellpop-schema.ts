@@ -15,22 +15,6 @@ export type CellPopData = {
   colNamesWrapped: ColNamesWrapped[];
   countsMatrixOrder: string[]
   countsMatrix: CountsMatrixValue[];
-  countsMatrixFractions: CountsMatrixFractions;
-  metadata: MetaData;
-  extendedChart: extendedChart;
-};
-
-// temporary for data change
-export type CellPopDataFlexible = {
-  rowNames: string[];
-  rowNamesRaw: string[];
-  rowNamesWrapped: RowNamesWrapped[];
-  colNames: string[];
-  colNamesRaw: string[];
-  colNamesWrapped: ColNamesWrapped[];
-  countsMatrixOrder: string[];
-  countsMatrix: CountsMatrixValue[] | CountsMatrixValueOld[];
-  countsMatrixFractions: CountsMatrixFractions | CountsMatrixFractionsOld;
   metadata: MetaData;
   extendedChart: extendedChart;
 };
@@ -39,11 +23,7 @@ export type RowNamesWrapped = { row: string };
 
 export type ColNamesWrapped = { col: string };
 
-// temporary for data change
 export type CountsMatrixValue = [string, string, number]
-
-// temporary for data change
-export type CountsMatrixValueOld = {row: string, col: string, value: number}
 
 export type CountsTotalRowValue = {
   row: string;
@@ -53,16 +33,6 @@ export type CountsTotalRowValue = {
 export type CountsTotalColValue = {
   col: string;
   countTotal: number;
-};
-
-export type CountsMatrixFractions = {
-  row: CountsMatrixValue[];
-  col: CountsMatrixValue[];
-};
-
-export type CountsMatrixFractionsOld = {
-  row: CountsMatrixValueOld[];
-  col: CountsMatrixValueOld[];
 };
 
 export type MetaData<T extends number | string> = {
