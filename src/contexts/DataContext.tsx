@@ -418,7 +418,7 @@ const getDerivedStatesSelector = (state: DataContextStore) => {
   const columnMaxes: Record<string, number> = {};
   let maxCount = 0;
   const { removedRows, removedColumns } = state;
-  state.data.countsMatrix.forEach(({ row, col, value }) => {
+  state.data.countsMatrix.forEach(([ row, col, value ]) => {
     if (removedRows.has(row) || removedColumns.has(col)) {
       return;
     }
@@ -441,7 +441,7 @@ const getDerivedStatesMemo = memoize(getDerivedStatesSelector);
 
 const getDataMap = memoize((state: DataContextStore) => {
   const dataMap: Record<DataMapKey, number> = {};
-  state.data.countsMatrix.forEach(({ row, col, value }) => {
+  state.data.countsMatrix.forEach(([ row, col, value ]) => {
     dataMap[`${row}-${col}`] = value;
   });
   return dataMap;
@@ -450,7 +450,7 @@ const getDataMap = memoize((state: DataContextStore) => {
 const getRowFractionDataMap = memoize((state: DataContextStore) => {
   const dataMap: Record<DataMapKey, number> = {};
   const { rowCounts } = getDerivedStatesSelector(state);
-  state.data.countsMatrix.forEach(({ row, col, value }) => {
+  state.data.countsMatrix.forEach(([ row, col, value ]) => {
     dataMap[`${row}-${col}`] = value / rowCounts[row];
   });
   return dataMap;
@@ -459,7 +459,7 @@ const getRowFractionDataMap = memoize((state: DataContextStore) => {
 const getColumnFractionDataMap = memoize((state: DataContextStore) => {
   const dataMap: Record<DataMapKey, number> = {};
   const { columnCounts } = getDerivedStatesSelector(state);
-  state.data.countsMatrix.forEach(({ row, col, value }) => {
+  state.data.countsMatrix.forEach(([ row, col, value ]) => {
     dataMap[`${row}-${col}`] = value / columnCounts[col];
   });
   return dataMap;

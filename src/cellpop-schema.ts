@@ -13,8 +13,8 @@ export type CellPopData = {
   colNames: string[];
   colNamesRaw: string[];
   colNamesWrapped: ColNamesWrapped[];
+  countsMatrixOrder: string[]
   countsMatrix: CountsMatrixValue[];
-  countsMatrixFractions: CountsMatrixFractions;
   metadata: MetaData;
   extendedChart: extendedChart;
 };
@@ -23,11 +23,7 @@ export type RowNamesWrapped = { row: string };
 
 export type ColNamesWrapped = { col: string };
 
-export type CountsMatrixValue = {
-  row: string;
-  col: string;
-  value: number;
-};
+export type CountsMatrixValue = [string, string, number]
 
 export type CountsTotalRowValue = {
   row: string;
@@ -37,11 +33,6 @@ export type CountsTotalRowValue = {
 export type CountsTotalColValue = {
   col: string;
   countTotal: number;
-};
-
-export type CountsMatrixFractions = {
-  col: CountsMatrixValue[];
-  row: CountsMatrixValue[];
 };
 
 export type MetaData<T extends number | string> = {
