@@ -105,23 +105,20 @@ function getPromiseMetadata(
     })
     .then((queryBody) => {
       const listAll = queryBody.hits.hits;
-      const metadata: Record<string, string | number> = listAll.reduce(
-        (acc: Record<string, unknown>, l: HuBMAPSearchHit) => {
-          const ls = l._source;
-          const dmm = l._source.donor.mapped_metadata;
-          return {
-            ...acc,
-            [ls.hubmap_id]: {
-              title: ls.title,
-              dataset_type: ls.dataset_type,
-              anatomy: ls?.anatomy_2?.[0] ?? ls?.anatomy_1?.[0],
-              sex: dmm.sex[0],
-              age: dmm.age_value[0],
-            },
-          };
-        },
-        {},
-      );
+      const metadata = {} as Record<string, unknown>;
+      for (let i = 0; i < listAll.length; i++) {
+        const l = listAll[i] as HuBMAPSearchHit;
+        const ls = l._source;
+        const dmm = l._source.donor.mapped_metadata;
+        metadata[ls.hubmap_id] = {
+          hubmap_id: ls.hubmap_id,
+          title: ls.title,
+          dataset_type: ls.dataset_type,
+          anatomy: ls?.anatomy_2?.[0] ?? ls?.anatomy_1?.[0],
+          sex: dmm.sex[0],
+          age: dmm.age_value[0],
+        }
+      }
       const hubmapIDs = Object.keys(metadata);
       return [hubmapIDs, metadata] as [
         string[],
