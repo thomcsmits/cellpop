@@ -27,8 +27,9 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
       if (values[0] && values[1]) {
         const obsSetsList = values[0][0];
         const filtering = values[0][1];
-        const hubmapIDs = values[1][0];
-        const hubmapIDsFiltered = hubmapIDs.filter((_, index) => filtering[index] === 1);
+        const uuidsFiltered = uuids.filter((_, index) => filtering[index] === 1);
+        const uuid_to_hubmap_id = values[1][0];
+        const hubmapIDsFiltered = uuidsFiltered.map((uuid) => uuid_to_hubmap_id[uuid]);
         const metadata = values[1][1];
         const { counts, metadata: datasetMetadata } =
           getCountsAndMetadataFromObsSetsList(obsSetsList, hubmapIDsFiltered);
@@ -81,7 +82,7 @@ function getPromiseData(urls: string[]) {
 // get metadata
 function getPromiseMetadata(
   uuids: string[],
-): Promise<void | [string[], Record<string, string | number>]> {
+): Promise<void | [Record<string, string>, Record<string, string | number>]> {
   const searchApi = "https://search.api.hubmapconsortium.org/v3/portal/search";
   const queryBody = {
     size: 10000,
@@ -106,12 +107,13 @@ function getPromiseMetadata(
     .then((queryBody) => {
       const listAll = queryBody.hits.hits;
       const metadata = {} as Record<string, unknown>;
+      const uuid_to_hubmap_id = {} as Record<string, string>;
       for (let i = 0; i < listAll.length; i++) {
         const l = listAll[i] as HuBMAPSearchHit;
         const ls = l._source;
         const dmm = l._source.donor.mapped_metadata;
+        uuid_to_hubmap_id[ls.uuid] = ls.hubmap_id;
         metadata[ls.hubmap_id] = {
-          hubmap_id: ls.hubmap_id,
           title: ls.title,
           dataset_type: ls.dataset_type,
           anatomy: ls?.anatomy_2?.[0] ?? ls?.anatomy_1?.[0],
@@ -119,9 +121,8 @@ function getPromiseMetadata(
           age: dmm.age_value[0],
         }
       }
-      const hubmapIDs = Object.keys(metadata);
-      return [hubmapIDs, metadata] as [
-        string[],
+      return [uuid_to_hubmap_id, metadata] as [
+        Record<string, string>,
         Record<string, string | number>,
       ];
     })

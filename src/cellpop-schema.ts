@@ -63,6 +63,7 @@ export type ObsSets = {
 };
 
 interface HuBMAPSearchSource {
+  uuid: string;
   hubmap_id: string;
   donor: {
     mapped_metadata: {
