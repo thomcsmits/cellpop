@@ -28,7 +28,7 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
         const obsSetsList = values[0][0];
         const filtering = values[0][1];
         const uuidsFiltered = uuids.filter((_, index) => filtering[index] === 1);
-        const uuid_to_hubmap_id = values[1][0];
+        const uuidToHubmapId = values[1][0];
         const hubmapIDsFiltered = uuidsFiltered.map((uuid) => uuid_to_hubmap_id[uuid]);
         const metadata = values[1][1];
         const { counts, metadata: datasetMetadata } =
@@ -112,7 +112,7 @@ function getPromiseMetadata(
         const l = listAll[i] as HuBMAPSearchHit;
         const ls = l._source;
         const dmm = l._source.donor.mapped_metadata;
-        uuid_to_hubmap_id[ls.uuid] = ls.hubmap_id;
+        uuidToHubmapId[ls.uuid] = ls.hubmap_id;
         metadata[ls.hubmap_id] = {
           title: ls?.title,
           assay: ls?.assay_display_name,
