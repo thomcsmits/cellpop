@@ -9,7 +9,7 @@ import TableChartIcon from "@mui/icons-material/TableChartRounded";
 import { GridSizeTuple } from "../src/contexts/DimensionsContext";
 
 function Demo() {
-  const [data, setData] = useState<CellPopData>(testData as CellPopData);
+  const [data, setData] = useState<CellPopData>();
 
   // data
   const uuids = [

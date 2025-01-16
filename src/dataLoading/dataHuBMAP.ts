@@ -10,8 +10,12 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
   const obsSetsPromiseData = Promise.allSettled(obsSetsListPromises)
     .then((obsSetsListWrapped) => {
       // filter out rejected
-      const obsSetsList = obsSetsListWrapped.filter((o) => o.status === "fulfilled").map((o) => o.value.data.obsSets);
-      const filtering = obsSetsListWrapped.map((o) => (o.status === "fulfilled" ? 1 : 0));
+      const obsSetsList = obsSetsListWrapped
+        .filter((o) => o.status === "fulfilled")
+        .map((o) => o.value.data.obsSets);
+      const filtering = obsSetsListWrapped.map((o) =>
+        o.status === "fulfilled" ? 1 : 0,
+      );
       const uuidsRemoved = uuids.filter((_, index) => filtering[index] === 0);
       if (uuidsRemoved.length > 0) {
         console.warn(`The following uuids were removed: ${uuidsRemoved}`);
@@ -22,14 +26,21 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
       console.error(error);
     });
 
-    const hubmapData = Promise.all([obsSetsPromiseData, getPromiseMetadata(uuids)])
+  const hubmapData = Promise.all([
+    obsSetsPromiseData,
+    getPromiseMetadata(uuids),
+  ])
     .then((values) => {
       if (values[0] && values[1]) {
         const obsSetsList = values[0][0];
         const filtering = values[0][1];
-        const uuidsFiltered = uuids.filter((_, index) => filtering[index] === 1);
+        const uuidsFiltered = uuids.filter(
+          (_, index) => filtering[index] === 1,
+        );
         const uuidToHubmapId = values[1][0];
-        const hubmapIDsFiltered = uuidsFiltered.map((uuid) => uuid_to_hubmap_id[uuid]);
+        const hubmapIDsFiltered = uuidsFiltered.map(
+          (uuid) => uuidToHubmapId[uuid],
+        );
         const metadata = values[1][1];
         const { counts, metadata: datasetMetadata } =
           getCountsAndMetadataFromObsSetsList(obsSetsList, hubmapIDsFiltered);
@@ -107,7 +118,7 @@ function getPromiseMetadata(
     .then((queryBody) => {
       const listAll = queryBody.hits.hits;
       const metadata = {} as Record<string, unknown>;
-      const uuid_to_hubmap_id = {} as Record<string, string>;
+      const uuidToHubmapId = {} as Record<string, string>;
       for (let i = 0; i < listAll.length; i++) {
         const l = listAll[i] as HuBMAPSearchHit;
         const ls = l._source;
@@ -127,10 +138,10 @@ function getPromiseMetadata(
           donor_medical_history: dmm?.medical_history?.[0],
           donor_cause_of_death: dmm?.cause_of_death?.[0],
           donor_death_event: dmm?.death_event?.[0],
-          donor_mechanism_of_injury: dmm?.mechanism_of_injury?.[0], 
-        }
+          donor_mechanism_of_injury: dmm?.mechanism_of_injury?.[0],
+        };
       }
-      return [uuid_to_hubmap_id, metadata] as [
+      return [uuidToHubmapId, metadata] as [
         Record<string, string>,
         Record<string, string | number>,
       ];
