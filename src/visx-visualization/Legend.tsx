@@ -16,6 +16,9 @@ export default function Legend() {
   const id = useId() + "-legend";
 
   const minColor = colors(0);
+  const legendColors = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1].map(
+    (value) => [colors(value * maxValue), `${value * 100}%`],
+  );
   const maxColor = colors(maxValue);
   const isNormalized = useIsNormalized();
   const normalization = useNormalization((state) => state.normalization);
@@ -32,11 +35,12 @@ export default function Legend() {
         <InputLabel id="heatmap-legend-label">{legendLabel}</InputLabel>
         <Box
           id={id}
+          data-testId="heatmap-legend"
           sx={{
-            w: "100%",
+            width: "100%",
             display: "flex",
             flexGrow: 1,
-            background: `linear-gradient(to right, ${minColor}, ${maxColor})`,
+            background: `linear-gradient(to right, ${legendColors.map(([c, position]) => `${c} ${position}`).join(", ")})`,
             borderRadius: 4,
           }}
         >
