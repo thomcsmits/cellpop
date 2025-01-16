@@ -1,3 +1,3 @@
-export { CellPop } from "./CellPopComponent";
+export { CellPop, CellPopHuBMAPLoader } from "./CellPopComponent";
 export { loadHuBMAPData } from "./dataLoading";
 

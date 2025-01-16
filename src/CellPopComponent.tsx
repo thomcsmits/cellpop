@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Theme } from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
@@ -8,6 +8,7 @@ import { AxisConfig } from "./contexts/AxisConfigContext";
 import { OuterContainerRefProvider } from "./contexts/ContainerRefContext";
 import { Dimensions, GridSizeTuple } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
+import { loadHuBMAPData } from "./dataLoading";
 import Controls from "./visx-visualization/Controls";
 import VizContainer from "./visx-visualization/layout";
 
@@ -28,6 +29,7 @@ export interface CellPopProps
   extends WithParentSizeProvidedProps,
     CellPopConfig {
   data: CellPopData;
+  uuids?: string[];
 }
 
 const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
@@ -93,3 +95,28 @@ export const CellPop = withParentSize(
     );
   },
 );
+
+type CellPopLoaderProps = Omit<CellPopProps, "data"> & {
+  uuids: string[];
+};
+
+export const CellPopHuBMAPLoader = ({
+  uuids,
+  ...props
+}: CellPopLoaderProps) => {
+  const [data, setData] = useState<CellPopData>();
+
+  useEffect(() => {
+    if (!data) {
+      loadHuBMAPData(uuids)
+        .then((data) => {
+          setData(data as CellPopData);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }, [uuids]);
+
+  return <CellPop data={data} {...props} />;
+};

@@ -1,6 +1,7 @@
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { defineConfig, UserConfigFnObject } from "vite";
+import dts from "vite-plugin-dts";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -34,9 +35,11 @@ export default defineConfig(({ mode }) => {
             react: "React",
             "react-dom": "ReactDOM",
           },
+          sourcemap: true,
         },
       },
     },
+    plugins: [react(), dts()],
     base: "/cellpop/",
   };
 }) satisfies UserConfigFnObject;
