@@ -28,8 +28,8 @@ export default function RowSelectionControls() {
             checked={selectedValues.has(row)}
             onChange={() => toggleSelection(row)}
             style={{
-              width: Math.floor(scale.bandwidth()),
-              height: Math.floor(scale.bandwidth()),
+              width: Math.max(Math.floor(scale.bandwidth()), 16),
+              height: Math.max(Math.floor(scale.bandwidth()), 16),
               left: 0,
               top: scale(row),
               position: "absolute",
