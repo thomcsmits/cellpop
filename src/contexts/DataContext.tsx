@@ -190,6 +190,9 @@ const applySortOrders = (
               metadata[a][key as keyof (typeof metadata)[typeof a]];
             const bValue =
               metadata[b][key as keyof (typeof metadata)[typeof b]];
+            if (aValue === undefined || bValue === undefined) {
+              return aValue === bValue ? 0 : aValue === undefined ? 1 : -1;
+            }
             if (typeof aValue === "number" && typeof bValue === "number") {
               return direction === "asc" ? aValue - bValue : bValue - aValue;
             }

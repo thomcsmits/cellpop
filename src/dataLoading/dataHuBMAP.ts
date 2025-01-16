@@ -27,8 +27,9 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
       if (values[0] && values[1]) {
         const obsSetsList = values[0][0];
         const filtering = values[0][1];
-        const hubmapIDs = values[1][0];
-        const hubmapIDsFiltered = hubmapIDs.filter((_, index) => filtering[index] === 1);
+        const uuidsFiltered = uuids.filter((_, index) => filtering[index] === 1);
+        const uuidToHubmapId = values[1][0];
+        const hubmapIDsFiltered = uuidsFiltered.map((uuid) => uuid_to_hubmap_id[uuid]);
         const metadata = values[1][1];
         const { counts, metadata: datasetMetadata } =
           getCountsAndMetadataFromObsSetsList(obsSetsList, hubmapIDsFiltered);
@@ -81,7 +82,7 @@ function getPromiseData(urls: string[]) {
 // get metadata
 function getPromiseMetadata(
   uuids: string[],
-): Promise<void | [string[], Record<string, string | number>]> {
+): Promise<void | [Record<string, string>, Record<string, string | number>]> {
   const searchApi = "https://search.api.hubmapconsortium.org/v3/portal/search";
   const queryBody = {
     size: 10000,
@@ -105,26 +106,32 @@ function getPromiseMetadata(
     })
     .then((queryBody) => {
       const listAll = queryBody.hits.hits;
-      const metadata: Record<string, string | number> = listAll.reduce(
-        (acc: Record<string, unknown>, l: HuBMAPSearchHit) => {
-          const ls = l._source;
-          const dmm = l._source.donor.mapped_metadata;
-          return {
-            ...acc,
-            [ls.hubmap_id]: {
-              title: ls.title,
-              dataset_type: ls.dataset_type,
-              anatomy: ls?.anatomy_2?.[0] ?? ls?.anatomy_1?.[0],
-              sex: dmm.sex[0],
-              age: dmm.age_value[0],
-            },
-          };
-        },
-        {},
-      );
-      const hubmapIDs = Object.keys(metadata);
-      return [hubmapIDs, metadata] as [
-        string[],
+      const metadata = {} as Record<string, unknown>;
+      const uuid_to_hubmap_id = {} as Record<string, string>;
+      for (let i = 0; i < listAll.length; i++) {
+        const l = listAll[i] as HuBMAPSearchHit;
+        const ls = l._source;
+        const dmm = l._source.donor.mapped_metadata;
+        uuidToHubmapId[ls.uuid] = ls.hubmap_id;
+        metadata[ls.hubmap_id] = {
+          title: ls?.title,
+          assay: ls?.assay_display_name,
+          anatomy: ls?.anatomy_2?.[0] ?? ls?.anatomy_1?.[0],
+          donor_age: dmm?.age_value?.[0],
+          donor_sex: dmm?.sex?.[0],
+          donor_height: dmm?.height_value[0],
+          donor_weight: dmm?.weight_value[0],
+          donor_race: dmm?.race?.[0],
+          donor_body_mass_index: dmm?.body_mass_index_value?.[0],
+          donor_blood_group: dmm?.abo_blood_group_system?.[0],
+          donor_medical_history: dmm?.medical_history?.[0],
+          donor_cause_of_death: dmm?.cause_of_death?.[0],
+          donor_death_event: dmm?.death_event?.[0],
+          donor_mechanism_of_injury: dmm?.mechanism_of_injury?.[0], 
+        }
+      }
+      return [uuid_to_hubmap_id, metadata] as [
+        Record<string, string>,
         Record<string, string | number>,
       ];
     })
