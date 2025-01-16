@@ -85,6 +85,7 @@ export default function HeatmapYAxis() {
             textAnchor: "end",
             fill: theme.palette.text.primary,
             className: "y-axis-tick-label text",
+            fontFamily: theme.typography.fontFamily,
             style: tickLabelStyle,
             dy: "0.25em",
             onMouseOver: (e) => {
