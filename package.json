@@ -42,10 +42,13 @@
     "eslint-plugin-react": "^7.37.2",
     "globals": "^15.14.0",
     "prettier": "^3.4.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
     "vite": "^6.0.5",
-    "vitest": "^2.1.8"
+    "vitest": "^2.1.8",
+    "zustand": "^5.0.3"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -73,13 +76,15 @@
     "@visx/stats": "^3.12.0",
     "@visx/text": "^3.12.0",
     "@visx/tooltip": "^3.12.0",
-    "@vitessce/zarr": "^3.5.2",
+    "@vitessce/zarr": "^3.5.4",
     "d3": "^7.9.0",
     "d3-scale-chromatic": "^3.1.0",
     "proxy-memoize": "^3.0.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "zundo": "^2.3.0",
-    "zustand": "^5.0.2"
+    "zundo": "^2.3.0"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1, ^19.0.0",
+    "react-dom": "^18.3.1, ^19.0.0",
+    "zustand": "^4, ^5"
   }
 }
