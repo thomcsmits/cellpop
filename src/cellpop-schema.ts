@@ -65,16 +65,29 @@ export type ObsSets = {
 interface HuBMAPSearchSource {
   uuid: string;
   hubmap_id: string;
+  title: string;
+  assay_display_name: string;
+  anatomy_1: string[];
+  anatomy_2: string[];
   donor: {
     mapped_metadata: {
       age_value: string[];
+      age_unit: string[];
+      height_value: string[]; 
+      height_unit: string[];
+      race: string[];
       sex: string[];
+      weight_value: string[];
+      weight_unit: string[];
+      body_mass_index_value: string[];
+      body_mass_index_unit: string[];
+      medical_history: string[];
+      cause_of_death: string[];
+      mechanism_of_injury: string[];
+      abo_blood_group_system: string[];
+      death_event: string[];
     };
   };
-  title: string;
-  dataset_type: string;
-  anatomy_1: string[];
-  anatomy_2: string[];
 }
 
 export type HuBMAPSearchHit = {

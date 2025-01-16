@@ -114,11 +114,20 @@ function getPromiseMetadata(
         const dmm = l._source.donor.mapped_metadata;
         uuid_to_hubmap_id[ls.uuid] = ls.hubmap_id;
         metadata[ls.hubmap_id] = {
-          title: ls.title,
-          dataset_type: ls.dataset_type,
+          title: ls?.title,
+          assay: ls?.assay_display_name,
           anatomy: ls?.anatomy_2?.[0] ?? ls?.anatomy_1?.[0],
-          sex: dmm.sex[0],
-          age: dmm.age_value[0],
+          donor_age: dmm?.age_value?.[0],
+          donor_sex: dmm?.sex?.[0],
+          donor_height: dmm?.height_value[0],
+          donor_weight: dmm?.weight_value[0],
+          donor_race: dmm?.race?.[0],
+          donor_body_mass_index: dmm?.body_mass_index_value?.[0],
+          donor_blood_group: dmm?.abo_blood_group_system?.[0],
+          donor_medical_history: dmm?.medical_history?.[0],
+          donor_cause_of_death: dmm?.cause_of_death?.[0],
+          donor_death_event: dmm?.death_event?.[0],
+          donor_mechanism_of_injury: dmm?.mechanism_of_injury?.[0], 
         }
       }
       return [uuid_to_hubmap_id, metadata] as [
