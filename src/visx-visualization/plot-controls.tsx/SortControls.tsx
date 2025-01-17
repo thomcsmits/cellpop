@@ -51,6 +51,10 @@ import {
   useAvailableRowSorts,
   useData,
 } from "../../contexts/DataContext";
+import {
+  useFieldDisplayName,
+  useSortableFields,
+} from "../../contexts/MetadataConfigContext";
 import { usePlotControlsContext } from "./PlotControlsContext";
 import { LeftAlignedButton } from "./style";
 
@@ -150,6 +154,9 @@ export function SortControls() {
     setSorts: section === "Column" ? s.setColumnSortOrder : s.setRowSortOrder,
   }));
 
+  const allowedSorts = useSortableFields(sorts.map((sort) => sort.key));
+  const filteredSorts = sorts.filter((sort) => allowedSorts.includes(sort.key));
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -213,7 +220,7 @@ export function SortControls() {
             strategy={verticalListSortingStrategy}
           >
             <Stack>
-              {sorts.map((sort, i) => (
+              {filteredSorts.map((sort, i) => (
                 <SortItem key={sort.key} sort={sort} index={i} />
               ))}
             </Stack>
@@ -299,7 +306,7 @@ function SortItem({ sort, index }: { sort: SortOrder<string>; index: number }) {
         >
           {[sort.key, ...availableSorts].map((key) => (
             <MenuItem key={key} value={key}>
-              {key.replace(/_/g, " ")}
+              {useFieldDisplayName(key)}
             </MenuItem>
           ))}
         </Select>

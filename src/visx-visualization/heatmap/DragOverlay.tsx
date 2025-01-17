@@ -31,14 +31,19 @@ import {
 } from "../../contexts/AxisConfigContext";
 import { useParentRef } from "../../contexts/ContainerRefContext";
 import {
+  useColumnMetadataKeys,
   useDataHistory,
   useDataMap,
   useFractionDataMap,
+  useMetadata,
+  useMetadataLookup,
+  useRowMetadataKeys,
 } from "../../contexts/DataContext";
 import {
   useDimensions,
   useHeatmapDimensions,
 } from "../../contexts/DimensionsContext";
+import { useTooltipFields } from "../../contexts/MetadataConfigContext";
 import { useNormalization } from "../../contexts/NormalizationContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import { Setter } from "../../utils/types";
@@ -214,6 +219,12 @@ function DragIndicator({
   const rowLabel = useRowConfig((store) => store.label);
   const columnLabel = useColumnConfig((store) => store.label);
   const { height } = useHeatmapDimensions();
+  const rowMetadataKeys = useRowMetadataKeys();
+  const columnMetadataKeys = useColumnMetadataKeys();
+  const rowTooltipFields = useTooltipFields(rowMetadataKeys);
+  const columnTooltipFields = useTooltipFields(columnMetadataKeys);
+
+  const lookupMetadata = useMetadataLookup();
 
   const strategy =
     selectedDimension === "X"
@@ -258,6 +269,14 @@ function DragIndicator({
           }
         : {};
 
+    const columnMetadata = lookupMetadata(
+      columnKey,
+      "cols",
+      columnTooltipFields,
+    );
+    console.log({ columnMetadataKeys, rowMetadataKeys });
+    const rowMetadata = lookupMetadata(rowKey, "rows", rowTooltipFields);
+
     openTooltip(
       {
         title: `${rowKey} - ${columnKey}`,
@@ -266,6 +285,8 @@ function DragIndicator({
           [rowLabel]: rowKey,
           [columnLabel]: columnKey,
           ...normalizationInfo,
+          ...columnMetadata,
+          ...rowMetadata,
         },
       },
       e.clientX,

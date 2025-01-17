@@ -83,8 +83,9 @@ function Demo() {
             `https://portal.hubmapconsortium.org/browse/${row}`,
           flipAxisPosition: true,
           createSubtitle: (_, metadataValues) => {
+            console.log(metadataValues);
             const anatomy = metadataValues["anatomy"];
-            const assay = metadataValues["assay"];
+            const assay = metadataValues["dataset_type"];
             return `${anatomy} | ${assay}`;
           },
           icon: <TableChartIcon />,
@@ -103,6 +104,7 @@ function Demo() {
           [0.35, 0.55, 0.1] as GridSizeTuple,
           [0.3, 0.6, 0.1] as GridSizeTuple,
         ]}
+        tooltipFields={["Cell Ontology Label"]}
       />
     </div>
   );

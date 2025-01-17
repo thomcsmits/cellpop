@@ -21,6 +21,7 @@ import {
 } from "./DisabledControlProvider";
 import { SelectedValuesProvider } from "./ExpandedValuesContext";
 import { FractionProvider } from "./FractionContext";
+import { MetadataConfigProvider } from "./MetadataConfigContext";
 import { NormalizationProvider } from "./NormalizationContext";
 import { ScaleProvider } from "./ScaleContext";
 import { SelectedDimensionProvider } from "./SelectedDimensionContext";
@@ -39,6 +40,9 @@ interface CellPopConfigProps extends PropsWithChildren {
   customTheme?: Theme;
   disabledControls?: DisableableControls[];
   initialProportions?: [GridSizeTuple, GridSizeTuple];
+  fieldDisplayNames?: Record<string, string>;
+  sortableFields?: string[];
+  tooltipFields?: string[];
 }
 
 export function Providers({
@@ -55,6 +59,9 @@ export function Providers({
   disabledControls = [],
   normalization: initialNormalization,
   initialProportions = [INITIAL_PROPORTIONS, INITIAL_PROPORTIONS],
+  fieldDisplayNames,
+  sortableFields,
+  tooltipFields,
 }: CellPopConfigProps) {
   return (
     <DisabledControlProvider disabledControls={disabledControls}>
@@ -77,7 +84,13 @@ export function Providers({
                             <SelectedDimensionProvider
                               initialSelectedDimension={selectedDimension}
                             >
-                              {children}
+                              <MetadataConfigProvider
+                                fieldDisplayNames={fieldDisplayNames}
+                                sortableFields={sortableFields}
+                                tooltipFields={tooltipFields}
+                              >
+                                {children}
+                              </MetadataConfigProvider>
                             </SelectedDimensionProvider>
                           </ColorScaleProvider>
                         </ScaleProvider>

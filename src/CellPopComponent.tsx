@@ -23,6 +23,9 @@ interface CellPopConfig {
   customTheme?: Theme;
   disabledControls?: DisableableControls[];
   initialProportions?: [GridSizeTuple, GridSizeTuple];
+  fieldDisplayNames?: Record<string, string>;
+  sortableFields?: string[];
+  tooltipFields?: string[];
 }
 
 export interface CellPopProps
@@ -47,6 +50,9 @@ export const CellPop = withParentSize(
     customTheme,
     disabledControls,
     initialProportions,
+    fieldDisplayNames,
+    sortableFields,
+    tooltipFields,
   }: CellPopProps) => {
     // If dimensions are provided, use them.
     // Otherwise, fall back to using parentWidth and parentHeight.
@@ -86,6 +92,9 @@ export const CellPop = withParentSize(
             yAxis={yAxis}
             disabledControls={disabledControls}
             initialProportions={initialProportions}
+            fieldDisplayNames={fieldDisplayNames}
+            sortableFields={sortableFields}
+            tooltipFields={tooltipFields}
           >
             <Controls />
             <VizContainer />

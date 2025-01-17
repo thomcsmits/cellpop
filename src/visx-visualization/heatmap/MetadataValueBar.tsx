@@ -329,6 +329,9 @@ export default function MetadataValueBar({
               dy={axis == "X" ? cellWidth + 8 : 0}
               fill={theme.palette.text.primary}
               angle={axis === "X" ? 90 : 0}
+              style={{
+                fontFamily: theme.typography.fontFamily,
+              }}
               onMouseMove={(e) => {
                 openTooltip(
                   {
@@ -357,6 +360,7 @@ export default function MetadataValueBar({
           fill={theme.palette.text.primary}
           style={{
             textTransform: "capitalize",
+            fontFamily: theme.typography.fontFamily,
           }}
         >
           {sortOrder.map((s) => s.key.split("_").join(" ")).join(", ")}

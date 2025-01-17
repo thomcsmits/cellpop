@@ -1,5 +1,5 @@
 import { memoize } from "proxy-memoize";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { temporal } from "zundo";
 import { createStore } from "zustand";
 import { CellPopData } from "../cellpop-schema";
@@ -421,7 +421,7 @@ const getDerivedStatesSelector = (state: DataContextStore) => {
   const columnMaxes: Record<string, number> = {};
   let maxCount = 0;
   const { removedRows, removedColumns } = state;
-  state.data.countsMatrix.forEach(([ row, col, value ]) => {
+  state.data.countsMatrix.forEach(([row, col, value]) => {
     if (removedRows.has(row) || removedColumns.has(col)) {
       return;
     }
@@ -444,7 +444,7 @@ const getDerivedStatesMemo = memoize(getDerivedStatesSelector);
 
 const getDataMap = memoize((state: DataContextStore) => {
   const dataMap: Record<DataMapKey, number> = {};
-  state.data.countsMatrix.forEach(([ row, col, value ]) => {
+  state.data.countsMatrix.forEach(([row, col, value]) => {
     dataMap[`${row}-${col}`] = value;
   });
   return dataMap;
@@ -453,7 +453,7 @@ const getDataMap = memoize((state: DataContextStore) => {
 const getRowFractionDataMap = memoize((state: DataContextStore) => {
   const dataMap: Record<DataMapKey, number> = {};
   const { rowCounts } = getDerivedStatesSelector(state);
-  state.data.countsMatrix.forEach(([ row, col, value ]) => {
+  state.data.countsMatrix.forEach(([row, col, value]) => {
     dataMap[`${row}-${col}`] = value / rowCounts[row];
   });
   return dataMap;
@@ -462,7 +462,7 @@ const getRowFractionDataMap = memoize((state: DataContextStore) => {
 const getColumnFractionDataMap = memoize((state: DataContextStore) => {
   const dataMap: Record<DataMapKey, number> = {};
   const { columnCounts } = getDerivedStatesSelector(state);
-  state.data.countsMatrix.forEach(([ row, col, value ]) => {
+  state.data.countsMatrix.forEach(([row, col, value]) => {
     dataMap[`${row}-${col}`] = value / columnCounts[col];
   });
   return dataMap;
@@ -501,6 +501,48 @@ const getRowSortKeys = memoize((state: DataContextStore) => {
 const getColumnSortKeys = memoize((state: DataContextStore) => {
   return getMetadataKeys(state.data.metadata.cols);
 });
+
+export const useMetadata = (keys: string[]) => {
+  const metadata = useData((s) => s.data.metadata);
+  return useMemo(
+    () =>
+      keys.reduce<Record<string, Record<string, string | number>>>(
+        (acc, key) => {
+          acc[key] = metadata[key];
+          return acc;
+        },
+        {},
+      ),
+    [metadata, keys],
+  );
+};
+
+export const useMetadataLookup = () => {
+  const metadata = useData((s) => s.data.metadata);
+  return useCallback(
+    (key: string, direction: "rows" | "cols", allowedKeys?: string[]) => {
+      console.log(metadata, key, direction, allowedKeys);
+      const md = metadata[direction][key];
+      if (!md) {
+        return {};
+      }
+      if (!allowedKeys) {
+        return md;
+      }
+      const filteredMetadata = Object.entries(md).reduce<
+        Record<string, string | number>
+      >((acc, [k, v]) => {
+        if (allowedKeys.includes(k)) {
+          acc[k] = v as string | number;
+        }
+        return acc;
+      }, {});
+      console.log({ filteredMetadata });
+      return filteredMetadata;
+    },
+    [metadata],
+  );
+};
 
 const useMetadataKeys = (direction: "row" | "column") => {
   return useData(direction === "row" ? getRowSortKeys : getColumnSortKeys);

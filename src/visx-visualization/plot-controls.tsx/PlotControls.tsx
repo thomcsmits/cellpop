@@ -144,6 +144,9 @@ export function PlotControlsButton() {
         open={showDrawer}
         onClose={closeDrawer}
         anchor="right"
+        SlideProps={{
+          container: parentRef.current,
+        }}
         ModalProps={{
           sx: {
             top: parentBoundingBox?.top,
@@ -159,6 +162,7 @@ export function PlotControlsButton() {
               left: parentBoundingBox?.left,
               width: parentBoundingBox?.width,
             },
+            invisible: true,
           },
         }}
         PaperProps={{
