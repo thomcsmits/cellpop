@@ -274,7 +274,6 @@ function DragIndicator({
       "cols",
       columnTooltipFields,
     );
-    console.log({ columnMetadataKeys, rowMetadataKeys });
     const rowMetadata = lookupMetadata(rowKey, "rows", rowTooltipFields);
 
     openTooltip(

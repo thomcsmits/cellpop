@@ -83,7 +83,6 @@ function Demo() {
             `https://portal.hubmapconsortium.org/browse/${row}`,
           flipAxisPosition: true,
           createSubtitle: (_, metadataValues) => {
-            console.log(metadataValues);
             const anatomy = metadataValues["anatomy"];
             const assay = metadataValues["dataset_type"];
             return `${anatomy} | ${assay}`;

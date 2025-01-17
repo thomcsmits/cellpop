@@ -521,7 +521,6 @@ export const useMetadataLookup = () => {
   const metadata = useData((s) => s.data.metadata);
   return useCallback(
     (key: string, direction: "rows" | "cols", allowedKeys?: string[]) => {
-      console.log(metadata, key, direction, allowedKeys);
       const md = metadata[direction][key];
       if (!md) {
         return {};
@@ -537,7 +536,6 @@ export const useMetadataLookup = () => {
         }
         return acc;
       }, {});
-      console.log({ filteredMetadata });
       return filteredMetadata;
     },
     [metadata],
