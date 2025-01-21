@@ -9,7 +9,6 @@ export default defineConfig(({ mode }) => {
     return {
       build: {
         rollupOptions: {
-          external: ["react", "react-dom"],
           input: {
             "index.html": "index.html",
             "demo/index.tsx": "demo/index.tsx",
