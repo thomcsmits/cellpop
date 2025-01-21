@@ -1,9 +1,9 @@
 import * as d3 from "d3";
 
 import { CellPopData, CellPopDimensions, CellPopTheme } from "./cellpop-schema";
+import { getTheme } from "./utils/theme";
 import { renderCellPopVisualization } from "./visualization";
 import { getPossibleMetadataSelections } from "./visualization/metadata";
-import { getTheme } from "./visualization/theme";
 
 // visualization
 export function getMainVis(

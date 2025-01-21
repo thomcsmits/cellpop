@@ -4,8 +4,8 @@ import { CellPopTheme } from "../cellpop-schema";
 
 import { Theme, ThemeProvider } from "@mui/material/styles";
 import { temporal } from "zundo";
+import { getTheme } from "../utils/theme";
 import { createStoreContext } from "../utils/zustand";
-import { getTheme } from "../visualization/theme";
 import { useThemeControlIsDisabled } from "./DisabledControlProvider";
 
 interface InitialThemeSetterState {
