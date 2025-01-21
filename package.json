@@ -22,7 +22,7 @@
     }
   },
   "files": [
-    "**"
+    "src", "dist"
   ],
   "repository": {
     "type": "git",
