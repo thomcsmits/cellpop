@@ -1,18 +1,15 @@
 import React from "react";
 
 import { useRowConfig } from "../../contexts/AxisConfigContext";
-import { useRows } from "../../contexts/AxisOrderContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
-import { AxisButtons } from "../heatmap/AxisButtons";
 import HeatmapYAxis from "../heatmap/HeatmapYAxis";
 import MetadataValueBar from "../heatmap/MetadataValueBar";
 import RowSelectionControls from "../heatmap/RowSelectionControls";
 import VisualizationPanel, { VisualizationPanelProps } from "./Panel";
 
 export default function MiddleRightPanel({ id }: VisualizationPanelProps) {
-  const [, { setSortOrder, sortOrders }] = useRows();
   const { width, height } = usePanelDimensions("right_middle");
-  const { flipAxisPosition } = useRowConfig();
+  const flipAxisPosition = useRowConfig((store) => store.flipAxisPosition);
 
   return (
     <VisualizationPanel id={id}>
@@ -23,11 +20,6 @@ export default function MiddleRightPanel({ id }: VisualizationPanelProps) {
           <HeatmapYAxis />
         </svg>
       )}
-      <AxisButtons
-        axis="Y"
-        setSortOrder={setSortOrder}
-        sortOrders={sortOrders}
-      />
       <RowSelectionControls />
     </VisualizationPanel>
   );

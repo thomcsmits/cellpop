@@ -76,9 +76,9 @@ export function useOrderedArrayState<
             return [...ordered].sort((a, b) => counts[a] - counts[b]);
           case "Counts Descending":
             return [...ordered].sort((a, b) => counts[b] - counts[a]);
-          case `${order.split(" ")[0]} Ascending`:
+          case `${order.split(" Ascending")[0]} Ascending`:
             return [...ordered].sort((a, b) => {
-              const metadataKey = order.split(" ")[0] as keyof MData;
+              const metadataKey = order.split(" Ascending")[0] as keyof MData;
               const aValue = metadata[a][metadataKey];
               const bValue = metadata[b][metadataKey];
               if (typeof aValue === "string" && typeof bValue === "string") {
@@ -92,9 +92,9 @@ export function useOrderedArrayState<
               }
               return 0;
             });
-          case `${order.split(" ")[0]} Descending`:
+          case `${order.split(" Descending")[0]} Descending`:
             return [...ordered].sort((a: T, b: T) => {
-              const metadataKey = order.split(" ")[0] as keyof MData;
+              const metadataKey = order.split(" Descending")[0] as keyof MData;
               const aValue = metadata[a][metadataKey] as string | number;
               const bValue = metadata[b][metadataKey] as string | number;
               if (typeof aValue === "string" && typeof bValue === "string") {
@@ -138,11 +138,12 @@ export function useOrderedArrayState<
   }, []);
 
   const selectedMetadata: string | undefined = useMemo(() => {
-    if (
-      !SORT_ORDERS.includes(sortOrder) &&
-      (sortOrder.includes("Ascending") || sortOrder.includes("Descending"))
-    ) {
-      return sortOrder.split(" ")[0] as string;
+    if (!SORT_ORDERS.includes(sortOrder)) {
+      if (sortOrder.includes("Ascending")) {
+        return sortOrder.split(" Ascending")[0];
+      } else if (sortOrder.includes("Descending")) {
+        return sortOrder.split(" Descending")[0];
+      }
     }
     return undefined;
   }, [sortOrder]);

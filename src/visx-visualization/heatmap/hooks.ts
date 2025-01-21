@@ -25,10 +25,7 @@ export function useTickTitle(
   );
 }
 
-export function useHeatmapAxis(
-  { createHref, label, flipAxisPosition }: AxisConfig,
-  filterId?: string,
-) {
+export function useHeatmapAxis({ createHref }: AxisConfig) {
   const openInNewTab = useOpenInNewTab(createHref);
   const tickTitle = useTickTitle(createHref);
   const tickLabelStyle = {
@@ -56,7 +53,9 @@ export function useSetTickLabelSize(
         const tickBounds = Array.from(ticks).map((t) =>
           t.getBoundingClientRect(),
         );
-        const maxSize = Math.max(...tickBounds.map((b) => orientation === 'x' ? b.height : b.width));
+        const maxSize = Math.max(
+          ...tickBounds.map((b) => (orientation === "x" ? b.height : b.width)),
+        );
         setTickLabelSize(maxSize);
       }
     } else {

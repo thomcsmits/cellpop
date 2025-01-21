@@ -1,11 +1,11 @@
 import React, { useId, useRef } from "react";
 
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useDimensions } from "../../contexts/DimensionsContext";
 import Tooltip from "../Tooltip";
 
 import { ParentRefProvider } from "../../contexts/ContainerRefContext";
 
+import { useTheme } from "@mui/material/styles";
 import { Root as ContextMenuRoot, Trigger } from "@radix-ui/react-context-menu";
 import {
   useSetTooltipData,
@@ -19,7 +19,6 @@ import MiddleCenterPanel from "./MiddleCenter";
 import MiddleLeftPanel from "./MiddleLeft";
 import MiddleRightPanel from "./MiddleRight";
 import VisualizationPanelResizer from "./PanelResizer";
-import "./style.css";
 import TopCenterPanel from "./TopCenter";
 import TopLeftPanel from "./TopLeft";
 import TopRightPanel from "./TopRight";
@@ -28,9 +27,7 @@ export default function VizContainerGrid() {
   const { width, height, rowSizes, columnSizes, resizeColumn, resizeRow } =
     useDimensions();
 
-  const {
-    theme: { background },
-  } = useCellPopTheme();
+  const theme = useTheme();
 
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -68,7 +65,7 @@ export default function VizContainerGrid() {
                 display: "grid",
                 gridTemplateColumns,
                 gridTemplateRows,
-                background,
+                background: theme.palette.background.default,
               }}
             >
               <TopLeftPanel id={`${id}-top-left`} />

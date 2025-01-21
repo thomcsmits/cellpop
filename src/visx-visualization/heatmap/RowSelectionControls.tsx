@@ -1,14 +1,19 @@
 import { Tooltip } from "@mui/material";
 import React from "react";
-import { useRows } from "../../contexts/AxisOrderContext";
+import { useRows } from "../../contexts/DataContext";
+import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { useYScale } from "../../contexts/ScaleContext";
 
 export default function RowSelectionControls() {
-  const [rows] = useRows();
-  const { selectedValues, toggleSelection, scale } = useYScale();
+  const rows = useRows();
+  const { scale } = useYScale();
+  const selectedValues = useSelectedValues((s) => s.selectedValues);
+  const toggleSelection = useSelectedValues((s) => s.toggleValue);
+  const smallScale = scale.bandwidth() < 10;
+  const rowsToRender = smallScale ? [...selectedValues] : rows;
   return (
     <>
-      {rows.map((row) => (
+      {rowsToRender.map((row) => (
         <Tooltip
           title={`Toggle ${row}`}
           key={row}
@@ -23,8 +28,8 @@ export default function RowSelectionControls() {
             checked={selectedValues.has(row)}
             onChange={() => toggleSelection(row)}
             style={{
-              width: Math.floor(scale.bandwidth()),
-              height: Math.floor(scale.bandwidth()),
+              width: Math.max(Math.floor(scale.bandwidth()), 16),
+              height: Math.max(Math.floor(scale.bandwidth()), 16),
               left: 0,
               top: scale(row),
               position: "absolute",

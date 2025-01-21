@@ -1,55 +1,25 @@
-import { CellPopTheme, CellPopThemeColors } from "../cellpop-schema";
+import { createTheme } from "@mui/material/styles";
+import { CellPopTheme } from "../cellpop-schema";
+
+export const light = createTheme({
+  palette: {
+    mode: "light",
+  },
+});
+
+export const dark = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
 
 export function getTheme(theme: CellPopTheme) {
-  const themeColors = new Object() as CellPopThemeColors;
-
-  if (theme === "dark") {
-    themeColors.background = "black";
-    themeColors.heatmapZero = "black";
-    themeColors.heatmapMax = "#69b3a2";
-    themeColors.heatmapGrid = "white";
-    themeColors.heatmapHighlight = "white";
-    themeColors.sideCharts = "white";
-    themeColors.text = "white";
-    themeColors.extensionDefault = "#69b3a2";
-    themeColors.extensionRange = [
-      "#1A2A22",
-      "#79FFFC",
-      "#8F5D4E",
-      "#FFFF7C",
-      "#FFFF7C",
-      "#C665BF",
-      "#8AFF79",
-      "#4E5C35",
-      "#A4FCE5",
-      "#FF8095",
-      "#7A85FE",
-    ];
+  switch (theme) {
+    case "light":
+      return light;
+    case "dark":
+      return dark;
+    default:
+      return light;
   }
-  // if (t === "light") {
-  else {
-    themeColors.background = "white";
-    themeColors.heatmapZero = "white";
-    themeColors.heatmapMax = "#69b3a2";
-    themeColors.heatmapGrid = "white";
-    themeColors.heatmapHighlight = "black";
-    themeColors.sideCharts = "black";
-    themeColors.text = "black";
-    themeColors.extensionDefault = "#69b3a2";
-    themeColors.extensionRange = [
-      "#1A2A22",
-      "#79FFFC",
-      "#8F5D4E",
-      "#FFFF7C",
-      "#FFFF7C",
-      "#C665BF",
-      "#8AFF79",
-      "#4E5C35",
-      "#A4FCE5",
-      "#FF8095",
-      "#7A85FE",
-    ];
-  }
-
-  return themeColors;
 }

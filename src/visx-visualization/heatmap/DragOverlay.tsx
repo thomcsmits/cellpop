@@ -1,17 +1,11 @@
-import React, {
-  PropsWithChildren,
-  startTransition,
-  useCallback,
-  useMemo,
-  useRef,
-} from "react";
-import { useXScale, useYScale } from "../../contexts/ScaleContext";
+import React, { PropsWithChildren, useMemo, useRef } from "react";
+import { ScaleBand, useXScale, useYScale } from "../../contexts/ScaleContext";
 import { useSelectedDimension } from "../../contexts/SelectedDimensionContext";
 
 import {
   CollisionDetection,
   DndContext,
-  DragEndEvent,
+  DragOverEvent,
   KeyboardSensor,
   MeasuringStrategy,
   PointerSensor,
@@ -29,26 +23,35 @@ import {
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { ScaleBand } from "d3";
+import { useEventCallback } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import {
   useColumnConfig,
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
 import { useParentRef } from "../../contexts/ContainerRefContext";
-import { useData } from "../../contexts/DataContext";
+import {
+  useColumnMetadataKeys,
+  useDataHistory,
+  useDataMap,
+  useFractionDataMap,
+  useMetadata,
+  useMetadataLookup,
+  useRowMetadataKeys,
+} from "../../contexts/DataContext";
 import {
   useDimensions,
   useHeatmapDimensions,
 } from "../../contexts/DimensionsContext";
+import { useTooltipFields } from "../../contexts/MetadataConfigContext";
+import { useNormalization } from "../../contexts/NormalizationContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
-import { SortOrder } from "../../hooks/useOrderedArray";
 import { Setter } from "../../utils/types";
 
 interface DragOverlayContainerProps extends PropsWithChildren {
   items: string[];
   setItems: Setter<string[]>;
-  setSort: Setter<SortOrder>;
+  resetSort: () => void;
 }
 const customCollisionDetectionAlgorithm: CollisionDetection = (args) => {
   // First, let's see if there are any collisions with the pointer
@@ -77,7 +80,6 @@ const indicatorProps = (
   },
   Y: {
     width,
-    // @ts-expect-error - y.bandwidth(string) is a custom method on the scale
     height: (item: string) => y.bandwidth(item),
     left: () => 0,
     top: (item: string) => y(item),
@@ -88,16 +90,18 @@ const indicatorProps = (
  * Wrapper for the heatmap which allows for dragging and dropping of rows or columns.
  * @param props.items The items to be sorted.
  * @param props.setItems Setter for the items.
- * @param props.setSort Setter for the sort order. Used to reset the sort order when custom sorting is applied.
  * @returns
  */
 function DragOverlayContainer({
   children,
   items,
   setItems,
-  setSort,
 }: DragOverlayContainerProps) {
   const { selectedDimension } = useSelectedDimension();
+
+  const dataHistory = useDataHistory();
+
+  const hasPastStates = dataHistory.pastStates.length > 0;
 
   const { scale: x } = useXScale();
   const { scale: y } = useYScale();
@@ -119,34 +123,39 @@ function DragOverlayContainer({
   const initialItemOrder = useRef<string[]>(items);
   const lastOver = useRef<string | number | null>(null);
 
-  const startDrag = useCallback(() => {
+  const startDrag = useEventCallback(() => {
     initialItemOrder.current = items;
     lastOver.current = null;
-  }, [items]);
 
-  const cancelDrag = useCallback(() => {
-    startTransition(() => {
-      setItems(initialItemOrder.current);
-    });
-  }, [setItems]);
+    if (hasPastStates) {
+      dataHistory.pause();
+    }
+  });
 
-  const handleDrag = useCallback(
-    ({ active, over }: DragEndEvent) => {
-      if (!over || active.id === over.id || lastOver.current === over.id) {
-        return;
-      }
+  const cancelDrag = useEventCallback(() => {
+    setItems(initialItemOrder.current);
+    dataHistory.resume();
+  });
 
-      lastOver.current = over.id;
+  const handleDrag = useEventCallback(({ active, over }: DragOverEvent) => {
+    if (!over || active.id === over.id || lastOver.current === over.id) {
+      if (over) lastOver.current = over.id;
+      return;
+    }
+    lastOver.current = over.id;
+    const oldIndex = items.indexOf(active.id as string);
+    const newIndex = items.indexOf(over.id as string);
 
-      setItems((items) => {
-        const oldIndex = items.indexOf(active.id as string);
-        const newIndex = items.indexOf(over.id as string);
+    if (hasPastStates) {
+      dataHistory.pause();
+    }
+    setItems(arrayMove(items, oldIndex, newIndex));
+  });
 
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    },
-    [setItems, setSort],
-  );
+  const handleDragEnd = useEventCallback(() => {
+    dataHistory.resume();
+    setItems(items);
+  });
 
   if (items.length === 0) {
     return children;
@@ -159,7 +168,7 @@ function DragOverlayContainer({
       onDragStart={startDrag}
       onDragCancel={cancelDrag}
       onDragMove={handleDrag}
-      onDragEnd={handleDrag}
+      onDragEnd={handleDragEnd}
       modifiers={[restrictToParentElement]}
       measuring={{
         droppable: {
@@ -199,15 +208,23 @@ function DragIndicator({
   const { scale: y } = useYScale();
 
   const { columnSizes, rowSizes } = useDimensions();
-  const { dataMap } = useData();
+  const dataMap = useDataMap();
+  const normalization = useNormalization((store) => store.normalization);
+  const normalizedDataMap = useFractionDataMap(normalization);
 
   const xOffset = columnSizes[0];
   const yOffset = rowSizes[0];
 
-  const { theme } = useCellPopTheme();
-  const { label: rowLabel } = useRowConfig();
-  const { label: columnLabel } = useColumnConfig();
-  const { width, height } = useHeatmapDimensions();
+  const theme = useTheme();
+  const rowLabel = useRowConfig((store) => store.label);
+  const columnLabel = useColumnConfig((store) => store.label);
+  const { height } = useHeatmapDimensions();
+  const rowMetadataKeys = useRowMetadataKeys();
+  const columnMetadataKeys = useColumnMetadataKeys();
+  const rowTooltipFields = useTooltipFields(rowMetadataKeys);
+  const columnTooltipFields = useTooltipFields(columnMetadataKeys);
+
+  const lookupMetadata = useMetadataLookup();
 
   const strategy =
     selectedDimension === "X"
@@ -220,53 +237,61 @@ function DragIndicator({
   const parentRef = useParentRef();
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const onMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      const visualizationBounds = parentRef.current?.getBoundingClientRect();
-      if (!visualizationBounds) {
-        return;
-      }
-      const xValue = e.clientX - xOffset - visualizationBounds.left;
+  const onMouseMove = useEventCallback((e: React.MouseEvent) => {
+    const visualizationBounds = parentRef.current?.getBoundingClientRect();
+    if (!visualizationBounds) {
+      return;
+    }
+    // e.clientX = mouse position relative to the viewport
+    // xOffset = position of the heatmap relative to the bounds of the cellpop container
+    // visualizationBounds.left = position of the cellpop container relative to the viewport
+    const xValue = e.clientX - xOffset - visualizationBounds.left;
 
-      const visualizationTotalHeight =
-        yOffset + height + visualizationBounds.top;
-      const yMousePosition = e.clientY;
-      const yValue = height - (visualizationTotalHeight - yMousePosition);
+    // y position is inverted to match the y scale
+    const visualizationTotalHeight = yOffset + height + visualizationBounds.top;
+    const yMousePosition = e.clientY;
+    const yValue = height - (visualizationTotalHeight - yMousePosition);
 
-      const columnCount = x.domain().length;
-      const xStep = x.bandwidth();
+    const columnKey = x.lookup(xValue);
+    const rowKey = y.lookup(yValue);
 
-      // Clamp indices to prevent out of bounds errors
-      const columnIndex = Math.min(
-        Math.max(Math.floor(xValue / xStep), 0),
-        columnCount - 1,
-      );
+    if (!rowKey || !columnKey) {
+      return;
+    }
 
-      // @ts-expect-error - y lookup is a custom method on the scale, added in
-      // ScaleContext. We should consider extending the d3 scale type to include
-      // this method.
-      const rowKey = y.lookup(yValue);
-      const columnKey = x.domain()[columnIndex];
+    const key = `${rowKey}-${columnKey}` as keyof typeof dataMap;
 
-      if (!rowKey || !columnKey) {
-        return;
-      }
+    const normalizationInfo =
+      normalization !== "None"
+        ? {
+            [`Percentage of total cells in ${normalization}`]:
+              (normalizedDataMap[key] * 100).toFixed(2) + "%",
+          }
+        : {};
 
-      openTooltip(
-        {
-          title: `${rowKey} - ${columnKey}`,
-          data: {
-            "Cell Count": dataMap[`${rowKey}-${columnKey}`],
-            [rowLabel]: rowKey,
-            [columnLabel]: columnKey,
-          },
+    const columnMetadata = lookupMetadata(
+      columnKey,
+      "cols",
+      columnTooltipFields,
+    );
+    const rowMetadata = lookupMetadata(rowKey, "rows", rowTooltipFields);
+
+    openTooltip(
+      {
+        title: `${rowKey} - ${columnKey}`,
+        data: {
+          "Cell Count": dataMap[`${rowKey}-${columnKey}`],
+          [rowLabel]: rowKey,
+          [columnLabel]: columnKey,
+          ...normalizationInfo,
+          ...columnMetadata,
+          ...rowMetadata,
         },
-        e.clientX,
-        e.clientY,
-      );
-    },
-    [x, y, xOffset, yOffset, dataMap, rowLabel, columnLabel, width, height],
-  );
+      },
+      e.clientX,
+      e.clientY,
+    );
+  });
 
   return (
     <div
@@ -278,7 +303,9 @@ function DragIndicator({
         zIndex: 1,
         left: left(item),
         top: top(item),
-        outline: isDragging ? `3px solid ${theme.text}` : "none",
+        outline: isDragging
+          ? `3px solid ${theme.palette.text.primary}`
+          : "none",
       }}
       ref={setNodeRef}
       {...attributes}

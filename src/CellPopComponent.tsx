@@ -1,44 +1,131 @@
-import React from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
+import { Theme } from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
+import { withParentSize, WithParentSizeProvidedProps } from "@visx/responsive";
 import { CellPopData, CellPopTheme } from "./cellpop-schema";
-import CellPopConfig from "./CellPopConfig";
 import { AxisConfig } from "./contexts/AxisConfigContext";
-import { Dimensions } from "./contexts/DimensionsContext";
+import { OuterContainerRefProvider } from "./contexts/ContainerRefContext";
+import { Dimensions, GridSizeTuple } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
+import { loadHuBMAPData } from "./dataLoading";
+import Controls from "./visx-visualization/Controls";
 import VizContainer from "./visx-visualization/layout";
 
-export interface CellPopProps {
-  data: CellPopData;
-  theme: CellPopTheme;
-  dimensions: Dimensions;
-  xAxisConfig: AxisConfig;
-  yAxisConfig: AxisConfig;
+type DisableableControls = "fraction" | "selection" | "theme";
+
+interface CellPopConfig {
+  yAxis: AxisConfig;
+  xAxis: AxisConfig;
+  onClick?: (e: React.MouseEvent) => void;
+  dimensions?: Dimensions;
+  theme?: CellPopTheme;
+  customTheme?: Theme;
+  disabledControls?: DisableableControls[];
+  initialProportions?: [GridSizeTuple, GridSizeTuple];
+  fieldDisplayNames?: Record<string, string>;
+  sortableFields?: string[];
+  tooltipFields?: string[];
 }
 
-export const CellPop = ({
-  theme,
-  dimensions,
-  data,
-  xAxisConfig,
-  yAxisConfig,
-}: CellPopProps) => {
-  if (!data) {
-    return <Skeleton />;
-  }
+export interface CellPopProps
+  extends WithParentSizeProvidedProps,
+    CellPopConfig {
+  data: CellPopData;
+  uuids?: string[];
+}
 
-  return (
-    <div>
-      <Providers
-        data={data}
-        dimensions={dimensions}
-        theme={theme}
-        xAxisConfig={xAxisConfig}
-        yAxisConfig={yAxisConfig}
-      >
-        <CellPopConfig />
-        <VizContainer />
-      </Providers>
-    </div>
-  );
+const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();
+
+export const CellPop = withParentSize(
+  ({
+    theme = "light",
+    dimensions: definedDimensions,
+    data,
+    xAxis,
+    yAxis,
+    onClick,
+    parentHeight,
+    parentWidth,
+    customTheme,
+    disabledControls,
+    initialProportions,
+    fieldDisplayNames,
+    sortableFields,
+    tooltipFields,
+  }: CellPopProps) => {
+    // If dimensions are provided, use them.
+    // Otherwise, fall back to using parentWidth and parentHeight.
+    const dimensions = useMemo(() => {
+      if (definedDimensions) {
+        return definedDimensions;
+      }
+      return {
+        width: parentWidth || 0,
+        height: parentHeight || 0,
+      };
+    }, [definedDimensions, parentHeight, parentWidth]);
+
+    const handleClick = useCallback(
+      (e: React.MouseEvent) => {
+        stopPropagation(e);
+        onClick?.(e);
+      },
+      [onClick],
+    );
+
+    const outerContainerRef = React.useRef<HTMLDivElement | null>(null);
+
+    if (!data) {
+      return <Skeleton />;
+    }
+
+    return (
+      <OuterContainerRefProvider value={outerContainerRef}>
+        <div onClick={handleClick} ref={outerContainerRef}>
+          <Providers
+            data={data}
+            dimensions={dimensions}
+            theme={theme}
+            customTheme={customTheme}
+            xAxis={xAxis}
+            yAxis={yAxis}
+            disabledControls={disabledControls}
+            initialProportions={initialProportions}
+            fieldDisplayNames={fieldDisplayNames}
+            sortableFields={sortableFields}
+            tooltipFields={tooltipFields}
+          >
+            <Controls />
+            <VizContainer />
+          </Providers>
+        </div>
+      </OuterContainerRefProvider>
+    );
+  },
+);
+
+type CellPopLoaderProps = Omit<CellPopProps, "data"> & {
+  uuids: string[];
+};
+
+export const CellPopHuBMAPLoader = ({
+  uuids,
+  ...props
+}: CellPopLoaderProps) => {
+  const [data, setData] = useState<CellPopData>();
+
+  useEffect(() => {
+    if (!data) {
+      loadHuBMAPData(uuids)
+        .then((data) => {
+          setData(data as CellPopData);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }, [uuids]);
+
+  return <CellPop data={data} {...props} />;
 };

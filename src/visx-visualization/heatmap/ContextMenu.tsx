@@ -1,22 +1,47 @@
+import { useEventCallback } from "@mui/material";
 import * as ContextMenu from "@radix-ui/react-context-menu";
 import React from "react";
 import {
   useColumnConfig,
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
-import { useColumns, useRows } from "../../contexts/AxisOrderContext";
-import { useData } from "../../contexts/DataContext";
-import { useYScale } from "../../contexts/ScaleContext";
+import {
+  useColumnSorts,
+  useData,
+  useMoveColumnToEnd,
+  useMoveColumnToStart,
+  useMoveRowToEnd,
+  useMoveRowToStart,
+  useRowSorts,
+} from "../../contexts/DataContext";
+import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import {
   useSetTooltipData,
   useTooltipData,
 } from "../../contexts/TooltipDataContext";
-import "./ContextMenu.css";
+import {
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  RightSlot,
+} from "./ContextMenu.styles";
 
 const HideRow = () => {
   const { tooltipData } = useTooltipData();
-  const { label: rowLabel } = useRowConfig();
+  const rowLabel = useRowConfig((store) => store.label);
   const { removeRow } = useData();
+  const { deselectValue, selectedValues } = useSelectedValues();
+
+  const onClick = useEventCallback(() => {
+    const rowValue = tooltipData.data[rowLabel] as string;
+    if (selectedValues.has(tooltipData.data[rowLabel] as string)) {
+      deselectValue(tooltipData.data[rowLabel] as string);
+    }
+    removeRow(rowValue);
+  });
 
   if (!tooltipData?.data) {
     return null;
@@ -25,19 +50,16 @@ const HideRow = () => {
   if (tooltipData.data[rowLabel]) {
     const rowValue = tooltipData.data[rowLabel] as string;
     return (
-      <ContextMenu.Item
-        className="ContextMenuItem"
-        onClick={() => removeRow(rowValue)}
-      >
+      <ContextMenuItem onClick={onClick}>
         Hide {rowLabel} ({rowValue})
-      </ContextMenu.Item>
+      </ContextMenuItem>
     );
   }
 };
 
 const HideColumn = () => {
   const { tooltipData } = useTooltipData();
-  const { label: columnLabel } = useColumnConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
   const { removeColumn } = useData();
 
   if (!tooltipData?.data) {
@@ -47,43 +69,40 @@ const HideColumn = () => {
   if (tooltipData.data[columnLabel]) {
     const columnValue = tooltipData.data[columnLabel] as string;
     return (
-      <ContextMenu.Item
-        className="ContextMenuItem"
-        onClick={() => removeColumn(columnValue)}
-      >
+      <ContextMenuItem onClick={() => removeColumn(columnValue)}>
         Hide {columnLabel} ({columnValue})
-      </ContextMenu.Item>
+      </ContextMenuItem>
     );
   }
 };
 
 const RestoreHiddenRows = () => {
   const { removedRows, resetRemovedRows } = useData();
-  const { label: rowLabel } = useRowConfig();
+  const rowLabel = useRowConfig((store) => store.label);
 
   if (!removedRows.size) {
     return null;
   }
 
   return (
-    <ContextMenu.Item className="ContextMenuItem" onClick={resetRemovedRows}>
+    <ContextMenuItem onClick={resetRemovedRows}>
       Restore Hidden {rowLabel}s
-    </ContextMenu.Item>
+    </ContextMenuItem>
   );
 };
 
 const RestoreHiddenColumns = () => {
   const { removedColumns, resetRemovedColumns } = useData();
-  const { label: columnLabel } = useColumnConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
 
   if (!removedColumns.size) {
     return null;
   }
 
   return (
-    <ContextMenu.Item className="ContextMenuItem" onClick={resetRemovedColumns}>
+    <ContextMenuItem onClick={resetRemovedColumns}>
       Restore Hidden {columnLabel}s
-    </ContextMenu.Item>
+    </ContextMenuItem>
   );
 };
 
@@ -91,48 +110,45 @@ const ExpandRow = () => {
   const {
     tooltipData: { data },
   } = useTooltipData();
-  const { label } = useRowConfig();
-  const { toggleSelection, selectedValues } = useYScale();
+  const label = useRowConfig((store) => store.label);
+  const expandRow = useSelectedValues((s) => s.toggleValue);
+  const expandedRows = useSelectedValues((s) => s.selectedValues);
   const { closeContextMenu } = useSetTooltipData();
 
-  if (!data[label] || selectedValues.has(data[label] as string)) {
+  if (!data[label] || expandedRows.has(data[label] as string)) {
     return null;
   }
 
   return (
-    <ContextMenu.Item
-      className="ContextMenuItem"
+    <ContextMenuItem
       onClick={() => {
-        toggleSelection(data[label] as string);
+        expandRow(data[label] as string);
         closeContextMenu();
       }}
     >
       Expand {label}
-    </ContextMenu.Item>
+    </ContextMenuItem>
   );
 };
 
 const CollapseRows = () => {
-  const { selectedValues, reset } = useYScale();
-  if (selectedValues.size === 0) {
+  const expandedRows = useSelectedValues((s) => s.selectedValues);
+  const reset = useSelectedValues((s) => s.reset);
+  if (expandedRows.size === 0) {
     return null;
   }
-  return (
-    <ContextMenu.Item className="ContextMenuItem" onClick={reset}>
-      Clear Selection
-    </ContextMenu.Item>
-  );
+  return <ContextMenuItem onClick={reset}>Clear Selection</ContextMenuItem>;
 };
 
 const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
-  const [, { moveToStart: moveRowToStart }] = useRows();
-  const [, { moveToStart: moveColumnToStart }] = useColumns();
+  const moveRowToStart = useMoveRowToStart();
+  const moveColumnToStart = useMoveColumnToStart();
   const {
     tooltipData: { data },
   } = useTooltipData();
-  const { label: rowLabel } = useRowConfig();
 
-  const { label: columnLabel } = useColumnConfig();
+  const rowLabel = useRowConfig((store) => store.label);
+  const columnLabel = useColumnConfig((store) => store.label);
 
   const move = dimension === "row" ? moveRowToStart : moveColumnToStart;
   const label = dimension === "row" ? rowLabel : columnLabel;
@@ -143,24 +159,22 @@ const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
   }
 
   return (
-    <ContextMenu.Item
-      className="ContextMenuItem"
-      onClick={() => move(data[label] as string)}
-    >
+    <ContextMenuItem onClick={() => move(data[label] as string)}>
       Move to {moveLabel}
-    </ContextMenu.Item>
+    </ContextMenuItem>
   );
 };
 
 const MoveToEnd = ({ dimension }: { dimension: "row" | "column" }) => {
-  const [, { moveToEnd: moveRowToEnd }] = useRows();
-  const [, { moveToEnd: moveColumnToEnd }] = useColumns();
+  const moveRowToEnd = useMoveRowToEnd();
+  const moveColumnToEnd = useMoveColumnToEnd();
+
   const {
     tooltipData: { data },
   } = useTooltipData();
-  const { label: rowLabel } = useRowConfig();
+  const rowLabel = useRowConfig((store) => store.label);
 
-  const { label: columnLabel } = useColumnConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
 
   const move = dimension === "row" ? moveRowToEnd : moveColumnToEnd;
   const label = dimension === "row" ? rowLabel : columnLabel;
@@ -171,69 +185,50 @@ const MoveToEnd = ({ dimension }: { dimension: "row" | "column" }) => {
   }
 
   return (
-    <ContextMenu.Item
-      className="ContextMenuItem"
-      onClick={() => move(data[label] as string)}
-    >
+    <ContextMenuItem onClick={() => move(data[label] as string)}>
       Move to {moveLabel}
-    </ContextMenu.Item>
+    </ContextMenuItem>
   );
 };
 
 const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
-  const [
-    ,
-    {
-      setSortOrder: sortColumns,
-      sortOrder: colSortOrder,
-      sortOrders: colSortOrders,
-    },
-  ] = useColumns();
-  const [
-    ,
-    {
-      setSortOrder: sortRows,
-      sortOrder: rowSortOrder,
-      sortOrders: rowSortOrders,
-    },
-  ] = useRows();
+  const { sortColumns, sortRows, colSortOrder, rowSortOrder } = useData((s) => {
+    return {
+      sortColumns: s.setColumnSortOrder,
+      sortRows: s.setRowSortOrder,
+      colSortOrder: s.columnSortOrder,
+      rowSortOrder: s.rowSortOrder,
+    };
+  });
+  const rowSortOrders = useRowSorts();
+  const colSortOrders = useColumnSorts();
 
   const sort = dimension === "row" ? sortRows : sortColumns;
   const sortOrders = dimension === "row" ? rowSortOrders : colSortOrders;
   const { label: rowLabel } = useRowConfig();
-  const { label: columnLabel } = useColumnConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
   const label = dimension === "row" ? rowLabel : columnLabel;
   const currentSortOrder = dimension === "row" ? rowSortOrder : colSortOrder;
 
   return (
     <ContextMenu.Sub>
-      <ContextMenu.SubTrigger className="ContextMenuSubTrigger">
-        Sort {label}s <div className="RightSlot">&rsaquo;</div>
-      </ContextMenu.SubTrigger>
+      <ContextMenuSubTrigger>
+        Sort {label}s <RightSlot>&rsaquo;</RightSlot>
+      </ContextMenuSubTrigger>
       <ContextMenu.Portal>
-        <ContextMenu.SubContent
-          className="ContextMenuSubContent"
-          sideOffset={2}
-          alignOffset={-5}
-        >
-          {sortOrders
-            .filter((order) => order !== "Custom")
-            .map((order) => (
-              <ContextMenu.Item
-                key={order}
-                className="ContextMenuItem"
-                onClick={() => sort(order)}
-              >
-                {order
-                  .split("_")
-                  .map((s) => `${s.charAt(0).toUpperCase()}${s.slice(1)}`)
-                  .join(" ")}
-                {currentSortOrder === order && (
-                  <div className="RightSlot">✓</div>
-                )}
-              </ContextMenu.Item>
-            ))}
-        </ContextMenu.SubContent>
+        <ContextMenuSubContent sideOffset={2} alignOffset={-5}>
+          {sortOrders.map((order) => (
+            <ContextMenuItem
+              key={order.key + order.direction}
+              onClick={() => sort([order])}
+            >
+              {order.key.charAt(0).toUpperCase()}
+              {order.key.slice(1).replace("_", " ")}{" "}
+              {order.direction === "asc" ? "Ascending" : "Descending"}
+              {currentSortOrder.includes(order) && <RightSlot>✓</RightSlot>}
+            </ContextMenuItem>
+          ))}
+        </ContextMenuSubContent>
       </ContextMenu.Portal>
     </ContextMenu.Sub>
   );
@@ -241,7 +236,7 @@ const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
 
 const ContextMenuComponent = () => {
   const { label: rowLabel } = useRowConfig();
-  const { label: columnLabel } = useColumnConfig();
+  const columnLabel = useColumnConfig((store) => store.label);
 
   const { tooltipData, contextMenuOpen } = useTooltipData();
   if (!tooltipData || !contextMenuOpen) {
@@ -258,41 +253,33 @@ const ContextMenuComponent = () => {
 
   return (
     <ContextMenu.Portal>
-      <ContextMenu.Content className="ContextMenuContent">
-        <ContextMenu.ContextMenuLabel className="ContextMenuLabel">
-          Global Actions
-        </ContextMenu.ContextMenuLabel>
+      <ContextMenuContent>
+        <ContextMenuLabel>Global Actions</ContextMenuLabel>
         <RestoreHiddenRows />
         <SortDimension dimension="row" />
         <RestoreHiddenColumns />
         <SortDimension dimension="column" />
         {hasRow && (
           <>
-            <ContextMenu.Separator className="ContextMenuSeparator" />
-            <ContextMenu.ContextMenuLabel className="ContextMenuLabel">
-              Rows ({rowLabel}s)
-            </ContextMenu.ContextMenuLabel>
+            <ContextMenuSeparator />
+            <ContextMenuLabel>Rows ({rowLabel}s)</ContextMenuLabel>
             <HideRow />
             <MoveToStart dimension="row" />
             <MoveToEnd dimension="row" />
             <ExpandRow />
             <CollapseRows />
-            {hasColumn && (
-              <ContextMenu.Separator className="ContextMenuSeparator" />
-            )}
           </>
         )}
         {hasColumn && (
           <>
-            <ContextMenu.ContextMenuLabel className="ContextMenuLabel">
-              Columns ({columnLabel}s)
-            </ContextMenu.ContextMenuLabel>
+            <ContextMenuSeparator />
+            <ContextMenuLabel>Columns ({columnLabel}s)</ContextMenuLabel>
             <HideColumn />
             <MoveToStart dimension="column" />
             <MoveToEnd dimension="column" />
           </>
         )}
-      </ContextMenu.Content>
+      </ContextMenuContent>
     </ContextMenu.Portal>
   );
 };

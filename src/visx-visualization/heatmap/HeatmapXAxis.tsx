@@ -1,11 +1,15 @@
-import { AxisBottom, Orientation } from "@visx/axis";
+import { useTheme } from "@mui/material/styles";
+import { Axis, Orientation } from "@visx/axis";
 import React, { useId } from "react";
 import { useColumnConfig } from "../../contexts/AxisConfigContext";
-import { useColumns } from "../../contexts/AxisOrderContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
-import { useData } from "../../contexts/DataContext";
+import {
+  useColumnCounts,
+  useColumns,
+  useData,
+} from "../../contexts/DataContext";
 import { useXScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
+import { LEFT_MULTIPLIER, TOP_MULTIPLIER } from "../side-graphs/constants";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
 import { TICK_TEXT_SIZE } from "./constants";
 import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
@@ -15,43 +19,54 @@ import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
  * @returns
  */
 export default function HeatmapXAxis() {
-  const { columnCounts } = useData();
-  const { theme } = useCellPopTheme();
+  const columnCounts = useColumnCounts();
+  const theme = useTheme();
   const { scale: x, tickLabelSize, setTickLabelSize } = useXScale();
   const axisConfig = useColumnConfig();
   const { label, flipAxisPosition } = axisConfig;
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const [columns] = useColumns();
+  const columns = useColumns();
+  const filteredColumns = columns.length;
+  const allColumns = useData((s) => s.columnOrder.length);
+
+  const labelWithCounts =
+    filteredColumns !== allColumns
+      ? `${label} (${filteredColumns}/${allColumns})`
+      : `${label} (${allColumns})`;
 
   const filterId = useId();
-  const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(
-    axisConfig,
-    filterId,
-  );
+  const { openInNewTab, tickTitle, tickLabelStyle } =
+    useHeatmapAxis(axisConfig);
   const size = x.bandwidth() > TICK_TEXT_SIZE ? TICK_TEXT_SIZE : x.bandwidth();
 
   useSetTickLabelSize(flipAxisPosition, setTickLabelSize, "x", size);
 
   return (
     <>
-      <SVGBackgroundColorFilter color={theme.background} id={filterId} />
-      <AxisBottom
+      <SVGBackgroundColorFilter
+        color={theme.palette.background.default}
+        id={filterId}
+      />
+      <Axis
         scale={x}
-        label={label}
+        label={labelWithCounts}
         numTicks={x.domain().length}
-        stroke={theme.text}
-        tickStroke={theme.text}
+        stroke={theme.palette.text.primary}
+        tickStroke={theme.palette.text.primary}
+        top={tickLabelSize * TOP_MULTIPLIER}
         tickLabelProps={(t) =>
           ({
-            textAnchor: "end",
+            angle: -90,
+            dx: "0.25em",
+            dy: "-0.25em",
+            textAnchor: "start",
             fontSize: size,
             style: tickLabelStyle,
-            fill: theme.text,
-            dy: "0.25em",
-            className: "x-axis-tick-label text",
-            transform: `rotate(-90, ${x(t)}, ${size})translate(0, ${size / 4})`,
+            fill: theme.palette.text.primary,
+            className: "x-axis-tick-label",
+            fontFamily: theme.typography.fontFamily,
             onMouseOver: (e) => {
               openTooltip(
                 {
@@ -70,14 +85,15 @@ export default function HeatmapXAxis() {
           }) as const
         }
         tickValues={columns}
-        orientation={Orientation.bottom}
+        orientation={Orientation.top}
         labelProps={{
-          fontSize: TICK_TEXT_SIZE * 1.5,
-          fill: theme.text,
+          fontSize: TICK_TEXT_SIZE * LEFT_MULTIPLIER,
+          fill: theme.palette.text.primary,
           className: "x-axis-label text",
           pointerEvents: "none",
+          fontFamily: theme.typography.fontFamily,
         }}
-        labelOffset={tickLabelSize - TICK_TEXT_SIZE * 2}
+        labelOffset={tickLabelSize}
       />
     </>
   );

@@ -2,9 +2,14 @@ import React, { useEffect, useState } from "react";
 import { CellPop } from "../src/CellPopComponent";
 import { CellPopData } from "../src/cellpop-schema";
 import { loadHuBMAPData } from "../src/dataLoading/dataHuBMAP";
+import { testData, testData_200_300 } from "./testData";
+
+import ScatterPlot from "@mui/icons-material/ScatterPlot";
+import TableChartIcon from "@mui/icons-material/TableChartRounded";
+import { GridSizeTuple } from "../src/contexts/DimensionsContext";
 
 function Demo() {
-  const [data, setData] = useState<CellPopData>();
+  const [data, setData] = useState<CellPopData>(testData);
 
   // data
   const uuids = [
@@ -37,49 +42,70 @@ function Demo() {
     "fae9a1f2e7abefca2203765a3c7a5ba1",
     "8d631eee88855ac59155edca2a3bc1ca",
     "1ea6c0ac5ba60fe35bf63af8699b6fbe",
+    "224e01ccfc20977ee5a6a6a5b96aa7d7",
+    "33b9c54d7c295897826e1e5271d4fc24",
+    "a48ab0bf5d8084da24859c4e64336e9c",
   ];
 
   // useEffect to make sure the data only loads once
+  // The `!data` check allows us to plug in test data as desired
   useEffect(() => {
-    loadHuBMAPData(uuids)
-      .then((data) => {
-        setData(data!);
-        // getMainVis(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    if (!data) {
+      loadHuBMAPData(uuids)
+        .then((data) => {
+          setData(data!);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
   }, []);
-
-  // const props = {
-  // 	data: null,
-  // 	theme: "light",
-  // }
-
-  console.log(data);
 
   if (!data) {
     return <div>Loading...</div>;
   }
 
   return (
-    <CellPop
-      data={data}
-      theme={"light"}
-      dimensions={{ width: 1500, height: 1000 }}
-      yAxisConfig={{
-        label: "Sample",
-        createHref: (row) =>
-          `https://portal.hubmapconsortium.org/browse/${row}`,
-        flipAxisPosition: true,
+    <div
+      style={{
+        width: "90vw",
+        height: "90vh",
+        margin: "auto",
+        marginTop: "5vh",
       }}
-      xAxisConfig={{
-        label: "Cell Type",
-        createHref: (col) =>
-          `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`,
-        flipAxisPosition: true,
-      }}
-    />
+    >
+      <CellPop
+        data={data}
+        theme={"light"}
+        yAxis={{
+          label: "Dataset",
+          createHref: (row) =>
+            `https://portal.hubmapconsortium.org/browse/${row}`,
+          flipAxisPosition: true,
+          createSubtitle: (_, metadataValues) => {
+            const anatomy = metadataValues["anatomy"];
+            const assay = metadataValues["dataset_type"];
+            return `${anatomy} | ${assay}`;
+          },
+          icon: <TableChartIcon />,
+        }}
+        xAxis={{
+          label: "Cell Type",
+          createHref: (col) =>
+            `https://www.ebi.ac.uk/ols4/search?q=${col}&ontology=cl`,
+          flipAxisPosition: true,
+          createSubtitle: (_, metadataValues) => {
+            return metadataValues["Cell Ontology Label"];
+          },
+          icon: <ScatterPlot />,
+        }}
+        initialProportions={[
+          [0.35, 0.55, 0.1] as GridSizeTuple,
+          [0.3, 0.6, 0.1] as GridSizeTuple,
+        ]}
+        tooltipFields={["Cell Ontology Label"]}
+      />
+    </div>
   );
 }
 

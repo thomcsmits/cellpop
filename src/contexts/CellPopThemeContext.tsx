@@ -1,21 +1,51 @@
-import React, { PropsWithChildren, useState } from "react";
-import { CellPopTheme, CellPopThemeColors } from "../cellpop-schema";
-import { createContext, useContext } from "../utils/context";
+import React, { PropsWithChildren, useMemo } from "react";
+import { createStore } from "zustand";
+import { CellPopTheme } from "../cellpop-schema";
 
-import { Setter } from "../utils/types";
-
+import { Theme, ThemeProvider } from "@mui/material/styles";
+import { temporal } from "zundo";
+import { createStoreContext } from "../utils/zustand";
 import { getTheme } from "../visualization/theme";
+import { useThemeControlIsDisabled } from "./DisabledControlProvider";
 
-interface ThemeContextType {
-  theme: CellPopThemeColors;
-  currentThemeName: CellPopTheme;
-  setTheme: Setter<CellPopTheme>;
+interface InitialThemeSetterState {
+  initialTheme?: CellPopTheme;
 }
 
-const ThemeContext = createContext<ThemeContextType | null>(
-  "CellPopThemeColors",
-);
-export const useCellPopTheme = () => useContext(ThemeContext);
+interface ThemeSetterState {
+  currentTheme: CellPopTheme;
+}
+interface ThemeSetterActions {
+  setTheme: (newTheme: CellPopTheme) => void;
+  reset: () => void;
+}
+
+interface ThemeSetterStoreType extends ThemeSetterState, ThemeSetterActions {}
+
+const themeSetterStore = ({
+  initialTheme = "light",
+}: InitialThemeSetterState) => {
+  return createStore<ThemeSetterStoreType>()(
+    temporal((set) => ({
+      currentTheme: initialTheme,
+      setTheme: (newTheme: CellPopTheme) => {
+        set({ currentTheme: newTheme });
+      },
+      reset: () => {
+        set({ currentTheme: initialTheme });
+      },
+    })),
+  );
+};
+
+const [ThemeSetterContextProvider, useSetTheme, , useThemeHistory] =
+  createStoreContext<ThemeSetterStoreType, InitialThemeSetterState, true>(
+    themeSetterStore,
+    "Theme Setter Store",
+    true,
+  );
+
+export { useSetTheme, useThemeHistory };
 
 /**
  * Provider which manages the theme to use for the visualization.
@@ -24,13 +54,30 @@ export const useCellPopTheme = () => useContext(ThemeContext);
 export function CellPopThemeProvider({
   children,
   theme: initialTheme,
-}: PropsWithChildren<{ theme: CellPopTheme }>) {
-  const [currentThemeName, setTheme] = useState(initialTheme);
-  const theme = getTheme(currentThemeName);
-
+  customTheme,
+}: PropsWithChildren<{ theme: CellPopTheme; customTheme?: Theme }>) {
+  const themeIsDisabled = useThemeControlIsDisabled();
   return (
-    <ThemeContext.Provider value={{ theme, currentThemeName, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
+    <ThemeSetterContextProvider
+      initialTheme={initialTheme}
+      reactive={themeIsDisabled}
+    >
+      <MuiThemeProvider customTheme={customTheme}>{children}</MuiThemeProvider>
+    </ThemeSetterContextProvider>
   );
+}
+
+function MuiThemeProvider({
+  children,
+  customTheme,
+}: PropsWithChildren<{ customTheme?: Theme }>) {
+  const { currentTheme } = useSetTheme();
+  const theme = useMemo(() => {
+    if (customTheme) {
+      return { ...getTheme(currentTheme), ...customTheme };
+    }
+    return getTheme(currentTheme);
+  }, [currentTheme, customTheme]);
+
+  return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
 }

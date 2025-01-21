@@ -13,8 +13,8 @@ export type CellPopData = {
   colNames: string[];
   colNamesRaw: string[];
   colNamesWrapped: ColNamesWrapped[];
+  countsMatrixOrder: string[]
   countsMatrix: CountsMatrixValue[];
-  countsMatrixFractions: CountsMatrixFractions;
   metadata: MetaData;
   extendedChart: extendedChart;
 };
@@ -23,11 +23,7 @@ export type RowNamesWrapped = { row: string };
 
 export type ColNamesWrapped = { col: string };
 
-export type CountsMatrixValue = {
-  row: string;
-  col: string;
-  value: number;
-};
+export type CountsMatrixValue = [string, string, number]
 
 export type CountsTotalRowValue = {
   row: string;
@@ -39,12 +35,7 @@ export type CountsTotalColValue = {
   countTotal: number;
 };
 
-export type CountsMatrixFractions = {
-  col: CountsMatrixValue[];
-  row: CountsMatrixValue[];
-};
-
-export type MetaData<T extends object = object> = {
+export type MetaData<T extends number | string> = {
   rows?: Record<string, T>;
   cols?: Record<string, T>;
 };
@@ -67,21 +58,36 @@ export type ObsSets = {
     children: {
       name: string;
       set: [unknown, unknown][];
-    };
+    }[];
   }[];
 };
 
 interface HuBMAPSearchSource {
+  uuid: string;
   hubmap_id: string;
+  title: string;
+  assay_display_name: string;
+  anatomy_1: string[];
+  anatomy_2: string[];
   donor: {
     mapped_metadata: {
       age_value: string[];
+      age_unit: string[];
+      height_value: string[]; 
+      height_unit: string[];
+      race: string[];
       sex: string[];
+      weight_value: string[];
+      weight_unit: string[];
+      body_mass_index_value: string[];
+      body_mass_index_unit: string[];
+      medical_history: string[];
+      cause_of_death: string[];
+      mechanism_of_injury: string[];
+      abo_blood_group_system: string[];
+      death_event: string[];
     };
   };
-  title: string;
-  dataset_type: string;
-  anatomy_2: string[];
 }
 
 export type HuBMAPSearchHit = {

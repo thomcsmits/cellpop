@@ -1,4 +1,6 @@
+import { useTheme } from "@mui/material/styles";
 import {
+  Axis,
   AxisLeft,
   AxisRight,
   Orientation,
@@ -8,12 +10,17 @@ import { scaleLinear } from "@visx/scale";
 import { Text } from "@visx/text";
 import React, { useId } from "react";
 import { AxisConfig, useRowConfig } from "../../contexts/AxisConfigContext";
-import { useRows } from "../../contexts/AxisOrderContext";
-import { useCellPopTheme } from "../../contexts/CellPopThemeContext";
-import { useData } from "../../contexts/DataContext";
+import {
+  useData,
+  useRowCounts,
+  useRowMaxes,
+  useRows,
+} from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
+import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import { EXPANDED_ROW_PADDING, useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
+import { LEFT_MULTIPLIER } from "../side-graphs/constants";
 import SVGBackgroundColorFilter from "../SVGBackgroundColorFilter";
 import { TICK_TEXT_SIZE } from "./constants";
 import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
@@ -22,25 +29,26 @@ import { useHeatmapAxis, useSetTickLabelSize } from "./hooks";
  * Component which renders the y-axis of the heatmap.
  */
 export default function HeatmapYAxis() {
-  const { theme } = useCellPopTheme();
-  const {
-    scale: y,
-    tickLabelSize,
-    setTickLabelSize,
-    selectedValues,
-  } = useYScale();
+  const theme = useTheme();
+  const selectedValues = useSelectedValues((s) => s.selectedValues);
+  const { scale: y, tickLabelSize, setTickLabelSize } = useYScale();
   const axisConfig = useRowConfig();
   const { label, flipAxisPosition } = axisConfig;
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  const [rows] = useRows();
-  const { rowCounts } = useData();
+  const rows = useRows();
+  const rowCounts = useRowCounts();
+  const filteredRowsCount = rows.length;
+  const allColumnsCount = useData((s) => s.rowOrder.length);
+
+  const labelWithCounts =
+    filteredRowsCount !== allColumnsCount
+      ? `${label} (${filteredRowsCount}/${allColumnsCount})`
+      : `${label} (${allColumnsCount})`;
 
   const filterId = useId();
-  const { openInNewTab, tickTitle, tickLabelStyle } = useHeatmapAxis(
-    axisConfig,
-    filterId,
-  );
+  const { openInNewTab, tickTitle, tickLabelStyle } =
+    useHeatmapAxis(axisConfig);
 
   const fontSize =
     y.bandwidth() > TICK_TEXT_SIZE ? TICK_TEXT_SIZE : y.bandwidth();
@@ -49,12 +57,16 @@ export default function HeatmapYAxis() {
 
   return (
     <>
-      <SVGBackgroundColorFilter color={theme.background} id={filterId} />
-      <AxisRight
+      <SVGBackgroundColorFilter
+        color={theme.palette.background.default}
+        id={filterId}
+      />
+      <Axis
         scale={y}
-        label={label}
-        stroke={theme.text}
-        tickStroke={theme.text}
+        label={labelWithCounts}
+        left={tickLabelSize * LEFT_MULTIPLIER}
+        stroke={theme.palette.text.primary}
+        tickStroke={theme.palette.text.primary}
         tickComponent={
           selectedValues.size > 0
             ? (props) =>
@@ -70,10 +82,12 @@ export default function HeatmapYAxis() {
         tickLabelProps={(t) =>
           ({
             fontSize,
-            fill: theme.text,
+            textAnchor: "end",
+            fill: theme.palette.text.primary,
             className: "y-axis-tick-label text",
+            fontFamily: theme.typography.fontFamily,
             style: tickLabelStyle,
-            transform: `translate(0, ${fontSize / 4})`,
+            dy: "0.25em",
             onMouseOver: (e) => {
               openTooltip(
                 {
@@ -92,13 +106,11 @@ export default function HeatmapYAxis() {
           }) as const
         }
         tickValues={rows}
-        orientation={Orientation.right}
-        labelOffset={
-          tickLabelSize || Math.max(...y.domain().map((s) => s.length)) * 8
-        }
+        orientation={Orientation.left}
+        labelOffset={tickLabelSize}
         labelProps={{
-          fontSize: TICK_TEXT_SIZE * 1.5,
-          fill: theme.text,
+          fontSize: TICK_TEXT_SIZE * LEFT_MULTIPLIER,
+          fill: theme.palette.text.primary,
           pointerEvents: "none",
           className: "y-axis-label text",
         }}
@@ -120,15 +132,18 @@ function ExpandedRowTick({
 }: TickRendererProps & {
   axisConfig: AxisConfig;
 } & ReturnType<typeof useHeatmapAxis>) {
-  const { selectedValues, expandedSize } = useYScale();
+  const { expandedSize } = useYScale();
+  const selectedValues = useSelectedValues((s) => s.selectedValues);
   const { flipAxisPosition } = axisConfig;
-  const { rowMaxes } = useData();
+  const rowMaxes = useRowMaxes();
 
   const panelSize = usePanelDimensions(
     flipAxisPosition ? "left_middle" : "right_middle",
   );
   const { openTooltip, closeTooltip } = useSetTooltipData();
-  const { theme } = useCellPopTheme();
+  const theme = useTheme();
+
+  const { tickLabelSize } = useYScale();
 
   if (selectedValues.has(row)) {
     // Display an axis scaled for the selected value instead of the tick if the value is expanded
@@ -143,21 +158,24 @@ function ExpandedRowTick({
     return (
       <Axis
         top={y - EXPANDED_ROW_PADDING * 2}
-        left={panelSize.width}
+        orientation="left"
+        left={panelSize.width - tickLabelSize * LEFT_MULTIPLIER}
         scale={yScale}
         label={row}
         labelOffset={expandedSize / 2}
         tickLabelProps={{
-          fill: theme.text,
+          fill: theme.palette.text.primary,
           style: tickLabelStyle,
+          fontFamily: theme.typography.fontFamily,
           onMouseOut: closeTooltip,
           onClick: () => openInNewTab(row),
           className: "text",
         }}
         labelProps={{
           style: tickLabelStyle,
-          fill: theme.text,
+          fill: theme.palette.text.primary,
           className: "text",
+          fontFamily: theme.typography.fontFamily,
           onMouseMove: (e) => {
             openTooltip(
               {

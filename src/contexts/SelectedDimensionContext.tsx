@@ -1,26 +1,35 @@
-import React, { PropsWithChildren, useState } from "react";
-import { createContext, useContext } from "../utils/context";
-interface SelectedScaleContext {
+import { temporal } from "zundo";
+import { createStore } from "zustand";
+import { createStoreContext } from "../utils/zustand";
+
+interface SelectedDimensionContextProps {
+  initialSelectedDimension: "X" | "Y";
+}
+
+interface SelectedDimensionContext {
   selectedDimension: "X" | "Y";
   setSelectedDimension: (dimension: "X" | "Y") => void;
 }
 
-const SelectedDimensionContext = createContext<SelectedScaleContext>(
-  "SelectedDimensionContext",
-);
-
-export const useSelectedDimension = () => useContext(SelectedDimensionContext);
-
-/**
- * Provider which manages the selected dimension for reordering axis values.
- */
-export const SelectedDimensionProvider = ({ children }: PropsWithChildren) => {
-  const [selectedDimension, setSelectedDimension] = useState<"X" | "Y">("X");
-  return (
-    <SelectedDimensionContext.Provider
-      value={{ selectedDimension, setSelectedDimension }}
-    >
-      {children}
-    </SelectedDimensionContext.Provider>
+const createSelectedDimensionContext = ({
+  initialSelectedDimension,
+}: SelectedDimensionContextProps) => {
+  return createStore<SelectedDimensionContext>()(
+    temporal((set) => ({
+      selectedDimension: initialSelectedDimension,
+      setSelectedDimension: (dimension: "X" | "Y") =>
+        set({ selectedDimension: dimension }),
+    })),
   );
 };
+
+export const [
+  SelectedDimensionProvider,
+  useSelectedDimension,
+  ,
+  useSelectedDimensionHistory,
+] = createStoreContext<
+  SelectedDimensionContext,
+  SelectedDimensionContextProps,
+  true
+>(createSelectedDimensionContext, "SelectedDimensionContext", true);

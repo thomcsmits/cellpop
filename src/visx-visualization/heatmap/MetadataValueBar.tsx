@@ -1,4 +1,4 @@
-import { rgbToHex } from "@mui/material/styles";
+import { rgbToHex, useTheme } from "@mui/material/styles";
 import { scaleLinear, scaleOrdinal } from "@visx/scale";
 import { Text } from "@visx/text";
 import {
@@ -8,8 +8,7 @@ import {
   schemePastel2,
 } from "d3";
 import React, { useCallback, useMemo } from "react";
-import { useColumns, useRows } from "../../contexts/AxisOrderContext";
-import { useData } from "../../contexts/DataContext";
+import { useColumns, useData, useRows } from "../../contexts/DataContext";
 import {
   EXPANDED_ROW_PADDING,
   useXScale,
@@ -32,11 +31,63 @@ const combinedColorScheme = [
 interface BarHelper {
   value: string | number;
   height: number;
+  width: number;
   color: string;
   x: number;
   y: number;
   keys: string[];
 }
+
+const useAxisMetadata = (axis: "X" | "Y") => {
+  const metadata = useData(({ data }) =>
+    axis === "X" ? data.metadata.cols : data.metadata.rows,
+  );
+  return metadata;
+};
+
+const useFilteredSortOrder = (axis: "X" | "Y") => {
+  const rowSort = useData((s) => s.rowSortOrder);
+  const columnSort = useData((s) => s.columnSortOrder);
+  return (axis === "X" ? columnSort : rowSort).filter(
+    (s) => s.key !== "count" && s.key !== "alphabetical",
+  );
+};
+
+// Use numeric scale if all metadata values in current sort are numeric
+const useMetadataIsNumeric = (axis: "X" | "Y") => {
+  const metadata = useAxisMetadata(axis);
+  const cols = useColumns();
+  const rows = useRows();
+  const keys = axis === "X" ? cols : rows;
+  const sortOrder = useFilteredSortOrder(axis);
+  const selectedMetadata = sortOrder.map((s) => s.key);
+  if (!metadata || !keys || !selectedMetadata.length || sortOrder.length > 1) {
+    return false;
+  }
+  return keys.every((key) => {
+    if (!metadata[key]) {
+      return false;
+    }
+    return selectedMetadata.every(
+      (mdKey) => !isNaN(parseInt(metadata[key][mdKey] as string, 10)),
+    );
+  });
+};
+
+const useMetadataValues = (axis: "X" | "Y") => {
+  const metadata = useAxisMetadata(axis);
+  const cols = useColumns();
+  const rows = useRows();
+  const keys = axis === "X" ? cols : rows;
+  const sortOrder = useFilteredSortOrder(axis);
+  const selectedMetadata = sortOrder.map((s) => s.key);
+  if (!metadata || !keys || !selectedMetadata.length) {
+    return [];
+  }
+  return keys.map((key) =>
+    selectedMetadata.map((mdKey) => metadata[key][mdKey]).join(", "),
+  );
+};
 
 export default function MetadataValueBar({
   axis,
@@ -46,34 +97,25 @@ export default function MetadataValueBar({
   const {
     data: { metadata: md },
   } = useData();
-  const rows = useRows();
-  const columns = useColumns();
-  const data = axis === "X" ? columns : rows;
   const metadata = axis === "X" ? md.cols : md.rows;
   const { scale: y } = useYScale();
   const { scale: x } = useXScale();
+  const rows = useRows();
+  const columns = useColumns();
 
-  const keys = data[0];
-
-  const { selectedMetadata, metadataKeys } = data[1];
+  const keys = axis === "X" ? columns : rows;
+  const theme = useTheme();
 
   const { openTooltip, closeTooltip } = useSetTooltipData();
 
-  if (!selectedMetadata || !metadata || !metadataKeys) {
-    return null;
-  }
-
-  const metadataIsNumeric = keys.every((key) => {
-    // @ts-expect-error we're handling typechecking at runtime
-    const value = metadata[key][selectedMetadata] as string;
-    return !isNaN(parseInt(value, 10)) && !isNaN(parseFloat(value));
-  });
-  const values: string[] = keys.map(
-    // @ts-expect-error we're handling typechecking at runtime
-    (key) => metadata[key][selectedMetadata] as string,
-  );
+  const values = useMetadataValues(axis);
+  const metadataIsNumeric = useMetadataIsNumeric(axis);
+  const sortOrder = useFilteredSortOrder(axis);
 
   const metadataValueColorScale = useMemo(() => {
+    if (!values) {
+      return null;
+    }
     if (metadataIsNumeric) {
       const numericValues = values.map((v) => parseInt(v, 10));
       const min = Math.min(...numericValues);
@@ -88,113 +130,150 @@ export default function MetadataValueBar({
         domain: values,
       });
     }
-  }, [keys, values, selectedMetadata, metadataIsNumeric]);
+  }, [keys, values, metadataIsNumeric]);
 
   const cellWidth = x.bandwidth();
 
   const axisLabelX = axis === "X" ? width / 2 : width / 3;
   const axisLabelY = axis === "X" ? height / 3 : height / 2;
 
-  const onMouseMove = useCallback(
-    (e: React.MouseEvent<SVGRectElement>) => {
-      const target = e.target as SVGRectElement;
-      const keys = target.getAttribute("data-keys")?.split(",") || [];
-      const value = target.getAttribute("data-value");
-      if (keys.length === 0 || !value) {
-        return;
-      }
-      const targetBounds = target.getBoundingClientRect();
-      const x = e.clientX - targetBounds.left;
-      const y = e.clientY - targetBounds.top;
-      if (x < 0 || y < 0 || x > targetBounds.width || y > targetBounds.height) {
-        return;
-      }
-      const titleCreator = () => {
-        if (keys.length === 1) {
-          return keys[0];
-        }
-        const keysLength = keys.length;
-        const keysReverse = keys.slice().reverse();
-        if (axis === "Y") {
-          const keyHeight = targetBounds.height / keysLength;
-          const keyIndex = Math.floor(y / keyHeight);
-          return keysReverse[keyIndex];
-        } else if (axis === "X") {
-          const keyWidth = targetBounds.width / keysLength;
-          const keyIndex = Math.floor(x / keyWidth);
-          return keysReverse[keyIndex];
-        }
-      };
-      const title = titleCreator();
-      openTooltip(
-        {
-          title,
-          data: {
-            [selectedMetadata]: value,
-          },
-        },
-        e.clientX,
-        e.clientY,
-      );
-    },
-    [selectedMetadata],
-  );
-
-  const bars = keys.reduce((acc, key) => {
-    // @ts-expect-error we're handling typechecking at runtime
-    const value = metadata[key][selectedMetadata] as string;
-    const processedValue = metadataIsNumeric ? parseInt(value, 10) : value;
-    // @ts-expect-error this is supported by the y axis
-    let height = y.bandwidth(key);
-    // Handle padding around expanded bars
-    if (height > y.bandwidth()) {
-      height += EXPANDED_ROW_PADDING * 2;
+  const onMouseMove = useCallback((e: React.MouseEvent<SVGRectElement>) => {
+    const target = e.target as SVGRectElement;
+    const keys = target.getAttribute("data-keys")?.split(",") || [];
+    const value = target.getAttribute("data-value");
+    if (keys.length === 0 || !value) {
+      return;
     }
-    height = Math.ceil(height);
+    const targetBounds = target.getBoundingClientRect();
+    const x = e.clientX - targetBounds.left;
+    const y = e.clientY - targetBounds.top;
+    if (x < 0 || y < 0 || x > targetBounds.width || y > targetBounds.height) {
+      return;
+    }
+    const titleCreator = () => {
+      if (keys.length === 1) {
+        return keys[0];
+      }
+      const keysLength = keys.length;
+      const keysReverse = keys.slice().reverse();
+      if (axis === "Y") {
+        const keyHeight = targetBounds.height / keysLength;
+        const keyIndex = Math.floor(y / keyHeight);
+        return keysReverse[keyIndex];
+      } else if (axis === "X") {
+        const keyWidth = targetBounds.width / keysLength;
+        const keyIndex = Math.floor(x / keyWidth);
+        return keysReverse[keyIndex];
+      }
+    };
+    const title = titleCreator();
+    openTooltip(
+      {
+        title,
+        data: {
+          ["key"]: value,
+        },
+      },
+      e.clientX,
+      e.clientY,
+    );
+  }, []);
+
+  if (!metadata || !keys || sortOrder.length === 0) {
+    return null;
+  }
+
+  const bars: BarHelper[] = keys.reduce((acc, key) => {
+    if (!(key in metadata)) {
+      return acc;
+    }
+    const currentMd = metadata[key];
+    const selectedMetadata = sortOrder.map((s) => s.key);
+    const value = selectedMetadata.map((mdKey) => currentMd[mdKey]).join(", ");
+    if (!value) {
+      console.warn("No value for key", metadata[key], selectedMetadata);
+      return acc;
+    }
+    const processedValue = metadataIsNumeric ? parseInt(value, 10) : value;
     // @ts-expect-error we're handling typechecking at runtime
     const color = metadataValueColorScale(processedValue);
+    if (axis === "Y") {
+      let height = y.bandwidth(key);
+      // Add padding around expanded bars
+      if (height > y.bandwidth()) {
+        height += EXPANDED_ROW_PADDING * 2;
+      }
+      height = Math.ceil(height);
+      const width = x.bandwidth();
 
-    const xVal = axis === "X" ? x(key) : x.bandwidth() * 2;
-    const yVal = axis === "X" ? y.bandwidth() * 2 : Math.ceil(y(key));
-    // if first bar
-    if (acc.length === 0) {
-      return [
-        {
-          value: processedValue,
-          height,
-          color,
-          x: xVal,
-          y: yVal,
-          keys: [key],
-        },
-      ];
-    }
-    // otherwise, check if the last bar has the same value
-    // if so, combine them
-    const lastBar = acc[acc.length - 1];
-    if (lastBar.value === processedValue) {
-      const newBar = {
-        ...lastBar,
-        y: Math.min(lastBar.y, yVal),
-        height: lastBar.height + height,
-        keys: [...lastBar.keys, key],
-      };
-      return [...acc.slice(0, -1), newBar];
-    }
-    return [
-      ...acc,
-      {
+      const xVal = x.bandwidth() * 2;
+      const yVal = Math.ceil(y(key));
+
+      const newBar: BarHelper = {
         value: processedValue,
+        height,
+        width,
+        color,
+        x: xVal,
+        y: yVal,
+        keys: [key],
+      };
+
+      // if first bar
+      if (acc.length === 0) {
+        return [newBar] as BarHelper[];
+      }
+      // otherwise, check if the last bar has the same value
+      // if so, combine them
+      const lastBar: BarHelper = acc[acc.length - 1];
+      if (lastBar.value === processedValue) {
+        const editedBar: BarHelper = {
+          ...lastBar,
+          y: Math.min(lastBar.y, yVal),
+          height: lastBar.height + height,
+          keys: [...lastBar.keys, key],
+        };
+        return [...acc.slice(0, -1), editedBar];
+      }
+      return [...acc, newBar];
+    } else if (axis === "X") {
+      const width = x.bandwidth();
+      const height = y.bandwidth();
+      const xVal = x(key);
+      const yVal = y.bandwidth();
+      const newBar: BarHelper = {
+        value: processedValue,
+        width,
         height,
         color,
         x: xVal,
         y: yVal,
         keys: [key],
-      },
-    ];
+      };
+      // if first bar
+      if (acc.length === 0) {
+        return [newBar] as BarHelper[];
+      }
+      // otherwise, check if the last bar has the same value and combine them if so
+      const lastBar: BarHelper = acc[acc.length - 1];
+      if (lastBar.value === processedValue) {
+        const editedBar = {
+          ...lastBar,
+          x: Math.min(lastBar.x, xVal),
+          width: lastBar.width + width,
+          keys: [...lastBar.keys, key],
+        };
+        return [...acc.slice(0, -1), editedBar];
+      }
+      // otherwise, add a new bar
+      return [...acc, newBar];
+    }
   }, [] as BarHelper[]);
 
   const textY = (bar: BarHelper) => {
+    if (axis === "X") {
+      return bar.y + bar.height / 2;
+    }
     if (bars.length === 1) {
       // Handle single-bar case by purposely un-centering the text
       // otherwise the label can overlap the metadata name
@@ -207,7 +286,15 @@ export default function MetadataValueBar({
   return (
     <svg width={width} height={height}>
       {bars.map((bar) => {
-        const { value, height, color, x: xVal, y: yVal, keys } = bar;
+        const {
+          value,
+          height,
+          width: barWidth,
+          color,
+          x: xVal,
+          y: yVal,
+          keys,
+        } = bar;
         const shortenedValue =
           value.toString().length > 20
             ? value.toString().slice(0, 10) + "..."
@@ -217,7 +304,7 @@ export default function MetadataValueBar({
             <rect
               x={xVal}
               y={yVal}
-              width={cellWidth}
+              width={barWidth}
               height={Math.ceil(height)}
               fill={color}
               data-value={value}
@@ -238,13 +325,18 @@ export default function MetadataValueBar({
               x={xVal}
               y={textY(bar)}
               className="text"
-              dx={cellWidth + 8}
-              orientation={axis === "X" ? "horizontal" : "vertical"}
+              dx={axis == "X" ? 0 : cellWidth + 8}
+              dy={axis == "X" ? cellWidth + 8 : 0}
+              fill={theme.palette.text.primary}
+              angle={axis === "X" ? 90 : 0}
+              style={{
+                fontFamily: theme.typography.fontFamily,
+              }}
               onMouseMove={(e) => {
                 openTooltip(
                   {
                     title: String(value),
-                    data: { [selectedMetadata]: value },
+                    data: { ["key"]: value },
                   },
                   e.clientX,
                   e.clientY,
@@ -257,19 +349,23 @@ export default function MetadataValueBar({
           </g>
         );
       })}
-      <Text
-        x={axisLabelX}
-        y={axisLabelY}
-        verticalAnchor="middle"
-        textAnchor="middle"
-        orientation={axis === "X" ? "horizontal" : "vertical"}
-        className="text"
-        style={{
-          textTransform: "capitalize",
-        }}
-      >
-        {selectedMetadata.split("_").join(" ")}
-      </Text>
+      {sortOrder.length === 1 ? (
+        <Text
+          x={axisLabelX}
+          y={axisLabelY}
+          verticalAnchor="middle"
+          textAnchor="middle"
+          orientation={axis === "X" ? "horizontal" : "vertical"}
+          className="text"
+          fill={theme.palette.text.primary}
+          style={{
+            textTransform: "capitalize",
+            fontFamily: theme.typography.fontFamily,
+          }}
+        >
+          {sortOrder.map((s) => s.key.split("_").join(" ")).join(", ")}
+        </Text>
+      ) : null}
     </svg>
   );
 }
