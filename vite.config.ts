@@ -40,7 +40,12 @@ export default defineConfig(({ mode }) => {
       },
     },
     sourcemap: true,
-    plugins: [react(), dts()],
+    plugins: [
+      react(),
+      dts({
+        insertTypesEntry: true,
+      }),
+    ],
     base: "/cellpop/",
   };
 }) satisfies UserConfigFnObject;
