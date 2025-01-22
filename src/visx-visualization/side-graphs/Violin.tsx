@@ -156,12 +156,12 @@ export default function RevisedViolins({ side = "top" }: ViolinsProps) {
   const violinAreaGenerator = useMemo(() => {
     if (side === "top") {
       return area<[string, number]>()
-        .y((d) => violinScale(d[0]))
+        .y((d) => violinScale(d[0]) as number)
         .x0((d) => densityScale(-d[1]) + categoricalScale.bandwidth() / 2)
         .x1((d) => densityScale(d[1]) + categoricalScale.bandwidth() / 2);
     } else {
       return area<[string, number]>()
-        .x((d) => violinScale(d[0]))
+        .x((d) => violinScale(d[0]) as number)
         .y0((d) => densityScale(-d[1]) + categoricalScale.bandwidth() / 2)
         .y1((d) => densityScale(d[1]) + categoricalScale.bandwidth() / 2);
     }
@@ -252,7 +252,7 @@ function Violin({
       />
       <path
         key={group}
-        d={areaGenerator(entries)}
+        d={areaGenerator(entries) ?? ""}
         opacity={1}
         fill={theme.palette.text.primary}
         fillOpacity={0.6}

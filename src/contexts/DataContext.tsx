@@ -4,7 +4,7 @@ import { temporal } from "zundo";
 import { createStore } from "zustand";
 import { CellPopData } from "../cellpop-schema";
 import { moveToEnd, moveToStart } from "../utils/array-reordering";
-import { createStoreContext } from "../utils/zustand";
+import { createTemporalStoreContext } from "../utils/zustand";
 import { Normalization } from "./NormalizationContext";
 
 interface DataContextProps {
@@ -187,22 +187,24 @@ const applySortOrders = (
         default:
           return (a: string, b: string) => {
             const aValue =
-              metadata[a][key as keyof (typeof metadata)[typeof a]];
+              metadata?.[a][key as keyof (typeof metadata)[typeof a]];
             const bValue =
-              metadata[b][key as keyof (typeof metadata)[typeof b]];
+              metadata?.[b][key as keyof (typeof metadata)[typeof b]];
             if (aValue === undefined || bValue === undefined) {
               return aValue === bValue ? 0 : aValue === undefined ? 1 : -1;
             }
             if (typeof aValue === "number" && typeof bValue === "number") {
               return direction === "asc" ? aValue - bValue : bValue - aValue;
             }
+
             const compare =
               direction === "asc"
-                ? aValue.localeCompare(bValue)
-                : bValue.localeCompare(aValue);
+                ? String(aValue).localeCompare(String(bValue))
+                : String(bValue).localeCompare(String(aValue));
             if (compare === 0) {
               return acc(a, b);
             }
+
             return compare;
           };
       }
@@ -408,11 +410,11 @@ const createDataContextStore = ({ initialData }: DataContextProps) =>
     })),
   );
 
-export const [DataProvider, useData, , useDataHistory] = createStoreContext<
-  DataContextStore,
-  DataContextProps,
-  true
->(createDataContextStore, "DataContextStore", true);
+export const [DataProvider, useData, , useDataHistory] =
+  createTemporalStoreContext<DataContextStore, DataContextProps>(
+    createDataContextStore,
+    "DataContextStore",
+  );
 
 const getDerivedStatesSelector = (state: DataContextStore) => {
   const rowCounts: Record<string, number> = {};
@@ -479,8 +481,11 @@ const getColumnNames = memoize((state: DataContextStore) => {
 });
 
 const getMetadataKeys = (
-  metadata: Record<string, Record<string, string | number>>,
+  metadata: Record<string, Record<string, string | number>> | undefined,
 ) => {
+  if (!metadata) {
+    return [];
+  }
   const metadataValues = Object.values(metadata);
   const set = metadataValues.reduce<Set<string>>(
     (acc: Set<string>, curr: object) => {
@@ -495,33 +500,18 @@ const getMetadataKeys = (
 };
 
 const getRowSortKeys = memoize((state: DataContextStore) => {
-  return getMetadataKeys(state.data.metadata.rows);
+  return getMetadataKeys(state.data.metadata?.rows);
 });
 
 const getColumnSortKeys = memoize((state: DataContextStore) => {
-  return getMetadataKeys(state.data.metadata.cols);
+  return getMetadataKeys(state.data.metadata?.cols);
 });
-
-export const useMetadata = (keys: string[]) => {
-  const metadata = useData((s) => s.data.metadata);
-  return useMemo(
-    () =>
-      keys.reduce<Record<string, Record<string, string | number>>>(
-        (acc, key) => {
-          acc[key] = metadata[key];
-          return acc;
-        },
-        {},
-      ),
-    [metadata, keys],
-  );
-};
 
 export const useMetadataLookup = () => {
   const metadata = useData((s) => s.data.metadata);
   return useCallback(
     (key: string, direction: "rows" | "cols", allowedKeys?: string[]) => {
-      const md = metadata[direction][key];
+      const md = metadata[direction]?.[key];
       if (!md) {
         return {};
       }

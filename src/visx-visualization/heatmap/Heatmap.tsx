@@ -61,8 +61,8 @@ function CanvasHeatmapRenderer() {
         columns.forEach((col) => {
           const key = `${row}-${col}`;
           const value = dataMap[key as keyof typeof dataMap];
-          const x = xScale.scale(col);
-          const yBackground = yScale.scale(row);
+          const x = xScale.scale(col)!;
+          const yBackground = yScale.scale(row)!;
           const barHeight = inlineYScale(value);
           const yBar = yBackground + cellHeight - barHeight;
           ctx.fillStyle = theme.palette.background.default;
@@ -79,8 +79,8 @@ function CanvasHeatmapRenderer() {
           ctx.fillStyle =
             value !== 0 ? colors(value) : theme.palette.background.default;
           ctx.strokeStyle = colors(colors.domain()[1] / 2);
-          const x = xScale.scale(col);
-          const y = yScale.scale(row);
+          const x = xScale.scale(col)!;
+          const y = yScale.scale(row)!;
           const w = Math.ceil(cellWidth);
           const h = Math.ceil(cellHeight);
           ctx.strokeRect(x, y, w, h);

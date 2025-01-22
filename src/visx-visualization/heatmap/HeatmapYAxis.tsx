@@ -53,7 +53,12 @@ export default function HeatmapYAxis() {
   const fontSize =
     y.bandwidth() > TICK_TEXT_SIZE ? TICK_TEXT_SIZE : y.bandwidth();
 
-  useSetTickLabelSize(flipAxisPosition, setTickLabelSize, "y", fontSize);
+  useSetTickLabelSize(
+    flipAxisPosition ?? false,
+    setTickLabelSize,
+    "y",
+    fontSize,
+  );
 
   return (
     <>
@@ -145,11 +150,11 @@ function ExpandedRowTick({
 
   const { tickLabelSize } = useYScale();
 
-  if (selectedValues.has(row)) {
+  if (selectedValues.has(row!)) {
     // Display an axis scaled for the selected value instead of the tick if the value is expanded
     // Use the tick label as the axis label
     const Axis = flipAxisPosition ? AxisLeft : AxisRight;
-    const max = rowMaxes[row];
+    const max = rowMaxes[row!];
     const yScale = scaleLinear({
       domain: [max, 0],
       range: [EXPANDED_ROW_PADDING, expandedSize - EXPANDED_ROW_PADDING],
@@ -168,7 +173,7 @@ function ExpandedRowTick({
           style: tickLabelStyle,
           fontFamily: theme.typography.fontFamily,
           onMouseOut: closeTooltip,
-          onClick: () => openInNewTab(row),
+          onClick: () => openInNewTab(row!),
           className: "text",
         }}
         labelProps={{
@@ -179,7 +184,7 @@ function ExpandedRowTick({
           onMouseMove: (e) => {
             openTooltip(
               {
-                title: tickTitle(row),
+                title: tickTitle(row!),
                 data: {
                   "Cell Count": max,
                 },
@@ -189,7 +194,7 @@ function ExpandedRowTick({
             );
           },
           onMouseOut: closeTooltip,
-          onClick: () => openInNewTab(row),
+          onClick: () => openInNewTab(row!),
         }}
       />
     );

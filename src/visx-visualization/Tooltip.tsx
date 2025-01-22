@@ -33,8 +33,8 @@ export default function Tooltip() {
 
   return (
     <TooltipWithBounds
-      top={tooltipTop - visualizationBounds?.top}
-      left={tooltipLeft - visualizationBounds?.left}
+      top={tooltipTop - (visualizationBounds?.top ?? 0)}
+      left={tooltipLeft - (visualizationBounds?.left ?? 0)}
       style={{
         ...defaultStyles,
         background: theme.palette.background.paper,
@@ -44,19 +44,20 @@ export default function Tooltip() {
       }}
     >
       <Stack gap={0.25}>
-        <Typography variant="subtitle1">{tooltipData.title}</Typography>
+        <Typography variant="subtitle1">{tooltipData?.title}</Typography>
         <Divider />
-        {Object.entries(tooltipData.data).map(([key, value]) => (
-          <Stack direction="row" key={key} gap={0.25}>
-            <Typography
-              sx={{ textTransform: "capitalize", fontWeight: 700 }}
-              variant="caption"
-            >
-              {key.replace("_", " ")}:{" "}
-            </Typography>
-            <Typography variant="caption">{String(value)}</Typography>
-          </Stack>
-        ))}
+        {tooltipData?.data &&
+          Object.entries(tooltipData.data).map(([key, value]) => (
+            <Stack direction="row" key={key} gap={0.25}>
+              <Typography
+                sx={{ textTransform: "capitalize", fontWeight: 700 }}
+                variant="caption"
+              >
+                {key.replace("_", " ")}:{" "}
+              </Typography>
+              <Typography variant="caption">{String(value)}</Typography>
+            </Stack>
+          ))}
       </Stack>
     </TooltipWithBounds>
   );

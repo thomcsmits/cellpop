@@ -21,7 +21,7 @@ export type ExtractState<S> = S extends { getState: () => infer X } ? X : never;
  * @param selector A selector function which takes the store state and returns a value
  * @param equalityFn An optional equality function which takes the previous and new values and returns a boolean
  */
-interface CurriedUseStore<T extends StoreApi<unknown>> {
+export interface CurriedUseStore<T extends StoreApi<unknown>> {
   (): ExtractState<T>;
   <U>(selector: (state: ExtractState<T>) => U): U;
   <U>(
@@ -36,9 +36,7 @@ interface CurriedUseStore<T extends StoreApi<unknown>> {
  * @returns A `useStore` hook for the passed context which can be called with a selector and equality function
  */
 export function createTemporalStoreContextHook<MyState>(
-  storeContext: Context<
-    (MyState & { temporal: StoreApi<unknown> }) | undefined
-  >,
+  storeContext: Context<MyState | undefined>,
 ) {
   function useTemporalStore(): TemporalState<MyState>;
   function useTemporalStore<T>(
@@ -53,6 +51,7 @@ export function createTemporalStoreContextHook<MyState>(
     equality?: (a: TemporalState<T>, b: TemporalState<T>) => boolean,
   ) {
     const store = useContext(storeContext);
+    // @ts-expect-error - Zustand types are annoying
     return useStoreWithEqualityFn(store.temporal, selector!, equality);
   }
   return useTemporalStore;
@@ -101,8 +100,7 @@ type CreateStoreContext<
         CurriedUseStore<StoreType>,
         Context<StoreType | undefined>,
       ];
-
-interface ProviderEnhancements {
+export interface ProviderEnhancements {
   // Reactive providers reset the store when the props change
   reactive?: boolean;
 }
@@ -115,14 +113,9 @@ interface ProviderEnhancements {
  * @param temporal Whether or not the store is temporal, i.e. whether there is a temporal store associated with it
  * @returns A Context and Provider for the created store
  */
-export function createStoreContext<
-  T,
-  CreateStoreArgs,
-  Temporal extends boolean,
->(
+export function createStoreContext<T, CreateStoreArgs>(
   createStore: (initialArgs: CreateStoreArgs) => StoreApi<T>,
   displayName: string,
-  temporal: Temporal,
 ) {
   type StoreType = StoreApi<T>;
   // Create a context for the passed `createStore` function's return type
@@ -144,7 +137,9 @@ export function createStoreContext<
     useEffect(() => {
       if (reactive) {
         const newStore = createStore(props as CreateStoreArgs);
-        store.current.setState(newStore.getState());
+        if (store.current) {
+          store.current.setState(newStore.getState());
+        }
       }
     }, [props]);
 
@@ -154,22 +149,28 @@ export function createStoreContext<
       </StoreContext.Provider>
     );
   }
-  if (temporal) {
-    // @ts-expect-error Temporal is true, so we need to create a temporal hook
-    // TODO: Figure out how to make it so that the Temporal flag properly infers types
-    const temporalHook = createTemporalStoreContextHook(StoreContext);
-    return [Provider, hook, StoreContext, temporalHook] as CreateStoreContext<
-      StoreApi<T>,
-      CreateStoreArgs,
-      true
-    >;
-  } else {
-    return [Provider, hook, StoreContext] as CreateStoreContext<
-      StoreApi<T>,
-      CreateStoreArgs,
-      false
-    >;
-  }
+  return [Provider, hook, StoreContext] as CreateStoreContext<
+    StoreApi<T>,
+    CreateStoreArgs
+  >;
+}
+
+export function createTemporalStoreContext<T, CreateStoreArgs>(
+  createStore: (initialArgs: CreateStoreArgs) => StoreApi<T>,
+  displayName: string,
+) {
+  type StoreType = StoreApi<T>;
+  const [Provider, hook, StoreContext] = createStoreContext<T, CreateStoreArgs>(
+    createStore,
+    displayName,
+  );
+
+  const temporalHook = createTemporalStoreContextHook(StoreContext);
+  return [Provider, hook, StoreContext, temporalHook] as CreateStoreContext<
+    StoreType,
+    CreateStoreArgs,
+    true
+  >;
 }
 
 /**

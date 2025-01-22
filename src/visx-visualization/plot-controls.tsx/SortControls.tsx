@@ -167,6 +167,10 @@ export function SortControls() {
   const handleDragEnd = useEventCallback((event: DragEndEvent) => {
     const { active, over } = event;
 
+    if (!active || !over) {
+      return;
+    }
+
     if (active.id !== over.id) {
       const oldIndex = sorts.findIndex((sort) => sort.key === active.id);
       const newIndex = sorts.findIndex((sort) => sort.key === over.id);

@@ -47,9 +47,8 @@ const createMetadataConfigStore = ({
 
 export const [MetadataConfigProvider, useMetadataConfig] = createStoreContext<
   MetadataConfigContext,
-  MetadataConfigContextProps,
-  false
->(createMetadataConfigStore, "FractionContext", false);
+  MetadataConfigContextProps
+>(createMetadataConfigStore, "FractionContext");
 
 export const useFieldDisplayName = (field: string) =>
   useMetadataConfig().getFieldDisplayName(field);

@@ -5,7 +5,7 @@ import { CellPopTheme } from "../cellpop-schema";
 import { Theme, ThemeProvider } from "@mui/material/styles";
 import { temporal } from "zundo";
 import { getTheme } from "../utils/theme";
-import { createStoreContext } from "../utils/zustand";
+import { createTemporalStoreContext } from "../utils/zustand";
 import { useThemeControlIsDisabled } from "./DisabledControlProvider";
 
 interface InitialThemeSetterState {
@@ -39,10 +39,9 @@ const themeSetterStore = ({
 };
 
 const [ThemeSetterContextProvider, useSetTheme, , useThemeHistory] =
-  createStoreContext<ThemeSetterStoreType, InitialThemeSetterState, true>(
+  createTemporalStoreContext<ThemeSetterStoreType, InitialThemeSetterState>(
     themeSetterStore,
     "Theme Setter Store",
-    true,
   );
 
 export { useSetTheme, useThemeHistory };

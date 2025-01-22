@@ -1,5 +1,10 @@
 import { AnnDataSource, ObsSetsAnndataLoader } from "@vitessce/zarr";
-import { HuBMAPSearchHit, ObsSets, dataOrdering } from "../cellpop-schema";
+import {
+  HuBMAPSearchHit,
+  MetaData,
+  ObsSets,
+  dataOrdering,
+} from "../cellpop-schema";
 import { getCountsAndMetadataFromObsSetsList } from "./dataLoaders";
 import { loadDataWithCounts } from "./dataWrangling";
 
@@ -45,7 +50,7 @@ export function loadHuBMAPData(uuids: string[], ordering?: dataOrdering) {
         const { counts, metadata: datasetMetadata } =
           getCountsAndMetadataFromObsSetsList(obsSetsList, hubmapIDsFiltered);
         const data = loadDataWithCounts(counts, undefined, ordering);
-        data.metadata = { rows: metadata, cols: datasetMetadata };
+        data.metadata = { rows: metadata, cols: datasetMetadata } as MetaData;
         return data;
       }
     })
@@ -93,7 +98,10 @@ function getPromiseData(urls: string[]) {
 // get metadata
 function getPromiseMetadata(
   uuids: string[],
-): Promise<void | [Record<string, string>, Record<string, string | number>]> {
+): Promise<
+  | void
+  | [Record<string, string>, Record<string, Record<string, string | number>>]
+> {
   const searchApi = "https://search.api.hubmapconsortium.org/v3/portal/search";
   const queryBody = {
     size: 10000,
@@ -143,7 +151,7 @@ function getPromiseMetadata(
       }
       return [uuidToHubmapId, metadata] as [
         Record<string, string>,
-        Record<string, string | number>,
+        Record<string, Record<string, string | number>>,
       ];
     })
     .catch((error) => {

@@ -19,7 +19,7 @@ const useColumnCountsScale = () => {
   const columnCounts = useColumnCounts();
   const { tickLabelSize } = useXScale();
   const fraction = useFraction((s) => s.fraction);
-  const domainMax = fraction ? 100 : max(Object.values(columnCounts));
+  const domainMax = fraction ? 100 : (max(Object.values(columnCounts)) ?? 0);
   return useCountsScale(
     [domainMax, 0],
     [height - tickLabelSize * TOP_MULTIPLIER, 0],

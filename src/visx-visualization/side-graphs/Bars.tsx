@@ -72,9 +72,13 @@ export default function Bars({
         const scaledKey = categoricalScale(key);
         const scaledValue = numericalScale(value);
         const x =
-          orientation === "vertical" ? scaledKey : domainLimit - scaledValue;
+          orientation === "vertical"
+            ? (scaledKey ?? 0)
+            : domainLimit - scaledValue;
         const y =
-          orientation === "vertical" ? domainLimit - scaledValue : scaledKey;
+          orientation === "vertical"
+            ? domainLimit - scaledValue
+            : (scaledKey ?? 0);
         const barHeight = scaledValue;
         const height = orientation === "vertical" ? barHeight : barWidth;
         const width = orientation === "vertical" ? barWidth : barHeight;

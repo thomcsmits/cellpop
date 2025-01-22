@@ -1,5 +1,6 @@
 import { scaleLinear } from "@visx/scale";
 import { useMemo } from "react";
+import { ScaleLinear } from "../../contexts/ScaleContext";
 
 /**
  * Generates a linear scale for the counts bars with the provided domain and range.
@@ -7,7 +8,10 @@ import { useMemo } from "react";
  * @param range
  * @returns
  */
-export function useCountsScale(domain: number[], range: number[]) {
+export function useCountsScale(
+  domain: number[],
+  range: number[],
+): ScaleLinear<number> {
   return useMemo(() => {
     return scaleLinear<number>({
       domain,

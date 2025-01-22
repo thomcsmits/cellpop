@@ -9,7 +9,8 @@ export function getCountsAndMetadataFromObsSetsList(
   rowNames: string[],
 ) {
   const counts: Record<string, Record<string, number>> = {};
-  const metadata: Record<string, Record<string, string>> = {};
+  // Record from dataset name to metadata name to metadata value
+  const metadata: Record<string, Record<string, string | number>> = {};
   for (let i = 0; i < rowNames.length; i++) {
     // First tree is the CL IDs
     counts[rowNames[i]] = getCountsPerType(obsSetsList[i].tree[0].children);

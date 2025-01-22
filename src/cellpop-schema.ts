@@ -13,17 +13,16 @@ export type CellPopData = {
   colNames: string[];
   colNamesRaw: string[];
   colNamesWrapped: ColNamesWrapped[];
-  countsMatrixOrder: string[]
+  countsMatrixOrder: string[];
   countsMatrix: CountsMatrixValue[];
   metadata: MetaData;
-  extendedChart: extendedChart;
 };
 
 export type RowNamesWrapped = { row: string };
 
 export type ColNamesWrapped = { col: string };
 
-export type CountsMatrixValue = [string, string, number]
+export type CountsMatrixValue = [string, string, number];
 
 export type CountsTotalRowValue = {
   row: string;
@@ -35,14 +34,9 @@ export type CountsTotalColValue = {
   countTotal: number;
 };
 
-export type MetaData<T extends number | string> = {
-  rows?: Record<string, T>;
-  cols?: Record<string, T>;
-};
-
-export type extendedChart = {
-  rowNames: string[];
-  colNames: string[];
+export type MetaData = {
+  rows?: Record<string, Record<string, string | number>>;
+  cols?: Record<string, Record<string, string | number>>;
 };
 
 export type dataOrdering = {
@@ -73,7 +67,7 @@ interface HuBMAPSearchSource {
     mapped_metadata: {
       age_value: string[];
       age_unit: string[];
-      height_value: string[]; 
+      height_value: string[];
       height_unit: string[];
       race: string[];
       sex: string[];

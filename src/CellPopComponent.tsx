@@ -31,8 +31,7 @@ interface CellPopConfig {
 export interface CellPopProps
   extends WithParentSizeProvidedProps,
     CellPopConfig {
-  data: CellPopData;
-  uuids?: string[];
+  data?: CellPopData;
 }
 
 const stopPropagation = (e: React.MouseEvent) => e.stopPropagation();

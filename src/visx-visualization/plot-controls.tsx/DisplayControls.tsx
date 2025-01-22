@@ -121,6 +121,10 @@ export function DisplayControls() {
   const handleDragEnd = useEventCallback((event: DragEndEvent) => {
     const { active, over } = event;
 
+    if (!active || !over) {
+      return;
+    }
+
     if (active.id !== over.id) {
       const oldIndex = items.indexOf(active.id as string);
       const newIndex = items.indexOf(over.id as string);
@@ -139,7 +143,7 @@ export function DisplayControls() {
   const filteredItems = items.filter(
     (item) =>
       item.toLowerCase().includes(search.toLowerCase()) ||
-      createSubtitle(item, metadata[item])
+      createSubtitle(item, metadata?.[item])
         .toLowerCase()
         .includes(search.toLowerCase()),
   );
@@ -324,7 +328,9 @@ function DisplayItem({ item }: { item: string }) {
     section === "Column" ? s.data.metadata.cols : s.data.metadata.rows,
   );
 
-  const subtitle = createSubtitle(item, metadata[item]);
+  const metadataValues = metadata?.[item];
+
+  const subtitle = createSubtitle(item, metadataValues);
   const canBeExpanded = useCanBeExpanded();
 
   const style = {

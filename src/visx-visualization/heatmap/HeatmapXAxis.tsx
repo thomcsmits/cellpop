@@ -41,7 +41,7 @@ export default function HeatmapXAxis() {
     useHeatmapAxis(axisConfig);
   const size = x.bandwidth() > TICK_TEXT_SIZE ? TICK_TEXT_SIZE : x.bandwidth();
 
-  useSetTickLabelSize(flipAxisPosition, setTickLabelSize, "x", size);
+  useSetTickLabelSize(flipAxisPosition ?? false, setTickLabelSize, "x", size);
 
   return (
     <>

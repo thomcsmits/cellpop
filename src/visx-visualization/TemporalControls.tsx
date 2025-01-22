@@ -65,16 +65,16 @@ function useTemporalActions() {
     const last = undoQueue.current.pop();
     if (last) {
       last.undo();
+      redoQueue.current.push(last);
     }
-    redoQueue.current.push(last);
   });
 
   const redo = useEventCallback(() => {
     const last = redoQueue.current.pop();
     if (last) {
       last.redo();
+      undoQueue.current.push(last);
     }
-    undoQueue.current.push(last);
   });
 
   const restoreToDefault = useEventCallback(() => {
