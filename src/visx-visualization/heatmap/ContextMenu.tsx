@@ -36,9 +36,9 @@ const HideRow = () => {
   const { deselectValue, selectedValues } = useSelectedValues();
 
   const onClick = useEventCallback(() => {
-    const rowValue = tooltipData.data[rowLabel] as string;
-    if (selectedValues.has(tooltipData.data[rowLabel] as string)) {
-      deselectValue(tooltipData.data[rowLabel] as string);
+    const rowValue = tooltipData?.data[rowLabel] as string;
+    if (selectedValues.has(tooltipData?.data[rowLabel] as string)) {
+      deselectValue(tooltipData?.data[rowLabel] as string);
     }
     removeRow(rowValue);
   });
@@ -107,22 +107,23 @@ const RestoreHiddenColumns = () => {
 };
 
 const ExpandRow = () => {
-  const {
-    tooltipData: { data },
-  } = useTooltipData();
+  const { tooltipData } = useTooltipData();
   const label = useRowConfig((store) => store.label);
   const expandRow = useSelectedValues((s) => s.toggleValue);
   const expandedRows = useSelectedValues((s) => s.selectedValues);
   const { closeContextMenu } = useSetTooltipData();
 
-  if (!data[label] || expandedRows.has(data[label] as string)) {
+  if (
+    !tooltipData?.data?.[label] ||
+    expandedRows.has(tooltipData?.data?.[label] as string)
+  ) {
     return null;
   }
 
   return (
     <ContextMenuItem
       onClick={() => {
-        expandRow(data[label] as string);
+        expandRow(tooltipData?.data?.[label] as string);
         closeContextMenu();
       }}
     >
@@ -143,9 +144,7 @@ const CollapseRows = () => {
 const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
   const moveRowToStart = useMoveRowToStart();
   const moveColumnToStart = useMoveColumnToStart();
-  const {
-    tooltipData: { data },
-  } = useTooltipData();
+  const { tooltipData } = useTooltipData();
 
   const rowLabel = useRowConfig((store) => store.label);
   const columnLabel = useColumnConfig((store) => store.label);
@@ -154,12 +153,12 @@ const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
   const label = dimension === "row" ? rowLabel : columnLabel;
   const moveLabel = dimension === "row" ? "Top" : "Left";
 
-  if (!data[label]) {
+  if (!tooltipData?.data?.[label]) {
     return null;
   }
 
   return (
-    <ContextMenuItem onClick={() => move(data[label] as string)}>
+    <ContextMenuItem onClick={() => move(tooltipData?.data?.[label] as string)}>
       Move to {moveLabel}
     </ContextMenuItem>
   );
@@ -169,9 +168,7 @@ const MoveToEnd = ({ dimension }: { dimension: "row" | "column" }) => {
   const moveRowToEnd = useMoveRowToEnd();
   const moveColumnToEnd = useMoveColumnToEnd();
 
-  const {
-    tooltipData: { data },
-  } = useTooltipData();
+  const { tooltipData } = useTooltipData();
   const rowLabel = useRowConfig((store) => store.label);
 
   const columnLabel = useColumnConfig((store) => store.label);
@@ -180,12 +177,12 @@ const MoveToEnd = ({ dimension }: { dimension: "row" | "column" }) => {
   const label = dimension === "row" ? rowLabel : columnLabel;
   const moveLabel = dimension === "row" ? "Bottom" : "Right";
 
-  if (!data[label]) {
+  if (!tooltipData?.data[label]) {
     return null;
   }
 
   return (
-    <ContextMenuItem onClick={() => move(data[label] as string)}>
+    <ContextMenuItem onClick={() => move(tooltipData?.data[label] as string)}>
       Move to {moveLabel}
     </ContextMenuItem>
   );

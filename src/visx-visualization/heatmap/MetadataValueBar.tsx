@@ -169,7 +169,7 @@ export default function MetadataValueBar({
     const title = titleCreator();
     openTooltip(
       {
-        title,
+        title: title ?? String(value),
         data: {
           ["key"]: value,
         },
@@ -183,92 +183,100 @@ export default function MetadataValueBar({
     return null;
   }
 
-  const bars: BarHelper[] = keys.reduce((acc, key) => {
-    if (!(key in metadata)) {
-      return acc;
-    }
-    const currentMd = metadata[key];
-    const selectedMetadata = sortOrder.map((s) => s.key);
-    const value = selectedMetadata.map((mdKey) => currentMd[mdKey]).join(", ");
-    if (!value) {
-      console.warn("No value for key", metadata[key], selectedMetadata);
-      return acc;
-    }
-    const processedValue = metadataIsNumeric ? parseInt(value, 10) : value;
-    // @ts-expect-error we're handling typechecking at runtime
-    const color = metadataValueColorScale(processedValue);
-    if (axis === "Y") {
-      let height = y.bandwidth(key);
-      // Add padding around expanded bars
-      if (height > y.bandwidth()) {
-        height += EXPANDED_ROW_PADDING * 2;
+  const bars: BarHelper[] = keys.reduce<BarHelper[]>(
+    (acc: BarHelper[], key: string): BarHelper[] => {
+      if (!(key in metadata)) {
+        return acc;
       }
-      height = Math.ceil(height);
-      const width = x.bandwidth();
-
-      const xVal = x.bandwidth() * 2;
-      const yVal = Math.ceil(y(key));
-
-      const newBar: BarHelper = {
-        value: processedValue,
-        height,
-        width,
-        color,
-        x: xVal,
-        y: yVal,
-        keys: [key],
-      };
-
-      // if first bar
-      if (acc.length === 0) {
-        return [newBar] as BarHelper[];
+      const currentMd = metadata[key];
+      const selectedMetadata = sortOrder.map((s) => s.key);
+      const value = selectedMetadata
+        .map((mdKey) => currentMd[mdKey])
+        .join(", ");
+      if (!value) {
+        console.warn("No value for key", metadata[key], selectedMetadata);
+        return acc;
       }
-      // otherwise, check if the last bar has the same value
-      // if so, combine them
-      const lastBar: BarHelper = acc[acc.length - 1];
-      if (lastBar.value === processedValue) {
-        const editedBar: BarHelper = {
-          ...lastBar,
-          y: Math.min(lastBar.y, yVal),
-          height: lastBar.height + height,
-          keys: [...lastBar.keys, key],
+      const processedValue = metadataIsNumeric ? parseInt(value, 10) : value;
+      // @ts-expect-error we're handling typechecking at runtime
+      const color = metadataValueColorScale(processedValue);
+      if (axis === "Y") {
+        let height = y.bandwidth(key);
+        // Add padding around expanded bars
+        if (height > y.bandwidth()) {
+          height += EXPANDED_ROW_PADDING * 2;
+        }
+        height = Math.ceil(height);
+        const width = x.bandwidth();
+
+        const xVal = x.bandwidth() * 2;
+        const yVal = Math.ceil(y(key) as number);
+
+        const newBar: BarHelper = {
+          value: processedValue,
+          height,
+          width,
+          color,
+          x: xVal,
+          y: yVal,
+          keys: [key],
         };
-        return [...acc.slice(0, -1), editedBar];
-      }
-      return [...acc, newBar];
-    } else if (axis === "X") {
-      const width = x.bandwidth();
-      const height = y.bandwidth();
-      const xVal = x(key);
-      const yVal = y.bandwidth();
-      const newBar: BarHelper = {
-        value: processedValue,
-        width,
-        height,
-        color,
-        x: xVal,
-        y: yVal,
-        keys: [key],
-      };
-      // if first bar
-      if (acc.length === 0) {
-        return [newBar] as BarHelper[];
-      }
-      // otherwise, check if the last bar has the same value and combine them if so
-      const lastBar: BarHelper = acc[acc.length - 1];
-      if (lastBar.value === processedValue) {
-        const editedBar = {
-          ...lastBar,
-          x: Math.min(lastBar.x, xVal),
-          width: lastBar.width + width,
-          keys: [...lastBar.keys, key],
+
+        // if first bar
+        if (acc.length === 0) {
+          return [newBar];
+        }
+        // otherwise, check if the last bar has the same value
+        // if so, combine them
+        const lastBar: BarHelper = acc[acc.length - 1];
+        if (lastBar.value === processedValue) {
+          const editedBar: BarHelper = {
+            ...lastBar,
+            y: Math.min(lastBar.y, yVal),
+            height: lastBar.height + height,
+            keys: [...lastBar.keys, key],
+          };
+          return [...acc.slice(0, -1), editedBar];
+        }
+        return [...acc, newBar];
+      } else if (axis === "X") {
+        const width = x.bandwidth();
+        const height = y.bandwidth();
+        const xVal = x(key)!;
+        const yVal = y.bandwidth();
+        const newBar: BarHelper = {
+          value: processedValue,
+          width,
+          height,
+          color,
+          x: xVal,
+          y: yVal,
+          keys: [key],
         };
-        return [...acc.slice(0, -1), editedBar];
+        // if first bar
+        if (acc.length === 0) {
+          return [newBar];
+        }
+        // otherwise, check if the last bar has the same value and combine them if so
+        const lastBar: BarHelper = acc[acc.length - 1];
+        if (lastBar.value === processedValue) {
+          const editedBar = {
+            ...lastBar,
+            x: Math.min(lastBar.x, xVal),
+            width: lastBar.width + width,
+            keys: [...lastBar.keys, key],
+          } as BarHelper;
+          const previousBars = acc.slice(0, -1);
+          return [...previousBars, editedBar];
+        }
+        // otherwise, add the new bar
+        return [...acc, newBar];
       }
-      // otherwise, add a new bar
-      return [...acc, newBar];
-    }
-  }, [] as BarHelper[]);
+      // Default case, should never be reached but is necessary for type checking
+      return acc;
+    },
+    [] as BarHelper[],
+  );
 
   const textY = (bar: BarHelper) => {
     if (axis === "X") {

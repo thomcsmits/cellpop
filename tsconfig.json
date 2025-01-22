@@ -1,15 +1,21 @@
 {
-    "compilerOptions": {
-      "target": "ES2020",
-      "module": "ESNext",
-      "moduleResolution": "Bundler",
-      "noImplicitAny": true,
-      "removeComments": true,
-      "preserveConstEnums": true,
-      "sourceMap": true,
-      "lib": ["ES2020", "DOM", "DOM.Iterable"],
-      "jsx": "react",
-      "esModuleInterop": true,
-    },
-    "include": ["src"],
-  }
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "strict": true,
+    "moduleResolution": "bundler",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "sourceMap": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "jsx": "react",
+    "esModuleInterop": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "./dist-tsc",
+    "rootDir": "./src",
+  },
+  "include": ["src", "src/utils"],
+  "exclude": ["node_modules", "dist", "dist-tsc"]
+}

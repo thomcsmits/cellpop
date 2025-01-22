@@ -2,6 +2,7 @@ import * as ContextMenu from "@radix-ui/react-context-menu";
 
 import { styled, Theme } from "@mui/material/styles";
 import { CSSProperties } from "@mui/material/styles/createMixins";
+import { ComponentType, PropsWithChildren } from "react";
 
 const ContentStyles = ({ theme }: { theme: Theme }) => {
   return {
@@ -16,11 +17,13 @@ const ContentStyles = ({ theme }: { theme: Theme }) => {
   } as CSSProperties;
 };
 
-export const ContextMenuContent = styled(ContextMenu.Content)(ContentStyles);
+export const ContextMenuContent = styled(ContextMenu.Content)(
+  ContentStyles,
+) as unknown as typeof ContextMenu.Content;
 
 export const ContextMenuSubContent = styled(ContextMenu.SubContent)(
   ContentStyles,
-);
+) as unknown as typeof ContextMenu.SubContent;
 
 const ItemStyles = ({ theme }: { theme: Theme }) =>
   ({
@@ -56,18 +59,24 @@ const ItemStyles = ({ theme }: { theme: Theme }) =>
     },
   }) as CSSProperties;
 
-export const ContextMenuItem = styled(ContextMenu.Item)(ItemStyles);
+export const ContextMenuItem = styled(ContextMenu.Item)(
+  ItemStyles,
+) as unknown as typeof ContextMenu.Item;
 export const ContextMenuCheckboxItem = styled(ContextMenu.CheckboxItem)(
   ItemStyles,
-);
-export const ContextMenuRadioItem = styled(ContextMenu.RadioItem)(ItemStyles);
-export const ContextMenuSubTrigger = styled(ContextMenu.SubTrigger)(ItemStyles);
+) as unknown as typeof ContextMenu.CheckboxItem;
+export const ContextMenuRadioItem = styled(ContextMenu.RadioItem)(
+  ItemStyles,
+) as unknown as typeof ContextMenu.RadioItem;
+export const ContextMenuSubTrigger = styled(ContextMenu.SubTrigger)(
+  ItemStyles,
+) as unknown as typeof ContextMenu.SubTrigger;
 
 export const RightSlot = styled("div")(({ theme }) => ({
   marginLeft: "auto",
   paddingLeft: theme.spacing(2.5),
   color: theme.palette.text.secondary,
-}));
+})) as unknown as ComponentType<PropsWithChildren>;
 
 export const ContextMenuLabel = styled(ContextMenu.Label)(({ theme }) => ({
   paddingLeft: theme.spacing(3),
@@ -75,7 +84,7 @@ export const ContextMenuLabel = styled(ContextMenu.Label)(({ theme }) => ({
   lineHeight: theme.spacing(3),
   color: theme.palette.primary.dark,
   userSelect: "none",
-}));
+})) as unknown as typeof ContextMenu.Label;
 
 export const ContextMenuSeparator = styled(ContextMenu.Separator)(
   ({ theme }) => ({
@@ -83,7 +92,7 @@ export const ContextMenuSeparator = styled(ContextMenu.Separator)(
     backgroundColor: theme.palette.divider,
     margin: theme.spacing(0.5, 0),
   }),
-);
+) as unknown as typeof ContextMenu.Separator;
 
 export const ContextMenuItemIndicator = styled(ContextMenu.ItemIndicator)(
   ({ theme }) => ({
@@ -94,4 +103,4 @@ export const ContextMenuItemIndicator = styled(ContextMenu.ItemIndicator)(
     alignItems: "center",
     justifyContent: "center",
   }),
-);
+) as unknown as typeof ContextMenu.ItemIndicator;

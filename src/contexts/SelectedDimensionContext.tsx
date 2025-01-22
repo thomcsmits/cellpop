@@ -1,6 +1,6 @@
 import { temporal } from "zundo";
 import { createStore } from "zustand";
-import { createStoreContext } from "../utils/zustand";
+import { createTemporalStoreContext } from "../utils/zustand";
 
 interface SelectedDimensionContextProps {
   initialSelectedDimension: "X" | "Y";
@@ -28,8 +28,7 @@ export const [
   useSelectedDimension,
   ,
   useSelectedDimensionHistory,
-] = createStoreContext<
+] = createTemporalStoreContext<
   SelectedDimensionContext,
-  SelectedDimensionContextProps,
-  true
->(createSelectedDimensionContext, "SelectedDimensionContext", true);
+  SelectedDimensionContextProps
+>(createSelectedDimensionContext, "SelectedDimensionContext");

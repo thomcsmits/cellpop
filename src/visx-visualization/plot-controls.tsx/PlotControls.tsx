@@ -151,7 +151,7 @@ export function PlotControlsButton() {
           sx: {
             top: parentBoundingBox?.top,
             height: parentBoundingBox?.height,
-            right: windowBoundingBox.right - parentBoundingBox?.right,
+            right: windowBoundingBox.right - (parentBoundingBox?.right ?? 0),
           },
         }}
         slotProps={{
@@ -173,7 +173,7 @@ export function PlotControlsButton() {
             },
             top: parentBoundingBox?.top,
             height: parentBoundingBox?.height,
-            right: windowBoundingBox.right - parentBoundingBox?.right,
+            right: windowBoundingBox.right - (parentBoundingBox?.right ?? 0),
             scrollBehavior: "smooth",
           },
         }}

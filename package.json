@@ -1,7 +1,7 @@
 {
   "name": "cellpop",
   "private": false,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "author": "Thomas Smits",
   "description": "A React component for visualizing cell populations in two-dimensional array data.",
@@ -11,11 +11,19 @@
   "module": "./dist/index.es.js",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.es.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.umd.js"
+      }
     }
   },
+  "files": [
+    "src", "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/hms-dbmi/cellpop.git"

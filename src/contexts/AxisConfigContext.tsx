@@ -1,6 +1,6 @@
 import { temporal } from "zundo";
 import { createStore } from "zustand";
-import { createStoreContext } from "../utils/zustand";
+import { createTemporalStoreContext } from "../utils/zustand";
 
 export interface AxisConfig {
   label: string;
@@ -8,7 +8,7 @@ export interface AxisConfig {
   flipAxisPosition?: boolean;
   createSubtitle?: (
     value: string,
-    metadataValues: Record<string, string>,
+    metadataValues?: Record<string, string | number>,
   ) => string;
   icon?: React.ReactElement<unknown>;
 }
@@ -38,9 +38,8 @@ export const [
   [RowConfigProvider, useRowConfig, , useRowConfigHistory],
   [ColumnConfigProvider, useColumnConfig, , useColumnConfigHistory],
 ] = ["Row", "Column"].map((direction) =>
-  createStoreContext<AxisConfigStore, AxisConfig, true>(
+  createTemporalStoreContext<AxisConfigStore, AxisConfig>(
     createAxisConfigStore,
     `${direction}ConfigContext`,
-    true,
   ),
 );

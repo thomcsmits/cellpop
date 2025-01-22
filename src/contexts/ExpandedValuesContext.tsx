@@ -1,6 +1,6 @@
 import { temporal } from "zundo";
 import { createStore } from "zustand";
-import { createStoreContext } from "../utils/zustand";
+import { createTemporalStoreContext } from "../utils/zustand";
 
 interface SelectedValuesContextProps {
   initialSelectedValues: string[];
@@ -54,8 +54,7 @@ export const [
   useSelectedValues,
   ,
   useExpandedValuesHistory,
-] = createStoreContext<SelectedValuesStore, SelectedValuesContextProps, true>(
+] = createTemporalStoreContext<SelectedValuesStore, SelectedValuesContextProps>(
   createSelectedValuesContext,
   "SelectedValuesContext",
-  true,
 );

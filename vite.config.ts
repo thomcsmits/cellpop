@@ -28,6 +28,7 @@ export default defineConfig(({ mode }) => {
         name: "cellpop",
         fileName: (format) => `index.${format}.js`,
       },
+      formats: ["es", "cjs"],
       rollupOptions: {
         external: ["react", "react-dom"],
         output: {
@@ -35,10 +36,10 @@ export default defineConfig(({ mode }) => {
             react: "React",
             "react-dom": "ReactDOM",
           },
-          sourcemap: true,
         },
       },
     },
+    sourcemap: true,
     plugins: [react(), dts()],
     base: "/cellpop/",
   };

@@ -35,7 +35,6 @@ import {
   useDataHistory,
   useDataMap,
   useFractionDataMap,
-  useMetadata,
   useMetadataLookup,
   useRowMetadataKeys,
 } from "../../contexts/DataContext";
@@ -46,11 +45,10 @@ import {
 import { useTooltipFields } from "../../contexts/MetadataConfigContext";
 import { useNormalization } from "../../contexts/NormalizationContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
-import { Setter } from "../../utils/types";
 
 interface DragOverlayContainerProps extends PropsWithChildren {
   items: string[];
-  setItems: Setter<string[]>;
+  setItems: (prevState: string[]) => void;
   resetSort: () => void;
 }
 const customCollisionDetectionAlgorithm: CollisionDetection = (args) => {
@@ -71,20 +69,21 @@ const indicatorProps = (
   y: ScaleBand<string>,
   width: number,
   height: number,
-) => ({
-  X: {
-    width: x.bandwidth(),
-    height,
-    left: (item: string) => x(item),
-    top: () => 0,
-  },
-  Y: {
-    width,
-    height: (item: string) => y.bandwidth(item),
-    left: () => 0,
-    top: (item: string) => y(item),
-  },
-});
+) =>
+  ({
+    X: {
+      width: x.bandwidth() ?? 0,
+      height,
+      left: (item: string) => x(item) ?? 0,
+      top: () => 0,
+    } as const,
+    Y: {
+      width,
+      height: (item: string) => y.bandwidth(item) ?? 0,
+      left: () => 0,
+      top: (item: string) => y(item) ?? 0,
+    } as const,
+  }) as const;
 
 /**
  * Wrapper for the heatmap which allows for dragging and dropping of rows or columns.

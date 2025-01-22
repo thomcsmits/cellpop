@@ -16,14 +16,19 @@ import {
 } from "../cellpop-schema";
 
 export function loadDataWithCounts(
-  counts: any,
+  counts: Record<string, Record<string, number>>,
   metadata?: MetaData,
   ordering?: dataOrdering,
 ) {
   const countsMatrix = getCountsMatrixFromCounts(counts);
-  const data = { countsMatrix: countsMatrix, countsMatrixOrder: ["row", "col", "value"] } as CellPopData;
+  const data = {
+    countsMatrix,
+    countsMatrixOrder: ["row", "col", "value"],
+  } as CellPopData;
   loadDataWrapper(data, ordering);
-  data.metadata = metadata;
+  if (metadata) {
+    data.metadata = metadata;
+  }
   return data;
 }
 
@@ -34,12 +39,16 @@ export function loadDataWithCountsMatrix(
 ) {
   const data = { countsMatrix: countsMatrix } as CellPopData;
   loadDataWrapper(data, ordering);
-  data.metadata = metadata;
+  if (metadata) {
+    data.metadata = metadata;
+  }
   return data;
 }
 
 // TODO: add order option here
-function getCountsMatrixFromCounts(counts: any) {
+function getCountsMatrixFromCounts(
+  counts: Record<string, Record<string, number>>,
+) {
   const countsArray = [];
   for (const row of Object.keys(counts)) {
     for (const [col, value] of Object.entries(counts[row])) {
@@ -69,13 +78,6 @@ function loadDataWrapper(data: CellPopData, ordering?: dataOrdering) {
   }
   wrapRowNames(data);
   wrapColNames(data);
-
-  // copy's
-  data.rowNamesRaw = [...data.rowNames];
-  data.colNamesRaw = [...data.colNames];
-
-  // save extended chart
-  data.extendedChart = { rowNames: [], colNames: [] };
 }
 
 function getRowNames(data: CellPopData) {

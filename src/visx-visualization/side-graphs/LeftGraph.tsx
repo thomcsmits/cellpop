@@ -19,7 +19,7 @@ const useXAxisCountsScale = () => {
   const rowCounts = useRowCounts();
   const fraction = useFraction((s) => s.fraction);
   const { tickLabelSize } = useYScale();
-  const domainMax = fraction ? 100 : max(Object.values(rowCounts));
+  const domainMax = fraction ? 100 : (max(Object.values(rowCounts)) ?? 0);
   return useCountsScale(
     [0, domainMax],
     [0, width - tickLabelSize * LEFT_MULTIPLIER],

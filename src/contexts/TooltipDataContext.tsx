@@ -8,7 +8,7 @@ export interface TooltipData {
 }
 
 interface TooltipDataContextType {
-  tooltipData: TooltipData | null;
+  tooltipData?: TooltipData;
   tooltipOpen: boolean;
   tooltipLeft: number;
   tooltipTop: number;
@@ -44,7 +44,7 @@ export function TooltipDataProvider({ children }: PropsWithChildren) {
     tooltipTop = 0,
   } = useTooltip<TooltipData>({
     tooltipOpen: false,
-    tooltipData: null,
+    tooltipData: undefined,
   });
 
   const [contextMenuOpen, setContextMenuOpen] = useState(false);

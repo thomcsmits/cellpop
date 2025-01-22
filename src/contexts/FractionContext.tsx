@@ -1,6 +1,6 @@
 import { temporal } from "zundo";
 import { createStore } from "zustand";
-import { createStoreContext } from "../utils/zustand";
+import { createTemporalStoreContext } from "../utils/zustand";
 
 interface FractionProps {
   initialFraction?: boolean;
@@ -20,8 +20,7 @@ const createFractionStore = ({ initialFraction = false }: FractionProps) => {
 };
 
 export const [FractionProvider, useFraction, , useFractionHistory] =
-  createStoreContext<FractionStore, FractionProps, true>(
+  createTemporalStoreContext<FractionStore, FractionProps>(
     createFractionStore,
     "FractionContext",
-    true,
   );

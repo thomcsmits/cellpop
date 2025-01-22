@@ -1,6 +1,6 @@
 import { temporal } from "zundo";
 import { createStore } from "zustand";
-import { createStoreContext } from "../utils/zustand";
+import { createTemporalStoreContext } from "../utils/zustand";
 
 interface NormalizationProps {
   initialNormalization?: Normalization;
@@ -38,10 +38,9 @@ export const [
   useNormalization,
   ,
   useNormalizationHistory,
-] = createStoreContext<NormalizationStore, NormalizationProps, true>(
+] = createTemporalStoreContext<NormalizationStore, NormalizationProps>(
   createNormalizationStore,
   "NormalizationStore",
-  true,
 );
 
 export const useIsNormalized = () => {
