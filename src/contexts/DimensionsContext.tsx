@@ -69,7 +69,7 @@ export function DimensionsProvider({
     (typeof toolbarHeight === "number"
       ? toolbarHeight
       : parseInt(toolbarHeight)) -
-    parseInt(theme.spacing(2));
+    parseInt(theme.spacing(3));
 
   const [columnSizes, setColumnSizes] = useState<GridSizeTuple>(
     getInitialSize(width, initialColumnProportions),
