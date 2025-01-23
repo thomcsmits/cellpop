@@ -1,3 +1,4 @@
+import { useTheme } from "@mui/material";
 import React, {
   PropsWithChildren,
   useCallback,
@@ -61,14 +62,17 @@ export function DimensionsProvider({
     INITIAL_PROPORTIONS,
   ],
 }: DimensionsProviderProps) {
+  const toolbarHeight = useTheme().mixins.toolbar.minHeight ?? 0;
+  const adjustedHeight = height - parseInt(toolbarHeight);
+
   const [columnSizes, setColumnSizes] = useState<GridSizeTuple>(
     getInitialSize(width, initialColumnProportions),
   );
   const [rowSizes, setRowSizes] = useState<GridSizeTuple>(
-    getInitialSize(height, initialRowProportions),
+    getInitialSize(adjustedHeight, initialRowProportions),
   );
 
-  const dimensionsRef = useRef({ width, height });
+  const dimensionsRef = useRef({ width, height: adjustedHeight });
 
   // Update the column and row sizes when container dimensions change,
   // keeping proportions between the panels

@@ -95,7 +95,6 @@ export const CellPop = withParentSize(
             sortableFields={sortableFields}
             tooltipFields={tooltipFields}
           >
-            <Controls />
             <VizContainer />
           </Providers>
         </div>
