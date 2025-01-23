@@ -62,12 +62,14 @@ export function DimensionsProvider({
     INITIAL_PROPORTIONS,
   ],
 }: DimensionsProviderProps) {
-  const toolbarHeight = useTheme().mixins.toolbar.minHeight ?? 0;
+  const theme = useTheme();
+  const toolbarHeight = theme.mixins.toolbar.minHeight ?? 0;
   const height =
     unadjustedHeight -
     (typeof toolbarHeight === "number"
       ? toolbarHeight
-      : parseInt(toolbarHeight));
+      : parseInt(toolbarHeight)) -
+    parseInt(theme.spacing(2));
 
   const [columnSizes, setColumnSizes] = useState<GridSizeTuple>(
     getInitialSize(width, initialColumnProportions),
