@@ -56,15 +56,15 @@ interface DimensionsProviderProps extends PropsWithChildren {
  */
 export function DimensionsProvider({
   children,
-  dimensions: { width, height },
+  dimensions: { width, height: unadjustedHeight },
   initialProportions: [initialColumnProportions, initialRowProportions] = [
     INITIAL_PROPORTIONS,
     INITIAL_PROPORTIONS,
   ],
 }: DimensionsProviderProps) {
   const toolbarHeight = useTheme().mixins.toolbar.minHeight ?? 0;
-  const adjustedHeight =
-    height -
+  const height =
+    unadjustedHeight -
     (typeof toolbarHeight === "number"
       ? toolbarHeight
       : parseInt(toolbarHeight));
@@ -73,10 +73,10 @@ export function DimensionsProvider({
     getInitialSize(width, initialColumnProportions),
   );
   const [rowSizes, setRowSizes] = useState<GridSizeTuple>(
-    getInitialSize(adjustedHeight, initialRowProportions),
+    getInitialSize(height, initialRowProportions),
   );
 
-  const dimensionsRef = useRef({ width, height: adjustedHeight });
+  const dimensionsRef = useRef({ width, height });
 
   // Update the column and row sizes when container dimensions change,
   // keeping proportions between the panels
@@ -132,7 +132,7 @@ export function DimensionsProvider({
     <DimensionsContext.Provider
       value={{
         width,
-        height: adjustedHeight,
+        height,
         columnSizes,
         rowSizes,
         resizeColumn,
