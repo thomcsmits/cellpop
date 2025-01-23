@@ -1,7 +1,9 @@
 import { Sort, Visibility } from "@mui/icons-material";
-import { Link, Typography } from "@mui/material";
+import { Link, Typography, useTheme } from "@mui/material";
 import React from "react";
 export function JumpToSection({ section }: { section: string }) {
+  const theme = useTheme();
+  console.debug({ theme });
   return (
     <Typography
       variant="subtitle1"

@@ -175,7 +175,7 @@ export default function Controls() {
     <AppBar
       position="static"
       elevation={0}
-      color={currentTheme === "dark" ? "default" : "transparent"}
+      color={currentTheme === "dark" ? "default" : "default"}
     >
       <Stack direction="row" spacing={5} p={1}>
         <HeatmapThemeControl />
