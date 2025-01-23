@@ -96,6 +96,7 @@ function CanvasHeatmapRenderer() {
     selectedValues,
     normalization,
     heatmapTheme,
+    theme,
   ]);
 
   return (
