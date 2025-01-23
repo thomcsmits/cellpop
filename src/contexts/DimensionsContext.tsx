@@ -132,7 +132,7 @@ export function DimensionsProvider({
     <DimensionsContext.Provider
       value={{
         width,
-        height,
+        height: adjustedHeight,
         columnSizes,
         rowSizes,
         resizeColumn,
