@@ -20,6 +20,8 @@ interface ColorScaleContext {
 const ColorScaleContext = createContext<ColorScaleContext>("ColorScaleContext");
 export const useColorScale = () => useContext(ColorScaleContext);
 
+const colorThresholds = new Array(256).fill(0);
+
 /**
  * Provider which instantiates and manages the scales used for the heatmap.
  */
@@ -31,16 +33,18 @@ export function ColorScaleProvider({ children }: PropsWithChildren) {
 
   const colorScaleContext = useMemo(() => {
     const theme = heatmapThemes[heatmapTheme];
-    const lowColor = theme(0);
-    const highColor = theme(1);
+
+    const range = colorThresholds.map((_, idx) => idx / 255);
+
+    console.log({ range });
     const scale = scaleLinear<string>({
-      range: [lowColor, highColor],
-      domain: [0, maxCount],
+      range: range.map((t) => theme(t)),
+      domain: range.map((r) => r * maxCount),
     });
 
     const percentageScale = scaleLinear<string>({
-      range: [lowColor, highColor],
-      domain: [0, 1],
+      range: range.map((t) => theme(t)),
+      domain: range,
     });
 
     return {

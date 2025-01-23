@@ -11,14 +11,17 @@ import {
 import { PlotControlsButton } from "./plot-controls.tsx/PlotControls";
 import { TemporalControls } from "./TemporalControls";
 
+const legendThresholds = new Array(100).fill(0).map((_, i) => i / 100);
+
 export default function Legend() {
   const { scale: colors, maxValue } = useColorScale();
   const id = useId() + "-legend";
 
   const minColor = colors(0);
-  const legendColors = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1].map(
-    (value) => [colors(value * maxValue), `${value * 100}%`],
-  );
+  const legendColors = legendThresholds.map((value) => [
+    colors(value * maxValue),
+    `${value * 100}%`,
+  ]);
   const maxColor = colors(maxValue);
   const isNormalized = useIsNormalized();
   const normalization = useNormalization((state) => state.normalization);
