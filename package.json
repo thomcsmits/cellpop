@@ -40,7 +40,8 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "prepare": "vite build"
   },
   "devDependencies": {
     "@testing-library/react": "^16.1.0",

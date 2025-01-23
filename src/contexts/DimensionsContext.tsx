@@ -1,3 +1,4 @@
+import { useTheme } from "@mui/material";
 import React, {
   PropsWithChildren,
   useCallback,
@@ -55,12 +56,21 @@ interface DimensionsProviderProps extends PropsWithChildren {
  */
 export function DimensionsProvider({
   children,
-  dimensions: { width, height },
+  dimensions: { width, height: unadjustedHeight },
   initialProportions: [initialColumnProportions, initialRowProportions] = [
     INITIAL_PROPORTIONS,
     INITIAL_PROPORTIONS,
   ],
 }: DimensionsProviderProps) {
+  const theme = useTheme();
+  const toolbarHeight = theme.mixins.toolbar.minHeight ?? 0;
+  const height =
+    unadjustedHeight -
+    (typeof toolbarHeight === "number"
+      ? toolbarHeight
+      : parseInt(toolbarHeight)) -
+    parseInt(theme.spacing(4));
+
   const [columnSizes, setColumnSizes] = useState<GridSizeTuple>(
     getInitialSize(width, initialColumnProportions),
   );

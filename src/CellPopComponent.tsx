@@ -76,7 +76,7 @@ export const CellPop = withParentSize(
     const outerContainerRef = React.useRef<HTMLDivElement | null>(null);
 
     if (!data) {
-      return <Skeleton />;
+      return <Skeleton height="100%" width="100%" />;
     }
 
     return (
@@ -95,7 +95,6 @@ export const CellPop = withParentSize(
             sortableFields={sortableFields}
             tooltipFields={tooltipFields}
           >
-            <Controls />
             <VizContainer />
           </Providers>
         </div>

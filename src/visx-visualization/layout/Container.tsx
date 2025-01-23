@@ -11,6 +11,7 @@ import {
   useSetTooltipData,
   useTooltipData,
 } from "../../contexts/TooltipDataContext";
+import Controls from "../Controls";
 import ContextMenuComponent from "../heatmap/ContextMenu";
 import BottomCenterPanel from "./BottomCenter";
 import BottomLeftPanel from "./BottomLeft";
@@ -42,6 +43,7 @@ export default function VizContainerGrid() {
 
   return (
     <ParentRefProvider value={parentRef}>
+      <Controls />
       <ContextMenuRoot
         onOpenChange={(open) => {
           if (open && tooltipData) {
