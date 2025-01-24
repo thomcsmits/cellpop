@@ -51,6 +51,7 @@ import {
   useAvailableRowSorts,
   useData,
 } from "../../contexts/DataContext";
+import { useTrackEvent } from "../../contexts/EventTrackerProvider";
 import {
   useFieldDisplayName,
   useSortableFields,
@@ -121,8 +122,10 @@ function useRevalidateSort() {
   const revalidateSort = useData((s) =>
     section === "Column" ? s.revalidateColumnSort : s.revalidateRowSort,
   );
+  const trackEvent = useTrackEvent();
   return useEventCallback(() => {
     revalidateSort();
+    trackEvent(`Revalidate ${section} Sort`, "");
   });
 }
 
@@ -154,6 +157,8 @@ export function SortControls() {
     setSorts: section === "Column" ? s.setColumnSortOrder : s.setRowSortOrder,
   }));
 
+  const trackEvent = useTrackEvent();
+
   const allowedSorts = useSortableFields(sorts.map((sort) => sort.key));
   const filteredSorts = sorts.filter((sort) => allowedSorts.includes(sort.key));
 
@@ -175,7 +180,10 @@ export function SortControls() {
       const oldIndex = sorts.findIndex((sort) => sort.key === active.id);
       const newIndex = sorts.findIndex((sort) => sort.key === over.id);
 
-      setSorts(arrayMove(sorts, oldIndex, newIndex));
+      const newSorts = arrayMove(sorts, oldIndex, newIndex);
+
+      setSorts(newSorts);
+      trackEvent("Update Sort Order", section, { newSorts });
     }
   });
 

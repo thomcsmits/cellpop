@@ -10,6 +10,7 @@ import { StoreApi } from "zustand";
 import { useThemeHistory } from "../contexts/CellPopThemeContext";
 import { useDataHistory } from "../contexts/DataContext";
 import { useThemeControlIsDisabled } from "../contexts/DisabledControlProvider";
+import { useTrackEvent } from "../contexts/EventTrackerProvider";
 import { useExpandedValuesHistory } from "../contexts/ExpandedValuesContext";
 import { useFractionHistory } from "../contexts/FractionContext";
 import { useNormalizationHistory } from "../contexts/NormalizationContext";
@@ -31,6 +32,8 @@ function useTemporalActions() {
 
   const undoQueue = useRef<TemporalState<StoreApi<unknown>>[]>([]);
   const redoQueue = useRef<TemporalState<StoreApi<unknown>>[]>([]);
+
+  const trackEvent = useTrackEvent();
 
   useEffect(() => {
     const onSave = (state: TemporalState<StoreApi<unknown>>) => () => {
@@ -66,6 +69,7 @@ function useTemporalActions() {
     if (last) {
       last.undo();
       redoQueue.current.push(last);
+      trackEvent("Undo Last Action", "");
     }
   });
 
@@ -74,6 +78,7 @@ function useTemporalActions() {
     if (last) {
       last.redo();
       undoQueue.current.push(last);
+      trackEvent("Redo Last Action", "");
     }
   });
 
@@ -86,6 +91,7 @@ function useTemporalActions() {
     normalizationHistory.undo(normalizationHistory.pastStates.length);
     undoQueue.current = [];
     redoQueue.current = [];
+    trackEvent("Restore to Default", "");
   });
 
   const canUndo = undoQueue.current.length > 0;

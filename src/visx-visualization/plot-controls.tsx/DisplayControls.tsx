@@ -43,6 +43,7 @@ import {
   useRowConfig,
 } from "../../contexts/AxisConfigContext";
 import { useData } from "../../contexts/DataContext";
+import { useTrackEvent } from "../../contexts/EventTrackerProvider";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import InfoTooltip from "../InfoTooltip";
 import { usePlotControlsContext } from "./PlotControlsContext";
@@ -287,19 +288,35 @@ const useToggleVisibility = () => {
   const showItem = useData((s) =>
     section === "Column" ? s.restoreColumn : s.restoreRow,
   );
+  const columnLabel = useColumnConfig((s) => s.label);
+  const rowLabel = useRowConfig((s) => s.label);
+  const label = section === "Column" ? columnLabel : rowLabel;
+  const trackEvent = useTrackEvent();
   const handleChange = useEventCallback((e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
       showItem(e.target.name);
+      trackEvent(`Show ${label}`, e.target.name);
     } else {
       hideItem(e.target.name);
+      trackEvent(`Hide ${label}`, e.target.name);
     }
   });
   return handleChange;
 };
 
 const useToggleExpansion = () => {
-  const toggleItem = useSelectedValues((s) => s.toggleValue);
+  const { toggleItem, selectedValues } = useSelectedValues((s) => ({
+    toggleItem: s.toggleValue,
+    selectedValues: s.selectedValues,
+  }));
+  const trackEvent = useTrackEvent();
+  const rowLabel = useRowConfig((s) => s.label);
   const handleChange = useEventCallback((e: ChangeEvent<HTMLInputElement>) => {
+    if (selectedValues.has(e.target.name)) {
+      trackEvent(`Collapse ${rowLabel}`, e.target.name);
+    } else {
+      trackEvent(`Expand ${rowLabel}`, e.target.name);
+    }
     toggleItem(e.target.name);
   });
   return handleChange;
