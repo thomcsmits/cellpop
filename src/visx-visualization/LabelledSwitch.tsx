@@ -34,7 +34,7 @@ export default function LabelledSwitch({
       label={
         <InputLabel
           color="primary"
-          sx={{ display: "flex", alignItems: "center" }}
+          sx={{ display: "flex", alignItems: "center", gap: 1 }}
         >
           {label} <InfoTooltip title={tooltip} />
         </InputLabel>
