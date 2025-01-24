@@ -6,17 +6,20 @@ import {
   SwitchProps,
 } from "@mui/material";
 import React from "react";
+import InfoTooltip from "./InfoTooltip";
 
 interface LabelledSwitchProps extends SwitchProps {
   leftLabel: string;
   rightLabel: string;
   label: string;
+  tooltip?: string;
 }
 
 export default function LabelledSwitch({
   leftLabel,
   rightLabel,
   label,
+  tooltip,
   ...rest
 }: LabelledSwitchProps) {
   return (
@@ -28,7 +31,14 @@ export default function LabelledSwitch({
           <InputLabel>{rightLabel}</InputLabel>
         </Stack>
       }
-      label={<InputLabel color="primary">{label}</InputLabel>}
+      label={
+        <InputLabel
+          color="primary"
+          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+        >
+          {label} <InfoTooltip title={tooltip} />
+        </InputLabel>
+      }
       labelPlacement="top"
     />
   );

@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useId } from "react";
 import { useColorScale } from "../contexts/ColorScaleContext";
 import { HEATMAP_THEMES_LIST, HeatmapTheme } from "../utils/heatmap-themes";
 
@@ -101,6 +101,9 @@ function FractionControl() {
       rightLabel="Fraction"
       onChange={changeFraction}
       checked={fraction}
+      tooltip={
+        "Toggle between displaying bars representing total cell counts, or violins representing fractions of data in the plot."
+      }
     />
   );
 }
@@ -127,6 +130,7 @@ function SelectedDimensionControl() {
       rightLabel="Column"
       onChange={changeSelectedDimension}
       checked={selectedDimension === "X"}
+      tooltip="Toggle to choose rows or columns for selection within the plot."
     />
   );
 }
@@ -137,18 +141,18 @@ function NormalizationControl() {
   const changeNormalization = useEventCallback((event: SelectChangeEvent) => {
     setNormalization(event.target.value as (typeof NORMALIZATIONS)[number]);
   });
+
+  const id = useId();
   if (normalizationIsDisabled) {
     return null;
   }
 
   return (
     <FormControl sx={{ maxWidth: 300 }}>
-      <InputLabel id="heatmap-normalization-select-label">
-        Heatmap Normalization
-      </InputLabel>
+      <InputLabel id={id}>Heatmap Normalization</InputLabel>
       <Select
-        labelId="heatmap-normalization-select-label"
-        id="heatmap-normalization-select"
+        labelId={id}
+        id={`${id}-select`}
         value={normalization}
         onChange={changeNormalization}
         variant="outlined"
