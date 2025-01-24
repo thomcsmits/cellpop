@@ -14,6 +14,7 @@ import {
   useMoveRowToStart,
   useRowSorts,
 } from "../../contexts/DataContext";
+import { useTrackEvent } from "../../contexts/EventTrackerProvider";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
 import {
   useSetTooltipData,
@@ -34,12 +35,15 @@ const HideRow = () => {
   const rowLabel = useRowConfig((store) => store.label);
   const { removeRow } = useData();
   const { deselectValue, selectedValues } = useSelectedValues();
+  const trackEvent = useTrackEvent();
 
   const onClick = useEventCallback(() => {
     const rowValue = tooltipData?.data[rowLabel] as string;
     if (selectedValues.has(tooltipData?.data[rowLabel] as string)) {
       deselectValue(tooltipData?.data[rowLabel] as string);
+      trackEvent(`Collapse ${rowLabel}`, rowValue);
     }
+    trackEvent(`Hide ${rowLabel}`, rowValue);
     removeRow(rowValue);
   });
 
@@ -61,31 +65,45 @@ const HideColumn = () => {
   const { tooltipData } = useTooltipData();
   const columnLabel = useColumnConfig((store) => store.label);
   const { removeColumn } = useData();
+  const trackEvent = useTrackEvent();
 
   if (!tooltipData?.data) {
     return null;
   }
 
-  if (tooltipData.data[columnLabel]) {
-    const columnValue = tooltipData.data[columnLabel] as string;
+  const columnValue = tooltipData?.data?.[columnLabel] as string;
+
+  if (columnValue) {
+    const onClick = () => {
+      removeColumn(columnValue);
+      trackEvent(`Hide ${columnLabel}`, columnValue);
+    };
     return (
-      <ContextMenuItem onClick={() => removeColumn(columnValue)}>
+      <ContextMenuItem onClick={onClick}>
         Hide {columnLabel} ({columnValue})
       </ContextMenuItem>
     );
   }
+  return null;
 };
 
 const RestoreHiddenRows = () => {
   const { removedRows, resetRemovedRows } = useData();
   const rowLabel = useRowConfig((store) => store.label);
 
+  const trackEvent = useTrackEvent();
+
+  const onClick = useEventCallback(() => {
+    resetRemovedRows();
+    trackEvent(`Restore Hidden ${rowLabel}s`, "");
+  });
+
   if (!removedRows.size) {
     return null;
   }
 
   return (
-    <ContextMenuItem onClick={resetRemovedRows}>
+    <ContextMenuItem onClick={onClick}>
       Restore Hidden {rowLabel}s
     </ContextMenuItem>
   );
@@ -94,13 +112,19 @@ const RestoreHiddenRows = () => {
 const RestoreHiddenColumns = () => {
   const { removedColumns, resetRemovedColumns } = useData();
   const columnLabel = useColumnConfig((store) => store.label);
+  const trackEvent = useTrackEvent();
+
+  const onClick = useEventCallback(() => {
+    resetRemovedColumns();
+    trackEvent(`Restore Hidden ${columnLabel}s`, "");
+  });
 
   if (!removedColumns.size) {
     return null;
   }
 
   return (
-    <ContextMenuItem onClick={resetRemovedColumns}>
+    <ContextMenuItem onClick={onClick}>
       Restore Hidden {columnLabel}s
     </ContextMenuItem>
   );
@@ -113,32 +137,37 @@ const ExpandRow = () => {
   const expandedRows = useSelectedValues((s) => s.selectedValues);
   const { closeContextMenu } = useSetTooltipData();
 
-  if (
-    !tooltipData?.data?.[label] ||
-    expandedRows.has(tooltipData?.data?.[label] as string)
-  ) {
+  const trackEvent = useTrackEvent();
+  const rowValue = tooltipData?.data?.[label] as string;
+
+  const onClick = useEventCallback(() => {
+    expandRow(rowValue);
+    closeContextMenu();
+    trackEvent(`Expand ${label}`, rowValue);
+  });
+
+  if (!rowValue || expandedRows.has(rowValue)) {
     return null;
   }
 
-  return (
-    <ContextMenuItem
-      onClick={() => {
-        expandRow(tooltipData?.data?.[label] as string);
-        closeContextMenu();
-      }}
-    >
-      Expand {label}
-    </ContextMenuItem>
-  );
+  return <ContextMenuItem onClick={onClick}>Expand {label}</ContextMenuItem>;
 };
 
 const CollapseRows = () => {
   const expandedRows = useSelectedValues((s) => s.selectedValues);
   const reset = useSelectedValues((s) => s.reset);
+  const trackEvent = useTrackEvent();
+  const label = useRowConfig((store) => store.label);
+
+  const onClick = useEventCallback(() => {
+    reset();
+    trackEvent(`Collapse All ${label}s`, "");
+  });
+
   if (expandedRows.size === 0) {
     return null;
   }
-  return <ContextMenuItem onClick={reset}>Clear Selection</ContextMenuItem>;
+  return <ContextMenuItem onClick={onClick}>Clear Selection</ContextMenuItem>;
 };
 
 const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
@@ -153,14 +182,21 @@ const MoveToStart = ({ dimension }: { dimension: "row" | "column" }) => {
   const label = dimension === "row" ? rowLabel : columnLabel;
   const moveLabel = dimension === "row" ? "Top" : "Left";
 
-  if (!tooltipData?.data?.[label]) {
+  const value = tooltipData?.data?.[label] as string;
+
+  const trackEvent = useTrackEvent();
+
+  const onClick = useEventCallback(() => {
+    move(value);
+    trackEvent(`Move ${label} to ${moveLabel}`, value);
+  });
+
+  if (!value) {
     return null;
   }
 
   return (
-    <ContextMenuItem onClick={() => move(tooltipData?.data?.[label] as string)}>
-      Move to {moveLabel}
-    </ContextMenuItem>
+    <ContextMenuItem onClick={onClick}>Move to {moveLabel}</ContextMenuItem>
   );
 };
 
@@ -177,14 +213,21 @@ const MoveToEnd = ({ dimension }: { dimension: "row" | "column" }) => {
   const label = dimension === "row" ? rowLabel : columnLabel;
   const moveLabel = dimension === "row" ? "Bottom" : "Right";
 
-  if (!tooltipData?.data[label]) {
+  const value = tooltipData?.data?.[label] as string;
+
+  const trackEvent = useTrackEvent();
+
+  const onClick = useEventCallback(() => {
+    move(value);
+    trackEvent(`Move ${label} to ${moveLabel}`, value);
+  });
+
+  if (!value) {
     return null;
   }
 
   return (
-    <ContextMenuItem onClick={() => move(tooltipData?.data[label] as string)}>
-      Move to {moveLabel}
-    </ContextMenuItem>
+    <ContextMenuItem onClick={onClick}>Move to {moveLabel}</ContextMenuItem>
   );
 };
 
@@ -207,6 +250,8 @@ const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
   const label = dimension === "row" ? rowLabel : columnLabel;
   const currentSortOrder = dimension === "row" ? rowSortOrder : colSortOrder;
 
+  const trackEvent = useTrackEvent();
+
   return (
     <ContextMenu.Sub>
       <ContextMenuSubTrigger>
@@ -217,7 +262,10 @@ const SortDimension = ({ dimension }: { dimension: "row" | "column" }) => {
           {sortOrders.map((order) => (
             <ContextMenuItem
               key={order.key + order.direction}
-              onClick={() => sort([order])}
+              onClick={() => {
+                sort([order]);
+                trackEvent(`Sort ${label}s`, `${order.key} ${order.direction}`);
+              }}
             >
               {order.key.charAt(0).toUpperCase()}
               {order.key.slice(1).replace("_", " ")}{" "}

@@ -19,6 +19,7 @@ import {
   DisableableControls,
   DisabledControlProvider,
 } from "./DisabledControlProvider";
+import { EventTrackerProvider } from "./EventTrackerProvider";
 import { SelectedValuesProvider } from "./ExpandedValuesContext";
 import { FractionProvider } from "./FractionContext";
 import { MetadataConfigProvider } from "./MetadataConfigContext";
@@ -43,6 +44,11 @@ interface CellPopConfigProps extends PropsWithChildren {
   fieldDisplayNames?: Record<string, string>;
   sortableFields?: string[];
   tooltipFields?: string[];
+  trackEvent?: (
+    event: string,
+    detail: string,
+    extra?: Record<string, unknown>,
+  ) => void;
 }
 
 export function Providers({
@@ -62,47 +68,50 @@ export function Providers({
   fieldDisplayNames,
   sortableFields,
   tooltipFields,
+  trackEvent,
 }: CellPopConfigProps) {
   return (
-    <DisabledControlProvider disabledControls={disabledControls}>
-      <DataProvider initialData={data}>
-        <SelectedValuesProvider initialSelectedValues={selectedValues}>
-          <RowConfigProvider {...yAxisConfig}>
-            <ColumnConfigProvider {...xAxisConfig}>
-              <TooltipDataProvider>
-                <CellPopThemeProvider theme={theme} customTheme={customTheme}>
-                  <DimensionsProvider
-                    dimensions={dimensions}
-                    initialProportions={initialProportions}
-                  >
-                    <FractionProvider initialFraction={fraction}>
-                      <NormalizationProvider
-                        initialNormalization={initialNormalization}
-                      >
-                        <ScaleProvider>
-                          <ColorScaleProvider>
-                            <SelectedDimensionProvider
-                              initialSelectedDimension={selectedDimension}
-                            >
-                              <MetadataConfigProvider
-                                fieldDisplayNames={fieldDisplayNames}
-                                sortableFields={sortableFields}
-                                tooltipFields={tooltipFields}
+    <EventTrackerProvider trackEvent={trackEvent}>
+      <DisabledControlProvider disabledControls={disabledControls}>
+        <DataProvider initialData={data}>
+          <SelectedValuesProvider initialSelectedValues={selectedValues}>
+            <RowConfigProvider {...yAxisConfig}>
+              <ColumnConfigProvider {...xAxisConfig}>
+                <TooltipDataProvider>
+                  <CellPopThemeProvider theme={theme} customTheme={customTheme}>
+                    <DimensionsProvider
+                      dimensions={dimensions}
+                      initialProportions={initialProportions}
+                    >
+                      <FractionProvider initialFraction={fraction}>
+                        <NormalizationProvider
+                          initialNormalization={initialNormalization}
+                        >
+                          <ScaleProvider>
+                            <ColorScaleProvider>
+                              <SelectedDimensionProvider
+                                initialSelectedDimension={selectedDimension}
                               >
-                                {children}
-                              </MetadataConfigProvider>
-                            </SelectedDimensionProvider>
-                          </ColorScaleProvider>
-                        </ScaleProvider>
-                      </NormalizationProvider>
-                    </FractionProvider>
-                  </DimensionsProvider>
-                </CellPopThemeProvider>
-              </TooltipDataProvider>
-            </ColumnConfigProvider>
-          </RowConfigProvider>
-        </SelectedValuesProvider>
-      </DataProvider>
-    </DisabledControlProvider>
+                                <MetadataConfigProvider
+                                  fieldDisplayNames={fieldDisplayNames}
+                                  sortableFields={sortableFields}
+                                  tooltipFields={tooltipFields}
+                                >
+                                  {children}
+                                </MetadataConfigProvider>
+                              </SelectedDimensionProvider>
+                            </ColorScaleProvider>
+                          </ScaleProvider>
+                        </NormalizationProvider>
+                      </FractionProvider>
+                    </DimensionsProvider>
+                  </CellPopThemeProvider>
+                </TooltipDataProvider>
+              </ColumnConfigProvider>
+            </RowConfigProvider>
+          </SelectedValuesProvider>
+        </DataProvider>
+      </DisabledControlProvider>
+    </EventTrackerProvider>
   );
 }

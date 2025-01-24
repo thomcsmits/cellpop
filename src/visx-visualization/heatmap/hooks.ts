@@ -1,13 +1,16 @@
 import { useCallback, useEffect } from "react";
 import { AxisConfig } from "../../contexts/AxisConfigContext";
+import { useTrackEvent } from "../../contexts/EventTrackerProvider";
 
 export function useOpenInNewTab(
   createHref: ((tick: string) => string) | undefined,
 ) {
+  const trackEvent = useTrackEvent();
   return useCallback(
     (tick: string) => {
       const href = createHref?.(tick);
       if (href) {
+        trackEvent("Open in new tab", tick, { href });
         window.open(href, "_blank");
       }
     },

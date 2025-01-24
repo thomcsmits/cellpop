@@ -9,7 +9,6 @@ import { OuterContainerRefProvider } from "./contexts/ContainerRefContext";
 import { Dimensions, GridSizeTuple } from "./contexts/DimensionsContext";
 import { Providers } from "./contexts/Providers";
 import { loadHuBMAPData } from "./dataLoading";
-import Controls from "./visx-visualization/Controls";
 import VizContainer from "./visx-visualization/layout";
 
 type DisableableControls = "fraction" | "selection" | "theme";
@@ -26,6 +25,11 @@ interface CellPopConfig {
   fieldDisplayNames?: Record<string, string>;
   sortableFields?: string[];
   tooltipFields?: string[];
+  trackEvent?: (
+    event: string,
+    detail: string,
+    extra?: Record<string, unknown>,
+  ) => void;
 }
 
 export interface CellPopProps
@@ -52,6 +56,7 @@ export const CellPop = withParentSize(
     fieldDisplayNames,
     sortableFields,
     tooltipFields,
+    trackEvent,
   }: CellPopProps) => {
     // If dimensions are provided, use them.
     // Otherwise, fall back to using parentWidth and parentHeight.
@@ -94,6 +99,7 @@ export const CellPop = withParentSize(
             fieldDisplayNames={fieldDisplayNames}
             sortableFields={sortableFields}
             tooltipFields={tooltipFields}
+            trackEvent={trackEvent}
           >
             <VizContainer />
           </Providers>

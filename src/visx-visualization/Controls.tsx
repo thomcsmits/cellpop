@@ -15,6 +15,7 @@ import {
   useNormalizationControlIsDisabled,
   useThemeControlIsDisabled,
 } from "../contexts/DisabledControlProvider";
+import { useTrackEvent } from "../contexts/EventTrackerProvider";
 import { useFraction } from "../contexts/FractionContext";
 import {
   NORMALIZATIONS,
@@ -25,9 +26,11 @@ import LabelledSwitch from "./LabelledSwitch";
 
 function HeatmapThemeControl() {
   const { setHeatmapTheme, heatmapTheme } = useColorScale();
+  const trackEvent = useTrackEvent();
 
   const handleThemeChange = useEventCallback((e: SelectChangeEvent) => {
     setHeatmapTheme(e.target.value as HeatmapTheme);
+    trackEvent("Change Heatmap Theme", e.target.value);
   });
   return (
     <FormControl sx={{ maxWidth: 300 }}>
@@ -59,11 +62,13 @@ function ThemeControl() {
   const themeIsDisabled = useThemeControlIsDisabled();
 
   const { currentTheme, setTheme } = useSetTheme();
+  const trackEvent = useTrackEvent();
 
   const changeVisTheme = useEventCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const newTheme = e.target.checked ? "dark" : "light";
       setTheme(newTheme);
+      trackEvent("Change Visualization Theme", newTheme);
     },
   );
   if (themeIsDisabled) {
@@ -83,10 +88,13 @@ function ThemeControl() {
 
 function FractionControl() {
   const { fraction, setFraction } = useFraction();
+  const trackEvent = useTrackEvent();
   const changeFraction = useEventCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const newFraction = Boolean(event.target.checked);
       setFraction(newFraction);
+      const fraction = newFraction ? "Fraction" : "Count";
+      trackEvent("Change Graph Type", fraction);
     },
   );
   const fractionIsDisabled = useFractionControlIsDisabled();
@@ -111,11 +119,12 @@ function FractionControl() {
 function SelectedDimensionControl() {
   const selectedDimensionIsDisabled = useFractionControlIsDisabled();
   const { selectedDimension, setSelectedDimension } = useSelectedDimension();
-
+  const trackEvent = useTrackEvent();
   const changeSelectedDimension = useEventCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const newSelectedDimension = event.target.checked ? "X" : "Y";
       setSelectedDimension(newSelectedDimension);
+      trackEvent("Change Control Orientation", newSelectedDimension);
     },
   );
 
