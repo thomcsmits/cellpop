@@ -18,7 +18,6 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   DragHandle,
   ExpandMoreRounded,
-  InfoRounded,
   Restore,
   Search,
   Visibility,
@@ -35,7 +34,6 @@ import {
   Stack,
   Switch,
   TextField,
-  Tooltip,
   Typography,
   useEventCallback,
 } from "@mui/material";
@@ -46,6 +44,7 @@ import {
 } from "../../contexts/AxisConfigContext";
 import { useData } from "../../contexts/DataContext";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
+import InfoTooltip from "../InfoTooltip";
 import { usePlotControlsContext } from "./PlotControlsContext";
 import { LeftAlignedButton } from "./style";
 
@@ -256,12 +255,7 @@ export function DisplayControls() {
                   gap={1}
                 >
                   Expanded
-                  <Tooltip
-                    title="Toggle between displaying row as heatmap cells or a bar plot."
-                    placement="top"
-                  >
-                    <Icon component={InfoRounded} fontSize="small" />
-                  </Tooltip>
+                  <InfoTooltip title="Toggle between displaying row as heatmap cells or a bar plot." />
                 </Typography>
               )}
               {filteredItems.map((item) => (
