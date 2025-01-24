@@ -17,7 +17,7 @@ export default function InfoTooltip({
   }
   return (
     <Tooltip title={title} placement={placement}>
-      <Icon component={InfoRounded} fontSize="small" />
+      <Icon component={InfoRounded} color="info" fontSize="small" />
     </Tooltip>
   );
 }

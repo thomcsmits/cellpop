@@ -32,7 +32,7 @@ export default function LabelledSwitch({
         </Stack>
       }
       label={
-        <InputLabel color="primary">
+        <InputLabel color="primary" display="flex" alignItems="center">
           {label} <InfoTooltip title={tooltip} />
         </InputLabel>
       }
