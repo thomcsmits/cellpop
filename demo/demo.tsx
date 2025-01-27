@@ -84,7 +84,7 @@ function Demo() {
           flipAxisPosition: true,
           createSubtitle: (_, metadataValues) => {
             const anatomy = metadataValues["anatomy"];
-            const assay = metadataValues["dataset_type"];
+            const assay = metadataValues["assay"];
             return `${anatomy} | ${assay}`;
           },
           icon: <TableChartIcon />,
