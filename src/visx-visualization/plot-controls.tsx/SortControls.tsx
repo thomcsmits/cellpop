@@ -53,7 +53,7 @@ import {
 } from "../../contexts/DataContext";
 import { useTrackEvent } from "../../contexts/EventTrackerProvider";
 import {
-  useFieldDisplayName,
+  useGetFieldDisplayName,
   useSortableFields,
 } from "../../contexts/MetadataConfigContext";
 import { usePlotControlsContext } from "./PlotControlsContext";
@@ -296,6 +296,7 @@ function SortItem({ sort, index }: { sort: SortOrder<string>; index: number }) {
   const remove = useEventCallback(() => {
     removeSort(sort.key);
   });
+  const getFieldDisplayName = useGetFieldDisplayName();
 
   return (
     <Stack key={sort.key} style={style} ref={setNodeRef}>
@@ -318,7 +319,7 @@ function SortItem({ sort, index }: { sort: SortOrder<string>; index: number }) {
         >
           {[sort.key, ...availableSorts].map((key) => (
             <MenuItem key={key} value={key}>
-              {useFieldDisplayName(key)}
+              {getFieldDisplayName(key)}
             </MenuItem>
           ))}
         </Select>
