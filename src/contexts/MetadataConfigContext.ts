@@ -52,6 +52,8 @@ export const [MetadataConfigProvider, useMetadataConfig] = createStoreContext<
 
 export const useFieldDisplayName = (field: string) =>
   useMetadataConfig().getFieldDisplayName(field);
+export const useGetFieldDisplayName = () =>
+  useMetadataConfig().getFieldDisplayName;
 export const useSortableFields = (fields: string[]) =>
   useMetadataConfig().getSortableFields(fields);
 export const useTooltipFields = (fields: string[]) =>
