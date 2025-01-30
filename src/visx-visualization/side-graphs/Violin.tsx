@@ -4,6 +4,7 @@ import { useTheme } from "@mui/material/styles";
 import { Group } from "@visx/group";
 import { scaleBand, scaleLinear } from "@visx/scale";
 import { area } from "@visx/shape";
+import { curveNatural } from "d3";
 import {
   useColumns,
   useFractionDataMap,
@@ -55,6 +56,14 @@ function getMultiplier(side: Side) {
 }
 
 /**
+ * Casts NaN and Undefined to 0
+ * @param value The value to handle
+ * @returns The value if it is not NaN or undefined, 0 otherwise
+ */
+function handleNaN(value?: number) {
+  return !value || isNaN(value) ? 0 : value;
+}
+/**
  * Returns the domain categories for the given side
  * The domain for the top violins is the rows (since they show the proportion of each cell as a fraction of the row total)
  * The domain for the left violins is the columns (since they show the proportion of each cell as a fraction of the column total)
@@ -86,7 +95,7 @@ function useViolinScale(side: Side) {
 
   return useMemo(() => {
     const topViolins = side === "top";
-    const rangeEnd = topViolins ? height : width;
+    const rangeEnd = topViolins ? height * getMultiplier(side) : width;
     const rangeStart = tickLabelSize * getMultiplier(side);
     const margin = topViolins ? TOP_MARGIN : LEFT_MARGIN;
     const range: [number, number] = [rangeStart, rangeEnd + margin];
@@ -94,7 +103,7 @@ function useViolinScale(side: Side) {
       range,
       domain: categories,
     });
-  }, [side, categories]);
+  }, [side, categories, width, height, tickLabelSize]);
 }
 
 /**
@@ -150,20 +159,34 @@ export default function RevisedViolins({ side = "top" }: ViolinsProps) {
   const violinScale = useViolinScale(side);
   const densityScale = scaleLinear({
     domain: [0, 1], // Fractions are between 0 and 1
-    range: [0, categoricalScale.bandwidth()],
+    range: [0, categoricalScale.bandwidth() / 2], // Total violin width is equal to the categorical scale bandwidth
   });
 
   const violinAreaGenerator = useMemo(() => {
     if (side === "top") {
       return area<[string, number]>()
-        .y((d) => violinScale(d[0]) as number)
-        .x0((d) => densityScale(-d[1]) + categoricalScale.bandwidth() / 2)
-        .x1((d) => densityScale(d[1]) + categoricalScale.bandwidth() / 2);
+        .y((d) => handleNaN(violinScale(d[0]) as number))
+        .x0(
+          (d) =>
+            handleNaN(densityScale(-d[1])) + categoricalScale.bandwidth() / 2,
+        )
+        .x1(
+          (d) =>
+            handleNaN(densityScale(d[1])) + categoricalScale.bandwidth() / 2,
+        )
+        .curve(curveNatural);
     } else {
       return area<[string, number]>()
-        .x((d) => violinScale(d[0]) as number)
-        .y0((d) => densityScale(-d[1]) + categoricalScale.bandwidth() / 2)
-        .y1((d) => densityScale(d[1]) + categoricalScale.bandwidth() / 2);
+        .x((d) => handleNaN(violinScale(d[0])) as number)
+        .y0(
+          (d) =>
+            handleNaN(densityScale(-d[1])) + categoricalScale.bandwidth() / 2,
+        )
+        .y1(
+          (d) =>
+            handleNaN(densityScale(d[1])) + categoricalScale.bandwidth() / 2,
+        )
+        .curve(curveNatural);
     }
   }, [densityScale, violinScale, side]);
 
