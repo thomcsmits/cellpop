@@ -28,6 +28,29 @@ class CpWidget(anywidget.AnyWidget):
 
 
 def cpProcessData(dataSource, is_h5ad, rowNames, colNameColumn, rowMetadata=None, colMetadata=None):
+    """
+    Helper function for CellPop data loading.
+
+    Parameters
+    ----------
+    dataSource : list
+        List of data sources (either AnnData file paths (list of strings) or obs (list of DataFrame).
+    is_h5ad : bool
+        Flag indicating if the data sources AnnData file paths.
+    rowNames : list
+        List of row names corresponding to each data source.
+    colNameColumn : str
+        Column name in obs to be used for grouping.
+    rowMetadata : dict, optional
+        Metadata for rows (default is None).
+    colMetadata : dict, optional
+        Metadata for columns (default is None).
+
+    Returns
+    -------
+    pd.DataFrame
+        Processed DataFrame with counts.
+    """
     if len(dataSource) > len(rowNames): 
         warnings.warn("Not enough rowNames supplied.")
         return
@@ -54,14 +77,77 @@ def cpProcessData(dataSource, is_h5ad, rowNames, colNameColumn, rowMetadata=None
 
 
 def cpAnnDataList(adLocations, rowNames, colNameColumn, rowMetadata=None, colMetadata=None):
+    """
+    Loader for CellPop data from a list of AnnData file paths.
+
+    Parameters
+    ----------
+    adLocations : list
+        List of AnnData file paths.
+    rowNames : list
+        List of row names corresponding to each AnnData file.
+    colNameColumn : str
+        Column name in obs to be used for grouping.
+    rowMetadata : dict, optional
+        Metadata for rows (default is None).
+    colMetadata : dict, optional
+        Metadata for columns (default is None).
+
+    Returns
+    -------
+    pd.DataFrame
+        Processed DataFrame with counts.
+    """
     return cpProcessData(adLocations, True, rowNames, colNameColumn, rowMetadata=None, colMetadata=None)
 
 
 def cpObsDfList(obsList, rowNames, colNameColumn, rowMetadata=None, colMetadata=None):
+    """
+    Loader for CellPop data from a list of dataframes.
+
+    Parameters
+    ----------
+    obsList : list
+        List of DataFrames.
+    rowNames : list
+        List of row names corresponding to each DataFrame.
+    colNameColumn : str
+        Column name in obs to be used for grouping.
+    rowMetadata : dict, optional
+        Metadata for rows (default is None).
+    colMetadata : dict, optional
+        Metadata for columns (default is None).
+
+    Returns
+    -------
+    pd.DataFrame
+        Processed DataFrame with counts.
+    """
     return cpProcessData(obsList, False, rowNames, colNameColumn, rowMetadata=None, colMetadata=None)
 
 
 def cpDfMulti(df, rowNameColumn, colNameColumn, rowMetadata=None, colMetadata=None):
+    """
+    Loader for CellPop data from a singular DataFrame with columns for row and col.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame with observations of row/col.
+    rowNameColumn : str
+        Column name in obs to be used for grouping for rows.
+    colNameColumn : str
+        Column name in obs to be used for grouping for cols.
+    rowMetadata : dict, optional
+        Metadata for rows (default is None).
+    colMetadata : dict, optional
+        Metadata for columns (default is None).
+
+    Returns
+    -------
+    pd.DataFrame
+        Processed DataFrame with counts.
+    """
     if rowNameColumn not in df.keys(): 
         warnings.warn(f"DataFrame does not have label {rowNameColumn}.")
         return
