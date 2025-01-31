@@ -5,6 +5,8 @@ import anywidget
 import traitlets
 
 import pandas as pd
+import anndata as ad
+
 import warnings
 
 try:
@@ -25,7 +27,7 @@ class CpWidget(anywidget.AnyWidget):
         self.dataDict = change.new.to_dict()
 
 
-def cpProcessData(dataSource, is_h5ad, rowNames, colNameDf, rowMetadata=None, colMetadata=None):
+def cpProcessData(dataSource, is_h5ad, rowNames, colNameColumn, rowMetadata=None, colMetadata=None):
     if len(dataSource) > len(rowNames): 
         warnings.warn("Not enough rowNames supplied.")
         return
@@ -41,19 +43,32 @@ def cpProcessData(dataSource, is_h5ad, rowNames, colNameDf, rowMetadata=None, co
         else:
             obs_i = dataSource[i]
         
-        if colNameDf not in obs_i.keys(): 
-            warnings.warn(f"Dataset {rowNames[i]} does not have label {colNameDf} in obs. Dataset skipped.")
+        if colNameColumn not in obs_i.keys(): 
+            warnings.warn(f"Dataset {rowNames[i]} does not have label {colNameColumn} in obs. Dataset skipped.")
             continue
-        obs_i = obs_i[[colNameDf]].reset_index(names=rowNames[i])
-        counts_i = obs_i.groupby(colNameDf, observed=True).count().T
+        obs_i = obs_i[[colNameColumn]].reset_index(names=rowNames[i])
+        counts_i = obs_i.groupby(colNameColumn, observed=True).count().T
         df = pd.concat([df, counts_i], join="outer").fillna(0)
     df = df.astype(int)
     return df
 
 
-def cpAnnDataList(adLocations, rowNames, colNameDf, rowMetadata=None, colMetadata=None):
-    return cpProcessData(adLocations, True, rowNames, colNameDf, rowMetadata=None, colMetadata=None)
+def cpAnnDataList(adLocations, rowNames, colNameColumn, rowMetadata=None, colMetadata=None):
+    return cpProcessData(adLocations, True, rowNames, colNameColumn, rowMetadata=None, colMetadata=None)
 
 
-def cpObsDfList(obsList, rowNames, colNameDf, rowMetadata=None, colMetadata=None):
-    return cpProcessData(obsList, False, rowNames, colNameDf, rowMetadata=None, colMetadata=None)
+def cpObsDfList(obsList, rowNames, colNameColumn, rowMetadata=None, colMetadata=None):
+    return cpProcessData(obsList, False, rowNames, colNameColumn, rowMetadata=None, colMetadata=None)
+
+
+def cpDfMulti(df, rowNameColumn, colNameColumn, rowMetadata=None, colMetadata=None):
+    if rowNameColumn not in df.keys(): 
+        warnings.warn(f"DataFrame does not have label {rowNameColumn}.")
+        return
+    if colNameColumn not in df.keys(): 
+        warnings.warn(f"DataFrame does not have label {colNameColumn}.")
+        return
+    df = df.groupby([rowNameColumn, colNameColumn]).size().reset_index(name="count")
+    df = df.pivot(index=rowNameColumn, columns=colNameColumn, values="count").fillna(0)
+    df = df.astype(int)
+    return df
