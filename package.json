@@ -33,6 +33,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "widget": "vite build --watch",
     "build": "vite build",
     "build-demo": "vite build --mode demo",
     "preview": "vite preview",
