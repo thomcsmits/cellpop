@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "cellpop"
 version = "0.0.0"
-dependencies = ["anywidget", "pandas"]
+dependencies = ["anywidget", "pandas", "anndata"]
 readme = "README.md"
 
 [project.optional-dependencies]
