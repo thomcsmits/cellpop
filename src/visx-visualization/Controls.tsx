@@ -158,7 +158,7 @@ function NormalizationControl() {
 
   return (
     <FormControl sx={{ maxWidth: 300 }}>
-      <InputLabel id={id}>Heatmap Normalization</InputLabel>
+      <InputLabel id={id} sx={(theme) => ({background: theme.palette.background.default})}>Heatmap&nbsp;Normalization</InputLabel>
       <Select
         labelId={id}
         id={`${id}-select`}
