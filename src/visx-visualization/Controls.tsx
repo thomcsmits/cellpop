@@ -189,6 +189,7 @@ export default function Controls() {
       position="static"
       elevation={0}
       color={currentTheme === "dark" ? "default" : "default"}
+      sx={{ pt: 2 }}
     >
       <Stack direction="row" spacing={5} p={1}>
         <HeatmapThemeControl />
