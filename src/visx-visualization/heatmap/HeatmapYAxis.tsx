@@ -72,17 +72,18 @@ export default function HeatmapYAxis() {
         left={tickLabelSize * LEFT_MULTIPLIER}
         stroke={theme.palette.text.primary}
         tickStroke={theme.palette.text.primary}
-        tickComponent={
-          selectedValues.size > 0
-            ? (props) =>
-                ExpandedRowTick({
-                  ...props,
-                  axisConfig,
-                  openInNewTab,
-                  tickTitle,
-                  tickLabelStyle,
-                })
-            : undefined
+        tickComponent={(tickLabelProps: TickRendererProps) =>
+          selectedValues.has(tickLabelProps?.formattedValue as string) ? (
+            <ExpandedRowTick {...tickLabelProps} />
+          ) : (
+            <Text
+              {...tickLabelProps}
+              // @ts-expect-error Visx types are slightly incorrect
+              x={(tickLabelProps?.to?.x ?? 0) - tickLabelProps.fontSize}
+            >
+              {tickLabelProps?.formattedValue}
+            </Text>
+          )
         }
         tickLabelProps={(t) =>
           ({
@@ -129,18 +130,16 @@ function ExpandedRowTick({
   x,
   y,
   formattedValue: row,
-  axisConfig,
-  openInNewTab,
-  tickTitle,
-  tickLabelStyle,
   ...tickLabelProps
-}: TickRendererProps & {
-  axisConfig: AxisConfig;
-} & ReturnType<typeof useHeatmapAxis>) {
+}: TickRendererProps) {
   const { expandedSize } = useYScale();
   const selectedValues = useSelectedValues((s) => s.selectedValues);
-  const { flipAxisPosition } = axisConfig;
   const rowMaxes = useRowMaxes();
+  const axisConfig = useRowConfig();
+  const { flipAxisPosition } = axisConfig;
+
+  const { openInNewTab, tickTitle, tickLabelStyle } =
+    useHeatmapAxis(axisConfig);
 
   const panelSize = usePanelDimensions(
     flipAxisPosition ? "left_middle" : "right_middle",
