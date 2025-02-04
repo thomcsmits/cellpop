@@ -140,7 +140,6 @@ export function PlotControlsButton() {
         Plot Controls
       </Button>
       <Drawer
-        container={parentRef.current}
         open={showDrawer}
         onClose={closeDrawer}
         anchor="right"
