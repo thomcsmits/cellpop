@@ -132,10 +132,11 @@ function ExpandedRowTick({
   formattedValue: row,
   ...tickLabelProps
 }: TickRendererProps) {
-  const { expandedSize } = useYScale();
+  const { expandedSize, nonExpandedSize } = useYScale();
   const selectedValues = useSelectedValues((s) => s.selectedValues);
   const rowMaxes = useRowMaxes();
   const axisConfig = useRowConfig();
+  const rows = useRows();
   const { flipAxisPosition } = axisConfig;
 
   const { openInNewTab, tickTitle, tickLabelStyle } =
@@ -154,14 +155,25 @@ function ExpandedRowTick({
     // Use the tick label as the axis label
     const Axis = flipAxisPosition ? AxisLeft : AxisRight;
     const max = rowMaxes[row!];
+    const range =
+      expandedSize > nonExpandedSize
+        ? [EXPANDED_ROW_PADDING, expandedSize - EXPANDED_ROW_PADDING / 2]
+        : [EXPANDED_ROW_PADDING, nonExpandedSize];
+
     const yScale = scaleLinear({
       domain: [max, 0],
-      range: [EXPANDED_ROW_PADDING, expandedSize - EXPANDED_ROW_PADDING],
+      range: range,
       nice: true,
     });
+
+    const top =
+      expandedSize > nonExpandedSize
+        ? y - nonExpandedSize / 2 - EXPANDED_ROW_PADDING * 2
+        : y - expandedSize / 2;
+
     return (
       <Axis
-        top={y - EXPANDED_ROW_PADDING * 2}
+        top={top}
         orientation="left"
         left={panelSize.width - tickLabelSize * LEFT_MULTIPLIER}
         scale={yScale}
