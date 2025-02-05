@@ -18,6 +18,7 @@ import {
 } from "../../contexts/DataContext";
 import { usePanelDimensions } from "../../contexts/DimensionsContext";
 import { useSelectedValues } from "../../contexts/ExpandedValuesContext";
+import { useNormalization } from "../../contexts/NormalizationContext";
 import { EXPANDED_ROW_PADDING, useYScale } from "../../contexts/ScaleContext";
 import { useSetTooltipData } from "../../contexts/TooltipDataContext";
 import { LEFT_MULTIPLIER } from "../side-graphs/constants";
@@ -160,9 +161,15 @@ function ExpandedRowTick({
         ? [EXPANDED_ROW_PADDING, expandedSize - EXPANDED_ROW_PADDING / 2]
         : [EXPANDED_ROW_PADDING, nonExpandedSize];
 
+    const normalizationIsNotNone = useNormalization(
+      (s) => s.normalization !== "None",
+    );
+
+    const domain = normalizationIsNotNone ? [1, 0] : [max, 0];
+
     const yScale = scaleLinear({
-      domain: [max, 0],
-      range: range,
+      domain,
+      range,
       nice: true,
     });
 
@@ -179,6 +186,9 @@ function ExpandedRowTick({
         scale={yScale}
         label={row}
         labelOffset={expandedSize / 2}
+        tickFormat={
+          normalizationIsNotNone ? (v) => `${(v as number) * 100}%` : undefined
+        }
         tickLabelProps={{
           fill: theme.palette.text.primary,
           style: tickLabelStyle,
