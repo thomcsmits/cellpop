@@ -122,7 +122,7 @@ function PlotControls({ onClose }: PlotControlsProps) {
   );
 }
 
-const StyledDrawer = styled(Drawer)(({ theme }) => ({
+const StyledDrawer = styled(Drawer)(() => ({
   position: "absolute",
   top: 0,
   zIndex: 1300,
@@ -133,9 +133,6 @@ export function PlotControlsButton() {
   const [showDrawer, setShowDrawer] = useState(false);
   const closeDrawer = useEventCallback(() => setShowDrawer(false));
   const openDrawer = useEventCallback(() => setShowDrawer(true));
-  const [slideDirection, setSlideDirection] = useState<"left" | "right">(
-    "right",
-  );
 
   return (
     <>
@@ -152,11 +149,9 @@ export function PlotControlsButton() {
         open={showDrawer}
         onClose={closeDrawer}
         anchor="right"
-        SlideProps={{
-          container: parentRef.current,
-          direction: slideDirection,
-          onEntered: () => setSlideDirection("left"),
-          onExited: () => setSlideDirection("right"),
+        transitionDuration={{
+          enter: 0,
+          exit: 300,
         }}
         ModalProps={{
           sx: {
