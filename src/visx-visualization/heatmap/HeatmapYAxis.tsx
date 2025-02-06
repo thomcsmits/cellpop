@@ -9,7 +9,7 @@ import {
 import { scaleLinear } from "@visx/scale";
 import { Text } from "@visx/text";
 import React, { useId } from "react";
-import { AxisConfig, useRowConfig } from "../../contexts/AxisConfigContext";
+import { useRowConfig } from "../../contexts/AxisConfigContext";
 import {
   useData,
   useRowCounts,
@@ -120,6 +120,7 @@ export default function HeatmapYAxis() {
           fill: theme.palette.text.primary,
           pointerEvents: "none",
           className: "y-axis-label text",
+          dy: `${TICK_TEXT_SIZE * LEFT_MULTIPLIER}px`,
         }}
         hideTicks={selectedValues.size > 0}
       />
