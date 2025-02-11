@@ -125,7 +125,7 @@ function PlotControls({ onClose }: PlotControlsProps) {
 const StyledDrawer = styled(Drawer)(() => ({
   position: "absolute",
   top: 0,
-  zIndex: 1300,
+  zIndex: 1099,
 }));
 
 export function PlotControlsButton() {
